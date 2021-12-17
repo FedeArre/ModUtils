@@ -3,15 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using UnityEngine;
 
 namespace SimplePartLoader
 {
-    public class SPL
+    internal class PartManager
     {
-        public static void LoadPart(AssetBundle bundle, string prefabName)
-        {
-            
-        }
+
     }
 }

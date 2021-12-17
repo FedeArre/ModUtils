@@ -7,11 +7,12 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
-    public class SPL
+    public class Part
     {
-        public static void LoadPart(AssetBundle bundle, string prefabName)
-        {
-            
-        }
+        GameObject Prefab;
+        CarProperties CarProps;
+        Partinfo PartInfo;
+
+
     }
 }
