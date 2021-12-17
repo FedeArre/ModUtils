@@ -27,8 +27,8 @@ namespace SimplePartLoader
             if (transparentData != null)
                 return;
 
-            transparentData = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot);
-            PartManager.transparentNames[CarProp]
+            transparentData = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, CarProps.PrefabName);
+            PartManager.transparentsData[CarProps.PrefabName] = transparentData; // This has to be checked.
         }
     }
 }
