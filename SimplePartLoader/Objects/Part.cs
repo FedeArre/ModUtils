@@ -9,15 +9,26 @@ namespace SimplePartLoader
 {
     public class Part
     {
-        GameObject Prefab;
-        CarProperties CarProps;
-        Partinfo PartInfo;
+        public GameObject Prefab;
+        public CarProperties CarProps;
+        public Partinfo PartInfo;
+
+        public TransparentData transparentData;
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
             Prefab = prefab;
             CarProps = carProp;
             PartInfo = partinfo;
+        }
+
+        public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
+        {
+            if (transparentData != null)
+                return;
+
+            transparentData = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot);
+            PartManager.transparentNames[CarProp]
         }
     }
 }

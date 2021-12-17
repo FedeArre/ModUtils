@@ -19,7 +19,12 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
+            PartManager.OnLoadCalled();
+        }
 
+        public override void Update()
+        {
+            PartManager.OnUpdateCalled();
         }
     }
 }

@@ -31,21 +31,29 @@ namespace SimplePartLoader
             if (!prefabCarProp || !prefabPartInfo)
                 throw new Exception("An essential component is missing!");
 
-            prefab.AddComponent<Pickup>().canHold = true;
+            // Automatically add some components
+            // Pickup and DISABLER for the part - Required so they work properly!
+            // Also add CarProperties to all nuts of the part, unexpected behaviour can happen if the component is missing.
+            Pickup prefabPickup = prefab.AddComponent<Pickup>();
+            prefabPickup.canHold = true;
+            prefabPickup.tempParent = GameObject.Find("hand");
+            prefabPickup.SphereCOl = GameObject.Find("SphereCollider");
+
             prefab.AddComponent<DISABLER>();
 
+            for(int i = 0; i < prefab.transform.childCount; i++)
+            {
+                Transform child = prefab.transform.GetChild(i);
+                if(child.GetComponent<HexNut>() || child.GetComponent<FlatNut>())
+                {
+                    child.GetComponent<CarProperties>();
+                }
+            }
 
-        }
+            Part p = new Part(prefab, prefabCarProp, prefabPartInfo);
+            PartManager.modLoadedParts.Add(p);
 
-        public static void SetupTransparent(Part part, string attachesTo, Vector3 transparentLocalPos, Vector3 transaprentLocalRot)
-        {
-
-        }
-
-        internal static void SendDebugMessage(string message)
-        {
-            if(ENABLE_DEBUG)
-                Debug.LogError(message);
+            GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
         }
     }
 }
