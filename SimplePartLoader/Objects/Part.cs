@@ -13,6 +13,11 @@ namespace SimplePartLoader
         CarProperties CarProps;
         Partinfo PartInfo;
 
-
+        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
+        {
+            Prefab = prefab;
+            CarProps = carProp;
+            PartInfo = partinfo;
+        }
     }
 }
