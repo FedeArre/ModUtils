@@ -21,20 +21,5 @@ namespace SimplePartLoader
         {
 
         }
-
-        public override void Continue()
-        {
-
-        }
-
-        public override void OnSave()
-        {
-
-        }
-
-        public override void Update()
-        {
-
-        }
     }
 }
