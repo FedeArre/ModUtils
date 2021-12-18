@@ -13,22 +13,20 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
-        public TransparentData transparentData;
+        internal List<TransparentData> transparentData; // Using a list since a Part can be attached into multiple places
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
             Prefab = prefab;
             CarProps = carProp;
             PartInfo = partinfo;
+
+            transparentData = new List<TransparentData>();
         }
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
         {
-            if (transparentData != null)
-                return;
-
-            transparentData = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, CarProps.PrefabName);
-            PartManager.transparentsData[CarProps.PrefabName] = transparentData; // This has to be checked.
+            transparentData.Add(new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, CarProps.PrefabName));
         }
     }
 }

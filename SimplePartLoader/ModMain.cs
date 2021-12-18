@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace SimplePartLoader
 {
@@ -11,11 +12,6 @@ namespace SimplePartLoader
         public override string Name => "SimplePartLoader";
         public override string Author => "Federico Arredondo";
         public override string Version => "dev";
-
-        public ModMain()
-        {
-
-        }
 
         public override void OnLoad()
         {

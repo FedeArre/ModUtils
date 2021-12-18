@@ -9,10 +9,16 @@ namespace SimplePartLoader
 {
     public class SPL
     {
-        static bool ENABLE_DEBUG;
-
-        public static void LoadPart(AssetBundle bundle, string prefabName)
+        /// <summary>
+        /// Adds a prefab as a car part into the game
+        /// </summary>
+        /// <param name="bundle">The bundle in which the prefab is located. Has to be loaded!</param>
+        /// <param name="prefabName">The name of the prefab to be loaded</param>
+        /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid, if the prefab already exists or if essential components are missing</exception>
+        /// <returns></returns>
+        public static Part LoadPart(AssetBundle bundle, string prefabName)
         {
+            // Safety checks
             if (!bundle)
                 throw new Exception("Tried to create a part without valid AssetBundle");
 
@@ -28,12 +34,15 @@ namespace SimplePartLoader
 
             CarProperties prefabCarProp = prefab.GetComponent<CarProperties>();
             Partinfo prefabPartInfo = prefab.GetComponent<Partinfo>();
+
             if (!prefabCarProp || !prefabPartInfo)
                 throw new Exception("An essential component is missing!");
 
-            // Automatically add some components
+            // Automatically add some components and also assign the correct layer.
             // Pickup and DISABLER for the part - Required so they work properly!
             // Also add CarProperties to all nuts of the part, unexpected behaviour can happen if the component is missing.
+            prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
+
             Pickup prefabPickup = prefab.AddComponent<Pickup>();
             prefabPickup.canHold = true;
             prefabPickup.tempParent = GameObject.Find("hand");
@@ -44,9 +53,12 @@ namespace SimplePartLoader
             for(int i = 0; i < prefab.transform.childCount; i++)
             {
                 Transform child = prefab.transform.GetChild(i);
-                if(child.GetComponent<HexNut>() || child.GetComponent<FlatNut>())
+                HexNut hx = child.GetComponent<HexNut>();
+
+                if (hx || child.GetComponent<FlatNut>())
                 {
                     child.GetComponent<CarProperties>();
+                    child.gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
                 }
             }
 
@@ -54,6 +66,8 @@ namespace SimplePartLoader
             PartManager.modLoadedParts.Add(p);
 
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
+
+            return p; // We provide the Part instance so the developer can setup the transparents
         }
     }
 }

@@ -12,18 +12,17 @@ namespace SimplePartLoader
     internal class PartManager
     {
         public static List<Part> modLoadedParts = new List<Part>();
-        public static Hashtable transparentsData = new Hashtable();
 
-        static bool translationsLoaded = false;
-        static bool hasTransparentSet = false;
+        static bool firstLoad = false;
 
         public static void OnLoadCalled()
         {
+            // Parts catalog - We need to first add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
             JunkPartsList jpl = junkyardListParent.GetComponent<JunkPartsList>();
             int sizeBeforeModify = jpl.Parts.Length;
 
-            Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count);
+            Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
             foreach (Part p in modLoadedParts)
             {
@@ -32,61 +31,39 @@ namespace SimplePartLoader
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
                 sizeBeforeModify++;
 
-                if (!translationsLoaded)
-                    LocalizationManager.Dictionary["English"].Add(p.CarProps.PartName, p.CarProps.PartName + "" + p.CarProps.PartNameExtension);
-            }
-
-            translationsLoaded = true;
-        }
-
-        public static void OnUpdateCalled()
-        {
-            if (tools.helditem == "Nothing" && hasTransparentSet)
-                hasTransparentSet = false;
-
-            else if(transparentsData[tools.helditem] != null)
-            {
-                hasTransparentSet = true;
-                TransparentData transparentData = (TransparentData) transparentsData[tools.helditem];
-
-                GameObject[] allObjects = UnityEngine.Object.FindObjectsOfType<GameObject>();
-                foreach (GameObject go in allObjects)
+                if (!firstLoad) // First load: We need to add our transparents
                 {
-                    if(go.name == transparentData.AttachesTo)
+                    foreach(TransparentData t in p.transparentData)
                     {
-                        if (!go.GetComponent<transparents>())
+                        if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
                         {
-                            bool hasTransparentAlready = false;
-                            for (int i = 0; i < go.transform.childCount; i++)
-                            {
-                                if (go.transform.GetChild(i).name == transparentData.Name)
-                                {
-                                    hasTransparentAlready = true;
-                                    break;
-                                }
-                            }
+                            GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
 
-                            if (hasTransparentAlready)
-                                continue;
+                            transparentObject.name = p.PartInfo.RenamedPrefab;
+                            
+                            transparentObject.transform.localPosition = new Vector3(0.3f, -0.06f, 0.1f);
+                            transparentObject.transform.localScale = Vector3.one;
+                            transparentObject.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
 
-                            GameObject transparentSpoiler = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            transparentObject.tag = "transparentpart";
+                            transparentObject.layer = LayerMask.NameToLayer("TransparentParts");
 
-                            UnityEngine.Object.Destroy(transparentSpoiler.GetComponent<BoxCollider>());
+                            transparents transparentComponent = transparentObject.AddComponent<transparents>();
+                            // We add dummy data so the component doesn't crash.
+                            transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
+                            transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
-                            transparentSpoiler.name = transparentData.Name;
-                            transparentSpoiler.transform.SetParent(go.transform);
-                            transparentSpoiler.transform.localPosition = transparentData.LocalPos;
-                            transparentSpoiler.transform.localScale = Vector3.one;
-                            transparentSpoiler.transform.localRotation = transparentData.LocalRot;
-                            transparentSpoiler.tag = "transparentpart";
-                            transparentSpoiler.layer = 8; // layername is TransparentParts
-
-                            transparents t = transparentSpoiler.AddComponent<transparents>();
-                            t.ATTACHABLES = new transparents.AttachingObjects[0];
-                            t.DEPENDANTS = new transparents.dependantObjects[0];
+                            transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform); // We load the cached resource as GameObject and 
                         }
                     }
+
+                    LocalizationManager.Dictionary["English"].Add(p.CarProps.PartName, p.CarProps.PartName + "" + p.CarProps.PartNameExtension);
+
+                    firstLoad = true;
                 }
+            }
+
         }
     }
 }
