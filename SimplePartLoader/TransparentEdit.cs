@@ -11,8 +11,7 @@ namespace SimplePartLoader
     {
         GameObject transparentObject;
         GameObject secondaryObject;
-        TransparentData transparentData;
-        transparents transparent;
+        public TransparentData transparentData;
 
         string dataShown = string.Empty;
 
@@ -93,7 +92,7 @@ namespace SimplePartLoader
                     transparentObject.transform.localPosition.Set(actualPos.x, actualPos.y, actualPos.z + (Input.GetKey(KeyCode.LeftShift) ? 0.1f : 0.01f));
             }
 
-            if(actualPos != transparentObject.transform.localPosition || actualRot != transparentObject.transform.localRotation.eulerAngles)
+            if (actualPos != transparentObject.transform.localPosition || actualRot != transparentObject.transform.localRotation.eulerAngles)
             {
                 Partinfo[] componentsInChildren = transparentObject.GetComponentsInChildren<Partinfo>();
                 for (int i = 0; i < componentsInChildren.Length; i++)
@@ -102,6 +101,7 @@ namespace SimplePartLoader
                     comp.remove(false);
                     comp.attach();
                 }
+            }
 
             actualPos = transparentObject.transform.localPosition;
             actualRot = transparentObject.transform.localRotation.eulerAngles;
@@ -109,7 +109,7 @@ namespace SimplePartLoader
 
         void OnGUI()
         {
-            dataShown = GUI.TextArea(new Rect(50, 50, 200, 600), dataShown);
+            dataShown = GUI.TextArea(new Rect(50, 50, 400, 300), dataShown);
         }
     }
 }

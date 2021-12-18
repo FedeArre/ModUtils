@@ -4,8 +4,6 @@ namespace SimplePartLoader
 {
     public class TransparentData
     {
-        private readonly Vector3 DEFAULT_SCALE = new Vector3(0.1f, 0.1f, 0.1f);
-
         public string Name;
         public string AttachesTo;
         public Vector3 LocalPos;
@@ -17,7 +15,7 @@ namespace SimplePartLoader
             AttachesTo = attachesTo;
             LocalPos = localPos;
             LocalRot = localRot;
-            Scale = DEFAULT_SCALE;
+            Scale = Vector3.one;
         }
 
         public TransparentData(string attachesTo, Vector3 localPos, Quaternion localRot, Vector3 scale)
