@@ -52,7 +52,8 @@ namespace SimplePartLoader
                             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
                             if (ModMain.IsTransparentEditingEnabled && p.TestingEnabled)
-                                transparentObject.AddComponent<TransparentEdit>();
+                                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+                            
 
                             transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform); // We load the cached resource as GameObject and 
                         }
