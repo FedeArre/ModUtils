@@ -90,6 +90,10 @@ namespace SimplePartLoader
                     transparentObject.transform.localRotation.eulerAngles.Set(actualRot.x, actualRot.y, actualRot.z + (Input.GetKey(KeyCode.LeftShift) ? 0.1f : 0.01f));
                 else
                     transparentObject.transform.localPosition.Set(actualPos.x, actualPos.y, actualPos.z + (Input.GetKey(KeyCode.LeftShift) ? 0.1f : 0.01f));
+            } 
+            else if (Input.GetKeyDown(KeyCode.Z))
+            {
+                secondaryObject.GetComponent<Renderer>().enabled = false;
             }
 
             if (actualPos != transparentObject.transform.localPosition || actualRot != transparentObject.transform.localRotation.eulerAngles)
