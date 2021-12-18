@@ -17,7 +17,7 @@ namespace SPL_Tester
         public Class1()
         {
             AssetBundle bundle = AssetBundle.LoadFromMemory(Properties.Resources.spoiler_example);
-            Part p = SPL.LoadPart(bundle, "Spoiler");
+            Part p = SPL.LoadPart(bundle, "SpoilerExample");
             p.SetupTransparent("TrunkDoor06", new Vector3(0f, 0f, 0f), Quaternion.Euler(0f, 0f, 0f));
             bundle.Unload(false);
         }
