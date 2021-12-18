@@ -34,13 +34,14 @@ namespace SimplePartLoader
                         if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
                         {
                             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+
                             GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
 
                             transparentObject.name = p.PartInfo.RenamedPrefab;
                             
-                            transparentObject.transform.localPosition = new Vector3(0.3f, -0.06f, 0.1f);
-                            transparentObject.transform.localScale = Vector3.one;
-                            transparentObject.transform.localRotation = Quaternion.Euler(0f, 90f, 0f);
+                            transparentObject.transform.localPosition = t.LocalPos;
+                            transparentObject.transform.localScale = t.Scale;
+                            transparentObject.transform.localRotation = t.LocalRot;
 
                             transparentObject.tag = "transparentpart";
                             transparentObject.layer = LayerMask.NameToLayer("TransparentParts");
@@ -49,6 +50,9 @@ namespace SimplePartLoader
                             // We add dummy data so the component doesn't crash.
                             transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
                             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
+
+                            if (ModMain.IsTransparentEditingEnabled && p.TestingEnabled)
+                                transparentObject.AddComponent<TransparentEdit>();
 
                             transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform); // We load the cached resource as GameObject and 
                         }
