@@ -48,13 +48,14 @@ namespace SimplePartLoader
 
             prefabCarProp.PREFAB = prefab; // Saving will not work without this due to a condition located in Saver.Save()
             Transform[] childs = prefab.GetComponentsInChildren<Transform>();
-            for(int i = 0; i < prefab.transform.childCount; i++)
+            for(int i = 0; i < childs.Length; i++)
             {
+                Debug.LogError(childs[i].name);
                 HexNut hx = childs[i].GetComponent<HexNut>();
 
                 if (hx || childs[i].GetComponent<FlatNut>())
                 {
-                    childs[i].GetComponent<CarProperties>();
+                    childs[i].gameObject.AddComponent<CarProperties>();
                     childs[i].gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
                 }
             }
