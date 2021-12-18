@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -51,15 +47,15 @@ namespace SimplePartLoader
             prefab.AddComponent<DISABLER>();
 
             prefabCarProp.PREFAB = prefab; // Saving will not work without this due to a condition located in Saver.Save()
+            Transform[] childs = prefab.GetComponentsInChildren<Transform>();
             for(int i = 0; i < prefab.transform.childCount; i++)
             {
-                Transform child = prefab.transform.GetChild(i);
-                HexNut hx = child.GetComponent<HexNut>();
+                HexNut hx = childs[i].GetComponent<HexNut>();
 
-                if (hx || child.GetComponent<FlatNut>())
+                if (hx || childs[i].GetComponent<FlatNut>())
                 {
-                    child.GetComponent<CarProperties>();
-                    child.gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
+                    childs[i].GetComponent<CarProperties>();
+                    childs[i].gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
                 }
             }
 
