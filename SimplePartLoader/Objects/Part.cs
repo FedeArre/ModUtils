@@ -26,7 +26,7 @@ namespace SimplePartLoader
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
         {
-            transparentData.Add(new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, CarProps.PrefabName));
+            transparentData.Add(new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot));
         }
     }
 }

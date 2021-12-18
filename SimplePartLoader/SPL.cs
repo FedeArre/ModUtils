@@ -50,6 +50,7 @@ namespace SimplePartLoader
 
             prefab.AddComponent<DISABLER>();
 
+            prefabCarProp.PREFAB = prefab; // Saving will not work without this due to a condition located in Saver.Save()
             for(int i = 0; i < prefab.transform.childCount; i++)
             {
                 Transform child = prefab.transform.GetChild(i);
@@ -64,6 +65,8 @@ namespace SimplePartLoader
 
             Part p = new Part(prefab, prefabCarProp, prefabPartInfo);
             PartManager.modLoadedParts.Add(p);
+
+            Saver.modParts.Add(p.CarProps.PrefabName, prefab);
 
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 

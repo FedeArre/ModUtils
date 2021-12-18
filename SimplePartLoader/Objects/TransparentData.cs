@@ -14,12 +14,11 @@ namespace SimplePartLoader
         public Vector3 LocalPos;
         public Quaternion LocalRot;
 
-        public TransparentData(string attachesTo, Vector3 localPos, Quaternion localRot, String name)
+        public TransparentData(string attachesTo, Vector3 localPos, Quaternion localRot)
         {
             AttachesTo = attachesTo;
             LocalPos = localPos;
             LocalRot = localRot;
-            Name = name;
         }
     }
 }
