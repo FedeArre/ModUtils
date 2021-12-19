@@ -50,7 +50,6 @@ namespace SimplePartLoader
             Transform[] childs = prefab.GetComponentsInChildren<Transform>();
             for(int i = 0; i < childs.Length; i++)
             {
-                Debug.LogError(childs[i].name);
                 HexNut hx = childs[i].GetComponent<HexNut>();
 
                 if (hx || childs[i].GetComponent<FlatNut>())
