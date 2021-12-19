@@ -9,30 +9,22 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
-        internal bool TestingEnabled;
-
-        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, bool testingEnabled = false)
+        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
             Prefab = prefab;
             CarProps = carProp;
             PartInfo = partinfo;
 
-            TestingEnabled = testingEnabled;
         }
 
-        public void EnableTransparentEditing()
+        public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
-            TestingEnabled = true;
+            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
         }
 
-        public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
+        public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)
         {
-            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot);
-        }
-
-        public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale)
-        {
-            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale);
+            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable);
         }
     }
 }
