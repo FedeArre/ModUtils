@@ -57,6 +57,8 @@ namespace SimplePartLoader
                 {
                     childs[i].gameObject.AddComponent<CarProperties>();
                     childs[i].gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
+                    if (!childs[i].GetComponent<BoxCollider>())
+                        childs[i].gameObject.AddComponent<BoxCollider>();
                 }
             }
 
