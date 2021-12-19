@@ -33,29 +33,29 @@ namespace SimplePartLoader
                     {
                         if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
                         {
-                            GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                            GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-                            GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
+                            GameObject.Destroy(gameObject.GetComponent<BoxCollider>());
 
-                            transparentObject.name = p.PartInfo.RenamedPrefab;
+                            gameObject.name = p.PartInfo.RenamedPrefab;
                             
-                            transparentObject.transform.localPosition = t.LocalPos;
-                            transparentObject.transform.localScale = t.Scale;
-                            transparentObject.transform.localRotation = t.LocalRot;
+                            gameObject.transform.localPosition = t.LocalPos;
+                            gameObject.transform.localScale = t.Scale;
+                            gameObject.transform.localRotation = t.LocalRot;
 
-                            transparentObject.tag = "transparentpart";
-                            transparentObject.layer = LayerMask.NameToLayer("TransparentParts");
+                            gameObject.tag = "transparentpart";
+                            gameObject.layer = LayerMask.NameToLayer("TransparentParts");
 
-                            transparents transparentComponent = transparentObject.AddComponent<transparents>();
+                            transparents transparentComponent = gameObject.AddComponent<transparents>();
                             // We add dummy data so the component doesn't crash.
                             transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
                             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
                             if (ModMain.IsTransparentEditingEnabled && p.TestingEnabled)
-                                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+                                gameObject.AddComponent<TransparentEdit>().transparentData = t;
                             
 
-                            transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform); // We load the cached resource as GameObject and 
+                            gameObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform); // We load the cached resource as GameObject and 
                         }
                     }
 
