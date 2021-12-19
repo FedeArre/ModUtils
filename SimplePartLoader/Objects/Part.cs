@@ -11,7 +11,7 @@ namespace SimplePartLoader
 
         internal List<TransparentData> transparentData; // Using a list since a Part can be attached into multiple places
 
-        public bool TestingEnabled;
+        internal bool TestingEnabled;
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, bool testingEnabled = false)
         {
@@ -22,6 +22,11 @@ namespace SimplePartLoader
             TestingEnabled = testingEnabled;
 
             transparentData = new List<TransparentData>();
+        }
+
+        public void EnableTransparentEditing()
+        {
+            TestingEnabled = true;
         }
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)

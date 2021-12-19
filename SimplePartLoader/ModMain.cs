@@ -11,8 +11,6 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "dev";
 
-        public static bool IsTransparentEditingEnabled = false;
-
         public override void OnLoad()
         {
             PartManager.OnLoadCalled();

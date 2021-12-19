@@ -71,10 +71,5 @@ namespace SimplePartLoader
 
             return p; // We provide the Part instance so the developer can setup the transparents
         }
-
-        public static void EnableTransparentEditor()
-        {
-            ModMain.IsTransparentEditingEnabled = true;
-        }
     }
 }

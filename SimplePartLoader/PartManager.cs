@@ -51,7 +51,7 @@ namespace SimplePartLoader
                             transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
                             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
-                            if (ModMain.IsTransparentEditingEnabled && p.TestingEnabled)
+                            if (p.TestingEnabled)
                                 gameObject.AddComponent<TransparentEdit>().transparentData = t;
                             
 
