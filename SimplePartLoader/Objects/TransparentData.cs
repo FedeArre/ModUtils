@@ -10,16 +10,18 @@ namespace SimplePartLoader
         public Quaternion LocalRot;
         public Vector3 Scale;
 
-        public TransparentData(string attachesTo, Vector3 localPos, Quaternion localRot)
+        public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot)
         {
+            Name = name;
             AttachesTo = attachesTo;
             LocalPos = localPos;
             LocalRot = localRot;
             Scale = Vector3.one;
         }
 
-        public TransparentData(string attachesTo, Vector3 localPos, Quaternion localRot, Vector3 scale)
+        public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, Vector3 scale)
         {
+            Name = name;
             AttachesTo = attachesTo;
             LocalPos = localPos;
             LocalRot = localRot;

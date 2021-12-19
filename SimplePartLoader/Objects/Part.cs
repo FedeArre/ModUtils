@@ -9,8 +9,6 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
-        internal Hashtable transparentData; // Using a list since a Part can be attached into multiple places
-
         internal bool TestingEnabled;
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, bool testingEnabled = false)
@@ -20,8 +18,6 @@ namespace SimplePartLoader
             PartInfo = partinfo;
 
             TestingEnabled = testingEnabled;
-
-            transparentData = new Hashtable();
         }
 
         public void EnableTransparentEditing()
@@ -31,12 +27,12 @@ namespace SimplePartLoader
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
         {
-            transparentData[attachesTo] = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot);
+            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot);
         }
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale)
         {
-            transparentData[attachesTo] = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, scale);
+            PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale);
         }
     }
 }

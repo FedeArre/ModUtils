@@ -1,5 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,20 +9,52 @@ namespace SimplePartLoader
     internal class PartManager
     {
         public static List<Part> modLoadedParts = new List<Part>();
+        public static Hashtable transparentData; // Using a list since a Part can be attached into multiple places
 
-        static bool firstLoad = false;
+        static bool hasFirstLoadOccured = false;
 
         public static void OnLoadCalled()
         {
             // Parts catalog - We need to first add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
+            GameObject carList = GameObject.Find("CarsParent"); // Car list of the game - Used for adding transparents
+            GameObject[] cars = carList.GetComponent<CarList>().Cars;
+
             JunkPartsList jpl = junkyardListParent.GetComponent<JunkPartsList>();
             int sizeBeforeModify = jpl.Parts.Length;
 
             Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
-            // Now we add our transparents into the game
+            foreach(Part p in modLoadedParts)
+            {
+                GameObject.DontDestroyOnLoad(p.Prefab);
 
+                jpl.Parts[sizeBeforeModify] = p.Prefab;
+                sizeBeforeModify++;
+            }
+
+            // Now we add our transparents into the game
+            foreach(GameObject car in cars)
+            {
+                Transform[] childs = car.GetComponentsInChildren<Transform>();
+
+                foreach (Part p in modLoadedParts)
+                {
+                    foreach (Transform child in childs) // We have to check in every car part from the vehicles prefab
+                    {
+                        if (p.transparentData[child.name] != null) // We know that 
+                        {
+                            if (!child.GetComponent<transparents>())
+                            {
+                                TransparentData t = (TransparentData) p.transparentData[child.name];
+
+
+                            }
+                        }
+                    }
+
+                }
+            }
         }
 
         internal static GameObject GetTransparentReadyObject(Part p, TransparentData t)
