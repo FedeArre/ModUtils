@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -9,7 +9,7 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
-        internal List<TransparentData> transparentData; // Using a list since a Part can be attached into multiple places
+        internal Hashtable transparentData; // Using a list since a Part can be attached into multiple places
 
         internal bool TestingEnabled;
 
@@ -21,7 +21,7 @@ namespace SimplePartLoader
 
             TestingEnabled = testingEnabled;
 
-            transparentData = new List<TransparentData>();
+            transparentData = new Hashtable();
         }
 
         public void EnableTransparentEditing()
@@ -31,12 +31,12 @@ namespace SimplePartLoader
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot)
         {
-            transparentData.Add(new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot));
+            transparentData[attachesTo] = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot);
         }
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale)
         {
-            transparentData.Add(new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, scale));
+            transparentData[attachesTo] = new TransparentData(attachesTo, transparentLocalPos, transaprentLocalRot, scale);
         }
     }
 }
