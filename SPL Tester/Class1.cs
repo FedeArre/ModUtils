@@ -21,7 +21,7 @@ namespace SPL_Tester
             Part p = SPL.LoadPart(bundle, "SpoilerExample");
 
             p.TestingEnabled = true;
-            p.SetupTransparent("TrunkDoor06", new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, -90f, 0f));
+            p.SetupTransparent("TrunkDoor06", new Vector3(0f, 0f, 0f), Quaternion.Euler(-90f, 90f, 0f));
             bundle.Unload(false);
         }
     }
