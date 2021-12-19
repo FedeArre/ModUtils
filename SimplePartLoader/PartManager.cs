@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -9,7 +10,7 @@ namespace SimplePartLoader
     internal class PartManager
     {
         public static List<Part> modLoadedParts = new List<Part>();
-        public static Hashtable transparentData; // Using a list since a Part can be attached into multiple places
+        public static Hashtable transparentData = new Hashtable(); // Using a list since a Part can be attached into multiple places
 
         static bool hasFirstLoadOccured = false;
 
@@ -25,49 +26,66 @@ namespace SimplePartLoader
 
             Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
-            foreach(Part p in modLoadedParts)
+            foreach (Part p in modLoadedParts)
             {
                 GameObject.DontDestroyOnLoad(p.Prefab);
 
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
                 sizeBeforeModify++;
+
+                if(!hasFirstLoadOccured)
+                    LocalizationManager.Dictionary["English"].Add(p.CarProps.PartName, p.CarProps.PartName);
             }
 
             // Now we add our transparents into the game
-            foreach(GameObject car in cars)
+            for(int i = 0; i < cars.Length; i++)
             {
-                Transform[] childs = car.GetComponentsInChildren<Transform>();
+                Transform[] childs = cars[i].GetComponentsInChildren<Transform>();
 
-                foreach (Part p in modLoadedParts)
+                foreach (Transform child in childs) // We check for every car part in the game
                 {
-                    foreach (Transform child in childs) // We have to check in every car part from the vehicles prefab
+                    TransparentData t = (TransparentData)transparentData[child.name];
+
+                    if (t != null)
                     {
-                        if (p.transparentData[child.name] != null) // We know that 
+                        if (!child.GetComponent<transparents>()) // Add transparent into game for car prefabs.
                         {
-                            if (!child.GetComponent<transparents>())
+                            GameObject transparentObject = GetTransparentReadyObject(t);
+                            
+                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(GetTransformPath(child))); // Modify directly the object in the CarList
+
+                            transparentObject.transform.localPosition = t.LocalPos;
+                            transparentObject.transform.localScale = t.Scale;
+                            transparentObject.transform.localRotation = t.LocalRot;
+                        }
+
+                        if (!hasFirstLoadOccured) // Add transparent into game resources for loading on saves.
+                        {
+                            if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
                             {
-                                TransparentData t = (TransparentData) p.transparentData[child.name];
+                                GameObject transparentObject = GetTransparentReadyObject(t);
+                                transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform);
 
-
+                                transparentObject.transform.localPosition = t.LocalPos;
+                                transparentObject.transform.localScale = t.Scale;
+                                transparentObject.transform.localRotation = t.LocalRot;
                             }
                         }
                     }
-
                 }
             }
+
+            if (!hasFirstLoadOccured)
+                hasFirstLoadOccured = true;
         }
 
-        internal static GameObject GetTransparentReadyObject(Part p, TransparentData t)
+        internal static GameObject GetTransparentReadyObject(TransparentData t)
         {
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
             GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
 
-            transparentObject.name = p.PartInfo.RenamedPrefab; // Renamed prefab is the one that the game uses for looking for transparent. Prefab name in car props is used for identify which prefab has to be loaded.
-
-            transparentObject.transform.localPosition = t.LocalPos;
-            transparentObject.transform.localScale = t.Scale;
-            transparentObject.transform.localRotation = t.LocalRot;
+            transparentObject.name = t.Name; // Renamed prefab is the one that the game uses for looking for transparent. Prefab name in car props is used for identify which prefab has to be loaded.
 
             transparentObject.tag = "transparentpart";
             transparentObject.layer = LayerMask.NameToLayer("TransparentParts");
@@ -77,10 +95,25 @@ namespace SimplePartLoader
             transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
-            if (p.TestingEnabled)
-                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+            if (t.TestingEnabled)
+               transparentObject.AddComponent<TransparentEdit>().transparentData = t;
 
             return transparentObject;
+        }
+
+        internal static string GetTransformPath(Transform transform)
+        {
+            string path = transform.name;
+            while (transform.parent != null)
+            {
+                transform = transform.parent;
+                if (transform.parent == null)
+                    return path;
+
+                path = transform.name + "/" + path;
+            }
+
+            return null; // Will never return this!
         }
     }
 }
