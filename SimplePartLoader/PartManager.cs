@@ -44,7 +44,7 @@ namespace SimplePartLoader
 
                 foreach (Transform child in childs) // We check for every car part in the game
                 {
-                    TransparentData t = (TransparentData)transparentData[child.name];
+                    TransparentData t = (TransparentData) transparentData[child.name];
 
                     if (t != null)
                     {

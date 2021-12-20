@@ -35,6 +35,10 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PaintIn3D">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\PaintIn3D.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Core" />
