@@ -24,9 +24,9 @@ namespace SimplePartLoader
             GameObject.Destroy(secondaryObject.GetComponent<BoxCollider>());
             secondaryObject.transform.SetParent(gameObject.transform);
 
-            secondaryObject.transform.localPosition = Vector3.zero;
-            secondaryObject.transform.localScale = Vector3.one;
-            secondaryObject.transform.localRotation = Quaternion.identity;
+            secondaryObject.transform.localPosition = transparentData.LocalPos;
+            secondaryObject.transform.localScale = transparentData.Scale;
+            secondaryObject.transform.localRotation = transparentData.LocalRot;
 
             actualPos = gameObject.transform.localPosition;
             actualRot = gameObject.transform.localRotation.eulerAngles;
@@ -107,6 +107,8 @@ namespace SimplePartLoader
 
             actualPos = gameObject.transform.localPosition;
             actualRot = gameObject.transform.localRotation.eulerAngles;
+            secondaryObject.transform.localPosition = actualPos;
+            secondaryObject.transform.localEulerAngles = actualRot;
         }
 
         void OnGUI()
