@@ -7,14 +7,14 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
-    internal class PartManager
+    public class PartManager
     {
         public static List<Part> modLoadedParts = new List<Part>();
         public static Hashtable transparentData = new Hashtable(); // Using a list since a Part can be attached into multiple places
 
-        static bool hasFirstLoadOccured = false;
+        internal static bool hasFirstLoadOccured = false;
 
-        public static void OnLoadCalled()
+        internal static void OnLoadCalled()
         {
             // Parts catalog - We need to first add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
