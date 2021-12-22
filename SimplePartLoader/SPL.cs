@@ -5,20 +5,6 @@ namespace SimplePartLoader
 {
     public class SPL
     {
-        public enum Language
-        {
-            English,
-            Portuguese,
-            German,
-            Russian,
-            Hungarian,
-            French,
-            Spanish,
-            Polish,
-            Swedish,
-            Czech
-        }
-
         /// <summary>
         /// Adds a prefab as a car part into the game
         /// </summary>
@@ -87,6 +73,20 @@ namespace SimplePartLoader
             return p; // We provide the Part instance so the developer can setup the transparents
         }
 
+        /*public enum Language
+        {
+            English,
+            Portuguese,
+            German,
+            Russian,
+            Hungarian,
+            French,
+            Spanish,
+            Polish,
+            Swedish,
+            Czech
+        }
+
         internal static string GetLanguageByType(Language lang)
         {
             switch (lang)
@@ -124,6 +124,6 @@ namespace SimplePartLoader
                 default:
                     return "English";
             }
-        }
+        }*/
     }
 }

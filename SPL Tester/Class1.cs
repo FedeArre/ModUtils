@@ -21,13 +21,5 @@ namespace SPL_Tester
             Part examplePart = SPL.LoadPart(bundle, "AwesomeSpoiler"); // "AwesomeSpoiler" is the name of the prefab.
             bundle.Unload(false);
         }
-
-        public override void OnLoad()
-        {
-            foreach(var asd in LocalizationManager.Dictionary)
-            {
-                Debug.LogError(asd.Key);
-            }
-        }
     }
 }

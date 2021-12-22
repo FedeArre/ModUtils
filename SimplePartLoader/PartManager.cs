@@ -37,7 +37,7 @@ namespace SimplePartLoader
                 {
                     foreach(var dictionary in LocalizationManager.Dictionary)
                     {
-                        dictionary.Value.Add(p.CarProps.PartName, p.GetLocale(dictionary.Key));
+                        dictionary.Value.Add(p.CarProps.PartName, p.CarProps.PartName);
                     }
                 }
             }

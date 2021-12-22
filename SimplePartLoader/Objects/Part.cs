@@ -13,7 +13,7 @@ namespace SimplePartLoader
 
         internal bool Paintable;
 
-        internal Hashtable languages = new Hashtable();
+        //internal Hashtable languages = new Hashtable();
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
@@ -21,10 +21,10 @@ namespace SimplePartLoader
             CarProps = carProp;
             PartInfo = partinfo;
 
-            foreach (var language in (SPL.Language[]) Enum.GetValues(typeof(SPL.Language)))
+            /*foreach (var language in (SPL.Language[]) Enum.GetValues(typeof(SPL.Language)))
             {
                 languages[SPL.GetLanguageByType(language)] = CarProps.PartName;
-            }
+            }*/
         }
 
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
@@ -51,7 +51,7 @@ namespace SimplePartLoader
             Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
         }
 
-        internal string GetLocale(string key)
+        /*internal string GetLocale(string key)
         {
             if(languages.ContainsKey(key))
                 return (string) languages[key];
@@ -62,6 +62,6 @@ namespace SimplePartLoader
         public void Localize(SPL.Language language, string newTranslation)
         {
             languages[SPL.GetLanguageByType(language)] = CarProps.PartName;
-        }
+        }*/
     }
 }
