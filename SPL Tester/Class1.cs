@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Assets.SimpleLocalization;
 using SimplePartLoader;
 using UnityEngine;
 
@@ -14,12 +15,19 @@ namespace SPL_Tester
         public override string Author => "Your name";
         public override string Version => "1.0";
 
-        public Class1()
+        public Class1() // This is the mod constructor - SimplePartLoader has to be used in the constructor of the mod only
         {
             AssetBundle bundle = AssetBundle.LoadFromMemory(Properties.Resources.spoiler_example);
-            Part p = SPL.LoadPart(bundle, "SpoilerExample");
-            p.SetupTransparent("TrunkDoor06", new Vector3(0f, 0.045f, -0.55f), Quaternion.Euler(274f, 180f, 0f));
+            Part examplePart = SPL.LoadPart(bundle, "AwesomeSpoiler"); // "AwesomeSpoiler" is the name of the prefab.
             bundle.Unload(false);
+        }
+
+        public override void OnLoad()
+        {
+            foreach(var asd in LocalizationManager.Dictionary)
+            {
+                Debug.LogError(asd.Key);
+            }
         }
     }
 }

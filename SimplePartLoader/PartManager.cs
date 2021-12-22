@@ -34,7 +34,12 @@ namespace SimplePartLoader
                 sizeBeforeModify++;
 
                 if(!hasFirstLoadOccured)
-                    LocalizationManager.Dictionary["English"].Add(p.CarProps.PartName, p.CarProps.PartName);
+                {
+                    foreach(var dictionary in LocalizationManager.Dictionary)
+                    {
+                        dictionary.Value.Add(p.CarProps.PartName, p.GetLocale(dictionary.Key));
+                    }
+                }
             }
 
             // Now we add our transparents into the game
