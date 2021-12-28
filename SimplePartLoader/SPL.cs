@@ -73,34 +73,6 @@ namespace SimplePartLoader
             return p; // We provide the Part instance so the developer can setup the transparents
         }
 
-        public static Part LoadDummy(AssetBundle bundle, string prefabName)
-        {
-            // Safety checks
-            if (!bundle)
-                throw new Exception("Tried to create a part without valid AssetBundle");
-
-            if (String.IsNullOrWhiteSpace(prefabName))
-                throw new Exception("Tried to create a part without prefab name");
-
-            if (Saver.modParts.ContainsKey(prefabName))
-                throw new Exception($"Tried to create an already existing prefab ({prefabName})");
-
-            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
-            if (!prefab)
-                throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
-
-            prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
-
-            Part p = new Part(prefab, null, null);
-            PartManager.modLoadedParts.Add(p);
-
-            //Saver.modParts.Add(p.CarProps.PrefabName, prefab); to-do a way to this.
-
-            GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
-
-            return p; // We provide the Part instance so the developer can setup the transparents
-        }
-
         public static void SetupCarPartFromDummy(Part p, string partName, string carName)
         {
             // We first delete all the components from our part.
