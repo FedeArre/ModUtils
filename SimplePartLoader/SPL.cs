@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using SimplePartLoader.Utils;
 
 namespace SimplePartLoader
 {
@@ -100,6 +101,100 @@ namespace SimplePartLoader
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 
             return p;
+        }
+
+        public static void CopyFullPartToPrefab(Part p, string partName, string carName)
+        {
+            // We first delete all the components from our part.
+            foreach (Component comp in p.Prefab.GetComponents<Component>())
+            {
+                if (!(comp is Transform))
+                {
+                    GameObject.Destroy(comp);
+                }
+            }
+
+            // Then we look up for the car part and store it
+            GameObject carPart = GetCarPart(partName, carName);
+
+            if (!carPart)
+            {
+                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! {partName} in {carName}");
+                return;
+            }
+
+            // Now we copy all the components from the car part into the prefab
+            foreach (Component comp in carPart.GetComponents<Component>())
+            {
+                if (!(comp is Transform))
+                {
+                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    Debug.LogError("copying comp " + comp.GetType());
+                }
+            }
+        }
+
+        public static void CopyPartToPrefab(Part p, string partName, string carName)
+        {
+            // We first delete all the components from our part.
+            foreach (Component comp in p.Prefab.GetComponents<Component>())
+            {
+                if (!(comp is Transform))
+                {
+                    GameObject.Destroy(comp);
+                }
+            }
+
+            // Then we look up for the car part and store it
+            GameObject carPart = GetCarPart(partName, carName);
+
+            if (!carPart)
+            {
+                Debug.LogError($"[SPL] Car part was not found on CopyPartToPrefab! {partName} in {carName}");
+                return;
+            }
+
+            // Now we copy all the components from the car part into the prefab
+            foreach (Component comp in carPart.GetComponents<Component>())
+            {
+                if (!(comp is Transform) && !(comp is Collider) && !(comp is Renderer) && !(comp is MeshFilter))
+                {
+                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    Debug.LogError("copying comp " + comp.GetType());
+                }
+            }
+        }
+
+        internal static GameObject GetCarPart(string partName, string carName)
+        {
+            GameObject carPart = null, carsParent = GameObject.Find("CarsParent");
+            foreach (GameObject car in carsParent.GetComponent<CarList>().Cars)
+            {
+                if (car.name == carName)
+                {
+                    Transform[] childs = car.transform.GetComponentsInChildren<Transform>();
+                    foreach (Transform child in childs)
+                    {
+                        if (child.name == partName)
+                        {
+                            if (!child.GetComponent<transparents>())
+                            {
+                                carPart = child.gameObject;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return carPart;
+        }
+        internal static void InvokeFirstLoadEvent()
+        {
+            if(FirstLoad != null)
+            {
+                FirstLoad?.Invoke();
+            }
         }
 
         /*public enum Language
