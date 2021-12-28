@@ -10,12 +10,20 @@ namespace SimplePartLoader
     public class PartManager
     {
         public static List<Part> modLoadedParts = new List<Part>();
+        public static List<Part> dummyParts = new List<Part>();
+
         public static Hashtable transparentData = new Hashtable(); // Using a list since a Part can be attached into multiple places
 
         internal static bool hasFirstLoadOccured = false;
 
         internal static void OnLoadCalled()
         {
+            // First, we need to check if this is the first load.
+            if (!hasFirstLoadOccured)
+            {
+
+            }
+
             // Parts catalog - We need to first add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
             GameObject carList = GameObject.Find("CarsParent"); // Car list of the game - Used for adding transparents

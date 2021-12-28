@@ -5,6 +5,9 @@ namespace SimplePartLoader
 {
     public class SPL
     {
+        public delegate void FirstLoadDelegate();
+        public static event FirstLoadDelegate FirstLoad;
+
         /// <summary>
         /// Adds a prefab as a car part into the game
         /// </summary>
@@ -73,58 +76,30 @@ namespace SimplePartLoader
             return p; // We provide the Part instance so the developer can setup the transparents
         }
 
-        public static void SetupCarPartFromDummy(Part p, string partName, string carName)
+        public static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
-            // We first delete all the components from our part.
-            foreach (Component comp in p.Prefab.GetComponents<Component>())
-            {
-                if(!(comp is Transform))
-                {
-                    GameObject.Destroy(comp);
-                }
-            }
+            // Safety checks
+            if (!bundle)
+                throw new Exception("Tried to create a part without valid AssetBundle");
 
-            // Then we look up for the car part and store it
-            GameObject carPart = null, carsParent = GameObject.Find("CarsParent");
-            foreach(GameObject car in carsParent.GetComponent<CarList>().Cars)
-            {
-                if(car.name == carName)
-                {
-                    Transform[] childs = car.transform.GetComponentsInChildren<Transform>();
-                    foreach(Transform child in childs)
-                    {
-                        if(child.name == partName)
-                        {
-                            carPart = child.gameObject;
-                            break;
-                        }
-                    }
-                }
-            }
+            if (String.IsNullOrWhiteSpace(prefabName))
+                throw new Exception("Tried to create a part without prefab name");
 
-            if (!carPart) return;
+            if (Saver.modParts.ContainsKey(prefabName))
+                throw new Exception($"Tried to create an already existing prefab ({prefabName})");
 
-            // Now we copy all the components from the car part into the prefab
-            foreach (Component comp in carPart.GetComponents<Component>())
-            {
-                if (!(comp is Transform))
-                {
-                    CopyComponent(comp, p.Prefab);
-                }
-            }
-        }
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
-        internal static Component CopyComponent(Component original, GameObject destination)
-        {
-            System.Type type = original.GetType();
-            Component copy = destination.AddComponent(type);
-            // Copied fields can be restricted with BindingFlags
-            System.Reflection.FieldInfo[] fields = type.GetFields();
-            foreach (System.Reflection.FieldInfo field in fields)
-            {
-                field.SetValue(copy, field.GetValue(original));
-            }
-            return copy;
+            Part p = new Part(prefab, null, null);
+            PartManager.dummyParts.Add(p);
+
+            Saver.modParts.Add(prefabName, prefab);
+
+            GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
+
+            return p;
         }
 
         /*public enum Language
