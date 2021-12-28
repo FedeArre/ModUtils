@@ -11,6 +11,7 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
+        internal string Name;
         internal bool Paintable;
 
         //internal Hashtable languages = new Hashtable();

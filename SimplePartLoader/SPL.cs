@@ -93,7 +93,10 @@ namespace SimplePartLoader
             if (!prefab)
                 throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
+            prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
+
             Part p = new Part(prefab, null, null);
+            p.Name = prefabName;
             PartManager.dummyParts.Add(p);
 
             Saver.modParts.Add(prefabName, prefab);
@@ -132,6 +135,12 @@ namespace SimplePartLoader
                     Debug.LogError("copying comp " + comp.GetType());
                 }
             }
+
+            p.CarProps = p.Prefab.GetComponent<CarProperties>();
+            p.PartInfo = p.Prefab.GetComponent<Partinfo>();
+
+            p.CarProps.PREFAB = p.Prefab;
+            p.CarProps.PrefabName = p.Name;
         }
 
         public static void CopyPartToPrefab(Part p, string partName, string carName)
@@ -163,6 +172,12 @@ namespace SimplePartLoader
                     Debug.LogError("copying comp " + comp.GetType());
                 }
             }
+
+            p.CarProps = p.Prefab.GetComponent<CarProperties>();
+            p.PartInfo = p.Prefab.GetComponent<Partinfo>();
+
+            p.CarProps.PREFAB = p.Prefab;
+            p.CarProps.PrefabName = p.Name;
         }
 
         internal static GameObject GetCarPart(string partName, string carName)
@@ -191,6 +206,7 @@ namespace SimplePartLoader
         }
         internal static void InvokeFirstLoadEvent()
         {
+            Debug.LogError("first load event invoked");
             if(FirstLoad != null)
             {
                 FirstLoad?.Invoke();
