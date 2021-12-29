@@ -54,11 +54,18 @@ namespace SimplePartLoader
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
                 sizeBeforeModify++;
 
+                // Localization
                 if(!hasFirstLoadOccured)
                 {
+                    if (p.languages["English"] == null)
+                        p.languages["English"] = p.CarProps.PartName;
+
                     foreach(var dictionary in LocalizationManager.Dictionary)
                     {
-                        dictionary.Value.Add(p.CarProps.PartName, p.CarProps.PartName);
+                        if (p.languages[dictionary.Key] != null)
+                            dictionary.Value.Add(p.CarProps.PartName, (string)p.languages[dictionary.Key]);
+                        else
+                            dictionary.Value.Add(p.CarProps.PartName, (string)p.languages["English"]); // Fallback to english if no locale was set.
                     }
                 }
             }

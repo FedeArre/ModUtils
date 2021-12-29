@@ -212,58 +212,5 @@ namespace SimplePartLoader
                 FirstLoad?.Invoke();
             }
         }
-
-        /*public enum Language
-        {
-            English,
-            Portuguese,
-            German,
-            Russian,
-            Hungarian,
-            French,
-            Spanish,
-            Polish,
-            Swedish,
-            Czech
-        }
-
-        internal static string GetLanguageByType(Language lang)
-        {
-            switch (lang)
-            {
-                case Language.English:
-                    return "English";
-
-                case Language.Portuguese:
-                    return "Portuguese";
-
-                case Language.German:
-                    return "German";
-
-                case Language.Russian:
-                    return "Russian";
-
-                case Language.Hungarian:
-                    return "Hungarian";
-
-                case Language.French:
-                    return "Francais";
-
-                case Language.Spanish:
-                    return "Español";
-
-                case Language.Polish:
-                    return "Polish";
-
-                case Language.Swedish:
-                    return "Swedish";
-
-                case Language.Czech:
-                    return "Čeština";
-
-                default:
-                    return "English";
-            }
-        }*/
     }
 }
