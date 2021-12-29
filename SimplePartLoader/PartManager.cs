@@ -20,21 +20,23 @@ namespace SimplePartLoader
         {
             // First, we need to check if this is the first load.
             if (!hasFirstLoadOccured)
+            {
                 SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.
 
-            // Now we add all our dummy parts into modLoadedParts and do a small safety check to see if all our parts are fine.
-            foreach(Part part in dummyParts)
-                modLoadedParts.Add(part);
+                // Now we add all our dummy parts into modLoadedParts and do a small safety check to see if all our parts are fine.
+                foreach (Part part in dummyParts)
+                    modLoadedParts.Add(part);
 
-            foreach(Part part in modLoadedParts.ToList()) // Using toList allows to remove the part if required without errors. May not be the most efficent solution.
-            {
-                if(!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
+                foreach (Part part in modLoadedParts.ToList()) // Using toList allows to remove the part if required without errors. May not be the most efficent solution.
                 {
-                    Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
-                    modLoadedParts.Remove(part);
+                    if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
+                        modLoadedParts.Remove(part);
+                    }
                 }
             }
-
+                
             // Parts catalog - We need to add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
             GameObject carList = GameObject.Find("CarsParent"); // Car list of the game - Used for adding transparents
