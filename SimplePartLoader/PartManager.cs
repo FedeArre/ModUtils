@@ -9,13 +9,26 @@ namespace SimplePartLoader
 {
     public class PartManager
     {
-        public static List<Part> modLoadedParts = new List<Part>();
-        public static List<Part> dummyParts = new List<Part>();
+        /// <summary>
+        /// List of all the loaded parts in the loader. It will not have the dummy parts until the first load has been completed.
+        /// </summary>
+        internal static List<Part> modLoadedParts = new List<Part>();
 
-        public static Hashtable transparentData = new Hashtable(); // Using a list since a Part can be attached into multiple places
+        /// <summary>
+        /// List of all the dummy parts that are loaded in memory. It will be empty after the first load is completed.
+        /// </summary>
+        internal static List<Part> dummyParts = new List<Part>();
+
+        /// <summary>
+        /// List of all the transparent that are saved in memory.
+        /// </summary>
+        internal static Hashtable transparentData = new Hashtable();
 
         internal static bool hasFirstLoadOccured = false;
-
+        
+        /// <summary>
+        /// Handles the OnLoad function when called.
+        /// </summary>
         internal static void OnLoadCalled()
         {
             // First, we need to check if this is the first load.
@@ -112,6 +125,11 @@ namespace SimplePartLoader
                 hasFirstLoadOccured = true;
         }
 
+        /// <summary>
+        /// Generates a GameObject to be used as transparent
+        /// </summary>
+        /// <param name="t">The TransparentData instance that has all the information about the object</param>
+        /// <returns>An GameObject ready to be a transparent (with the respective tag, layer, name, transparents component and without colliders)</returns>
         internal static GameObject GetTransparentReadyObject(TransparentData t)
         {
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -134,6 +152,11 @@ namespace SimplePartLoader
             return transparentObject;
         }
 
+        /// <summary>
+        /// Gets the absolute path to a transform
+        /// </summary>
+        /// <param name="transform">Transform to get the path of</param>
+        /// <returns>A string containing the absolute path. It will never return null</returns>
         internal static string GetTransformPath(Transform transform)
         {
             string path = transform.name;
@@ -146,7 +169,7 @@ namespace SimplePartLoader
                 path = transform.name + "/" + path;
             }
 
-            return null; // Will never return this!
+            return null;
         }
     }
 }

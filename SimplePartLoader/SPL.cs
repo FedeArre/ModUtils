@@ -77,6 +77,13 @@ namespace SimplePartLoader
             return p; // We provide the Part instance so the developer can setup the transparents
         }
 
+        /// <summary>
+        /// Allows to load a dummy part into the memory for getitng his properties later.
+        /// </summary>
+        /// <param name="bundle">The bundle in which the prefab is located. Has to be loaded!</param>
+        /// <param name="prefabName">The name of the prefab to be loaded</param>
+        /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
+        /// <returns></returns>
         public static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
             // Safety checks
@@ -106,6 +113,12 @@ namespace SimplePartLoader
             return p;
         }
 
+        /// <summary>
+        /// Allows to copy all the components (including Unity built-in components) from a car part of the game into a dummy part.
+        /// </summary>
+        /// <param name="p">The dummy part</param>
+        /// <param name="partName">The name of the part that is going that provide the components to copy</param>
+        /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
         public static void CopyFullPartToPrefab(Part p, string partName, string carName)
         {
             // We first delete all the components from our part.
@@ -143,6 +156,12 @@ namespace SimplePartLoader
             p.CarProps.PrefabName = p.Name;
         }
 
+        /// <summary>
+        /// Allows to copy all the components (excluding Unity built-in components) from a car part of the game into a dummy part.
+        /// </summary>
+        /// <param name="p">The dummy part</param>
+        /// <param name="partName">The name of the part that is going that provide the components to copy</param>
+        /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
         public static void CopyPartToPrefab(Part p, string partName, string carName)
         {
             // We first delete all the components from our part.
@@ -180,6 +199,12 @@ namespace SimplePartLoader
             p.CarProps.PrefabName = p.Name;
         }
 
+        /// <summary>
+        /// Internal usage only, gets a car part from his name and car
+        /// </summary>
+        /// <param name="partName">The name of the part</param>
+        /// <param name="carName">The car of the part</param>
+        /// <returns>The prefab of the part if exists, null otherwise</returns>
         internal static GameObject GetCarPart(string partName, string carName)
         {
             GameObject carPart = null, carsParent = GameObject.Find("CarsParent");
@@ -204,9 +229,12 @@ namespace SimplePartLoader
 
             return carPart;
         }
+
+        /// <summary>
+        /// Invokes the FirstLoad event if any script is suscribed to it.
+        /// </summary>
         internal static void InvokeFirstLoadEvent()
         {
-            Debug.LogError("first load event invoked");
             if(FirstLoad != null)
             {
                 FirstLoad?.Invoke();

@@ -33,7 +33,7 @@ namespace SimplePartLoader
             PartManager.transparentData[attachesTo] = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable);
         }
 
-        public void MakePartPaintable(int materialIndex, string slotTextureType = "_MainTex")
+        public void EnablePainting(int materialIndex, string slotTextureType = "_MainTex")
         {
             if (Paintable)
                 return;
@@ -41,6 +41,7 @@ namespace SimplePartLoader
             Paintable = true;
 
             CarProps.Paintable = true;
+
             Prefab.AddComponent<P3dPaintable>();
             Prefab.AddComponent<P3dPaintableTexture>().Slot = new P3dSlot(materialIndex, slotTextureType);
             Prefab.GetComponent<P3dPaintableTexture>().UpdateMaterial();
@@ -51,14 +52,5 @@ namespace SimplePartLoader
         {
             languages[language] = newTranslation;
         }
-
-        internal string GetLocale(string key)
-        {
-            if (languages.ContainsKey(key))
-                return (string)languages[key];
-
-            return (string)languages["English"];
-        }
-
     }
 }
