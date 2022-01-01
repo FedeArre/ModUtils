@@ -174,6 +174,8 @@ namespace SimplePartLoader
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
+            p.PartInfo.RenamedPrefab = carPart.transform.name;
+
             Debug.LogError("Finished " + p.Name);
         }
 
