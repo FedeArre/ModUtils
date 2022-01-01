@@ -1,6 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using SimplePartLoader.Utils;
+using System.Reflection;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SimplePartLoader
 {
@@ -8,6 +11,8 @@ namespace SimplePartLoader
     {
         public delegate void FirstLoadDelegate();
         public static event FirstLoadDelegate FirstLoad;
+
+        public static bool DEVELOPER_LOG = false;
 
         /// <summary>
         /// Adds a prefab as a car part into the game
@@ -100,8 +105,6 @@ namespace SimplePartLoader
             if (!prefab)
                 throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
-            prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
-
             Part p = new Part(prefab, null, null);
             p.Name = prefabName;
             PartManager.dummyParts.Add(p);
@@ -119,8 +122,14 @@ namespace SimplePartLoader
         /// <param name="p">The dummy part</param>
         /// <param name="partName">The name of the part that is going that provide the components to copy</param>
         /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
-        public static void CopyFullPartToPrefab(Part p, string partName, string carName)
+        public static void CopyFullPartToPrefab(Part p, string partName)
         {
+            if(p == null)
+            {
+                Debug.LogError("[SPL]: Tried to do full copy into empty part");
+                return;
+            }
+
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
             {
@@ -131,13 +140,15 @@ namespace SimplePartLoader
             }
 
             // Then we look up for the car part and store it
-            GameObject carPart = GetCarPart(partName, carName);
+            GameObject carPart = GetCarPart(partName);
 
             if (!carPart)
             {
-                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! {partName} in {carName}");
+                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! {partName}");
                 return;
             }
+
+            p.Prefab.layer = carPart.layer;
 
             // Now we copy all the components from the car part into the prefab
             foreach (Component comp in carPart.GetComponents<Component>())
@@ -145,58 +156,153 @@ namespace SimplePartLoader
                 if (!(comp is Transform))
                 {
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
-                    Debug.LogError("copying comp " + comp.GetType());
+                    Debug.LogError("Now copying base component " + comp);
                 }
             }
+
+            Debug.LogError("printing all parts before doing it - PART " + carPart.name);
+            Transform[] t = carPart.GetComponentsInChildren<Transform>();
+            foreach(Transform t2 in t)
+            {
+                Debug.LogError($"{t2.name} - parent is {t2.parent}");
+            }
+            AttachPrefabChilds(p.Prefab, carPart);
 
             p.CarProps = p.Prefab.GetComponent<CarProperties>();
             p.PartInfo = p.Prefab.GetComponent<Partinfo>();
 
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
+
+            Debug.LogError("Finished " + p.Name);
         }
 
-        /// <summary>
-        /// Allows to copy all the components (excluding Unity built-in components) from a car part of the game into a dummy part.
-        /// </summary>
-        /// <param name="p">The dummy part</param>
-        /// <param name="partName">The name of the part that is going that provide the components to copy</param>
-        /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
-        public static void CopyPartToPrefab(Part p, string partName, string carName)
+        internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
-            // We first delete all the components from our part.
-            foreach (Component comp in p.Prefab.GetComponents<Component>())
+            Debug.LogError("Now attaching to " + partToAttach.name);
+
+            // Now we also do the same for the childs of the object.
+            for (int i = 0; i < original.transform.childCount; i++)
             {
-                if (!(comp is Transform))
+                Debug.LogError("Attaching " + original.transform.GetChild(i).name);
+                GameObject childObject = new GameObject();
+                childObject.transform.SetParent(partToAttach.transform);
+
+                childObject.name = original.transform.GetChild(i).name;
+                childObject.layer = original.transform.GetChild(i).gameObject.layer;
+                childObject.tag = original.transform.GetChild(i).tag;
+
+                childObject.transform.localPosition = original.transform.GetChild(i).localPosition;
+                childObject.transform.localRotation = original.transform.GetChild(i).localRotation;
+                childObject.transform.localScale = original.transform.GetChild(i).localScale;
+
+                foreach (Component comp in original.transform.GetChild(i).GetComponents<Component>())
                 {
-                    GameObject.Destroy(comp);
+                    if(comp is FLUID)
+                    {
+                        FieldInfo[] sourceFields = original.transform.GetChild(i).GetComponent<FLUID>().GetType().GetFields(BindingFlags.Public |
+                        BindingFlags.NonPublic |
+                        BindingFlags.Instance);
+
+                        foreach (FieldInfo field in sourceFields)
+                        {
+                            Debug.LogError($"{field.Name} - {field.FieldType} - {field.GetValue(original.transform.GetChild(i).GetComponent<FLUID>())}");
+                        }
+                    }
+                    if (comp is Transform || comp == null)
+                        continue;
+
+                    if(!childObject.GetComponent(comp.GetType()))
+                    {
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
+
+                        Debug.LogError("copying comp " + comp.GetType());
+                    } 
+                    else
+                    {
+                        CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
+
+                        Debug.LogError("cloning comp " + comp.GetType());
+                    }
+                }
+
+                Debug.LogError($"COUNT: {original.transform.GetChild(i).childCount}");
+                if (original.transform.GetChild(i).childCount != 0)
+                    AttachPrefabChilds(childObject, original.transform.GetChild(i).gameObject);
+            }
+
+        }
+
+        public static void CopyComponentData(Component comp, Component other)
+        {
+            Type type = comp.GetType();
+
+            List<Type> derivedTypes = new List<Type>();
+            Type derived = type.BaseType;
+            while (derived != null)
+            {
+                if (derived == typeof(MonoBehaviour))
+                {
+                    break;
+                }
+                derivedTypes.Add(derived);
+                derived = derived.BaseType;
+            }
+
+            IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
+
+            foreach (Type derivedType in derivedTypes)
+            {
+                pinfos = pinfos.Concat(derivedType.GetProperties(Extension.bindingFlags));
+            }
+
+            pinfos = from property in pinfos
+                     where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
+                     where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                     select property;
+            foreach (var pinfo in pinfos)
+            {
+                if (pinfo.CanWrite)
+                {
+                    if (pinfos.Any(e => e.Name == $"shared{char.ToUpper(pinfo.Name[0])}{pinfo.Name.Substring(1)}"))
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        pinfo.SetValue(comp, pinfo.GetValue(other, null), null);
+                    }
+                    catch { } // In case of NotImplementedException being thrown. For some reason specifying that exception didn't seem to catch it, so I didn't catch anything specific.
                 }
             }
 
-            // Then we look up for the car part and store it
-            GameObject carPart = GetCarPart(partName, carName);
+            IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
 
-            if (!carPart)
+            foreach (var finfo in finfos)
             {
-                Debug.LogError($"[SPL] Car part was not found on CopyPartToPrefab! {partName} in {carName}");
-                return;
-            }
 
-            // Now we copy all the components from the car part into the prefab
-            foreach (Component comp in carPart.GetComponents<Component>())
-            {
-                if (!(comp is Transform) && !(comp is Collider) && !(comp is Renderer) && !(comp is MeshFilter))
+                foreach (Type derivedType in derivedTypes)
                 {
-                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
-                    Debug.LogError("copying comp " + comp.GetType());
+                    if (finfos.Any(e => e.Name == $"shared{char.ToUpper(finfo.Name[0])}{finfo.Name.Substring(1)}"))
+                    {
+                        continue;
+                    }
+                    finfos = finfos.Concat(derivedType.GetFields(Extension.bindingFlags));
                 }
             }
 
-            p.CarProps = p.Prefab.GetComponent<CarProperties>();
-            p.PartInfo = p.Prefab.GetComponent<Partinfo>();
+            foreach (var finfo in finfos)
+            {
+                finfo.SetValue(comp, finfo.GetValue(other));
+            }
 
-            p.CarProps.PREFAB = p.Prefab;
-            p.CarProps.PrefabName = p.Name;
+            finfos = from field in finfos
+                     where field.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                     select field;
+            foreach (var finfo in finfos)
+            {
+                finfo.SetValue(comp, finfo.GetValue(other));
+            }
         }
 
         /// <summary>
@@ -205,24 +311,17 @@ namespace SimplePartLoader
         /// <param name="partName">The name of the part</param>
         /// <param name="carName">The car of the part</param>
         /// <returns>The prefab of the part if exists, null otherwise</returns>
-        internal static GameObject GetCarPart(string partName, string carName)
+        internal static GameObject GetCarPart(string partName)
         {
-            GameObject carPart = null, carsParent = GameObject.Find("CarsParent");
-            foreach (GameObject car in carsParent.GetComponent<CarList>().Cars)
+            GameObject carPart = null, PartsParent = GameObject.Find("PartsParent");
+            foreach (GameObject part in PartsParent.GetComponent<JunkPartsList>().Parts)
             {
-                if (car.name == carName)
+                if (part.name == partName)
                 {
-                    Transform[] childs = car.transform.GetComponentsInChildren<Transform>();
-                    foreach (Transform child in childs)
+                    if (!part.GetComponent<transparents>())
                     {
-                        if (child.name == partName)
-                        {
-                            if (!child.GetComponent<transparents>())
-                            {
-                                carPart = child.gameObject;
-                                break;
-                            }
-                        }
+                        carPart = part;
+                        break;
                     }
                 }
             }
@@ -239,6 +338,12 @@ namespace SimplePartLoader
             {
                 FirstLoad?.Invoke();
             }
+        }
+
+        internal static void DevLog(string str)
+        {
+            if (DEVELOPER_LOG)
+                Debug.Log("[SPL]: " + str);
         }
     }
 }

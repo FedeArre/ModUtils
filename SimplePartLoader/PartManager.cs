@@ -75,6 +75,9 @@ namespace SimplePartLoader
 
                     foreach(var dictionary in LocalizationManager.Dictionary)
                     {
+                        if (dictionary.Value.ContainsKey(p.CarProps.PartName))
+                            continue;
+
                         if (p.languages[dictionary.Key] != null)
                             dictionary.Value.Add(p.CarProps.PartName, (string)p.languages[dictionary.Key]);
                         else
