@@ -9,7 +9,7 @@ namespace SimplePartLoader.Utils
     public static class Extension
     {
         // From Unity Forums
-        private const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.DeclaredOnly;
+        public const BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Default | BindingFlags.DeclaredOnly;
 
         public static T GetCopyOf<T>(this Component comp, T other) where T : Component
         {
