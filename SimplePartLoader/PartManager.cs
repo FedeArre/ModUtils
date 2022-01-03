@@ -1,4 +1,5 @@
 ﻿using Assets.SimpleLocalization;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -75,7 +76,7 @@ namespace SimplePartLoader
 
                     foreach(var dictionary in LocalizationManager.Dictionary)
                     {
-                        if (dictionary.Value.ContainsKey(p.CarProps.PartName))
+                        if (dictionary.Value.ContainsKey(p.CarProps.PartName)) // Ignore case where the name is shared so the translation already exists
                             continue;
 
                         if (p.languages[dictionary.Key] != null)
@@ -101,7 +102,7 @@ namespace SimplePartLoader
                         {
                             GameObject transparentObject = GetTransparentReadyObject(t);
                             
-                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(GetTransformPath(child))); // Modify directly the object in the CarList
+                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(Functions.GetTransformPath(child))); // Modify directly the object in the CarList
 
                             transparentObject.transform.localPosition = t.LocalPos;
                             transparentObject.transform.localScale = t.Scale;
@@ -153,26 +154,6 @@ namespace SimplePartLoader
                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
 
             return transparentObject;
-        }
-
-        /// <summary>
-        /// Gets the absolute path to a transform
-        /// </summary>
-        /// <param name="transform">Transform to get the path of</param>
-        /// <returns>A string containing the absolute path. It will never return null</returns>
-        internal static string GetTransformPath(Transform transform)
-        {
-            string path = transform.name;
-            while (transform.parent != null)
-            {
-                transform = transform.parent;
-                if (transform.parent == null)
-                    return path;
-
-                path = transform.name + "/" + path;
-            }
-
-            return null;
         }
     }
 }

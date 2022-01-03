@@ -25,23 +25,23 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                throw new Exception("Tried to create a part without valid AssetBundle");
+                throw new Exception("SPL - Tried to create a part without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                throw new Exception("Tried to create a part without prefab name");
+                throw new Exception("SPL - Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                throw new Exception($"Tried to create an already existing prefab ({prefabName})");
+                throw new Exception($"SPL - Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             CarProperties prefabCarProp = prefab.GetComponent<CarProperties>();
             Partinfo prefabPartInfo = prefab.GetComponent<Partinfo>();
 
             if (!prefabCarProp || !prefabPartInfo)
-                throw new Exception("An essential component is missing!");
+                throw new Exception("SPL - An essential component is missing!");
 
             // Automatically add some components and also assign the correct layer.
             // Pickup and DISABLER for the part - Required so they work properly!
@@ -93,17 +93,17 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                throw new Exception("Tried to create a part without valid AssetBundle");
+                throw new Exception("SPL - Tried to create a part without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                throw new Exception("Tried to create a part without prefab name");
+                throw new Exception("SPL - Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                throw new Exception($"Tried to create an already existing prefab ({prefabName})");
+                throw new Exception($"SPL - Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                throw new Exception($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             Part p = new Part(prefab, null, null);
             p.Name = prefabName;
@@ -142,7 +142,7 @@ namespace SimplePartLoader
             }
 
             // Then we look up for the car part and store it
-            GameObject carPart = GetCarPart(partName);
+            GameObject carPart = Functions.GetCarPart(partName);
 
             if (!carPart)
             {
@@ -172,14 +172,14 @@ namespace SimplePartLoader
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
-            p.PartInfo.RenamedPrefab = carPart.transform.name;
+            p.PartInfo.RenamedPrefab = carPart.transform.name; // Fixes transparents breaking after reloading
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
 
         internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
-            DevLog("Attachhing childs to " + partToAttach.name);
+            DevLog("Attaching childs to " + partToAttach.name);
 
             // Now we also do the same for the childs of the object.
             for (int i = 0; i < original.transform.childCount; i++)
@@ -205,117 +205,19 @@ namespace SimplePartLoader
                     {
                         childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
 
-                        Debug.LogError("copying comp " + comp.GetType());
+                        DevLog("Copying component " + comp.GetType());
                     } 
                     else
                     {
-                        CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
 
-                        Debug.LogError("cloning comp " + comp.GetType());
+                        DevLog("Cloning component" + comp.GetType());
                     }
                 }
 
-                Debug.LogError($"COUNT: {original.transform.GetChild(i).childCount}");
                 if (original.transform.GetChild(i).childCount != 0)
                     AttachPrefabChilds(childObject, original.transform.GetChild(i).gameObject);
             }
-
-        }
-
-        public static void CopyComponentData(Component comp, Component other)
-        {
-            Type type = comp.GetType();
-
-            List<Type> derivedTypes = new List<Type>();
-            Type derived = type.BaseType;
-            while (derived != null)
-            {
-                if (derived == typeof(MonoBehaviour))
-                {
-                    break;
-                }
-                derivedTypes.Add(derived);
-                derived = derived.BaseType;
-            }
-
-            IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
-
-            foreach (Type derivedType in derivedTypes)
-            {
-                pinfos = pinfos.Concat(derivedType.GetProperties(Extension.bindingFlags));
-            }
-
-            pinfos = from property in pinfos
-                     where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
-                     where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
-                     select property;
-            foreach (var pinfo in pinfos)
-            {
-                if (pinfo.CanWrite)
-                {
-                    if (pinfos.Any(e => e.Name == $"shared{char.ToUpper(pinfo.Name[0])}{pinfo.Name.Substring(1)}"))
-                    {
-                        continue;
-                    }
-                    try
-                    {
-                        pinfo.SetValue(comp, pinfo.GetValue(other, null), null);
-                    }
-                    catch { } // In case of NotImplementedException being thrown. For some reason specifying that exception didn't seem to catch it, so I didn't catch anything specific.
-                }
-            }
-
-            IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
-
-            foreach (var finfo in finfos)
-            {
-
-                foreach (Type derivedType in derivedTypes)
-                {
-                    if (finfos.Any(e => e.Name == $"shared{char.ToUpper(finfo.Name[0])}{finfo.Name.Substring(1)}"))
-                    {
-                        continue;
-                    }
-                    finfos = finfos.Concat(derivedType.GetFields(Extension.bindingFlags));
-                }
-            }
-
-            foreach (var finfo in finfos)
-            {
-                finfo.SetValue(comp, finfo.GetValue(other));
-            }
-
-            finfos = from field in finfos
-                     where field.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
-                     select field;
-            foreach (var finfo in finfos)
-            {
-                finfo.SetValue(comp, finfo.GetValue(other));
-            }
-        }
-
-        /// <summary>
-        /// Internal usage only, gets a car part from his name and car
-        /// </summary>
-        /// <param name="partName">The name of the part</param>
-        /// <param name="carName">The car of the part</param>
-        /// <returns>The prefab of the part if exists, null otherwise</returns>
-        internal static GameObject GetCarPart(string partName)
-        {
-            GameObject carPart = null, PartsParent = GameObject.Find("PartsParent");
-            foreach (GameObject part in PartsParent.GetComponent<JunkPartsList>().Parts)
-            {
-                if (part.name == partName)
-                {
-                    if (!part.GetComponent<transparents>())
-                    {
-                        carPart = part;
-                        break;
-                    }
-                }
-            }
-
-            return carPart;
         }
 
         /// <summary>
