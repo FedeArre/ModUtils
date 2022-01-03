@@ -117,14 +117,16 @@ namespace SimplePartLoader
         }
 
         /// <summary>
-        /// Allows to copy all the components (including Unity built-in components) from a car part of the game into a dummy part.
+        /// Allows to copy all the components from a car part of the game into a dummy part.
         /// </summary>
         /// <param name="p">The dummy part</param>
         /// <param name="partName">The name of the part that is going that provide the components to copy</param>
         /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
-        public static void CopyFullPartToPrefab(Part p, string partName)
+        /// <param name="ignoreBuiltin">Ignore Unity built-in components (Renderer, collider and MeshFilter) while doing the copy</param>
+        /// <param name="doNotCopyChilds">Disables the recursive child copy</param>
+        public static void CopyPartToPrefab(Part p, string partName, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
         {
-            if(p == null)
+            if(p == null) // Safety check
             {
                 Debug.LogError("[SPL]: Tried to do full copy into empty part");
                 return;
@@ -133,7 +135,7 @@ namespace SimplePartLoader
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
             {
-                if (!(comp is Transform))
+                if (!(comp is Transform) || !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     GameObject.Destroy(comp);
                 }
@@ -148,26 +150,22 @@ namespace SimplePartLoader
                 return;
             }
 
-            p.Prefab.layer = carPart.layer;
+            p.Prefab.layer = carPart.layer; // Set the layer depending on the car part.
 
             // Now we copy all the components from the car part into the prefab
             foreach (Component comp in carPart.GetComponents<Component>())
             {
-                if (!(comp is Transform))
+                if (!(comp is Transform) || !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
-                    Debug.LogError("Now copying base component " + comp);
+                    DevLog($"Now copying component to base object ({comp})");
                 }
             }
 
-            Debug.LogError("printing all parts before doing it - PART " + carPart.name);
-            Transform[] t = carPart.GetComponentsInChildren<Transform>();
-            foreach(Transform t2 in t)
-            {
-                Debug.LogError($"{t2.name} - parent is {t2.parent}");
-            }
-            AttachPrefabChilds(p.Prefab, carPart);
+            if(!doNotCopyChilds)
+                AttachPrefabChilds(p.Prefab, carPart); // Call the recursive function that copies all the child hierarchy.
 
+            // Setting things up so the game knows what part is this (and also the Saver)
             p.CarProps = p.Prefab.GetComponent<CarProperties>();
             p.PartInfo = p.Prefab.GetComponent<Partinfo>();
 
@@ -176,17 +174,17 @@ namespace SimplePartLoader
 
             p.PartInfo.RenamedPrefab = carPart.transform.name;
 
-            Debug.LogError("Finished " + p.Name);
+            Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
 
         internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
-            Debug.LogError("Now attaching to " + partToAttach.name);
+            DevLog("Attachhing childs to " + partToAttach.name);
 
             // Now we also do the same for the childs of the object.
             for (int i = 0; i < original.transform.childCount; i++)
             {
-                Debug.LogError("Attaching " + original.transform.GetChild(i).name);
+                DevLog("Attaching " + original.transform.GetChild(i).name);
                 GameObject childObject = new GameObject();
                 childObject.transform.SetParent(partToAttach.transform);
 
@@ -200,18 +198,7 @@ namespace SimplePartLoader
 
                 foreach (Component comp in original.transform.GetChild(i).GetComponents<Component>())
                 {
-                    if(comp is FLUID)
-                    {
-                        FieldInfo[] sourceFields = original.transform.GetChild(i).GetComponent<FLUID>().GetType().GetFields(BindingFlags.Public |
-                        BindingFlags.NonPublic |
-                        BindingFlags.Instance);
-
-                        foreach (FieldInfo field in sourceFields)
-                        {
-                            Debug.LogError($"{field.Name} - {field.FieldType} - {field.GetValue(original.transform.GetChild(i).GetComponent<FLUID>())}");
-                        }
-                    }
-                    if (comp is Transform || comp == null)
+                    if (comp is Transform || comp == null) // Note that this function does not take in account ignoreBuiltin from CopyPartToPrefab
                         continue;
 
                     if(!childObject.GetComponent(comp.GetType()))
@@ -338,10 +325,15 @@ namespace SimplePartLoader
         {
             if(FirstLoad != null)
             {
+                DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
                 FirstLoad?.Invoke();
             }
         }
 
+        /// <summary>
+        /// Prints a string on the log if the DEVELOPER_LOG is enabled.
+        /// </summary>
+        /// <param name="str">The string to be printed on log</param>
         internal static void DevLog(string str)
         {
             if (DEVELOPER_LOG)
