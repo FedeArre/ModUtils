@@ -23,7 +23,7 @@ namespace SimplePartLoader
             secondaryObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             GameObject.Destroy(secondaryObject.GetComponent<BoxCollider>());
             secondaryObject.transform.SetParent(gameObject.transform);
-
+            Debug.LogError(transparentData);
             secondaryObject.transform.localPosition = transparentData.LocalPos;
             secondaryObject.transform.localScale = transparentData.Scale;
             secondaryObject.transform.localRotation = transparentData.LocalRot;

@@ -1,9 +1,6 @@
-﻿using System;
+﻿using SimplePartLoader.Utils;
+using System;
 using UnityEngine;
-using SimplePartLoader.Utils;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SimplePartLoader
 {
@@ -57,7 +54,7 @@ namespace SimplePartLoader
 
             prefabCarProp.PREFAB = prefab; // Saving will not work without this due to a condition located in Saver.Save()
             Transform[] childs = prefab.GetComponentsInChildren<Transform>();
-            for(int i = 0; i < childs.Length; i++)
+            for (int i = 0; i < childs.Length; i++)
             {
                 HexNut hx = childs[i].GetComponent<HexNut>();
 
@@ -126,7 +123,7 @@ namespace SimplePartLoader
         /// <param name="doNotCopyChilds">Disables the recursive child copy</param>
         public static void CopyPartToPrefab(Part p, string partName, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
         {
-            if(p == null) // Safety check
+            if (p == null) // Safety check
             {
                 Debug.LogError("[SPL]: Tried to do full copy into empty part");
                 return;
@@ -155,14 +152,14 @@ namespace SimplePartLoader
             // Now we copy all the components from the car part into the prefab
             foreach (Component comp in carPart.GetComponents<Component>())
             {
-                if (!(comp is Transform) || !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
+                if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
                     DevLog($"Now copying component to base object ({comp})");
                 }
             }
 
-            if(!doNotCopyChilds)
+            if (!doNotCopyChilds)
                 AttachPrefabChilds(p.Prefab, carPart); // Call the recursive function that copies all the child hierarchy.
 
             // Setting things up so the game knows what part is this (and also the Saver)
@@ -201,12 +198,12 @@ namespace SimplePartLoader
                     if (comp is Transform || comp == null) // Note that this function does not take in account ignoreBuiltin from CopyPartToPrefab
                         continue;
 
-                    if(!childObject.GetComponent(comp.GetType()))
+                    if (!childObject.GetComponent(comp.GetType()))
                     {
                         childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
 
                         DevLog("Copying component " + comp.GetType());
-                    } 
+                    }
                     else
                     {
                         Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
@@ -225,7 +222,7 @@ namespace SimplePartLoader
         /// </summary>
         internal static void InvokeFirstLoadEvent()
         {
-            if(FirstLoad != null)
+            if (FirstLoad != null)
             {
                 DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
                 FirstLoad?.Invoke();

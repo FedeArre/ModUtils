@@ -26,13 +26,31 @@ namespace SimplePartLoader
         internal static Hashtable transparentData = new Hashtable();
 
         internal static bool hasFirstLoadOccured = false;
-        
+
+        internal static List<GameObject> gameParts;
         /// <summary>
         /// Handles the OnLoad function when called.
         /// </summary>
         internal static void OnLoadCalled()
         {
-            // First, we need to check if this is the first load.
+            // We first load all our parts into the list.
+            gameParts = new List<GameObject>();
+            foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
+            {
+                gameParts.Add(part);
+            }
+
+            foreach(Transform part in GameObject.Find("SHOPITEMS").GetComponentsInChildren(typeof(Transform)))
+            {
+                if (!part.GetComponent<SaleItem>())
+                    continue;
+
+                if (part.GetComponent<SaleItem>().Item.GetComponent<CarProperties>())
+                {
+                    gameParts.Add(part.GetComponent<SaleItem>().Item);
+                }
+            }
+            // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
                 SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.

@@ -18,16 +18,13 @@ namespace SimplePartLoader.Utils
         /// <returns>The prefab of the part if exists, null otherwise</returns>
         internal static GameObject GetCarPart(string partName)
         {
-            GameObject carPart = null, PartsParent = GameObject.Find("PartsParent");
-            foreach (GameObject part in PartsParent.GetComponent<JunkPartsList>().Parts)
+            GameObject carPart = null;
+            foreach (GameObject part in PartManager.gameParts)
             {
                 if (part.name == partName)
                 {
-                    if (!part.GetComponent<transparents>())
-                    {
-                        carPart = part;
-                        break;
-                    }
+                    carPart = part;
+                    break;
                 }
             }
 
