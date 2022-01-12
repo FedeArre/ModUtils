@@ -424,6 +424,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SPL.cs" />
     <Compile Include="TransparentEdit.cs" />
+    <Compile Include="Utils\Extension.cs" />
+    <Compile Include="Utils\Functions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

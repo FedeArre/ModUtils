@@ -1,4 +1,5 @@
 ﻿using Assets.SimpleLocalization;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,14 +10,66 @@ namespace SimplePartLoader
 {
     public class PartManager
     {
-        public static List<Part> modLoadedParts = new List<Part>();
-        public static Hashtable transparentData = new Hashtable(); // Using a list since a Part can be attached into multiple places
+        /// <summary>
+        /// List of all the loaded parts in the loader. It will not have the dummy parts until the first load has been completed.
+        /// </summary>
+        internal static List<Part> modLoadedParts = new List<Part>();
+
+        /// <summary>
+        /// List of all the dummy parts that are loaded in memory. It will be empty after the first load is completed.
+        /// </summary>
+        internal static List<Part> dummyParts = new List<Part>();
+
+        /// <summary>
+        /// List of all the transparent that are saved in memory.
+        /// </summary>
+        internal static Hashtable transparentData = new Hashtable();
 
         internal static bool hasFirstLoadOccured = false;
 
+        internal static List<GameObject> gameParts;
+        /// <summary>
+        /// Handles the OnLoad function when called.
+        /// </summary>
         internal static void OnLoadCalled()
         {
-            // Parts catalog - We need to first add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
+            // We first load all our parts into the list.
+            gameParts = new List<GameObject>();
+            foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
+            {
+                gameParts.Add(part);
+            }
+
+            foreach(Transform part in GameObject.Find("SHOPITEMS").GetComponentsInChildren(typeof(Transform)))
+            {
+                if (!part.GetComponent<SaleItem>())
+                    continue;
+
+                if (part.GetComponent<SaleItem>().Item.GetComponent<CarProperties>())
+                {
+                    gameParts.Add(part.GetComponent<SaleItem>().Item);
+                }
+            }
+            // We need to check if this is the first load.
+            if (!hasFirstLoadOccured)
+            {
+                SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.
+
+                // Now we add all our dummy parts into modLoadedParts and do a small safety check to see if all our parts are fine.
+                foreach (Part part in dummyParts)
+                    modLoadedParts.Add(part);
+
+                foreach (Part part in modLoadedParts.ToList()) // Using toList allows to remove the part if required without errors. May not be the most efficent solution.
+                {
+                    if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
+                        modLoadedParts.Remove(part);
+                    }
+                }
+            }
+                
+            // Parts catalog - We need to add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
             GameObject carList = GameObject.Find("CarsParent"); // Car list of the game - Used for adding transparents
             GameObject[] cars = carList.GetComponent<CarList>().Cars;
@@ -33,11 +86,21 @@ namespace SimplePartLoader
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
                 sizeBeforeModify++;
 
+                // Localization
                 if(!hasFirstLoadOccured)
                 {
+                    if (p.languages["English"] == null)
+                        p.languages["English"] = p.CarProps.PartName;
+
                     foreach(var dictionary in LocalizationManager.Dictionary)
                     {
-                        dictionary.Value.Add(p.CarProps.PartName, p.CarProps.PartName);
+                        if (dictionary.Value.ContainsKey(p.CarProps.PartName)) // Ignore case where the name is shared so the translation already exists
+                            continue;
+
+                        if (p.languages[dictionary.Key] != null)
+                            dictionary.Value.Add(p.CarProps.PartName, (string)p.languages[dictionary.Key]);
+                        else
+                            dictionary.Value.Add(p.CarProps.PartName, (string)p.languages["English"]); // Fallback to english if no locale was set.
                     }
                 }
             }
@@ -57,7 +120,7 @@ namespace SimplePartLoader
                         {
                             GameObject transparentObject = GetTransparentReadyObject(t);
                             
-                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(GetTransformPath(child))); // Modify directly the object in the CarList
+                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(Functions.GetTransformPath(child))); // Modify directly the object in the CarList
 
                             transparentObject.transform.localPosition = t.LocalPos;
                             transparentObject.transform.localScale = t.Scale;
@@ -84,6 +147,11 @@ namespace SimplePartLoader
                 hasFirstLoadOccured = true;
         }
 
+        /// <summary>
+        /// Generates a GameObject to be used as transparent
+        /// </summary>
+        /// <param name="t">The TransparentData instance that has all the information about the object</param>
+        /// <returns>An GameObject ready to be a transparent (with the respective tag, layer, name, transparents component and without colliders)</returns>
         internal static GameObject GetTransparentReadyObject(TransparentData t)
         {
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -104,21 +172,6 @@ namespace SimplePartLoader
                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
 
             return transparentObject;
-        }
-
-        internal static string GetTransformPath(Transform transform)
-        {
-            string path = transform.name;
-            while (transform.parent != null)
-            {
-                transform = transform.parent;
-                if (transform.parent == null)
-                    return path;
-
-                path = transform.name + "/" + path;
-            }
-
-            return null; // Will never return this!
         }
     }
 }
