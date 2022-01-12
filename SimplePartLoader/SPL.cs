@@ -1,5 +1,8 @@
-﻿using SimplePartLoader.Utils;
+﻿using PaintIn3D;
+using SimplePartLoader.Utils;
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -132,7 +135,7 @@ namespace SimplePartLoader
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
             {
-                if (!(comp is Transform) || !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
+                if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     GameObject.Destroy(comp);
                 }
@@ -154,7 +157,52 @@ namespace SimplePartLoader
             {
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
-                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    if(comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner)
+                    {
+                        /*
+                         * Leave this here for debugging purposes. Will print all info of the component if painting related.
+                         * Debug.LogError("-----------------------------------------");
+                        Debug.LogError("Now printing all info about " + comp.GetType());
+                        FieldInfo[] sourceFields = comp.GetType().GetFields(BindingFlags.Public |
+                            BindingFlags.NonPublic |
+                            BindingFlags.Instance);
+
+                        foreach (FieldInfo field in sourceFields)
+                        {
+                            Debug.LogError($"{field.Name} - {field.FieldType} - {field.GetValue(comp)}");
+                        }*/
+
+                        if(comp is P3dPaintable)
+                        {
+                            p.Prefab.AddComponent<P3dPaintable>();
+                        }
+                        else if(comp is P3dPaintableTexture)
+                        {
+                            P3dPaintableTexture p3d = p.Prefab.AddComponent<P3dPaintableTexture>();
+                            P3dPaintableTexture original = comp as P3dPaintableTexture;
+
+                            p3d.Slot = new P3dSlot(original.Slot.Index, original.Slot.Name);
+                            p3d.UpdateMaterial();
+                        }
+                        else if (comp is P3dMaterialCloner)
+                        {
+                            P3dMaterialCloner p3d = p.Prefab.AddComponent<P3dMaterialCloner>();
+                            P3dMaterialCloner original = comp as P3dMaterialCloner;
+
+                            p3d.Index = original.Index;
+                        }
+                        else if (comp is P3dChangeCounter)
+                        {
+                            P3dChangeCounter p3d = p.Prefab.AddComponent<P3dChangeCounter>();
+                            P3dChangeCounter original = comp as P3dChangeCounter;
+
+                            p3d.Threshold = original.Threshold;
+                            p3d.Color = original.Color;
+                        }
+                    }
+                    else
+                        p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    
                     DevLog($"Now copying component to base object ({comp})");
                 }
             }
