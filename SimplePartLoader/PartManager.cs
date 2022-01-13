@@ -1,7 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using SimplePartLoader.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -23,7 +22,7 @@ namespace SimplePartLoader
         /// <summary>
         /// List of all the transparent that are saved in memory.
         /// </summary>
-        internal static Hashtable transparentData = new Hashtable();
+        internal static List<TransparentData> transparentData = new List<TransparentData>();
 
         internal static bool hasFirstLoadOccured = false;
 
@@ -105,38 +104,53 @@ namespace SimplePartLoader
                 }
             }
 
-            // Now we add our transparents into the game
-            for(int i = 0; i < cars.Length; i++)
+            SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
+            foreach (TransparentData t in transparentData)
             {
-                Transform[] childs = cars[i].GetComponentsInChildren<Transform>();
+                if (t == null)
+                    continue;
 
-                foreach (Transform child in childs) // We check for every car part in the game
+                if (GetGameObjectByName(t.AttachesTo))
                 {
-                    TransparentData t = (TransparentData) transparentData[child.name];
+                    Transform attachment = ((GameObject)cachedResources.Load(t.AttachesTo)).transform;
 
-                    if (t != null)
+                    if (!IsChildNameUnique(attachment, t.Name))
+                        continue;
+
+                    SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name})");
+
+                    GameObject transparentObject = GetTransparentReadyObject(t);
+                    transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform);
+
+                    transparentObject.transform.localPosition = t.LocalPos;
+                    transparentObject.transform.localScale = t.Scale;
+                    transparentObject.transform.localRotation = t.LocalRot;
+                }
+                else
+                    Debug.LogError($"[SPL]: Trying to attach transparent into invalid object. Make sure the object is valid ({t.AttachesTo})");
+
+                for (int i = 0; i < cars.Length; i++) // Now we need to also attach the part into the car prefabs (or it will not spawn in the game)
+                {
+                    Transform[] childs = cars[i].GetComponentsInChildren<Transform>();
+
+                    foreach (Transform child in childs) // We check for every car part in the game
                     {
-                        if (!child.GetComponent<transparents>()) // Add transparent into game for car prefabs.
+                        if(t.AttachesTo == child.name)
                         {
-                            GameObject transparentObject = GetTransparentReadyObject(t);
-                            
-                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(Functions.GetTransformPath(child))); // Modify directly the object in the CarList
-
-                            transparentObject.transform.localPosition = t.LocalPos;
-                            transparentObject.transform.localScale = t.Scale;
-                            transparentObject.transform.localRotation = t.LocalRot;
-                        }
-
-                        if (!hasFirstLoadOccured) // Add transparent into game resources for loading on saves.
-                        {
-                            if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
+                            if(!child.GetComponent<transparents>())
                             {
+                                if (!IsChildNameUnique(child, t.Name))
+                                    break;
+
                                 GameObject transparentObject = GetTransparentReadyObject(t);
-                                transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform);
+                                transparentObject.transform.SetParent(child);
+
+                                SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name}) (car-prefab variant)");
 
                                 transparentObject.transform.localPosition = t.LocalPos;
                                 transparentObject.transform.localScale = t.Scale;
                                 transparentObject.transform.localRotation = t.LocalRot;
+                                break;
                             }
                         }
                     }
@@ -172,6 +186,54 @@ namespace SimplePartLoader
                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
 
             return transparentObject;
+        }
+
+        /// <summary>
+        /// Checks if a child name is unique between all his silbings.
+        /// </summary>
+        /// <param name="t">The transform of the parent of the object.</param>
+        /// <param name="nameToCheck">The name to check</param>
+        /// <returns>True if unique, false otherwise</returns>
+        internal static bool IsChildNameUnique(Transform t, string nameToCheck)
+        {
+            if (t == null)
+                return false;
+
+            for(int i =  0; i < t.childCount; i++)
+            {
+                Transform child = t.GetChild(0);
+                if (child.name == nameToCheck)
+                {
+                    Debug.LogError($"Found {nameToCheck} on {t.name}");
+                    return false;
+                }
+            }
+
+            Debug.LogError("returning true");
+            return true;
+        }
+
+        internal static GameObject GetGameObjectByName(string name)
+        {
+            GameObject go = null;
+
+            if (cachedResources.Load(name))
+            {
+                go = (GameObject)cachedResources.Load(name);
+            }
+            else
+            {
+                foreach(GameObject tempGo in gameParts)
+                {
+                    if(tempGo.name == name)
+                    {
+                        go = tempGo;
+                        break;
+                    }
+                }
+            }
+
+            return go;
         }
     }
 }

@@ -121,10 +121,10 @@ namespace SimplePartLoader
         /// </summary>
         /// <param name="p">The dummy part</param>
         /// <param name="partName">The name of the part that is going that provide the components to copy</param>
-        /// <param name="carName">The car of which the part is from (LAD, LADCoupe or Chad)</param>
+        /// <param name="p3dSupport">Enable experimental Paint in 3D cloning support</param>
         /// <param name="ignoreBuiltin">Ignore Unity built-in components (Renderer, collider and MeshFilter) while doing the copy</param>
         /// <param name="doNotCopyChilds">Disables the recursive child copy</param>
-        public static void CopyPartToPrefab(Part p, string partName, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
+        public static void CopyPartToPrefab(Part p, string partName, bool p3dSupport = true, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
         {
             if (p == null) // Safety check
             {
@@ -157,7 +157,7 @@ namespace SimplePartLoader
             {
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
-                    if(comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner)
+                    if((comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner) && p3dSupport)
                     {
                         /*
                          * Leave this here for debugging purposes. Will print all info of the component if painting related.
