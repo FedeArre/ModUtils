@@ -107,11 +107,9 @@ namespace SimplePartLoader
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
             foreach (TransparentData t in transparentData)
             {
-                Debug.LogError(t);
                 if (t == null)
                     continue;
 
-                Debug.LogError(cachedResources.Load(t.AttachesTo));
                 if (GetGameObjectByName(t.AttachesTo))
                 {
                     Transform attachment = ((GameObject)cachedResources.Load(t.AttachesTo)).transform;
@@ -158,36 +156,6 @@ namespace SimplePartLoader
                     }
                 }
             }
-            // Now we add our transparents into the game
-            /*for(int i = 0; i < cars.Length; i++)
-            {
-                Transform[] childs = cars[i].GetComponentsInChildren<Transform>();
-
-                foreach (Transform child in childs) // We check for every car part in the game
-                {
-                    TransparentData t = (TransparentData) transparentData[child.name];
-
-                    if (t != null)
-                    {
-                        Debug.LogError($"t not null, name: " + t.Name);
-                        if (!child.GetComponent<transparents>()) // Add transparent into game for car prefabs.
-                        {
-                            GameObject transparentObject = GetTransparentReadyObject(t);
-                            
-                            transparentObject.transform.SetParent(carList.GetComponent<CarList>().Cars[i].transform.Find(Functions.GetTransformPath(child))); // Modify directly the object in the CarList
-
-                            transparentObject.transform.localPosition = t.LocalPos;
-                            transparentObject.transform.localScale = t.Scale;
-                            transparentObject.transform.localRotation = t.LocalRot;
-                        }
-
-                        if (cachedResources.Load(t.AttachesTo) != null) // Checking if valid AttachesTo has been given
-                        {
-                            
-                        }
-                    }
-                }
-            }*/
 
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
