@@ -11,6 +11,12 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.1.0";
 
+        public ModMain()
+        {
+            Debug.LogError("SimplePartLoader is loading - Version: " + Version);
+            Debug.LogError("Developed by Federico Arredondo - www.github.com/FedeArre");
+        }
+
         public override void OnLoad()
         {
             PartManager.OnLoadCalled();
