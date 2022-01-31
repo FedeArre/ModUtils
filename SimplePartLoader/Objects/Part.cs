@@ -42,7 +42,9 @@ namespace SimplePartLoader
 
             CarProps.Paintable = true;
 
-            Prefab.AddComponent<P3dPaintable>();
+            if(!Prefab.GetComponent<P3dPaintable>())
+                Prefab.AddComponent<P3dPaintable>();
+
             Prefab.AddComponent<P3dPaintableTexture>().Slot = new P3dSlot(materialIndex, slotTextureType);
             Prefab.GetComponent<P3dPaintableTexture>().UpdateMaterial();
             Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
