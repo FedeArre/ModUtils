@@ -39,16 +39,20 @@ namespace SimplePartLoader
                 gameParts.Add(part);
             }
 
-            foreach(Transform part in GameObject.Find("SHOPITEMS").GetComponentsInChildren(typeof(Transform)))
+            if (GameObject.Find("SHOPITEMS")) // Safety check for survival mode.
             {
-                if (!part.GetComponent<SaleItem>())
-                    continue;
-
-                if (part.GetComponent<SaleItem>().Item.GetComponent<CarProperties>())
+                foreach(Transform part in GameObject.Find("SHOPITEMS").GetComponentsInChildren(typeof(Transform)))
                 {
-                    gameParts.Add(part.GetComponent<SaleItem>().Item);
+                    if (!part.GetComponent<SaleItem>())
+                        continue;
+
+                    if (part.GetComponent<SaleItem>().Item.GetComponent<CarProperties>())
+                    {
+                        gameParts.Add(part.GetComponent<SaleItem>().Item);
+                    }
                 }
             }
+            
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
@@ -84,6 +88,7 @@ namespace SimplePartLoader
 
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
                 sizeBeforeModify++;
+                gameParts.Add(p.Prefab);
 
                 // Localization
                 if(!hasFirstLoadOccured)
@@ -105,29 +110,25 @@ namespace SimplePartLoader
             }
 
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
-            foreach (TransparentData t in transparentData)
+
+            // We know load our transparents. We have to load them for the junkyard parts, car prefabs.
+            foreach(TransparentData t in transparentData)
             {
-                if (t == null)
-                    continue;
+                // We check the car part list for every possible part that has the transparent. This is slow but required for dummy part transparent attaching and will not impact FPS (Only loading time).
+                foreach(GameObject part in gameParts)
+                { 
+                    if(t.AttachesTo == part.name)
+                    {
+                        SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name})");
 
-                if (GetGameObjectByName(t.AttachesTo))
-                {
-                    Transform attachment = ((GameObject)cachedResources.Load(t.AttachesTo)).transform;
+                        GameObject transparentObject = GetTransparentReadyObject(t);
+                        transparentObject.transform.SetParent(part.transform);
 
-                    if (!IsChildNameUnique(attachment, t.Name))
-                        continue;
-
-                    SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name})");
-
-                    GameObject transparentObject = GetTransparentReadyObject(t);
-                    transparentObject.transform.SetParent(((GameObject)cachedResources.Load(t.AttachesTo)).transform);
-
-                    transparentObject.transform.localPosition = t.LocalPos;
-                    transparentObject.transform.localScale = t.Scale;
-                    transparentObject.transform.localRotation = t.LocalRot;
+                        transparentObject.transform.localPosition = t.LocalPos;
+                        transparentObject.transform.localScale = t.Scale;
+                        transparentObject.transform.localRotation = t.LocalRot;
+                    }
                 }
-                else
-                    Debug.LogError($"[SPL]: Trying to attach transparent into invalid object. Make sure the object is valid ({t.AttachesTo})");
 
                 for (int i = 0; i < cars.Length; i++) // Now we need to also attach the part into the car prefabs (or it will not spawn in the game)
                 {
@@ -139,9 +140,6 @@ namespace SimplePartLoader
                         {
                             if(!child.GetComponent<transparents>())
                             {
-                                if (!IsChildNameUnique(child, t.Name))
-                                    break;
-
                                 GameObject transparentObject = GetTransparentReadyObject(t);
                                 transparentObject.transform.SetParent(child);
 
@@ -156,7 +154,7 @@ namespace SimplePartLoader
                     }
                 }
             }
-
+ 
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
         }
@@ -209,31 +207,7 @@ namespace SimplePartLoader
                 }
             }
 
-            Debug.LogError("returning true");
             return true;
-        }
-
-        internal static GameObject GetGameObjectByName(string name)
-        {
-            GameObject go = null;
-
-            if (cachedResources.Load(name))
-            {
-                go = (GameObject)cachedResources.Load(name);
-            }
-            else
-            {
-                foreach(GameObject tempGo in gameParts)
-                {
-                    if(tempGo.name == name)
-                    {
-                        go = tempGo;
-                        break;
-                    }
-                }
-            }
-
-            return go;
         }
     }
 }
