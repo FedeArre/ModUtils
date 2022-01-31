@@ -24,9 +24,16 @@ namespace SimplePartLoader
         /// </summary>
         internal static List<TransparentData> transparentData = new List<TransparentData>();
 
+        /// <summary>
+        /// Used for triggering first load event.
+        /// </summary>
         internal static bool hasFirstLoadOccured = false;
 
+        /// <summary>
+        /// A list that contains all objects from the game.
+        /// </summary>
         internal static List<GameObject> gameParts;
+
         /// <summary>
         /// Handles the OnLoad function when called.
         /// </summary>
