@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace SimplePartLoader.Utils
 {
-    internal class Functions
+    public class Functions
     {
         /// <summary>
         /// Internal usage only, gets a car part from his name and car
@@ -16,7 +16,7 @@ namespace SimplePartLoader.Utils
         /// <param name="partName">The name of the part</param>
         /// <param name="carName">The car of the part</param>
         /// <returns>The prefab of the part if exists, null otherwise</returns>
-        internal static GameObject GetCarPart(string partName)
+        public static GameObject GetCarPart(string partName)
         {
             GameObject carPart = null;
             foreach (GameObject part in PartManager.gameParts)
@@ -36,7 +36,7 @@ namespace SimplePartLoader.Utils
         /// </summary>
         /// <param name="transform">Transform to get the path of</param>
         /// <returns>A string containing the absolute path. It will never return null</returns>
-        internal static string GetTransformPath(Transform transform)
+        public static string GetTransformPath(Transform transform)
         {
             string path = transform.name;
             while (transform.parent != null)
@@ -57,7 +57,7 @@ namespace SimplePartLoader.Utils
         /// </summary>
         /// <param name="other">The target component</param>
         /// <param name="comp">The target component</param>
-        internal static void CopyComponentData(Component comp, Component other)
+        public static void CopyComponentData(Component comp, Component other)
         {
             Type type = comp.GetType();
 
