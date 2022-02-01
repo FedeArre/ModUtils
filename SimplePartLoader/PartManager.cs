@@ -176,6 +176,7 @@ namespace SimplePartLoader
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
             GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
+            GameObject.Destroy(transparentObject.GetComponent<Renderer>());
 
             transparentObject.name = t.Name; // Renamed prefab is the one that the game uses for looking for transparent. Prefab name in car props is used for identify which prefab has to be loaded.
 
