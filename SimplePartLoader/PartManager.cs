@@ -63,8 +63,17 @@ namespace SimplePartLoader
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
-                SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.
-
+                try
+                {
+                    SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.
+                }
+                catch(Exception ex)
+                {
+                    Debug.LogError("[SPL]: Something went wrong during first load event! FirstLoad execution has been stopped. Error: ");
+                    Debug.LogError(ex.ToString());
+                    return;
+                }
+                
                 // Now we add all our dummy parts into modLoadedParts and do a small safety check to see if all our parts are fine.
                 foreach (Part part in dummyParts)
                     modLoadedParts.Add(part);
@@ -165,7 +174,16 @@ namespace SimplePartLoader
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
 
-            SPL.InvokeLoadFinish();
+            try
+            {
+                SPL.InvokeLoadFinish();
+            }
+            catch(Exception ex)
+            {
+                Debug.LogError("[SPL]: Something went wrong during load finished event! LoadFinish execution has been stopped. Error: ");
+                Debug.LogError(ex.ToString());
+                return;
+            }
         }
 
         /// <summary>
