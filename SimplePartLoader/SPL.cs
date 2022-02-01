@@ -17,6 +17,10 @@ namespace SimplePartLoader
 
         public static bool DEVELOPER_LOG = false;
 
+        internal static GameObject Player;
+
+        internal static tools PlayerTools;
+
         /// <summary>
         /// Adds a prefab as a car part into the game
         /// </summary>
@@ -220,7 +224,7 @@ namespace SimplePartLoader
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
-            p.PartInfo.RenamedPrefab = carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
+            p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
@@ -301,5 +305,9 @@ namespace SimplePartLoader
             if (DEVELOPER_LOG)
                 Debug.Log("[SPL]: " + str);
         }
+
+        public static GameObject GetPlayer() { return Player ? Player : GameObject.Find("Player"); }
+
+        public static tools GetPlayerTools() {  return PlayerTools ? PlayerTools : GameObject.Find("Player").GetComponent<tools>(); }
     }
 }

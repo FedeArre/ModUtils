@@ -39,6 +39,10 @@ namespace SimplePartLoader
         /// </summary>
         internal static void OnLoadCalled()
         {
+            // Preload these so developers can use them.
+            SPL.Player = GameObject.Find("Player");
+            SPL.PlayerTools = SPL.Player.GetComponent<tools>();
+
             // We first load all our parts into the list.
             gameParts = new List<GameObject>();
             foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
