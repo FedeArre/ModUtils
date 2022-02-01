@@ -164,6 +164,8 @@ namespace SimplePartLoader
  
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
+
+            SPL.InvokeLoadFinish();
         }
 
         /// <summary>

@@ -12,6 +12,9 @@ namespace SimplePartLoader
         public delegate void FirstLoadDelegate();
         public static event FirstLoadDelegate FirstLoad;
 
+        public delegate void LoadFinishDelegate();
+        public static event LoadFinishDelegate LoadFinish;
+
         public static bool DEVELOPER_LOG = false;
 
         /// <summary>
@@ -274,6 +277,18 @@ namespace SimplePartLoader
             {
                 DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
                 FirstLoad?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Invokes the LoadFinished event if any script is suscribed to it.
+        /// </summary>
+        internal static void InvokeLoadFinish()
+        {
+            if (LoadFinish != null)
+            {
+                DevLog("Load finish event was called");
+                LoadFinish?.Invoke();
             }
         }
 
