@@ -171,7 +171,7 @@ namespace SimplePartLoader
         /// </summary>
         /// <param name="t">The TransparentData instance that has all the information about the object</param>
         /// <returns>An GameObject ready to be a transparent (with the respective tag, layer, name, transparents component and without colliders)</returns>
-        internal static GameObject GetTransparentReadyObject(TransparentData t)
+        public static GameObject GetTransparentReadyObject(TransparentData t)
         {
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
@@ -192,30 +192,6 @@ namespace SimplePartLoader
                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
 
             return transparentObject;
-        }
-
-        /// <summary>
-        /// Checks if a child name is unique between all his silbings.
-        /// </summary>
-        /// <param name="t">The transform of the parent of the object.</param>
-        /// <param name="nameToCheck">The name to check</param>
-        /// <returns>True if unique, false otherwise</returns>
-        internal static bool IsChildNameUnique(Transform t, string nameToCheck)
-        {
-            if (t == null)
-                return false;
-
-            for(int i =  0; i < t.childCount; i++)
-            {
-                Transform child = t.GetChild(0);
-                if (child.name == nameToCheck)
-                {
-                    Debug.LogError($"Found {nameToCheck} on {t.name}");
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
