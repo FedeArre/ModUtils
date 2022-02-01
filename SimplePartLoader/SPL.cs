@@ -220,7 +220,7 @@ namespace SimplePartLoader
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
-            p.PartInfo.RenamedPrefab = carPart.transform.name; // Fixes transparents breaking after reloading
+            p.PartInfo.RenamedPrefab = carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
