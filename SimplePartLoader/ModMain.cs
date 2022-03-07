@@ -10,7 +10,7 @@ namespace SimplePartLoader
         public override string ID => "SimplePartLoader";
         public override string Name => "SimplePartLoader";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.1.1b";
+        public override string Version => "v1.1.1";
 
         public ModMain()
         {

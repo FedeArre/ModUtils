@@ -1,4 +1,5 @@
-﻿using PaintIn3D;
+﻿using Assets.SimpleLocalization;
+using PaintIn3D;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -227,6 +228,45 @@ namespace SimplePartLoader
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
+        }
+
+        /// <summary>
+        /// Forces the registering of a part into the internal mod list. Useful for parts that do not exist in survival.
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="addToCatalog"></param>
+        public static void ForcePartRegister(Part p, bool addToCatalog = false)
+        {
+            Debug.LogError("[SPL]: Forcing register of part " + p.Name + " into the internal mod parts list.");
+
+            PartManager.modLoadedParts.Add(p);
+            GameObject.DontDestroyOnLoad(p.Prefab);
+            PartManager.gameParts.Add(p.Prefab);
+
+            if (addToCatalog) // Adding part into catalog
+            {
+                GameObject junkyardListParent = GameObject.Find("PartsParent");
+                JunkPartsList jpl = junkyardListParent.GetComponent<JunkPartsList>();
+                int sizeBeforeModify = jpl.Parts.Length;
+
+                Array.Resize(ref jpl.Parts, sizeBeforeModify + 1);
+                jpl.Parts[sizeBeforeModify] = p.Prefab;
+            }
+
+            // Localization
+            if (p.languages["English"] == null)
+                p.languages["English"] = p.CarProps.PartName;
+
+            foreach (var dictionary in LocalizationManager.Dictionary)
+            {
+                if (dictionary.Value.ContainsKey(p.CarProps.PartName)) // Ignore case where the name is shared so the translation already exists
+                    continue;
+
+                if (p.languages[dictionary.Key] != null)
+                    dictionary.Value.Add(p.CarProps.PartName, (string)p.languages[dictionary.Key]);
+                else
+                    dictionary.Value.Add(p.CarProps.PartName, (string)p.languages["English"]); // Fallback to english if no locale was set.
+            }
         }
 
         internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
