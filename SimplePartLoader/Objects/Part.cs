@@ -65,7 +65,8 @@ namespace SimplePartLoader
                 Prefab.AddComponent<PickupWindow>();
                 Prefab.AddComponent<RemoveWindow>();
 
-                Prefab.layer = 11; // Windows layer.
+                Prefab.layer = LayerMask.NameToLayer("Windows");
+                Prefab.tag = "Window";
 
                 // Also check if part has welds / bolts
                 foreach(WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
