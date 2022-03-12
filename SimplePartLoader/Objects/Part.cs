@@ -54,5 +54,35 @@ namespace SimplePartLoader
         {
             languages[language] = newTranslation;
         }
+
+        public void UsePrytoolAttachment()
+        {
+            if(Prefab.GetComponent<Pickup>())
+                GameObject.Destroy(Prefab.GetComponent<Pickup>());
+
+            if (!Prefab.GetComponent<PickupWindow>())
+            {
+                Prefab.AddComponent<PickupWindow>();
+                Prefab.AddComponent<RemoveWindow>();
+
+                Prefab.layer = 11; // Windows layer.
+
+                // Also check if part has welds / bolts
+                foreach(WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
+                {
+                    GameObject.Destroy(wc.gameObject);
+                }
+
+                foreach (BoltNut bn in Prefab.GetComponentsInChildren<BoltNut>())
+                {
+                    GameObject.Destroy(bn.gameObject);
+                }
+
+                foreach (HexNut hn in Prefab.GetComponentsInChildren<HexNut>())
+                {
+                    GameObject.Destroy(hn.gameObject);
+                }
+            }
+        }
     }
 }
