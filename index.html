@@ -7,6 +7,7 @@
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/style.min.css" title="docsify-darklight-theme" type="text/css"/>
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/sidebar.min.css" />
 </head>
 <body>
   <div id="app"></div>
@@ -15,14 +16,18 @@
       name: 'SimplePartLoader',
       repo: 'https://github.com/FedeArre/SimplePartLoader',
       loadSidebar: true,
-      subMaxLevel: 2
+      alias: {
+        '/.*/_sidebar.md': '/_sidebar.md',
+    },
+      maxLevel: 4,
+      subMaxLevel: 2,
+      sidebarDisplayLevel: 1
     }
   </script>
   <!-- Docsify v4 -->
   <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
-  <script 
-    src="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js"
-    type="text/javascript">
+  <script src="//cdn.jsdelivr.net/npm/docsify-darklight-theme@latest/dist/index.min.js" type="text/javascript"></script>
+  <script src="//cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js" type="text/javascript"></script>
 </script>
 </body>
 </html>

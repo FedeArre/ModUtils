@@ -1,1 +1,21 @@
-* [Guide](guide.md)
+- **Geting started**
+    - [Downloads](downloads.md)
+    - [Frequently Asked Questions](faq.md)
+
+- **API**
+    - [SPL](api/spl.md)
+        - **Methods**
+            - [LoadPart](api/spl/loadpart.md)
+            - [LoadDummy](api/spl/loaddummy.md)
+            - [CopyPartToPrefab](api/spl/copyparttoprefab.md)
+            - [ForcePartRegister](api/spl/forcepartregister.md)
+            - [GetPlayer](api/spl/getplayer.md)
+            - [GetPlayerTools](api/spl/getplayertools.md)
+        - **Events**
+            - [FirstLoad](api/spl/firstload.md)
+            - [LoadFinish](api/spl.loadfinish.md)
+    - [Part](api/part.md)
+        - [SetupTransparent](api/part/setuptransparent.md)
+        - [EnablePainting](api/part/enablepainting.md)
+        - [Localize](api/part/localize.md)
+        - [UsePrytoolAttachment](api/part/useprytoolattachment.md) 

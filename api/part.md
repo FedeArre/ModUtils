@@ -1,0 +1,19 @@
+# Part <!-- {docsify-ignore} -->
+
+Represents a car part in the game. 
+
+## Variables <!-- {docsify-ignore} -->
+
+Name | Description | Type
+----- | ----------- | ----
+Prefab | Stores a reference to the Prefab of the part | GameObject
+CarProps | Stores a reference to the CarProperties of the prefab of the part | CarProperties
+PartInfo | Stores a reference to the PartInfo of the prefab of the part | PartInfo
+
+## Methods <!-- {docsify-ignore} -->
+Name | Description
+----- | -----------
+[SetupTransparent](api/part/setuptransparent.md) | Allows to create a transparent (Attachment point) for the part
+[EnablePainting](api/part/enablepainting.md) | Makes the part paintable (Will use experimental PaintIn3D support)
+[Localize](api/part/localize.md) | Allows to localize a part for a specific language
+[UsePrytoolAttachment](api/part/useprytoolattachment.md) | Sets the part to use the prytool attachment system of the game
