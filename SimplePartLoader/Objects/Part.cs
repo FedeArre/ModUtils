@@ -70,11 +70,11 @@ namespace SimplePartLoader
         }
 
         // Painting support
-        public void EnablePaintSupport(int paintMaterialIndex, int rustMaterialIndex = -1, int washMaterialIndex = -1)
+        public void EnablePaintSupport(int paintMaterialIndex, bool enableRustAndDirt = true)
         {
             if(Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Name} but already has painting components.");
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -82,9 +82,9 @@ namespace SimplePartLoader
 
             // Material checks
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
-            if(prefabRenderer.materials.Length > paintMaterialIndex)
+            if(prefabRenderer.materials.Length < paintMaterialIndex)
             {
-                Debug.LogError($"[SPL]: Invalid paint material index on {Name}.");
+                Debug.LogError($"[SPL]: Invalid material index for painting on {Prefab.name}.");
                 return;
             }
 
@@ -97,6 +97,66 @@ namespace SimplePartLoader
             paintableTexture_paint.Slot = p3dSlot_paint;
             materialCloner_paint.Index = paintMaterialIndex;
             counter_paint.PaintableTexture = paintableTexture_paint;
+
+            // Rust and dirt - Initial check
+            if (!enableRustAndDirt)
+                return;
+
+            // Rust and dirt - Material check
+            // We first need to check if the object has a rust-dirt material already created. If no, we have to create it.
+            Material l2Material = null;
+            int l2Material_index = -1;
+
+            for(int i = 0; i < prefabRenderer.materials.Length; i++)
+            {
+                if(prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                {
+                    l2Material = prefabRenderer.materials[i];
+                    l2Material_index = i;
+                    break;
+                }
+            }
+
+            if (!l2Material)
+            {
+                l2Material = new Material(Shader.Find("Thunderbyte/RustDirt2Layers"));
+
+                // Now we need to add this material to our object.
+                Material[] newMaterialsArray = new Material[prefabRenderer.materials.Length+1];
+                
+                for(int i = 0; i < prefabRenderer.materials.Length; i++)
+                {
+                    newMaterialsArray[i] = prefabRenderer.materials[i];
+                }
+
+                newMaterialsArray[newMaterialsArray.Length - 1] = l2Material;
+                prefabRenderer.materials = newMaterialsArray;
+            }
+
+            // Painting components
+            // We need to add 3 paintable textures, 2 change counters and a material cloner.
+            P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
+
+            P3dChangeCounter conter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter conter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
+
+            P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+
+            P3dSlot p3dSlot_rustDirt = new P3dSlot(l2Material_index, "_L2MetallicRustDustSmoothness");
+            P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
+            P3dSlot p3dSlot_grungeMap = new P3dSlot(l2Material_index, "_GrungeMap");
+
+            // Setting up the components
+            paintableTexture_colorMap.Slot = p3dSlot_colorMap;
+            paintableTexture_grungeMap.Slot = p3dSlot_grungeMap;
+            paintableTexture_grungeMap.Slot = p3dSlot_rustDirt;
+
+            materialCloner_l2.Index = l2Material_index;
+
+            conter_rustDirt.PaintableTexture = paintableTexture_rustDirt;
+            conter_colorMap.PaintableTexture = paintableTexture_colorMap;
         }
     }
 }
