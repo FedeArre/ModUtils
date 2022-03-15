@@ -70,7 +70,7 @@ namespace SimplePartLoader
         }
 
         // Painting support
-        public void EnablePaintSupport(int paintMaterialIndex, bool enableRustAndDirt = true)
+        public void EnablePaintSupport(int paintMaterialIndex, bool enableRustAndDirt)
         {
             if(Paintable || Prefab.GetComponent<P3dPaintable>())
             {
@@ -95,6 +95,8 @@ namespace SimplePartLoader
             P3dChangeCounter counter_paint = Prefab.AddComponent<P3dChangeCounter>();
 
             paintableTexture_paint.Slot = p3dSlot_paint;
+            paintableTexture_paint.Group = 5;
+
             materialCloner_paint.Index = paintMaterialIndex;
             counter_paint.PaintableTexture = paintableTexture_paint;
 
@@ -150,8 +152,12 @@ namespace SimplePartLoader
 
             // Setting up the components
             paintableTexture_colorMap.Slot = p3dSlot_colorMap;
+
             paintableTexture_grungeMap.Slot = p3dSlot_grungeMap;
-            paintableTexture_grungeMap.Slot = p3dSlot_rustDirt;
+            paintableTexture_grungeMap.Group = 100;
+
+            paintableTexture_rustDirt.Slot = p3dSlot_rustDirt;
+            paintableTexture_rustDirt.Group = 100;
 
             materialCloner_l2.Index = l2Material_index;
 
