@@ -18,4 +18,14 @@
         - [SetupTransparent](api/part/setuptransparent.md)
         - [EnablePainting](api/part/enablepainting.md)
         - [Localize](api/part/localize.md)
-        - [UsePrytoolAttachment](api/part/useprytoolattachment.md) 
+        - [UsePrytoolAttachment](api/part/useprytoolattachment.md)
+
+- **Guides**
+    - [First steps](guides/first_steps.md)
+    - [Transparents and the editor](guides/transparents.md)
+    - [What are dummy parts?](guides/dummy_parts.md)
+    - [Fixing broken dummy parts](guides/fixing_dummy_parts.md)
+    - [Changing the mesh of a dummy part](guides/fixing_dummy_parts.md)
+    - [Exporting from Blender](guides/blender_fix.md)
+    - [The painting system](guides/painting.md)
+    - [Localization](guides/localization.md)
