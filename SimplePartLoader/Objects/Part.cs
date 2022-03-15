@@ -98,7 +98,9 @@ namespace SimplePartLoader
             paintableTexture_paint.Group = 5;
 
             materialCloner_paint.Index = paintMaterialIndex;
+            
             counter_paint.PaintableTexture = paintableTexture_paint;
+            counter_paint.Threshold = 0.7f;
             counter_paint.enabled = false;
             
             CarProps.Paintable = true;
@@ -140,7 +142,7 @@ namespace SimplePartLoader
             }
 
             // Painting components
-            // We need to add 3 paintable textures, 2 change counters and a material cloner.
+            // We need to add 3 paintable textures, 2 change counters, a color counter and a material cloner.
             P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
@@ -149,6 +151,8 @@ namespace SimplePartLoader
             P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
 
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+
+            P3dColorCounter colorCounter_l2 = Prefab.AddComponent<P3dColorCounter>();
 
             P3dSlot p3dSlot_rustDirt = new P3dSlot(l2Material_index, "_L2MetallicRustDustSmoothness");
             P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
@@ -168,8 +172,14 @@ namespace SimplePartLoader
             counter_rustDirt.PaintableTexture = paintableTexture_rustDirt;
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
 
+            counter_rustDirt.Threshold = 0.5f;
             counter_rustDirt.enabled = false;
+
+            counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
+
+            colorCounter_l2.Threshold = 0.1f;
+            colorCounter_l2.PaintableTexture = paintableTexture_colorMap;
         }
     }
 }
