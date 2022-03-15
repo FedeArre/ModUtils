@@ -68,5 +68,35 @@ namespace SimplePartLoader
                 }
             }
         }
+
+        // Painting support
+        public void EnablePaintSupport(int paintMaterialIndex, int rustMaterialIndex = -1, int washMaterialIndex = -1)
+        {
+            if(Paintable || Prefab.GetComponent<P3dPaintable>())
+            {
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Name} but already has painting components.");
+                return;
+            }
+
+            P3dPaintable p3dPaintable = Prefab.AddComponent<P3dPaintable>();
+
+            // Material checks
+            Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
+            if(prefabRenderer.materials.Length > paintMaterialIndex)
+            {
+                Debug.LogError($"[SPL]: Invalid paint material index on {Name}.");
+                return;
+            }
+
+            // Paint
+            P3dPaintableTexture paintableTexture_paint = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
+            P3dSlot p3dSlot_paint = new P3dSlot(paintMaterialIndex, "_MainTex");
+            P3dChangeCounter counter_paint = Prefab.AddComponent<P3dChangeCounter>();
+
+            paintableTexture_paint.Slot = p3dSlot_paint;
+            materialCloner_paint.Index = paintMaterialIndex;
+            counter_paint.PaintableTexture = paintableTexture_paint;
+        }
     }
 }
