@@ -99,6 +99,9 @@ namespace SimplePartLoader
 
             materialCloner_paint.Index = paintMaterialIndex;
             counter_paint.PaintableTexture = paintableTexture_paint;
+            counter_paint.enabled = false;
+            
+            CarProps.Paintable = true;
 
             // Rust and dirt - Initial check
             if (!enableRustAndDirt)
@@ -142,8 +145,8 @@ namespace SimplePartLoader
             P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
 
-            P3dChangeCounter conter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
-            P3dChangeCounter conter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter counter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
 
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
 
@@ -162,8 +165,11 @@ namespace SimplePartLoader
 
             materialCloner_l2.Index = l2Material_index;
 
-            conter_rustDirt.PaintableTexture = paintableTexture_rustDirt;
-            conter_colorMap.PaintableTexture = paintableTexture_colorMap;
+            counter_rustDirt.PaintableTexture = paintableTexture_rustDirt;
+            counter_colorMap.PaintableTexture = paintableTexture_colorMap;
+
+            counter_rustDirt.enabled = false;
+            counter_colorMap.enabled = false;
         }
     }
 }
