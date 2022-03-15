@@ -33,23 +33,6 @@ namespace SimplePartLoader
             PartManager.transparentData.Add(new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable));
         }
 
-        public void EnablePainting(int materialIndex, string slotTextureType = "_MainTex")
-        {
-            if (Paintable)
-                return;
-
-            Paintable = true;
-
-            CarProps.Paintable = true;
-
-            if(!Prefab.GetComponent<P3dPaintable>())
-                Prefab.AddComponent<P3dPaintable>();
-
-            Prefab.AddComponent<P3dPaintableTexture>().Slot = new P3dSlot(materialIndex, slotTextureType);
-            Prefab.GetComponent<P3dPaintableTexture>().UpdateMaterial();
-            Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
-        }
-
         public void Localize(string language, string newTranslation)
         {
             languages[language] = newTranslation;
