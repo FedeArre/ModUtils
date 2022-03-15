@@ -132,6 +132,7 @@ namespace SimplePartLoader
                 }
 
                 newMaterialsArray[newMaterialsArray.Length - 1] = l2Material;
+                l2Material_index = newMaterialsArray.Length - 1;
                 prefabRenderer.materials = newMaterialsArray;
             }
 
