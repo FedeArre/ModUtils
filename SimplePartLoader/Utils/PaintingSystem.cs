@@ -27,11 +27,87 @@ namespace SimplePartLoader.Utils
             paintableTexture.UpdateMaterial();
 
             Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
+
+            part.CarProps.Paintable = true;
+            part.Paintable = true;
         }
 
         public static void EnablePaintAndRust(Part part, int l2Index)
         {
+            GameObject Prefab = part.Prefab;
 
+            if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
+            {
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                return;
+            }
+
+            Prefab.AddComponent<P3dPaintable>();
+
+            // Material checks
+            Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
+            int l2Material_index = -1;
+
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            {
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                {
+                    Debug.LogError("Found material at index " + i);
+                    l2Material_index = i;
+                }
+            }
+
+            // We create a L2 material if the object does not have.
+            if (l2Material_index == -1)
+            {
+                CreatePaintRustMaterial(prefabRenderer, l2Index);
+                if (l2Index != -1)
+                    l2Material_index = l2Index; // It was added to our specific index.
+                else
+                    l2Material_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+            }
+
+            // Now we add all the painting components
+            P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+
+            P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_rust = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
+
+            P3dChangeCounter counter_rust = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
+
+            P3dSlot p3dSlot_rustDirt = new P3dSlot(l2Material_index, "_L2MetallicRustDustSmoothness");
+            P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
+            P3dSlot p3dSlot_grungeMap = new P3dSlot(l2Material_index, "_GrungeMap");
+
+            // Setting up the components
+
+            // Material cloner
+            materialCloner_l2.Index = l2Material_index;
+
+            // Paintable textures
+            paintableTexture_colorMap.Slot = p3dSlot_colorMap;
+
+            paintableTexture_grungeMap.Slot = p3dSlot_grungeMap;
+            paintableTexture_grungeMap.Group = 100;
+
+            paintableTexture_rust.Slot = p3dSlot_rustDirt;
+            paintableTexture_rust.Group = 100;
+
+            // Counters
+            counter_rust.PaintableTexture = paintableTexture_rust;
+            counter_rust.Threshold = 0.5f;
+            counter_rust.enabled = false;
+
+            counter_colorMap.PaintableTexture = paintableTexture_colorMap;
+            counter_colorMap.Threshold = 0.1f;
+            counter_colorMap.enabled = false;
+
+            // Final details
+            part.Paintable = true;
+            part.CarProps.Paintable = true;
+            part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
         public static void EnableDirtOnly(Part part, int alphaIndex)
