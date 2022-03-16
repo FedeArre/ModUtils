@@ -54,6 +54,7 @@ namespace SimplePartLoader.Utils
                 {
                     Debug.LogError("Found material at index " + i);
                     l2Material_index = i;
+                    break;
                 }
             }
 
@@ -112,7 +113,60 @@ namespace SimplePartLoader.Utils
 
         public static void EnableDirtOnly(Part part, int alphaIndex)
         {
+            GameObject Prefab = part.Prefab;
 
+            if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
+            {
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                return;
+            }
+
+            Prefab.AddComponent<P3dPaintable>();
+
+            // Material checks
+            Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
+            int alphaMaterial_index = -1;
+
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            {
+                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
+                {
+                    alphaMaterial_index = i;
+                    break;
+                }
+            }
+
+            // We create a Paint in 3D/Alpha material if it does not exist.
+            if (alphaMaterial_index == -1)
+            {
+                CreateAlphaMaterial(prefabRenderer, alphaMaterial_index);
+
+                if (alphaIndex != -1)
+                    alphaMaterial_index = alphaIndex; // It was added to our specific index.
+                else
+                    alphaMaterial_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+            }
+
+            // Setting up the components
+
+            // Material cloner
+            P3dMaterialCloner materialCloner_dirt = Prefab.AddComponent<P3dMaterialCloner>();
+            materialCloner_dirt.Index = alphaMaterial_index;
+
+            // Paintable texture
+            P3dPaintableTexture paintableTexture_dirt = Prefab.AddComponent<P3dPaintableTexture>();
+            paintableTexture_dirt.Slot = new P3dSlot(alphaMaterial_index, "_MainTex");
+            paintableTexture_dirt.Group = 5;
+
+            // Counter
+            P3dChangeCounter counter_dirt = Prefab.AddComponent<P3dChangeCounter>();
+            counter_dirt.PaintableTexture = paintableTexture_dirt;
+            counter_dirt.Threshold = 0.7f;
+            counter_dirt.enabled = false;
+
+            // Final details
+            part.Paintable = true;
+            part.CarProps.Washable = true;
         }
 
         public static void EnableFullSupport(Part part, int l2Index, int alphaIndex)
