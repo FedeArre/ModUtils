@@ -70,7 +70,17 @@ namespace SimplePartLoader
             }
         }
 
-        public void EnablePainting(SPL.PaintingSupportedTypes type, int rustOrPaintMaterialIndex = -1, int alphaMaterialIndex = -1)
+        /// <summary>
+        /// Enables paint-only on the part. Deprecated (Use EnablePartPainting with type OnlyPaint instead).
+        /// </summary>
+        /// <param name="materialIndex">The index of the material that will be paintable</param>
+        [Obsolete("EnablePainting is deprecated and only exists for compatibility reasons. Please use EnablePartPainting instead.")]
+        public void EnablePainting(int materialIndex)
+        {
+            PaintingSystem.EnablePaintOnly(this, materialIndex);
+        }
+
+        public void EnablePartPainting(SPL.PaintingSupportedTypes type, int rustOrPaintMaterialIndex = -1, int alphaMaterialIndex = -1)
         {
             switch (type)
             {
