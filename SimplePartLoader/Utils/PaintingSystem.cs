@@ -100,17 +100,20 @@ namespace SimplePartLoader.Utils
             paintableTexture_dirt.Group = 5;
 
             counter_rust.PaintableTexture = paintableTexture_rust;
-            counter_colorMap.PaintableTexture = paintableTexture_colorMap;
-
             counter_rust.Threshold = 0.5f;
+            counter_rust.enabled = false;
 
+            counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
+            counter_colorMap.enabled = false;
 
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
+            counter_dirt.enabled = false;
 
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
+            part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
         /// <summary>
@@ -120,6 +123,7 @@ namespace SimplePartLoader.Utils
         /// <param name="indexForMaterial">The index for the L2 material. If the index is -1 the material will be added as a new element of the renderer materials at the end.</param>
         public static void CreatePaintRustMaterial(Renderer renderer, int indexForMaterial = -1)
         {
+            Debug.LogError("Creating L2 material for " + renderer);
             Material l2Material = new Material(Shader.Find("Thunderbyte/RustDirt2Layers"));
 
             // Now we need to add this material to our object.
@@ -142,13 +146,13 @@ namespace SimplePartLoader.Utils
         }
 
         /// <summary>
-        /// Creates a PaintIn3D/Alpha material and assigns it into a renderer.
+        /// Creates a Paintin3D/Alpha material and assigns it into a renderer.
         /// </summary>
         /// <param name="renderer">The renderer of the object</param>
         /// <param name="indexForMaterial">The index for the alpha material. If the index is -1 the material will be added as a new element of the renderer materials at the end.</param>
         public static void CreateAlphaMaterial(Renderer renderer, int indexForMaterial = -1)
         {
-            Material alphaMaterial = new Material(Shader.Find("Paint In 3D/Alpha"));
+            Material alphaMaterial = new Material(Shader.Find("Paint in 3D/Alpha"));
 
             // Now we need to add this material to our object.
             if (indexForMaterial == -1)
