@@ -70,7 +70,7 @@ namespace SimplePartLoader
         }
 
         // Painting support
-        public void EnablePaintSupport(int paintMaterialIndex)
+        /*public void EnablePaintSupport(int paintRustMaterial = -2, int dirtMaterial = -2)
         {
             if(Paintable || Prefab.GetComponent<P3dPaintable>())
             {
@@ -97,6 +97,7 @@ namespace SimplePartLoader
             {
                 if(prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
                 {
+                    Debug.LogError("Found material at index " + i);
                     l2Material = prefabRenderer.materials[i];
                     l2Material_index = i;
                     break;
@@ -122,14 +123,15 @@ namespace SimplePartLoader
 
             // Painting components
             // We need to add 3 paintable textures, 2 change counters, a color counter and a material cloner.
+            P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+
             P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
+            
+            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
             P3dPaintableTexture paintableTexture_paint = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
             
-            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
-            P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
-
             P3dChangeCounter counter_paint = Prefab.AddComponent<P3dChangeCounter>();
             P3dChangeCounter counter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
             P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
@@ -139,6 +141,8 @@ namespace SimplePartLoader
             P3dSlot p3dSlot_grungeMap = new P3dSlot(l2Material_index, "_GrungeMap");
             P3dSlot p3dSlot_paint = new P3dSlot(paintMaterialIndex, "_MainTex");
             
+            Debug.LogError($"Setting things up. pmi is {paintMaterialIndex} l2 {l2Material_index}");
+
             // Setting up the components
             paintableTexture_colorMap.Slot = p3dSlot_colorMap;
 
@@ -147,6 +151,9 @@ namespace SimplePartLoader
 
             paintableTexture_rustDirt.Slot = p3dSlot_rustDirt;
             paintableTexture_rustDirt.Group = 100;
+            
+            paintableTexture_paint.Slot = p3dSlot_paint;
+            paintableTexture_paint.Group = 5;
 
             materialCloner_l2.Index = l2Material_index;
 
@@ -157,8 +164,6 @@ namespace SimplePartLoader
 
             counter_colorMap.Threshold = 0.1f;
 
-            paintableTexture_paint.Slot = p3dSlot_paint;
-            paintableTexture_paint.Group = 5;
 
             materialCloner_paint.Index = paintMaterialIndex;
             
@@ -167,6 +172,6 @@ namespace SimplePartLoader
 
             CarProps.Paintable = true;
             CarProps.Washable = true;
-        }
+        }*/
     }
 }
