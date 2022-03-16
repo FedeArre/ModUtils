@@ -70,7 +70,7 @@ namespace SimplePartLoader
         }
 
         // Painting support
-        public void EnablePaintSupport(int paintMaterialIndex, bool enableRustAndDirt)
+        public void EnablePaintSupport(int paintMaterialIndex)
         {
             if(Paintable || Prefab.GetComponent<P3dPaintable>())
             {
@@ -87,27 +87,6 @@ namespace SimplePartLoader
                 Debug.LogError($"[SPL]: Invalid material index for painting on {Prefab.name}.");
                 return;
             }
-
-            // Paint
-            P3dPaintableTexture paintableTexture_paint = Prefab.AddComponent<P3dPaintableTexture>();
-            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
-            P3dSlot p3dSlot_paint = new P3dSlot(paintMaterialIndex, "_MainTex");
-            P3dChangeCounter counter_paint = Prefab.AddComponent<P3dChangeCounter>();
-
-            paintableTexture_paint.Slot = p3dSlot_paint;
-            paintableTexture_paint.Group = 5;
-
-            materialCloner_paint.Index = paintMaterialIndex;
-            
-            counter_paint.PaintableTexture = paintableTexture_paint;
-            counter_paint.Threshold = 0.7f;
-            counter_paint.enabled = false;
-            
-            CarProps.Paintable = true;
-
-            // Rust and dirt - Initial check
-            if (!enableRustAndDirt)
-                return;
 
             // Rust and dirt - Material check
             // We first need to check if the object has a rust-dirt material already created. If no, we have to create it.
@@ -143,21 +122,23 @@ namespace SimplePartLoader
 
             // Painting components
             // We need to add 3 paintable textures, 2 change counters, a color counter and a material cloner.
-            P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
-            P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
             P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
-
-            P3dChangeCounter counter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
-            P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
-
+            P3dPaintableTexture paintableTexture_rustDirt = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_paint = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_grungeMap = Prefab.AddComponent<P3dPaintableTexture>();
+            
+            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
 
-            P3dColorCounter colorCounter_l2 = Prefab.AddComponent<P3dColorCounter>();
+            P3dChangeCounter counter_paint = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter counter_rustDirt = Prefab.AddComponent<P3dChangeCounter>();
+            P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
 
             P3dSlot p3dSlot_rustDirt = new P3dSlot(l2Material_index, "_L2MetallicRustDustSmoothness");
             P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
             P3dSlot p3dSlot_grungeMap = new P3dSlot(l2Material_index, "_GrungeMap");
-
+            P3dSlot p3dSlot_paint = new P3dSlot(paintMaterialIndex, "_MainTex");
+            
             // Setting up the components
             paintableTexture_colorMap.Slot = p3dSlot_colorMap;
 
@@ -173,13 +154,19 @@ namespace SimplePartLoader
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
 
             counter_rustDirt.Threshold = 0.5f;
-            counter_rustDirt.enabled = false;
 
             counter_colorMap.Threshold = 0.1f;
-            counter_colorMap.enabled = false;
 
-            colorCounter_l2.Threshold = 0.1f;
-            colorCounter_l2.PaintableTexture = paintableTexture_colorMap;
+            paintableTexture_paint.Slot = p3dSlot_paint;
+            paintableTexture_paint.Group = 5;
+
+            materialCloner_paint.Index = paintMaterialIndex;
+            
+            counter_paint.PaintableTexture = paintableTexture_paint;
+            counter_paint.Threshold = 0.7f;
+
+            CarProps.Paintable = true;
+            CarProps.Washable = true;
         }
     }
 }

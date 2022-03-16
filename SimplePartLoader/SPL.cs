@@ -164,7 +164,7 @@ namespace SimplePartLoader
             {
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
-                    if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner)
+                    if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter)
                         continue;
 
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
