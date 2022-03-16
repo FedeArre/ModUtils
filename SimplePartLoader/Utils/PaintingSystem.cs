@@ -285,11 +285,10 @@ namespace SimplePartLoader.Utils
         /// <param name="indexForMaterial">The index for the L2 material. If the index is -1 the material will be added as a new element of the renderer materials at the end.</param>
         public static void CreatePaintRustMaterial(Renderer renderer, int indexForMaterial = -1)
         {
-            Debug.LogError("Creating L2 material for " + renderer);
             Material l2Material = new Material(Shader.Find("Thunderbyte/RustDirt2Layers"));
 
             // Now we need to add this material to our object.
-            if(indexForMaterial == -1)
+            if (indexForMaterial == -1)
             {
                 Material[] newMaterialsArray = new Material[renderer.materials.Length + 1];
 
@@ -303,7 +302,9 @@ namespace SimplePartLoader.Utils
             }
             else
             {
-                renderer.materials[indexForMaterial] = l2Material;
+                Material[] mats = renderer.materials;
+                mats[indexForMaterial] = l2Material;
+                renderer.materials = mats;
             }
         }
 
@@ -331,7 +332,9 @@ namespace SimplePartLoader.Utils
             }
             else
             {
-                renderer.materials[indexForMaterial] = alphaMaterial;
+                Material[] mats = renderer.materials;
+                mats[indexForMaterial] = alphaMaterial;
+                renderer.materials = mats;
             }
         }
     }
