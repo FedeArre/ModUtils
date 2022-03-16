@@ -10,6 +10,35 @@ namespace SimplePartLoader.Utils
 {
     internal class PaintingSystem
     {
+        public static void EnablePaintOnly(Part part, int materialIndex)
+        {
+            GameObject Prefab = part.Prefab;
+
+            if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
+            {
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                return;
+            }
+
+            Prefab.AddComponent<P3dPaintable>();
+
+            P3dPaintableTexture paintableTexture = Prefab.AddComponent<P3dPaintableTexture>();
+            paintableTexture.Slot = new P3dSlot(materialIndex, "_MainTex");
+            paintableTexture.UpdateMaterial();
+
+            Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
+        }
+
+        public static void EnablePaintAndRust(Part part, int l2Index)
+        {
+
+        }
+
+        public static void EnableDirtOnly(Part part, int alphaIndex)
+        {
+
+        }
+
         public static void EnableFullSupport(Part part, int l2Index, int alphaIndex)
         {
             GameObject Prefab = part.Prefab;
@@ -20,7 +49,7 @@ namespace SimplePartLoader.Utils
                 return;
             }
 
-            P3dPaintable p3dPaintable = Prefab.AddComponent<P3dPaintable>();
+            Prefab.AddComponent<P3dPaintable>();
 
             // Material checks
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
@@ -99,6 +128,7 @@ namespace SimplePartLoader.Utils
             paintableTexture_dirt.Slot = p3dSlot_dirt;
             paintableTexture_dirt.Group = 5;
 
+            // Counters
             counter_rust.PaintableTexture = paintableTexture_rust;
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
@@ -111,6 +141,8 @@ namespace SimplePartLoader.Utils
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
 
+            // Final details
+            part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
