@@ -75,8 +75,9 @@ namespace SimplePartLoader
         /// </summary>
         /// <param name="materialIndex">The index of the material that will be paintable</param>
         [Obsolete("EnablePainting is deprecated and only exists for compatibility reasons. Please use EnablePartPainting instead.")]
-        public void EnablePainting(int materialIndex)
+        public void EnablePainting(int materialIndex, string slot)
         {
+            // Slot is now unused.
             PaintingSystem.EnablePaintOnly(this, materialIndex);
         }
 
