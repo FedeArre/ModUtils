@@ -132,6 +132,7 @@ namespace SimplePartLoader
             return p;
         }
 
+
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
         /// </summary>
@@ -194,6 +195,12 @@ namespace SimplePartLoader
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
+        }
+
+        [Obsolete("CopyPartToPrefab with 5 parameters is deprecated and only exists for compatibility reasons.")]
+        public static void CopyPartToPrefab(Part p, string partName, bool p3dSupport = true, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
+        {
+            CopyPartToPrefab(p, partName, ignoreBuiltin, doNotCopyChilds);
         }
 
         /// <summary>
