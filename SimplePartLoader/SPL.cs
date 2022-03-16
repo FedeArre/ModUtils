@@ -197,12 +197,6 @@ namespace SimplePartLoader
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
 
-        [Obsolete("CopyPartToPrefab with 5 parameters is deprecated and only exists for compatibility reasons.")]
-        public static void CopyPartToPrefab(Part p, string partName, bool p3dSupport = true, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
-        {
-            CopyPartToPrefab(p, partName, ignoreBuiltin, doNotCopyChilds);
-        }
-
         /// <summary>
         /// Forces the registering of a part into the internal mod list. Useful for parts that do not exist in survival.
         /// </summary>
