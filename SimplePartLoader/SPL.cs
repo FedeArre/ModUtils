@@ -22,13 +22,13 @@ namespace SimplePartLoader
 
         internal static tools PlayerTools;
 
-        public enum PaintingSupportType
+        public enum PaintingSupportedTypes
         {
-            OnlyPaint = 1,
-            OnlyDirt,
-            OnlyPaintRust
+            FullPaintingSupport = 1,
+            OnlyPaint,
+            OnlyPaintAndRust,
+            OnlyDirt
         }
-
 
         /// <summary>
         /// Adds a prefab as a car part into the game

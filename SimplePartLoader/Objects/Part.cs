@@ -70,55 +70,35 @@ namespace SimplePartLoader
             }
         }
 
-        public void EnableFullPaintSupport()
+        public void EnablePainting(SPL.PaintingSupportedTypes type, int rustOrPaintMaterialIndex = -1, int alphaMaterialIndex = -1)
         {
-            PaintingSystem.EnableFullSupport(this, -1, -1);
+            switch (type)
+            {
+                case SPL.PaintingSupportedTypes.FullPaintingSupport:
+                    PaintingSystem.EnableFullSupport(this, rustOrPaintMaterialIndex, alphaMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyPaint:
+                    PaintingSystem.EnablePaintOnly(this, rustOrPaintMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyPaintAndRust:
+                    PaintingSystem.EnablePaintAndRust(this, rustOrPaintMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyDirt:
+                    PaintingSystem.EnableDirtOnly(this, alphaMaterialIndex);
+                    break;
+
+                default:
+                    Debug.LogError("[SPL]: An invalid type has been sent to Part.EnablePainting, part: " +Prefab.name);
+                    break;
+            }
         }
 
-        /* 
-            For painting:
-            2 types of materials are required: Thunderbyte/RustDirt2Layers and Paint in 3D/Alpha (shaders)
-            
-            Group values are correct.
-            Order: ColorMap, RustDirt, MainTex (alpha shader), Grunge map.
-            Change counter can be disabled.
-
-            
-         */
-        // Painting support
-        /*public void EnablePaintSupport(int paintRustMaterial = -2, int dirtMaterial = -2)
+        /*public void EnableFullPaintSupport(int rustDustMaterial = -1, int alphaMaterial = -1)
         {
-            
-            
-
-            
-
-            // Rust and dirt - Material check
-            // We first need to check if the object has a rust-dirt material already created. If no, we have to create it.
-            Material l2Material = null;
-            int l2Material_index = -1;
-
-            for(int i = 0; i < prefabRenderer.materials.Length; i++)
-            {
-                if(prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
-                {
-                    Debug.LogError("Found material at index " + i);
-                    l2Material = prefabRenderer.materials[i];
-                    l2Material_index = i;
-                    break;
-                }
-            }
-
-            if (!l2Material)
-            {
-                
-            }
-
-            // Painting components
-            // We need to add 3 paintable textures, 2 change counters, a color counter and a material cloner.
-            
-            
-            
+            PaintingSystem.EnableFullSupport(this, rustDustMaterial, alphaMaterial);
         }*/
     }
 }
