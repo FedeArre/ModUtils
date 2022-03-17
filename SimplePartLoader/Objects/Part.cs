@@ -1,4 +1,5 @@
 ﻿using PaintIn3D;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -31,23 +32,6 @@ namespace SimplePartLoader
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)
         {
             PartManager.transparentData.Add(new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable));
-        }
-
-        public void EnablePainting(int materialIndex, string slotTextureType = "_MainTex")
-        {
-            if (Paintable)
-                return;
-
-            Paintable = true;
-
-            CarProps.Paintable = true;
-
-            if(!Prefab.GetComponent<P3dPaintable>())
-                Prefab.AddComponent<P3dPaintable>();
-
-            Prefab.AddComponent<P3dPaintableTexture>().Slot = new P3dSlot(materialIndex, slotTextureType);
-            Prefab.GetComponent<P3dPaintableTexture>().UpdateMaterial();
-            Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
         }
 
         public void Localize(string language, string newTranslation)
@@ -85,5 +69,36 @@ namespace SimplePartLoader
                 }
             }
         }
+
+        public void EnablePartPainting(SPL.PaintingSupportedTypes type, int rustOrPaintMaterialIndex = -1, int alphaMaterialIndex = -1)
+        {
+            switch (type)
+            {
+                case SPL.PaintingSupportedTypes.FullPaintingSupport:
+                    PaintingSystem.EnableFullSupport(this, rustOrPaintMaterialIndex, alphaMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyPaint:
+                    PaintingSystem.EnablePaintOnly(this, rustOrPaintMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyPaintAndRust:
+                    PaintingSystem.EnablePaintAndRust(this, rustOrPaintMaterialIndex);
+                    break;
+
+                case SPL.PaintingSupportedTypes.OnlyDirt:
+                    PaintingSystem.EnableDirtOnly(this, alphaMaterialIndex);
+                    break;
+
+                default:
+                    Debug.LogError("[SPL]: An invalid type has been sent to Part.EnablePainting, part: " +Prefab.name);
+                    break;
+            }
+        }
+
+        /*public void EnableFullPaintSupport(int rustDustMaterial = -1, int alphaMaterial = -1)
+        {
+            PaintingSystem.EnableFullSupport(this, rustDustMaterial, alphaMaterial);
+        }*/
     }
 }

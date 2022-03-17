@@ -22,6 +22,14 @@ namespace SimplePartLoader
 
         internal static tools PlayerTools;
 
+        public enum PaintingSupportedTypes
+        {
+            FullPaintingSupport = 1,
+            OnlyPaint,
+            OnlyPaintAndRust,
+            OnlyDirt
+        }
+
         /// <summary>
         /// Adds a prefab as a car part into the game
         /// </summary>
@@ -124,15 +132,15 @@ namespace SimplePartLoader
             return p;
         }
 
+
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
         /// </summary>
         /// <param name="p">The dummy part</param>
         /// <param name="partName">The name of the part that is going that provide the components to copy</param>
-        /// <param name="p3dSupport">Enable experimental Paint in 3D cloning support</param>
         /// <param name="ignoreBuiltin">Ignore Unity built-in components (Renderer, collider and MeshFilter) while doing the copy</param>
         /// <param name="doNotCopyChilds">Disables the recursive child copy</param>
-        public static void CopyPartToPrefab(Part p, string partName, bool p3dSupport = true, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
+        public static void CopyPartToPrefab(Part p, string partName, bool ignoreBuiltin = false, bool doNotCopyChilds = false)
         {
             if (p == null) // Safety check
             {
@@ -165,51 +173,10 @@ namespace SimplePartLoader
             {
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
-                    if((comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner) && p3dSupport)
-                    {
-                        /*
-                         * Leave this here for debugging purposes. Will print all info of the component if painting related.
-                         * Debug.LogError("-----------------------------------------");
-                        Debug.LogError("Now printing all info about " + comp.GetType());
-                        FieldInfo[] sourceFields = comp.GetType().GetFields(BindingFlags.Public |
-                            BindingFlags.NonPublic |
-                            BindingFlags.Instance);
+                    if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter)
+                        continue;
 
-                        foreach (FieldInfo field in sourceFields)
-                        {
-                            Debug.LogError($"{field.Name} - {field.FieldType} - {field.GetValue(comp)}");
-                        }*/
-
-                        if(comp is P3dPaintable)
-                        {
-                            p.Prefab.AddComponent<P3dPaintable>();
-                        }
-                        else if(comp is P3dPaintableTexture)
-                        {
-                            P3dPaintableTexture p3d = p.Prefab.AddComponent<P3dPaintableTexture>();
-                            P3dPaintableTexture original = comp as P3dPaintableTexture;
-
-                            p3d.Slot = new P3dSlot(original.Slot.Index, original.Slot.Name);
-                            p3d.UpdateMaterial();
-                        }
-                        else if (comp is P3dMaterialCloner)
-                        {
-                            P3dMaterialCloner p3d = p.Prefab.AddComponent<P3dMaterialCloner>();
-                            P3dMaterialCloner original = comp as P3dMaterialCloner;
-
-                            p3d.Index = original.Index;
-                        }
-                        else if (comp is P3dChangeCounter)
-                        {
-                            P3dChangeCounter p3d = p.Prefab.AddComponent<P3dChangeCounter>();
-                            P3dChangeCounter original = comp as P3dChangeCounter;
-
-                            p3d.Threshold = original.Threshold;
-                            p3d.Color = original.Color;
-                        }
-                    }
-                    else
-                        p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
                     
                     DevLog($"Now copying component to base object ({comp})");
                 }
