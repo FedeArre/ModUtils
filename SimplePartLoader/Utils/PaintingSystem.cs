@@ -48,24 +48,23 @@ namespace SimplePartLoader.Utils
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
             int l2Material_index = -1;
 
-            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            // Looking up the material or creating it.
+            if (l2Index == -1) // Already has a material, it will look for it.
             {
-                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                for (int i = 0; i < prefabRenderer.materials.Length; i++)
                 {
-                    Debug.LogError("Found material at index " + i);
-                    l2Material_index = i;
-                    break;
+                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                    {
+                        l2Material_index = i;
+                        break;
+                    }
                 }
             }
-
-            // We create a L2 material if the object does not have.
-            if (l2Material_index == -1)
+            else
             {
+                // We create our own if it does not exist on the provided index.
                 CreatePaintRustMaterial(prefabRenderer, l2Index);
-                if (l2Index != -1)
-                    l2Material_index = l2Index; // It was added to our specific index.
-                else
-                    l2Material_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+                l2Material_index = l2Index;
             }
 
             // Now we add all the painting components
@@ -127,24 +126,22 @@ namespace SimplePartLoader.Utils
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
             int alphaMaterial_index = -1;
 
-            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            // Looking up the material or creating it.
+            if (alphaIndex == -1)
             {
-                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
+                for (int i = 0; i < prefabRenderer.materials.Length; i++)
                 {
-                    alphaMaterial_index = i;
-                    break;
+                    if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
+                    {
+                        alphaMaterial_index = i;
+                        break;
+                    }
                 }
             }
-
-            // We create a Paint in 3D/Alpha material if it does not exist.
-            if (alphaMaterial_index == -1)
+            else
             {
                 CreateAlphaMaterial(prefabRenderer, alphaMaterial_index);
-
-                if (alphaIndex != -1)
-                    alphaMaterial_index = alphaIndex; // It was added to our specific index.
-                else
-                    alphaMaterial_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+                alphaMaterial_index = alphaIndex;
             }
 
             // Setting up the components
@@ -185,39 +182,40 @@ namespace SimplePartLoader.Utils
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
             int l2Material_index = -1, alphaMaterial_index = -1;
 
-            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            if(l2Index == -1) // Already has a material, it will look for it.
             {
-                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                for (int i = 0; i < prefabRenderer.materials.Length; i++)
                 {
-                    Debug.LogError("Found material at index " + i);
-                    l2Material_index = i;
-                }
-
-                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
-                {
-                    Debug.LogError("Found material alpha at index " + i);
-                    alphaMaterial_index = i;
+                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                    {
+                        l2Material_index = i;
+                        break;
+                    }
                 }
             }
-
-            // We create a L2 material if the object does not have.
-            if (l2Material_index == -1)
-            {
+            else
+            { 
+                // We create our own if it does not exist on the provided index.
                 CreatePaintRustMaterial(prefabRenderer, l2Index);
-                if (l2Index != -1)
-                    l2Material_index = l2Index; // It was added to our specific index.
-                else
-                    l2Material_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+                l2Material_index = l2Index;
             }
 
-            if (alphaMaterial_index == -1)
+            // Same as above.
+            if (alphaIndex == -1)
+            {
+                for(int i = 0; i < prefabRenderer.materials.Length; i++)
+                {
+                    if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
+                    {
+                        alphaMaterial_index = i;
+                        break;
+                    }
+                }
+            }
+            else 
             {
                 CreateAlphaMaterial(prefabRenderer, alphaMaterial_index);
-
-                if (alphaIndex != -1)
-                    alphaMaterial_index = alphaIndex; // It was added to our specific index.
-                else
-                    alphaMaterial_index = prefabRenderer.materials.Length - 1; // It was added to the end.
+                alphaMaterial_index = alphaIndex;
             }
 
             // Now we create our painting components.
@@ -237,8 +235,6 @@ namespace SimplePartLoader.Utils
             P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
             P3dSlot p3dSlot_grungeMap = new P3dSlot(l2Material_index, "_GrungeMap");
             P3dSlot p3dSlot_dirt = new P3dSlot(alphaMaterial_index, "_MainTex");
-
-            Debug.LogError($"Setting things up. alpha is {alphaMaterial_index} l2 {l2Material_index}");
 
             // Setting up the components
 
@@ -282,60 +278,30 @@ namespace SimplePartLoader.Utils
         /// Creates a L2 material and assigns it into a renderer.
         /// </summary>
         /// <param name="renderer">The renderer of the object</param>
-        /// <param name="indexForMaterial">The index for the L2 material. If the index is -1 the material will be added as a new element of the renderer materials at the end.</param>
+        /// <param name="indexForMaterial">The index for the L2 material.</param>
         public static void CreatePaintRustMaterial(Renderer renderer, int indexForMaterial = -1)
         {
             Material l2Material = new Material(Shader.Find("Thunderbyte/RustDirt2Layers"));
 
             // Now we need to add this material to our object.
-            if (indexForMaterial == -1)
-            {
-                Material[] newMaterialsArray = new Material[renderer.materials.Length + 1];
-
-                for (int i = 0; i < renderer.materials.Length; i++)
-                {
-                    newMaterialsArray[i] = renderer.materials[i];
-                }
-
-                newMaterialsArray[newMaterialsArray.Length - 1] = l2Material;
-                renderer.materials = newMaterialsArray;
-            }
-            else
-            {
-                Material[] mats = renderer.materials;
-                mats[indexForMaterial] = l2Material;
-                renderer.materials = mats;
-            }
+            Material[] mats = renderer.materials;
+            mats[indexForMaterial] = l2Material;
+            renderer.materials = mats;
         }
 
         /// <summary>
         /// Creates a Paintin3D/Alpha material and assigns it into a renderer.
         /// </summary>
         /// <param name="renderer">The renderer of the object</param>
-        /// <param name="indexForMaterial">The index for the alpha material. If the index is -1 the material will be added as a new element of the renderer materials at the end.</param>
-        public static void CreateAlphaMaterial(Renderer renderer, int indexForMaterial = -1)
+        /// <param name="indexForMaterial">The index for the alpha material.</param>
+        public static void CreateAlphaMaterial(Renderer renderer, int indexForMaterial)
         {
             Material alphaMaterial = new Material(Shader.Find("Paint in 3D/Alpha"));
 
             // Now we need to add this material to our object.
-            if (indexForMaterial == -1)
-            {
-                Material[] newMaterialsArray = new Material[renderer.materials.Length + 1];
-
-                for (int i = 0; i < renderer.materials.Length; i++)
-                {
-                    newMaterialsArray[i] = renderer.materials[i];
-                }
-
-                newMaterialsArray[newMaterialsArray.Length - 1] = alphaMaterial;
-                renderer.materials = newMaterialsArray;
-            }
-            else
-            {
-                Material[] mats = renderer.materials;
-                mats[indexForMaterial] = alphaMaterial;
-                renderer.materials = mats;
-            }
+            Material[] mats = renderer.materials;
+            mats[indexForMaterial] = alphaMaterial;
+            renderer.materials = mats;
         }
     }
 }
