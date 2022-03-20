@@ -168,7 +168,6 @@ namespace SimplePartLoader
                                 transparentObject.transform.localPosition = t.LocalPos;
                                 transparentObject.transform.localScale = t.Scale;
                                 transparentObject.transform.localRotation = t.LocalRot;
-                                break;
                             }
                         }
                     }
