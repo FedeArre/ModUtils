@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SimplePartLoader.Utils
+namespace SimplePartLoader
 {
-    internal class PaintingSystem
+    public class PaintingSystem
     {
-        public static void EnablePaintOnly(Part part, int materialIndex)
+        internal static void EnablePaintOnly(Part part, int materialIndex)
         {
             GameObject Prefab = part.Prefab;
 
@@ -32,7 +32,7 @@ namespace SimplePartLoader.Utils
             part.Paintable = true;
         }
 
-        public static void EnablePaintAndRust(Part part, int l2Index)
+        internal static void EnablePaintAndRust(Part part)
         {
             GameObject Prefab = part.Prefab;
 
@@ -49,22 +49,19 @@ namespace SimplePartLoader.Utils
             int l2Material_index = -1;
 
             // Looking up the material or creating it.
-            if (l2Index == -1) // Already has a material, it will look for it.
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                for (int i = 0; i < prefabRenderer.materials.Length; i++)
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
                 {
-                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
-                    {
-                        l2Material_index = i;
-                        break;
-                    }
+                    l2Material_index = i;
+                    break;
                 }
             }
-            else
+
+            if (l2Material_index == -1)
             {
-                // We create our own if it does not exist on the provided index.
-                CreatePaintRustMaterial(prefabRenderer, l2Index);
-                l2Material_index = l2Index;
+                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                return;
             }
 
             // Now we add all the painting components
@@ -110,7 +107,7 @@ namespace SimplePartLoader.Utils
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
-        public static void EnableDirtOnly(Part part, int alphaIndex)
+        internal static void EnableDirtOnly(Part part)
         {
             GameObject Prefab = part.Prefab;
 
@@ -127,21 +124,19 @@ namespace SimplePartLoader.Utils
             int alphaMaterial_index = -1;
 
             // Looking up the material or creating it.
-            if (alphaIndex == -1)
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                for (int i = 0; i < prefabRenderer.materials.Length; i++)
+                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
                 {
-                    if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
-                    {
-                        alphaMaterial_index = i;
-                        break;
-                    }
+                    alphaMaterial_index = i;
+                    break;
                 }
             }
-            else
+
+            if(alphaMaterial_index == -1)
             {
-                CreateAlphaMaterial(prefabRenderer, alphaMaterial_index);
-                alphaMaterial_index = alphaIndex;
+                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                return;
             }
 
             // Setting up the components
@@ -166,7 +161,7 @@ namespace SimplePartLoader.Utils
             part.CarProps.Washable = true;
         }
 
-        public static void EnableFullSupport(Part part, int l2Index, int alphaIndex)
+        internal static void EnableFullSupport(Part part)
         {
             GameObject Prefab = part.Prefab;
 
@@ -182,40 +177,34 @@ namespace SimplePartLoader.Utils
             Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
             int l2Material_index = -1, alphaMaterial_index = -1;
 
-            if(l2Index == -1) // Already has a material, it will look for it.
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                for (int i = 0; i < prefabRenderer.materials.Length; i++)
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
                 {
-                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
-                    {
-                        l2Material_index = i;
-                        break;
-                    }
+                    l2Material_index = i;
+                    break;
                 }
-            }
-            else
-            { 
-                // We create our own if it does not exist on the provided index.
-                CreatePaintRustMaterial(prefabRenderer, l2Index);
-                l2Material_index = l2Index;
             }
 
-            // Same as above.
-            if (alphaIndex == -1)
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                for(int i = 0; i < prefabRenderer.materials.Length; i++)
+                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
                 {
-                    if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
-                    {
-                        alphaMaterial_index = i;
-                        break;
-                    }
+                    alphaMaterial_index = i;
+                    break;
                 }
             }
-            else 
+
+            if(alphaMaterial_index == -1)
             {
-                CreateAlphaMaterial(prefabRenderer, alphaMaterial_index);
-                alphaMaterial_index = alphaIndex;
+                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                return;
+            }
+
+            if(l2Material_index == -1)
+            {
+                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                return;
             }
 
             // Now we create our painting components.
@@ -274,34 +263,70 @@ namespace SimplePartLoader.Utils
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
-        /// <summary>
-        /// Creates a L2 material and assigns it into a renderer.
-        /// </summary>
-        /// <param name="renderer">The renderer of the object</param>
-        /// <param name="indexForMaterial">The index for the L2 material.</param>
-        public static void CreatePaintRustMaterial(Renderer renderer, int indexForMaterial = -1)
+        public static Material GetDirtMaterial()
         {
-            Material l2Material = new Material(Shader.Find("Thunderbyte/RustDirt2Layers"));
+            Material m = null;
+            
+            foreach(GameObject go in PartManager.gameParts)
+            {
+                if(go != null)
+                {
+                    if(go.name == "DoorFR06")
+                    {
+                        m = go.GetComponent<Renderer>().materials[1];
+                    }
+                }
+            }
 
-            // Now we need to add this material to our object.
-            Material[] mats = renderer.materials;
-            mats[indexForMaterial] = l2Material;
-            renderer.materials = mats;
+            if (!m)
+            {
+                Debug.LogError("[SPL]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
+            }
+            return m;
         }
 
-        /// <summary>
-        /// Creates a Paintin3D/Alpha material and assigns it into a renderer.
-        /// </summary>
-        /// <param name="renderer">The renderer of the object</param>
-        /// <param name="indexForMaterial">The index for the alpha material.</param>
-        public static void CreateAlphaMaterial(Renderer renderer, int indexForMaterial)
+        public static Material GetPaintRustMaterial()
         {
-            Material alphaMaterial = new Material(Shader.Find("Paint in 3D/Alpha"));
+            Material m = null;
 
-            // Now we need to add this material to our object.
-            Material[] mats = renderer.materials;
-            mats[indexForMaterial] = alphaMaterial;
-            renderer.materials = mats;
+            foreach (GameObject go in PartManager.gameParts)
+            {
+                if (go != null)
+                {
+                    if (go.name == "DoorFR06")
+                    {
+                        m = go.GetComponent<Renderer>().materials[0];
+                    }
+                }
+            }
+
+            if (!m)
+            {
+                Debug.LogError("[SPL]: GetPaintRustMaterial was not able to retrive a paint/rust material. Make sure you are using it on FirstLoad event.");
+            }
+            return m;
+        }
+
+        public static Material GetBodymatMaterial()
+        {
+            Material m = null;
+
+            foreach (GameObject go in PartManager.gameParts)
+            {
+                if (go != null)
+                {
+                    if (go.name == "DoorFR06")
+                    {
+                        m = go.GetComponent<Renderer>().materials[2];
+                    }
+                }
+            }
+
+            if (!m)
+            {
+                Debug.LogError("[SPL]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
+            }
+            return m;
         }
     }
 }

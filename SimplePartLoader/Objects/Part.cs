@@ -70,24 +70,24 @@ namespace SimplePartLoader
             }
         }
 
-        public void EnablePartPainting(SPL.PaintingSupportedTypes type, int rustOrPaintMaterialIndex = -1, int alphaMaterialIndex = -1)
+        public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
         {
             switch (type)
             {
                 case SPL.PaintingSupportedTypes.FullPaintingSupport:
-                    PaintingSystem.EnableFullSupport(this, rustOrPaintMaterialIndex, alphaMaterialIndex);
+                    PaintingSystem.EnableFullSupport(this);
                     break;
 
                 case SPL.PaintingSupportedTypes.OnlyPaint:
-                    PaintingSystem.EnablePaintOnly(this, rustOrPaintMaterialIndex);
+                    PaintingSystem.EnablePaintOnly(this, paintMaterial);
                     break;
 
                 case SPL.PaintingSupportedTypes.OnlyPaintAndRust:
-                    PaintingSystem.EnablePaintAndRust(this, rustOrPaintMaterialIndex);
+                    PaintingSystem.EnablePaintAndRust(this);
                     break;
 
                 case SPL.PaintingSupportedTypes.OnlyDirt:
-                    PaintingSystem.EnableDirtOnly(this, alphaMaterialIndex);
+                    PaintingSystem.EnableDirtOnly(this);
                     break;
 
                 default:
