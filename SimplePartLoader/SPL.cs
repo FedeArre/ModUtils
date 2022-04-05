@@ -72,20 +72,38 @@ namespace SimplePartLoader
             prefab.AddComponent<DISABLER>();
 
             prefabCarProp.PREFAB = prefab; // Saving will not work without this due to a condition located in Saver.Save()
-            Transform[] childs = prefab.GetComponentsInChildren<Transform>();
-            for (int i = 0; i < childs.Length; i++)
+            
+            foreach(HexNut hx in prefab.GetComponentsInChildren<HexNut>())
             {
-                HexNut hx = childs[i].GetComponent<HexNut>();
+                hx.gameObject.AddComponent<CarProperties>();
+                hx.gameObject.AddComponent<DISABLER>();
 
-                if (hx || childs[i].GetComponent<FlatNut>())
-                {
-                    childs[i].gameObject.AddComponent<CarProperties>();
-                    childs[i].gameObject.AddComponent<DISABLER>();
+                hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
 
-                    childs[i].gameObject.layer = LayerMask.NameToLayer(hx ? "Bolts" : "FlatBolts"); // Add bolts if they have HexNut component or FlatBolts if has FlatNut component.
-                    if (!childs[i].GetComponent<BoxCollider>())
-                        childs[i].gameObject.AddComponent<BoxCollider>();
-                }
+                if (!hx.GetComponent<BoxCollider>())
+                        hx.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach(FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
+            {
+                fn.gameObject.AddComponent<CarProperties>();
+                fn.gameObject.AddComponent<DISABLER>();
+
+                fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
+
+                if (!fn.GetComponent<BoxCollider>())
+                    fn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach(WeldCut wc in prefab.GetComponentsInChildren<WeldCut>())
+            {
+                fn.gameObject.AddComponent<CarProperties>();
+                fn.gameObject.AddComponent<DISABLER>();
+
+                fn.gameObject.layer = LayerMask.NameToLayer("Weld");
+
+                if (!fn.GetComponent<MeshCollider>())
+                    fn.gameObject.AddComponent<MeshCollider>();
             }
 
             Part p = new Part(prefab, prefabCarProp, prefabPartInfo);
