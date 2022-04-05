@@ -14,6 +14,8 @@ namespace SimplePartLoader
         private static AudioManager AudioList;
         private static AudioSource Source;
 
+        private static MainCarProperties CurrentPlayerCar;
+
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");
@@ -22,6 +24,18 @@ namespace SimplePartLoader
             GameObject PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();
+        }
+
+        internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
+        {
+            if (isOnCar)
+            {
+                CurrentPlayerCar = mcp;
+            }
+            else
+            {
+                CurrentPlayerCar = null;
+            }
         }
 
         public static GameObject GetPlayer()
@@ -81,6 +95,11 @@ namespace SimplePartLoader
             {
                 Source.PlayOneShot(AudioList.Cash);
             }
+        }
+
+        public static MainCarProperties GetPlayerCurrentCar()
+        {
+            return CurrentPlayerCar;
         }
     }
 }
