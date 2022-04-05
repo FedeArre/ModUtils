@@ -16,6 +16,9 @@ namespace SimplePartLoader
 
         private static MainCarProperties CurrentPlayerCar;
 
+        public delegate void OnPlayerCarChangeDelegate();
+        public static event OnPlayerCarChangeDelegate PlayerCarChanged;
+
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");
@@ -35,6 +38,11 @@ namespace SimplePartLoader
             else
             {
                 CurrentPlayerCar = null;
+            }
+
+            if(PlayerCarChanged != null)
+            {
+                PlayerCarChanged?.Invoke();
             }
         }
 
