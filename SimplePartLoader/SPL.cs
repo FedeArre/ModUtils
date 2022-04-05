@@ -97,13 +97,13 @@ namespace SimplePartLoader
 
             foreach(WeldCut wc in prefab.GetComponentsInChildren<WeldCut>())
             {
-                fn.gameObject.AddComponent<CarProperties>();
-                fn.gameObject.AddComponent<DISABLER>();
+                wc.gameObject.AddComponent<CarProperties>();
+                wc.gameObject.AddComponent<DISABLER>();
 
-                fn.gameObject.layer = LayerMask.NameToLayer("Weld");
+                wc.gameObject.layer = LayerMask.NameToLayer("Weld");
 
-                if (!fn.GetComponent<MeshCollider>())
-                    fn.gameObject.AddComponent<MeshCollider>();
+                if (!wc.GetComponent<MeshCollider>())
+                    wc.gameObject.AddComponent<MeshCollider>();
             }
 
             Part p = new Part(prefab, prefabCarProp, prefabPartInfo);
@@ -331,8 +331,10 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
+        [Obsolete("Use ModAPI.GetPlayer() instead!")]
         public static GameObject GetPlayer() { return Player ? Player : GameObject.Find("Player"); }
-
+        
+        [Obsolete("Use ModAPI.GetPlayerTools() instead!")]
         public static tools GetPlayerTools() {  return PlayerTools ? PlayerTools : GameObject.Find("Player").GetComponent<tools>(); }
     }
 }
