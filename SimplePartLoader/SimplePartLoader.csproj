@@ -419,6 +419,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ModAPI.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
