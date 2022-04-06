@@ -20,6 +20,7 @@ namespace SimplePartLoader
             LocalRot = localRot;
             Scale = Vector3.one;
             TestingEnabled = testingModeEnable;
+            PartThatNeedsToBeOff = null;
         }
 
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, Vector3 scale, bool testingModeEnable)
@@ -30,6 +31,7 @@ namespace SimplePartLoader
             LocalRot = localRot;
             Scale = scale;
             TestingEnabled = testingModeEnable;
+            PartThatNeedsToBeOff = null;
         }
     }
 }
