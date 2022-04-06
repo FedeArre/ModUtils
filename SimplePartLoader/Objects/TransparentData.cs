@@ -10,6 +10,7 @@ namespace SimplePartLoader
         public Quaternion LocalRot;
         public Vector3 Scale;
         public bool TestingEnabled;
+        public string PartThatNeedsToBeOff;
 
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, bool testingModeEnable)
         {
