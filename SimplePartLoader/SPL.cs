@@ -103,7 +103,7 @@ namespace SimplePartLoader
                 wc.gameObject.layer = LayerMask.NameToLayer("Weld");
 
                 if (!wc.GetComponent<MeshCollider>())
-                    wc.gameObject.AddComponent<MeshCollider>();
+                    wc.gameObject.AddComponent<MeshCollider>().convex = true;
             }
 
             Part p = new Part(prefab, prefabCarProp, prefabPartInfo);
