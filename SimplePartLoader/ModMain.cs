@@ -23,10 +23,10 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
-            ModAPI.OnLoadCalled();
+            ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
 
-            PlayerTransform = ModAPI.GetPlayer().transform;
+            PlayerTransform = ModUtils.GetPlayer().transform;
         }
 
         public override void Update()
@@ -35,8 +35,8 @@ namespace SimplePartLoader
             {
                 if(PlayerTransform.parent == null && PlayerOnCar)
                 {
-                    ModAPI.UpdatePlayerStatus(PlayerOnCar);
-                    // Player not longer on car.
+                    PlayerOnCar = false;
+                    ModUtils.UpdatePlayerStatus(PlayerOnCar);
                 }
 
                 else if(PlayerTransform.parent != null && !PlayerOnCar)
@@ -45,7 +45,7 @@ namespace SimplePartLoader
                     if(mcp)
                     {
                         PlayerOnCar = true;
-                        ModAPI.UpdatePlayerStatus(PlayerOnCar, mcp);
+                        ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
                     }
                 }
             }

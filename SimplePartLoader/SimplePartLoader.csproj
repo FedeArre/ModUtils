@@ -419,8 +419,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ModAPI.cs" />
+    <Compile Include="ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
+    <Compile Include="ModUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="PartManager.cs" />

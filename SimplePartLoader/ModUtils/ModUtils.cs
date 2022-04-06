@@ -7,14 +7,16 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
-    public class ModAPI
+    public class ModUtils
     {
         private static GameObject Player;
         private static tools PlayerTools;
         private static AudioManager AudioList;
         private static AudioSource Source;
-
+        
         private static MainCarProperties CurrentPlayerCar;
+
+        internal static List<GameObject> Cars;
 
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
@@ -27,6 +29,17 @@ namespace SimplePartLoader
             GameObject PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();
+
+            Cars = new List<GameObject>();
+
+            GameObject[] carList = GameObject.Find("CarsParent").GetComponent<CarList>().Cars;
+            foreach(GameObject car in carList)
+            {
+                car.AddComponent<SPL_CarTracking>();
+            }
+            Debug.LogError("dsaaaaaa");
+            GameObject dummy = new GameObject("SPL_Dummy");
+            dummy.AddComponent<SPL_CarTracking>().AddToAll();
         }
 
         internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
@@ -40,6 +53,7 @@ namespace SimplePartLoader
                 CurrentPlayerCar = null;
             }
 
+            Debug.LogError($"UpdatePlayerStatus has changed to {isOnCar} - {mcp}");
             if(PlayerCarChanged != null)
             {
                 PlayerCarChanged?.Invoke();
