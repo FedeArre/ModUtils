@@ -57,27 +57,30 @@ namespace SimplePartLoader
 
             if (!Prefab.GetComponent<PickupWindow>())
             {
+                RemoveAttachmentsFromPart();
+
                 Prefab.AddComponent<PickupWindow>();
                 Prefab.AddComponent<RemoveWindow>();
 
                 Prefab.layer = LayerMask.NameToLayer("Windows");
                 Prefab.tag = "Window";
+            }
+        }
 
-                // Also check if part has welds / bolts
-                foreach(WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
-                {
-                    GameObject.Destroy(wc.gameObject);
-                }
+        public void UseHandAttachment()
+        {
+            if (Prefab.GetComponent<Pickup>())
+                GameObject.Destroy(Prefab.GetComponent<Pickup>());
 
-                foreach (BoltNut bn in Prefab.GetComponentsInChildren<BoltNut>())
-                {
-                    GameObject.Destroy(bn.gameObject);
-                }
+            if (!Prefab.GetComponent<PickupHand>())
+            {
+                RemoveAttachmentsFromPart();
 
-                foreach (HexNut hn in Prefab.GetComponentsInChildren<HexNut>())
-                {
-                    GameObject.Destroy(hn.gameObject);
-                }
+                Prefab.AddComponent<PickupHand>();
+                Prefab.AddComponent<RemoveWindow>();
+
+                Prefab.layer = LayerMask.NameToLayer("Windows");
+                Prefab.tag = "Window";
             }
         }
 
@@ -107,9 +110,31 @@ namespace SimplePartLoader
             }
         }
 
-        /*public void EnableFullPaintSupport(int rustDustMaterial = -1, int alphaMaterial = -1)
+        private void RemoveAttachmentsFromPart()
         {
-            PaintingSystem.EnableFullSupport(this, rustDustMaterial, alphaMaterial);
-        }*/
+            foreach (WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
+            {
+                GameObject.Destroy(wc.gameObject);
+            }
+
+            foreach (BoltNut bn in Prefab.GetComponentsInChildren<BoltNut>())
+            {
+                GameObject.Destroy(bn.gameObject);
+            }
+
+            foreach (HexNut hn in Prefab.GetComponentsInChildren<HexNut>())
+            {
+                GameObject.Destroy(hn.gameObject);
+            }
+
+            if(Prefab.GetComponent<RemoveWindow>())
+                GameObject.Destroy(Prefab.GetComponent<RemoveWindow>());
+
+            if(Prefab.GetComponent<PickupHand>())
+                GameObject.Destroy(Prefab.GetComponent<PickupHand>());
+
+            if(Prefab.GetComponent<PickupWindow>())
+                GameObject.Destroy(Prefab.GetComponent<PickupWindow>());
+        }
     }
 }
