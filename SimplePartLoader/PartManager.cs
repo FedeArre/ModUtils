@@ -213,7 +213,10 @@ namespace SimplePartLoader
             transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
 
             if (t.PartThatNeedsToBeOff != null)
+            {
                 transparentComponent.PartThatNeedsToBeOffname = t.PartThatNeedsToBeOff;
+                transparentComponent.PartHaveToBeREmoved = true;
+            }
 
             if (t.TestingEnabled)
                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
