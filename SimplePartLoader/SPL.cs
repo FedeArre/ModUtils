@@ -331,10 +331,10 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
-        [Obsolete("Use ModAPI.GetPlayer() instead!")]
+        [Obsolete("Use ModUtils.GetPlayer() instead!")]
         public static GameObject GetPlayer() { return Player ? Player : GameObject.Find("Player"); }
         
-        [Obsolete("Use ModAPI.GetPlayerTools() instead!")]
+        [Obsolete("Use ModUtils.GetPlayerTools() instead!")]
         public static tools GetPlayerTools() {  return PlayerTools ? PlayerTools : GameObject.Find("Player").GetComponent<tools>(); }
     }
 }

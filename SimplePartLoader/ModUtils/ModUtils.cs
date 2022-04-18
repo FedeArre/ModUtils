@@ -37,7 +37,7 @@ namespace SimplePartLoader
             {
                 car.AddComponent<SPL_CarTracking>();
             }
-            Debug.LogError("dsaaaaaa");
+
             GameObject dummy = new GameObject("SPL_Dummy");
             dummy.AddComponent<SPL_CarTracking>().AddToAll();
         }
@@ -122,6 +122,36 @@ namespace SimplePartLoader
         public static MainCarProperties GetPlayerCurrentCar()
         {
             return CurrentPlayerCar;
+        }
+
+        public static List<GameObject> GetCars()
+        {
+            return Cars;
+        }
+
+        public static CarDetails GetNearestCar()
+        {
+            if(Cars.Count == 0)
+                return null;
+
+            CarDetails carDetails = new CarDetails();
+            GameObject NearestCar = Cars.First();
+            float CurrentLowestDistance = float.MaxValue;
+            Vector3 PlayerPosition = Player.transform.position;
+
+            foreach(GameObject car in Cars)
+            {
+                float Distance = Vector3.Distance(PlayerPosition, car.transform.position);
+                if (Distance < CurrentLowestDistance)
+                {
+                    CurrentLowestDistance = Distance;
+                    NearestCar = car;
+                }
+            }
+
+            carDetails.Car = NearestCar.GetComponent<MainCarProperties>();
+            carDetails.Distance = CurrentLowestDistance;
+            return carDetails;
         }
     }
 }

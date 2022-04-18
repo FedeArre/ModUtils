@@ -11,6 +11,9 @@ namespace SimplePartLoader
         public Vector3 Scale;
         public bool TestingEnabled;
         public string PartThatNeedsToBeOff;
+        public transparents.AttachingObjects[] AttachingObjects;
+        public transparents.dependantObjects[] DependantObjects;
+        public int SavePosition;
 
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, bool testingModeEnable)
         {
@@ -21,6 +24,8 @@ namespace SimplePartLoader
             Scale = Vector3.one;
             TestingEnabled = testingModeEnable;
             PartThatNeedsToBeOff = null;
+            AttachingObjects = new transparents.AttachingObjects[0];
+            DependantObjects = new transparents.dependantObjects[0];
         }
 
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, Vector3 scale, bool testingModeEnable)

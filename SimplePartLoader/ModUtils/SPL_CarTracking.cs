@@ -17,6 +17,7 @@ namespace SimplePartLoader
             if (dummy)
                 return;
 
+            ModUtils.Cars.Add(this.gameObject);
         }
 
         void OnDestroy()
@@ -24,7 +25,7 @@ namespace SimplePartLoader
             if (dummy)
                 return;
 
-
+            ModUtils.Cars.Remove(this.gameObject);
         }
 
         public void AddToAll()

@@ -208,9 +208,11 @@ namespace SimplePartLoader
             transparentObject.layer = LayerMask.NameToLayer("TransparentParts");
 
             transparents transparentComponent = transparentObject.AddComponent<transparents>();
-            // We add dummy data so the component doesn't crash.
-            transparentComponent.ATTACHABLES = new transparents.AttachingObjects[0];
-            transparentComponent.DEPENDANTS = new transparents.dependantObjects[0];
+            
+            // We now load data that may vary to our component.
+            transparentComponent.ATTACHABLES = t.AttachingObjects;
+            transparentComponent.DEPENDANTS = t.DependantObjects;
+            transparentComponent.SavePosition = t.SavePosition;
 
             if (t.PartThatNeedsToBeOff != null)
             {
