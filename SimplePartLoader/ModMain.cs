@@ -10,7 +10,10 @@ namespace SimplePartLoader
         public override string ID => "SimplePartLoader";
         public override string Name => "SimplePartLoader";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.2.3";
+        public override string Version => "v1.3.1";
+
+        Transform PlayerTransform;
+        bool PlayerOnCar;
 
         public ModMain()
         {
@@ -20,7 +23,32 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
+            ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
+
+            PlayerTransform = ModUtils.GetPlayer().transform;
+        }
+
+        public override void Update()
+        {
+            if (PlayerTransform)
+            {
+                if(PlayerTransform.parent == null && PlayerOnCar)
+                {
+                    PlayerOnCar = false;
+                    ModUtils.UpdatePlayerStatus(PlayerOnCar);
+                }
+
+                else if(PlayerTransform.parent != null && !PlayerOnCar)
+                {
+                    MainCarProperties mcp = PlayerTransform.root.GetComponent<MainCarProperties>();
+                    if(mcp)
+                    {
+                        PlayerOnCar = true;
+                        ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
+                    }
+                }
+            }
         }
     }
 }
