@@ -305,6 +305,20 @@ namespace SimplePartLoader
             if (FirstLoad != null)
             {
                 DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
+                foreach(EventHandler handler in FirstLoad.GetInvocationList())
+                {
+                    try
+                    {
+                        handler(null, new EventArgs());
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while loading a mod, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.GetType().Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        
+                    }
+                }
                 FirstLoad?.Invoke();
             }
         }
