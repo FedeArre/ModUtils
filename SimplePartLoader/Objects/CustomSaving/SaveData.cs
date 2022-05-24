@@ -23,7 +23,6 @@ namespace SimplePartLoader
             }
 
             PartName = carProps.PrefabName;
-
         }
     }
 }

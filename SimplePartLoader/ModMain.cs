@@ -28,6 +28,12 @@ namespace SimplePartLoader
             
             PlayerTransform = ModUtils.GetPlayer().transform;
 
+            if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
+                CustomSaverHandler.NewGame();
+        }
+
+        public override void Continue()
+        {
             // Custom saving
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)

@@ -17,7 +17,7 @@ namespace SimplePartLoader
 
         IEnumerator LoadCoroutine()
         {
-            yield return new WaitForEndOfFrame();
+            yield return 0;
 
             CustomSaverHandler.Load();
             GameObject.Destroy(this.gameObject);

@@ -14,23 +14,31 @@ namespace SimplePartLoader
         public static string SavePath = $"{Application.persistentDataPath}/modSaves/";
         public static string FileName = "simplePartLoader.json";
 
+        public static void NewGame()
+        {
+            try
+            {
+                if (File.Exists(SavePath + FileName))
+                {
+                    File.Delete(SavePath + FileName);
+                }
+            }
+            catch(Exception ex)
+            {
+                Debug.Log("[SPL]: There was an issue trying to reset the custom data.");
+                Debug.Log("[SPL]: " + ex.Message);
+                return;
+            }
+        }
+
         public static void Load()
         {
             DataWrapper LoadedData;
-
+            Debug.Log("Starting loadign save dataaaa");
             try
             {
                 if (!Directory.Exists(SavePath))
                     Directory.CreateDirectory(SavePath);
-
-
-                if (PlayerPrefs.GetFloat("LoadLevel") == 0f) // New game
-                {
-                    if (File.Exists(SavePath + FileName))
-                        File.Delete(SavePath + FileName);
-
-                    return;
-                }
 
                 using (StreamReader r = new StreamReader(SavePath + FileName))
                 {
@@ -48,23 +56,25 @@ namespace SimplePartLoader
                 return;
             }
 
-            foreach (SaveData sdComponent in UnityEngine.Object.FindObjectsOfType<SaveData>())
+            foreach (SaveData sd in UnityEngine.Object.FindObjectsOfType<SaveData>())
             {
-                CarProperties carProps = sdComponent.GetComponent<CarProperties>();
-                if(!carProps)
-                {
+                CarProperties carProps = sd.GetComponent<CarProperties>();
+
+                if (!carProps || carProps.ObjectNumber == 0)
                     continue;
-                }
 
                 foreach(SavedData loadedData in LoadedData.Data)
                 {
+                    Debug.Log("foreach " + carProps.ObjectNumber + "  " + loadedData.ObjectNumber);
                     if(carProps.ObjectNumber == loadedData.ObjectNumber)
                     {
-                        sdComponent.Data = loadedData.Data;
+                        sd.Data = loadedData.Data;
+                        Debug.Log(sd);
                     }
                 }
             }
 
+            Debug.Log($"[SPL]: Loading data was succesful, {LoadedData.Data.Count} entries have been loaded");
             SPL.InvokeDataLoadedEvent();
         }
 
