@@ -9,7 +9,7 @@ namespace SimplePartLoader
 {
     internal class SaveData : MonoBehaviour
     {
-        public Dictionary<string, object> Data;
+        public Dictionary<string, object> Data = new Dictionary<string, object>();
         public string PartName;
     }
 }

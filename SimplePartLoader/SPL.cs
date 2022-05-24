@@ -16,12 +16,12 @@ namespace SimplePartLoader
         public delegate void LoadFinishDelegate();
         public static event LoadFinishDelegate LoadFinish;
 
+        public delegate void DataLoadedDelegate();
+        public static event DataLoadedDelegate DataLoaded;
+
         public static bool DEVELOPER_LOG = false;
 
-        internal static GameObject Player;
-
-        internal static tools PlayerTools;
-
+        // All availables paint types in the game
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
@@ -316,7 +316,7 @@ namespace SimplePartLoader
                     {
                         Debug.Log("[SPL]: Exception caught while loading a mod, you should report this to the mod developer.");
                         Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.GetType().Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
                         
                     }
                 }
@@ -326,12 +326,50 @@ namespace SimplePartLoader
         /// <summary>
         /// Invokes the LoadFinished event if any script is suscribed to it.
         /// </summary>
-        internal static void InvokeLoadFinish()
+        internal static void InvokeLoadFinishedEvent()
         {
             if (LoadFinish != null)
             {
-                DevLog("Load finish event was called");
-                LoadFinish?.Invoke();
+                DevLog("Load finish has been called - Developer logging is enabled (Please disable before releasing your mod!)");
+                foreach (var handler in LoadFinish.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while on load finish, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Invokes the DataLoaded event if any script is suscribed to it.
+        /// </summary>
+        internal static void InvokeDataLoadedEvent()
+        {
+            if (DataLoaded != null)
+            {
+                DevLog("Data loaded has been called - Developer logging is enabled (Please disable before releasing your mod!)");
+                foreach (var handler in DataLoaded.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while on data loaded event, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+
+                    }
+                }
             }
         }
 
@@ -345,10 +383,11 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
+        // Left for compatibility
         [Obsolete("Use ModUtils.GetPlayer() instead!")]
-        public static GameObject GetPlayer() { return Player ? Player : GameObject.Find("Player"); }
+        public static GameObject GetPlayer() { return ModUtils.GetPlayer(); }
         
         [Obsolete("Use ModUtils.GetPlayerTools() instead!")]
-        public static tools GetPlayerTools() {  return PlayerTools ? PlayerTools : GameObject.Find("Player").GetComponent<tools>(); }
+        public static tools GetPlayerTools() { return ModUtils.GetPlayerTools(); }
     }
 }

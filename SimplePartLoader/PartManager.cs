@@ -40,10 +40,6 @@ namespace SimplePartLoader
         /// </summary>
         internal static void OnLoadCalled()
         {
-            // Preload these so developers can use them.
-            SPL.Player = GameObject.Find("Player");
-            SPL.PlayerTools = SPL.Player.GetComponent<tools>();
-
             // We first load all our parts into the list.
             gameParts = new List<GameObject>();
             foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
@@ -178,16 +174,7 @@ namespace SimplePartLoader
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
 
-            try
-            {
-                SPL.InvokeLoadFinish();
-            }
-            catch(Exception ex)
-            {
-                Debug.LogError("[SPL]: Something went wrong during load finished event! LoadFinish execution has been stopped. Error: ");
-                Debug.LogError(ex.ToString());
-                return;
-            }
+            SPL.InvokeLoadFinish();
         }
 
         /// <summary>

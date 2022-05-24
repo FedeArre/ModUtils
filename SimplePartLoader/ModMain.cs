@@ -29,12 +29,20 @@ namespace SimplePartLoader
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             // Custom saving
+            // Custom data saving is not enabled for survival mode!
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+
             GameObject dummyObject = new GameObject("SPL_Dummy");
             dummyObject.AddComponent<SavingHandlerMono>().Load();
         }
 
         public override void OnSaveFinish()
         {
+            // Custom data saving is not enabled for survival mode!
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+
             CustomSaverHandler.Save();
         }
         
