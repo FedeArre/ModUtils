@@ -18,7 +18,6 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
-        internal SaveData SaveData { get; private set; }
 
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
@@ -76,8 +75,7 @@ namespace SimplePartLoader
                 return;
 
             SavingEnabled = true;
-            SaveData = Prefab.AddComponent<SaveData>();
-            SaveData.PartName = CarProps.PrefabName;
+            Prefab.AddComponent<SaveData>();
         }
 
         public void UseHandAttachment()

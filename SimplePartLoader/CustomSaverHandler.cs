@@ -65,7 +65,7 @@ namespace SimplePartLoader
                 }
             }
 
-            SPL.InvokeLoadFinish();
+            SPL.InvokeDataLoadedEvent();
         }
 
         public static void Save()

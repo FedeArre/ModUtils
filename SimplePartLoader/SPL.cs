@@ -342,7 +342,6 @@ namespace SimplePartLoader
                         Debug.Log("[SPL]: Exception caught while on load finish, you should report this to the mod developer.");
                         Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
                         Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
-
                     }
                 }
             }
