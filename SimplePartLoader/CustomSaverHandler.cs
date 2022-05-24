@@ -16,7 +16,56 @@ namespace SimplePartLoader
 
         public static void Load()
         {
+            DataWrapper LoadedData;
 
+            try
+            {
+                if (!Directory.Exists(SavePath))
+                    Directory.CreateDirectory(SavePath);
+
+
+                if (PlayerPrefs.GetFloat("LoadLevel") == 0f) // New game
+                {
+                    if (File.Exists(SavePath + FileName))
+                        File.Delete(SavePath + FileName);
+
+                    return;
+                }
+
+                using (StreamReader r = new StreamReader(SavePath + FileName))
+                {
+                    string json = r.ReadToEnd();
+                    if (String.IsNullOrEmpty(json))
+                        return;
+
+                    LoadedData = JsonConvert.DeserializeObject<DataWrapper>(json);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log("[SPL]: There was an issue trying to load the custom data.");
+                Debug.Log("[SPL]: " + ex.Message);
+                return;
+            }
+
+            foreach (SaveData sdComponent in UnityEngine.Object.FindObjectsOfType<SaveData>())
+            {
+                CarProperties carProps = sdComponent.GetComponent<CarProperties>();
+                if(!carProps)
+                {
+                    continue;
+                }
+
+                foreach(SavedData loadedData in LoadedData.Data)
+                {
+                    if(carProps.ObjectNumber == loadedData.ObjectNumber)
+                    {
+                        sdComponent.Data = loadedData.Data;
+                    }
+                }
+            }
+
+            SPL.InvokeLoadFinish();
         }
 
         public static void Save()
@@ -35,13 +84,24 @@ namespace SimplePartLoader
                 DataToSave.Data.Add(sd);
             }
 
-            if (!Directory.Exists(SavePath))
-                Directory.CreateDirectory(SavePath);
-
-            using (TextWriter tw = new StreamWriter(SavePath + FileName))
+            try
             {
-                tw.Write(JsonConvert.SerializeObject(DataToSave));
+                if (!Directory.Exists(SavePath))
+                    Directory.CreateDirectory(SavePath);
+
+                using (TextWriter tw = new StreamWriter(SavePath + FileName))
+                {
+                    tw.Write(JsonConvert.SerializeObject(DataToSave));
+                }
+
+                Debug.Log($"[SPL]: Succesfully saved custom data ({DataToSave.Data.Count})");
             }
+            catch(Exception ex)
+            {
+                Debug.Log("[SPL]: Saving was not succesful due to an exception.");
+                Debug.Log("[SPL]: " + ex.Message);
+            }
+            
         }
     }
 }
