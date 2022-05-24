@@ -429,7 +429,9 @@
     <Compile Include="ModMain.cs" />
     <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />
+    <Compile Include="Objects\CustomSaving\DataWrapper.cs" />
     <Compile Include="Objects\CustomSaving\SaveData.cs" />
+    <Compile Include="Objects\CustomSaving\SavingHandlerMono.cs" />
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="PartManager.cs" />

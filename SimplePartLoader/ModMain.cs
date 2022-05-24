@@ -25,10 +25,20 @@ namespace SimplePartLoader
         {
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-
+            
             PlayerTransform = ModUtils.GetPlayer().transform;
+
+            // Custom saving
+            GameObject dummyObject = new GameObject("SPL_Dummy");
+            dummyObject.AddComponent<SavingHandlerMono>().Load();
         }
 
+        public override void OnSaveFinish()
+        {
+            CustomSaverHandler.Save();
+        }
+        
+        // For mod utils
         public override void Update()
         {
             if (PlayerTransform)
