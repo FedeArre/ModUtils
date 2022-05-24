@@ -263,6 +263,86 @@ namespace SimplePartLoader
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
+        internal static void EnablePaintAndDirt(Part part)
+        {
+            GameObject Prefab = part.Prefab;
+
+            if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
+            {
+                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                return;
+            }
+
+            Prefab.AddComponent<P3dPaintable>();
+
+            // Material checks
+            Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
+            int l2Material_index = -1, alphaMaterial_index = -1;
+
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            {
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                {
+                    l2Material_index = i;
+                    break;
+                }
+            }
+
+            for (int i = 0; i < prefabRenderer.materials.Length; i++)
+            {
+                if (prefabRenderer.materials[i].shader.name == "Paint in 3D/Alpha")
+                {
+                    alphaMaterial_index = i;
+                    break;
+                }
+            }
+
+            if (alphaMaterial_index == -1)
+            {
+                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                return;
+            }
+
+            if (l2Material_index == -1)
+            {
+                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                return;
+            }
+
+            // Now we create our painting components.
+            P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+            P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
+
+            P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_dirt = Prefab.AddComponent<P3dPaintableTexture>();
+            P3dPaintableTexture paintableTexture_rust = Prefab.AddComponent<P3dPaintableTexture>();
+
+            P3dSlot p3dSlot_rustDirt = new P3dSlot(l2Material_index, "_L2MetallicRustDustSmoothness");
+            P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
+            P3dSlot p3dSlot_dirt = new P3dSlot(alphaMaterial_index, "_MainTex");
+
+            // Setting up the components
+
+            // Material cloner
+            materialCloner_l2.Index = l2Material_index;
+            materialCloner_paint.Index = alphaMaterial_index;
+
+            // Paintable textures
+            paintableTexture_colorMap.Slot = p3dSlot_colorMap;
+
+            paintableTexture_rust.Slot = p3dSlot_rustDirt;
+            paintableTexture_rust.Group = 100;
+
+            paintableTexture_dirt.Slot = p3dSlot_dirt;
+            paintableTexture_dirt.Group = 5;
+
+            // Final details
+            part.Paintable = true;
+            part.CarProps.Paintable = true;
+            part.CarProps.Washable = true;
+            part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
+        }
+
         public static Material GetDirtMaterial()
         {
             Material m = null;

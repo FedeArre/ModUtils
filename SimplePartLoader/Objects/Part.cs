@@ -104,6 +104,10 @@ namespace SimplePartLoader
                     PaintingSystem.EnableDirtOnly(this);
                     break;
 
+                case SPL.PaintingSupportedTypes.OnlyPaintAndDirt:
+                    PaintingSystem.EnablePaintAndDirt(this);
+                    break;
+
                 default:
                     Debug.LogError("[SPL]: An invalid type has been sent to Part.EnablePainting, part: " +Prefab.name);
                     break;

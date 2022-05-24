@@ -27,7 +27,8 @@ namespace SimplePartLoader
             FullPaintingSupport = 1,
             OnlyPaint,
             OnlyPaintAndRust,
-            OnlyDirt
+            OnlyDirt,
+            OnlyPaintAndDirt
         }
 
         /// <summary>
