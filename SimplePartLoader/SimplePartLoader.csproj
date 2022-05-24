@@ -37,6 +37,11 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="PaintIn3D">
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\PaintIn3D.dll</HintPath>
       <Private>False</Private>
@@ -419,10 +424,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />
+    <Compile Include="Objects\CustomSaving\SaveData.cs" />
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="PartManager.cs" />
@@ -433,9 +440,7 @@
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="ModUtils\PaintingSystem.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Objects\CustomSaving\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

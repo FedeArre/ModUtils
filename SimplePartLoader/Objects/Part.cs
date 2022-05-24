@@ -17,7 +17,9 @@ namespace SimplePartLoader
 
         internal Hashtable languages = new Hashtable();
 
-        
+        internal bool SavingEnabled;
+        internal SaveData SaveData { get; private set; }
+
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
             Prefab = prefab;
@@ -66,6 +68,16 @@ namespace SimplePartLoader
                 Prefab.layer = LayerMask.NameToLayer("Windows");
                 Prefab.tag = "Window";
             }
+        }
+
+        public void EnableDataSaving()
+        {
+            if (SavingEnabled)
+                return;
+
+            SavingEnabled = true;
+            SaveData = Prefab.AddComponent<SaveData>();
+            SaveData.PartName = CarProps.PrefabName;
         }
 
         public void UseHandAttachment()
