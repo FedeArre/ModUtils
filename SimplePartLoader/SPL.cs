@@ -305,11 +305,11 @@ namespace SimplePartLoader
             if (FirstLoad != null)
             {
                 DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
-                foreach(EventHandler handler in FirstLoad.GetInvocationList())
+                foreach(var handler in FirstLoad.GetInvocationList())
                 {
                     try
                     {
-                        handler(null, new EventArgs());
+                        handler.DynamicInvoke();
                     }
                     catch(Exception ex)
                     {
@@ -319,7 +319,6 @@ namespace SimplePartLoader
                         
                     }
                 }
-                FirstLoad?.Invoke();
             }
         }
 
