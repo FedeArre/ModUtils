@@ -95,27 +95,34 @@ namespace SimplePartLoader
             }
         }
 
+        [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on SimplePartLoader 1.5. Use PaintingSystem.Types instead!")]
         public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
+        {
+            PaintingSystem.Types newType = (PaintingSystem.Types)type;
+            EnablePartPainting(newType, paintMaterial);
+        }
+        
+        public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
             switch (type)
             {
-                case SPL.PaintingSupportedTypes.FullPaintingSupport:
+                case PaintingSystem.Types.FullPaintingSupport:
                     PaintingSystem.EnableFullSupport(this);
                     break;
 
-                case SPL.PaintingSupportedTypes.OnlyPaint:
+                case PaintingSystem.Types.OnlyPaint:
                     PaintingSystem.EnablePaintOnly(this, paintMaterial);
                     break;
 
-                case SPL.PaintingSupportedTypes.OnlyPaintAndRust:
+                case PaintingSystem.Types.OnlyPaintAndRust:
                     PaintingSystem.EnablePaintAndRust(this);
                     break;
 
-                case SPL.PaintingSupportedTypes.OnlyDirt:
+                case PaintingSystem.Types.OnlyDirt:
                     PaintingSystem.EnableDirtOnly(this);
                     break;
 
-                case SPL.PaintingSupportedTypes.OnlyPaintAndDirt:
+                case PaintingSystem.Types.OnlyPaintAndDirt:
                     PaintingSystem.EnablePaintAndDirt(this);
                     break;
 
@@ -142,7 +149,7 @@ namespace SimplePartLoader
                 GameObject.Destroy(hn.gameObject);
             }
 
-            if(Prefab.GetComponent<RemoveWindow>())
+            if (Prefab.GetComponent<RemoveWindow>())
                 GameObject.Destroy(Prefab.GetComponent<RemoveWindow>());
 
             if(Prefab.GetComponent<PickupHand>())

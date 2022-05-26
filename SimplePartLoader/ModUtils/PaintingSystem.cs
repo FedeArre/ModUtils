@@ -10,6 +10,15 @@ namespace SimplePartLoader
 {
     public class PaintingSystem
     {
+        public enum Types
+        {
+            FullPaintingSupport = 1,
+            OnlyPaint,
+            OnlyPaintAndRust,
+            OnlyDirt,
+            OnlyPaintAndDirt
+        }
+
         internal static void EnablePaintOnly(Part part, int materialIndex)
         {
             GameObject Prefab = part.Prefab;

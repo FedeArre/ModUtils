@@ -22,6 +22,7 @@ namespace SimplePartLoader
         public static bool DEVELOPER_LOG = false;
 
         // All availables paint types in the game
+        [Obsolete("This enum will be removed in SimplePartLoader 1.5, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
@@ -382,7 +383,7 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
-        // Left for compatibility
+        // Compatibility
         [Obsolete("Use ModUtils.GetPlayer() instead!")]
         public static GameObject GetPlayer() { return ModUtils.GetPlayer(); }
         

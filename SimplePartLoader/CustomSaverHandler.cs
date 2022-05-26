@@ -90,7 +90,7 @@ namespace SimplePartLoader
                 sd.PrefabName = data.PartName;
                 sd.Data = data.Data;
                 sd.ObjectNumber = carProps.ObjectNumber;
-
+                
                 DataToSave.Data.Add(sd);
             }
 

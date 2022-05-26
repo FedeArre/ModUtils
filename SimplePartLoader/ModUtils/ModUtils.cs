@@ -53,7 +53,7 @@ namespace SimplePartLoader
                 CurrentPlayerCar = null;
             }
 
-            Debug.LogError($"UpdatePlayerStatus has changed to {isOnCar} - {mcp}");
+            //Debug.Log($"UpdatePlayerStatus has changed to {isOnCar} - {mcp}");
             if(PlayerCarChanged != null)
             {
                 PlayerCarChanged?.Invoke();
