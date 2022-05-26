@@ -1,11 +1,11 @@
-# [Part](api/part.md).SetupTransparent
+# [Part](api/part.md).AddTransparent
 
-*public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)*
+*public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)*
 
-*public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)*
+*public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)*
 
 #### Description
-Creates a transparent (Attachment point) in the indicated part on the given position.
+Creates a transparent (Attachment point) in the indicated part on the given position. Returns a [TransparentData](api/transparentdata.md) instance.
 
 #### Parameters
 Name | Description | Type | Default
@@ -24,5 +24,9 @@ public ModMain()
 {
     Part example_part = SPL.LoadPart(MyAssetBundle, "ExamplePart");
     example_part.SetupTransparent("TrunkDoor06", Vector3.up, Quaternion.identity);
+
+    Part example_part2 = SPL.LoadPart(MyAssetBundle, "ExamplePart2");
+    TransparentData data = example_part2.SetupTransparent("TrunkDoor06", Vector3.up, Quaternion.identity);
+    data.SavePosition = 1;
 }
 ```

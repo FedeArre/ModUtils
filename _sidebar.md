@@ -9,16 +9,17 @@
             - [LoadDummy](api/spl/loaddummy.md)
             - [CopyPartToPrefab](api/spl/copyparttoprefab.md)
             - [ForcePartRegister](api/spl/forcepartregister.md)
-            - [GetPlayer](api/spl/getplayer.md)
-            - [GetPlayerTools](api/spl/getplayertools.md)
         - **Events**
-            - [FirstLoad](api/spl/firstload.md)
-            - [LoadFinish](api/spl.loadfinish.md)
+            - [FirstLoad](api/spl/events/firstload.md)
+            - [LoadFinish](api/spl/events/loadfinish.md)
+            - [DataLoaded](api/spl/events/dataloaded.md)
     - [Part](api/part.md)
-        - [SetupTransparent](api/part/setuptransparent.md)
-        - [EnablePainting](api/part/enablepainting.md)
+        - [AddTransparent](api/part/addtransparent.md)
+        - [EnablePartPainting](api/part/enablepartpainting.md)
         - [Localize](api/part/localize.md)
         - [UsePrytoolAttachment](api/part/useprytoolattachment.md)
+        - [UseHandAttachment](api/part/usehandattachment.md)
+        - [EnableDataSaving](api/part/enabledatasaving.md)
 
 - **Guides**
     - [First steps](guides/first_steps.md)
