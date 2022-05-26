@@ -87,7 +87,7 @@ namespace SimplePartLoader
                         modLoadedParts.Remove(part);
                     }
 
-                    if (!part.Prefab.GetComponment<SPL_Part>())
+                    if (!part.Prefab.GetComponent<SPL_Part>())
                     {
                         part.Prefab.AddComponent<SPL_Part>();
                     }

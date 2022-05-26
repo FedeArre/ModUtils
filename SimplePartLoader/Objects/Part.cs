@@ -26,14 +26,14 @@ namespace SimplePartLoader
             PartInfo = partinfo;
         }
 
-        [Obsolete("SetupTransparent will be removed on SimplePartLoader 1.4, use AddTransparent instead!")]
+        [Obsolete("SetupTransparent will be removed on SimplePartLoader 1.5, use AddTransparent instead!")]
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
             PartManager.transparentData.Add(td);
         }
 
-        [Obsolete("SetupTransparent will be removed on SimplePartLoader 1.4, use AddTransparent instead!")]
+        [Obsolete("SetupTransparent will be removed on SimplePartLoader 1.5, use AddTransparent instead!")]
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable);
