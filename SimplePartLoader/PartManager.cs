@@ -86,6 +86,11 @@ namespace SimplePartLoader
                         Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
                         modLoadedParts.Remove(part);
                     }
+
+                    if (!part.Prefab.GetComponment<SPL_Part>())
+                    {
+                        part.Prefab.AddComponent<SPL_Part>();
+                    }
                 }
             }
                 
