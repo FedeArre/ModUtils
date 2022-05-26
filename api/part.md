@@ -13,7 +13,9 @@ PartInfo | Stores a reference to the PartInfo of the prefab of the part | PartIn
 ## Methods <!-- {docsify-ignore} -->
 Name | Description
 ----- | -----------
-[SetupTransparent](api/part/setuptransparent.md) | Allows to create a transparent (Attachment point) for the part
-[EnablePainting](api/part/enablepainting.md) | Makes the part paintable (Will use experimental PaintIn3D support)
+[AddTransparent](api/part/setuptransparent.md) | Allows to create a transparent (Attachment point) for the part. Returns a [TransparentData](api/transparentdata.md) instance
+[EnablePartPainting](api/part/enablepartpainting.md) | Makes the part paintable
 [Localize](api/part/localize.md) | Allows to localize a part for a specific language
 [UsePrytoolAttachment](api/part/useprytoolattachment.md) | Sets the part to use the prytool attachment system of the game
+[UseHandAttachment](api/part/usehandattachment.md) | Sets the part to use the hand attachment system of the game
+[EnableDataSaving](api/part/enabledatasaving.md) | Enables the data saving feature for this part

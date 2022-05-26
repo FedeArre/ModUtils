@@ -5,12 +5,10 @@ Is a mod for My Garage that allows developers to implement their custom parts in
 # Features
 - [x] Saving and loading of custom car parts
 - [x] Transparents (Attachment points) in-game editor
-- [x] Supports all attachment system of the game: Nuts, screws and prytool
+- [x] Supports all attachment system of the game.
 - [x] Support for cloning parts at runtime
-
-## Planned features
-- [ ] Full PaintIn3D support
-- [ ] Support to store custom data per part
+- [x] Full PaintIn3D support
+- [x] Support to store custom data per part
 
 # Credits
 - Federico Arredondo - Main developer
