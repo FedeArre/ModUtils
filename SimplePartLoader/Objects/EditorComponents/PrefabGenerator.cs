@@ -12,7 +12,7 @@ namespace SimplePartLoader
         public string PrefabName;
         public string CopiesFrom;
 
-        public Mesh NewMesh;
+        public GameObject NewMesh;
 
         public string PartName;
 

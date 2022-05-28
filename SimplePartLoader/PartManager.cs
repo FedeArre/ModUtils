@@ -20,6 +20,8 @@ namespace SimplePartLoader
         /// </summary>
         internal static List<Part> dummyParts = new List<Part>();
 
+        internal static List<Part> prefabGenParts = new List<Part> ();
+
         /// <summary>
         /// List of all the transparent that are saved in memory.
         /// </summary>
@@ -64,6 +66,66 @@ namespace SimplePartLoader
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
+                // We create our parts from the prefab generator
+                foreach(Part part in prefabGenParts)
+                {
+                    PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
+
+                    SPL.CopyPartToPrefab(part, data.CopiesFrom);
+                    if(!part.CarProps)
+                    {
+                        Debug.LogError($"[SPL]: Prefab generator was unable to create {part.Name}");
+                        continue;
+                    }
+
+                    if (data.NewMesh)
+                    {
+                        if(!data.NewMesh.GetComponent<MeshCollider>())
+                        {
+                            Debug.LogError($"[SPL]: New mesh of {part.Name} does not have mesh collider!");
+                        }
+
+                        part.Prefab.GetComponent<MeshFilter>().sharedMesh = data.NewMesh.GetComponent<MeshFilter>().sharedMesh;
+                        part.Prefab.GetComponent<MeshCollider>().sharedMesh = data.NewMesh.GetComponent<MeshFilter>().sharedMesh;
+                        part.Prefab.GetComponent<Renderer>().materials = data.NewMesh.GetComponent<Renderer>().materials;
+                    }
+
+                    if(!String.IsNullOrWhiteSpace(data.PartName))
+                    {
+                        part.CarProps.PartName = data.PartName;
+                        part.CarProps.PartNameExtension = "";
+                    }
+
+                    if(data.NewPrice != 0)
+                    {
+                        if (data.NewPrice < 0)
+                            part.PartInfo.price += data.NewPrice;
+                        else
+                            part.PartInfo.price = data.NewPrice;
+                    }
+
+                    part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
+                    part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
+
+                    if(data.CatalogImage)
+                    {
+                        part.PartInfo.Thumbnail = data.CatalogImage;
+                    }
+
+                    if(data.SavingFeatureEnabled)
+                        part.EnableDataSaving();
+
+                    if(data.AttachmentType != PrefabGenerator.AttachmentTypes.Default)
+                    {
+                        if (data.AttachmentType == PrefabGenerator.AttachmentTypes.Prytool)
+                            part.UsePrytoolAttachment();
+                        else
+                            part.UseHandAttachment();
+                    }
+
+                    Debug.Log($"[SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                }
+
                 try
                 {
                     SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.

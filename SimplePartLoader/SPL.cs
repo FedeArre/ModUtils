@@ -142,16 +142,26 @@ namespace SimplePartLoader
                 throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             Part p = new Part(prefab, null, null);
-            p.Name = prefabName;
-            PartManager.dummyParts.Add(p);
-
-            Saver.modParts.Add(prefabName, prefab);
-
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
+
+            if (prefab.GetComponent<PrefabGenerator>())
+            {
+                PrefabGenerator prefabGen = prefab.GetComponent<PrefabGenerator>();
+                p.Name = prefabGen.PrefabName;
+                Saver.modParts.Add(prefabGen.PrefabName, prefab);
+            }
+            else
+            {
+                p.Name = prefabName;
+                Saver.modParts.Add(prefabName, prefab);
+
+                PartManager.dummyParts.Add(p);
+
+                DevLog($"Dummy part (Not using prefab generator) added into list ({prefabName})");
+            }
 
             return p;
         }
-
 
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
@@ -171,6 +181,9 @@ namespace SimplePartLoader
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
             {
+                if (comp is PrefabGenerator)
+                    continue;
+
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     GameObject.Destroy(comp);
@@ -182,7 +195,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! {partName}");
+                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 

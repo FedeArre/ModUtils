@@ -432,6 +432,9 @@
     <Compile Include="Objects\CustomSaving\DataWrapper.cs" />
     <Compile Include="Objects\CustomSaving\SaveData.cs" />
     <Compile Include="Objects\CustomSaving\SavingHandlerMono.cs" />
+    <Compile Include="Objects\EditorComponents\PrefabGenerator.cs" />
+    <Compile Include="Objects\EditorComponents\UseHand.cs" />
+    <Compile Include="Objects\EditorComponents\UsePrytool.cs" />
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
