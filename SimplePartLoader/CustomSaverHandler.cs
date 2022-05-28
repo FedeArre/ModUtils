@@ -25,8 +25,8 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.Log("[SPL]: There was an issue trying to reset the custom data.");
-                Debug.Log("[SPL]: " + ex.Message);
+                Debug.LogError("[SPL]: There was an issue trying to reset the custom data.");
+                Debug.LogError("[SPL]: " + ex.Message);
                 return;
             }
         }
@@ -51,8 +51,8 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.Log("[SPL]: There was an issue trying to load the custom data.");
-                Debug.Log("[SPL]: " + ex.Message);
+                Debug.LogError("[SPL]: There was an issue trying to load the custom data.");
+                Debug.LogError("[SPL]: " + ex.Message);
                 return;
             }
 
@@ -65,11 +65,9 @@ namespace SimplePartLoader
 
                 foreach(SavedData loadedData in LoadedData.Data)
                 {
-                    Debug.Log("foreach " + carProps.ObjectNumber + "  " + loadedData.ObjectNumber);
                     if(carProps.ObjectNumber == loadedData.ObjectNumber)
                     {
                         sd.Data = loadedData.Data;
-                        Debug.Log(sd);
                     }
                 }
             }
@@ -108,8 +106,8 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.Log("[SPL]: Saving was not succesful due to an exception.");
-                Debug.Log("[SPL]: " + ex.Message);
+                Debug.LogError("[SPL]: Saving was not succesful due to an exception.");
+                Debug.LogError("[SPL]: " + ex.Message);
             }
             
         }
