@@ -19,6 +19,7 @@ namespace SimplePartLoader
         {
             Debug.LogError("SimplePartLoader is loading - Version: " + Version);
             Debug.LogError("Developed by Federico Arredondo - www.github.com/FedeArre");
+            Debug.LogError("Special thanks to mbdriver, BrennFuchS and Jim Goose!");
         }
 
         public override void OnLoad()

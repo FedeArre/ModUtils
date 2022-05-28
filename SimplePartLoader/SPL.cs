@@ -149,6 +149,9 @@ namespace SimplePartLoader
                 PrefabGenerator prefabGen = prefab.GetComponent<PrefabGenerator>();
                 p.Name = prefabGen.PrefabName;
                 Saver.modParts.Add(prefabGen.PrefabName, prefab);
+
+                PartManager.prefabGenParts.Add(p);
+                DevLog($"Dummy part (Using prefab generator) added into list ({prefabName})");
             }
             else
             {
