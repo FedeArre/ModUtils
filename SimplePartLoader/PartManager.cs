@@ -141,6 +141,9 @@ namespace SimplePartLoader
                 foreach (Part part in dummyParts)
                     modLoadedParts.Add(part);
 
+                foreach (Part part in prefabGenParts)
+                    modLoadedParts.Add(part);
+
                 foreach (Part part in modLoadedParts.ToList()) // Using toList allows to remove the part if required without errors. May not be the most efficent solution.
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
