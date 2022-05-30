@@ -38,6 +38,7 @@ public class PrefabGenerator : MonoBehaviour
     {
         Default,
         Prytool,
-        Hand
+        Hand,
+        UseMarkedBolts
     }
 }

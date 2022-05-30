@@ -5,9 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SimplePartLoader
+internal class MarkAsFlatnut : MonoBehaviour
 {
-    internal class UsePrytool : MonoBehaviour
-    {
-    }
 }
+

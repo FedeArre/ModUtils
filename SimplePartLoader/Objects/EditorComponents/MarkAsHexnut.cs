@@ -5,9 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SimplePartLoader
+internal class MarkAsHexnut : MonoBehaviour
 {
-    internal class UseHand : MonoBehaviour
-    {
-    }
 }
