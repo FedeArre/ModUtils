@@ -12,6 +12,8 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
 
+        internal GameObject OriginalGameobject;
+
         internal string Name;
         internal bool Paintable;
 
@@ -40,6 +42,11 @@ namespace SimplePartLoader
             PartManager.transparentData.Add(td);
         }
         
+        public GameObject GetDummyOriginal()
+        {
+            return OriginalGameobject;
+        }
+
         public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);

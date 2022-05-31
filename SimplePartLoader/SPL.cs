@@ -230,6 +230,8 @@ namespace SimplePartLoader
 
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
 
+            p.OriginalGameobject = carPart;
+
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
 
