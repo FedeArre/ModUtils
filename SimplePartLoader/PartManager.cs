@@ -87,7 +87,7 @@ namespace SimplePartLoader
                     if(data.NewPrice != 0)
                     {
                         if (data.NewPrice < 0)
-                            part.PartInfo.price += data.NewPrice;
+                            part.PartInfo.price += -(data.NewPrice);
                         else
                             part.PartInfo.price = data.NewPrice;
                     }
