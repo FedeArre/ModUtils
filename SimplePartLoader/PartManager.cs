@@ -62,7 +62,7 @@ namespace SimplePartLoader
                     }
                 }
             }
-            
+
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
@@ -71,23 +71,11 @@ namespace SimplePartLoader
                 {
                     PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
 
-                    SPL.CopyPartToPrefab(part, data.CopiesFrom);
+                    SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
                     if(!part.CarProps)
                     {
                         Debug.LogError($"[SPL]: Prefab generator was unable to create {part.Name}");
                         continue;
-                    }
-
-                    if (data.NewMesh)
-                    {
-                        if(!data.NewMesh.GetComponent<MeshCollider>())
-                        {
-                            Debug.LogError($"[SPL]: New mesh of {part.Name} does not have mesh collider!");
-                        }
-
-                        part.Prefab.GetComponent<MeshFilter>().sharedMesh = data.NewMesh.GetComponent<MeshFilter>().sharedMesh;
-                        part.Prefab.GetComponent<MeshCollider>().sharedMesh = data.NewMesh.GetComponent<MeshFilter>().sharedMesh;
-                        part.Prefab.GetComponent<Renderer>().materials = data.NewMesh.GetComponent<Renderer>().materials;
                     }
 
                     if(!String.IsNullOrWhiteSpace(data.PartName))

@@ -11,8 +11,8 @@ public class PrefabGenerator : MonoBehaviour
     public string CopiesFrom;
 
     [Header("Mesh change")]
-    [Tooltip("The prefab of the new mesh (If used). Has to contain a MeshRenderer and a MeshFilter")]
-    public GameObject NewMesh;
+    [Tooltip("If you are using a new mesh for the prefab")]
+    public bool EnableMeshChange;
 
     [Header("Car Properties")]
     [Tooltip("The part name that will be shown in-game")]
