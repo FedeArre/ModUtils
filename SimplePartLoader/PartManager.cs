@@ -87,7 +87,7 @@ namespace SimplePartLoader
                     if(data.NewPrice != 0)
                     {
                         if (data.NewPrice < 0)
-                            part.PartInfo.price += -(data.NewPrice);
+                            part.PartInfo.price += Math.Abs(data.NewPrice);
                         else
                             part.PartInfo.price = data.NewPrice;
                     }
@@ -132,6 +132,7 @@ namespace SimplePartLoader
                     }
 
                     Debug.Log($"[SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                    GameObject.Destroy(part.Prefab.GetComponent<PrefabGenerator>());
                 }
 
                 try
