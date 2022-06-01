@@ -42,6 +42,11 @@ namespace SimplePartLoader
             PartManager.transparentData.Add(td);
         }
         
+        public T GetComponent<T>()
+        {
+            return Prefab.GetComponent<T>();
+        }
+
         public GameObject GetDummyOriginal()
         {
             return OriginalGameobject;
