@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod, IModSettings
+    public class ModMain : Mod
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "SimplePartLoader";
@@ -74,18 +74,6 @@ namespace SimplePartLoader
                     }
                 }
             }
-        }
-
-        public void CreateModSettings(ModSettings modSettings)
-        {
-            modSettings.AddButton("My great button", null);
-            modSettings.AddLabel("Label");
-            modSettings.AddTextField("Text field oo", "fdms_textspace", "empty", null);
-        }
-
-        public void ModSettingsLoaded()
-        {
-            
         }
     }
 }
