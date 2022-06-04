@@ -1,10 +1,11 @@
 ﻿
+using ModUI;
 using System.Collections;
 using UnityEngine;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod
+    public class ModMain : Mod, IModSettings
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "SimplePartLoader";
@@ -19,7 +20,6 @@ namespace SimplePartLoader
         {
             Debug.LogError("SimplePartLoader is loading - Version: " + Version);
             Debug.LogError("Developed by Federico Arredondo - www.github.com/FedeArre");
-            Debug.LogError("Special thanks to mbdriver, BrennFuchS and Jim Goose!");
         }
 
         public override void OnLoad()
@@ -74,6 +74,18 @@ namespace SimplePartLoader
                     }
                 }
             }
+        }
+
+        public void CreateModSettings(ModSettings modSettings)
+        {
+            modSettings.AddButton("My great button", null);
+            modSettings.AddLabel("Label");
+            modSettings.AddTextField("Text field oo", "fdms_textspace", "empty", null);
+        }
+
+        public void ModSettingsLoaded()
+        {
+            
         }
     }
 }

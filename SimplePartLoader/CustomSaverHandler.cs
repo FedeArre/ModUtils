@@ -83,6 +83,12 @@ namespace SimplePartLoader
             foreach (SaveData data in UnityEngine.Object.FindObjectsOfType<SaveData>())
             {
                 CarProperties carProps = data.GetComponent<CarProperties>();
+                if (!carProps)
+                {
+                    Debug.LogError("[SPL]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
+                    continue;
+                }
+
                 SavedData sd = new SavedData();
 
                 sd.PrefabName = data.PartName;
