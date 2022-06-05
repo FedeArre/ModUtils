@@ -20,6 +20,19 @@
         - [UsePrytoolAttachment](api/part/useprytoolattachment.md)
         - [UseHandAttachment](api/part/usehandattachment.md)
         - [EnableDataSaving](api/part/enabledatasaving.md)
+    - [ModUtils](api/modutils.md)
+        - [GetPlayer](api/modutils/getplayer.md)
+        - [GetPlayerTools](api/modutils/getplayertools.md)
+        - [GetAudios](api/modutils/getaudios.md)
+        - [PlaySound](api/modutils/playsound.md)
+        - [PlayCashSound](api/modutils/playcashsound.md)
+        - [GetPlayerCurrentCar](api/modutils/getplayercurrentcar.md)
+        - [GetNearestCar](api/modutils/getnearestcar.md)
+    - [PaintingSystem](api/paintingsystem.md)
+        - [GetBodymatMaterial](api/paintingsystem/getbodymaterial.md)
+        - [GetPaintRustMaterial](api/paintingsystem/getpaintrustmaterial.md)
+        - [GetDirtMaterial](api/paintingsystem/getdirtmaterial.md)
+
 
 - **Guides**
     - [First steps](guides/first_steps.md)

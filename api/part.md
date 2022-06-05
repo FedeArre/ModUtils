@@ -19,3 +19,5 @@ Name | Description
 [UsePrytoolAttachment](api/part/useprytoolattachment.md) | Sets the part to use the prytool attachment system of the game
 [UseHandAttachment](api/part/usehandattachment.md) | Sets the part to use the hand attachment system of the game
 [EnableDataSaving](api/part/enabledatasaving.md) | Enables the data saving feature for this part
+[GetComponent](api/part/getcomponent.md) | Shortcut of Part.Prefab.GetComponent<T>()
+[GetDummyOriginal](api/part/getdummyoriginal.md) | Returns a reference to the original prefab that got copied using CopyPartToPrefab or prefab generator.

@@ -30,7 +30,7 @@ public void OnDataLoad()
             if(data.Data.ContainsKey("BatteryCharge"))
             {
                 // We assign the data to our object.
-                data.gameObject.GetComponent<BatteryComponent>().BatteryChargeLevel = data.Data["BatteryCharge"];
+                data.gameObject.GetComponent<BatteryComponent>().BatteryChargeLevel = Int32.Parse(data.Data["BatteryCharge"]);
             }
         }
     }
