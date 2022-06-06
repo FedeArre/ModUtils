@@ -20,6 +20,8 @@
         - [UsePrytoolAttachment](api/part/useprytoolattachment.md)
         - [UseHandAttachment](api/part/usehandattachment.md)
         - [EnableDataSaving](api/part/enabledatasaving.md)
+        - [GetComponent](api/part/getcomponent.md)
+        - [GetDummyOriginal](api/part/getdummyoriginal.md)
     - [ModUtils](api/modutils.md)
         - [GetPlayer](api/modutils/getplayer.md)
         - [GetPlayerTools](api/modutils/getplayertools.md)

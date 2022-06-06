@@ -7,7 +7,7 @@ Static class that contains all the useful methods of SimplePartLoader
 Method | Description
 ----- | -----------
 [LoadPart](api/spl/loadpart.md) | Given a prefab from an AssetBundle, creates a [Part](api/part.md)
-[LoadDummy](api/spl/loaddummy.md) | Allows to load an empty prefab into SPL parts, creating a [Part](api/part.md). Used for [mesh override](guides/mesh_override.md)
+[LoadDummy](api/spl/loaddummy.md) | Allows to load an empty prefab or prefabs with prefab generator component into SPL parts, creating a [Part](api/part.md).
 [CopyPartToPrefab](api/spl/copyparttoprefab.md) | Clones a game's GameObject prefab into a [Part](api/part.md) that has been loaded using [LoadDummy](api/spl/loaddummy.md)
 [ForcePartRegister](api/spl/forcepartregister.md) | Internally registers a part into SPL object list after SPL has been loaded. Used for parts that do not exist on both gamemodes
 
