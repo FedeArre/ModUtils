@@ -4,7 +4,7 @@ namespace SimplePartLoader
 {
     public class TransparentData
     {
-        public string Name;
+        public string Name { get; internal set; }
         public string AttachesTo;
         public Vector3 LocalPos;
         public Quaternion LocalRot;

@@ -20,6 +20,8 @@ namespace SimplePartLoader
         /// </summary>
         internal static List<Part> dummyParts = new List<Part>();
 
+        internal static List<Part> prefabGenParts = new List<Part> ();
+
         /// <summary>
         /// List of all the transparent that are saved in memory.
         /// </summary>
@@ -40,10 +42,6 @@ namespace SimplePartLoader
         /// </summary>
         internal static void OnLoadCalled()
         {
-            // Preload these so developers can use them.
-            SPL.Player = GameObject.Find("Player");
-            SPL.PlayerTools = SPL.Player.GetComponent<tools>();
-
             // We first load all our parts into the list.
             gameParts = new List<GameObject>();
             foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
@@ -64,10 +62,100 @@ namespace SimplePartLoader
                     }
                 }
             }
-            
+
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
+                // We create our parts from the prefab generator
+                foreach(Part part in prefabGenParts)
+                {
+                    PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
+
+                    SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
+                    if(!part.CarProps)
+                    {
+                        Debug.LogWarning($"[SPL]: Prefab generator was unable to create {part.Name}");
+                        continue;
+                    }
+
+                    if(!String.IsNullOrWhiteSpace(data.PartName))
+                    {
+                        part.CarProps.PartName = data.PartName;
+                        part.CarProps.PartNameExtension = "";
+                    }
+
+                    if(data.NewPrice != 0)
+                    {
+                        if (data.NewPrice < 0)
+                            part.PartInfo.price += Math.Abs(data.NewPrice);
+                        else
+                            part.PartInfo.price = data.NewPrice;
+                    }
+
+                    part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
+                    part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
+
+                    if(data.CatalogImage)
+                    {
+                        part.PartInfo.Thumbnail = data.CatalogImage;
+                    }
+
+                    if(!String.IsNullOrWhiteSpace(data.RenamedPrefab))
+                    {
+                        part.PartInfo.RenamedPrefab = data.RenamedPrefab;
+                    }
+
+                    if(data.SavingFeatureEnabled)
+                        part.EnableDataSaving();
+
+                    switch (data.AttachmentType)
+                    {
+                        case PrefabGenerator.AttachmentTypes.Prytool:
+                            part.UsePrytoolAttachment();
+                            break;
+
+                        case PrefabGenerator.AttachmentTypes.Hand:
+                            part.UseHandAttachment();
+                            break;
+
+                        case PrefabGenerator.AttachmentTypes.UseMarkedBolts:
+                            {
+                                // We first remove all the FlatNut / HexNut on our part.
+                                foreach (HexNut hx in part.Prefab.GetComponentsInChildren<HexNut>())
+                                    GameObject.Destroy(hx.gameObject);
+
+                                foreach (FlatNut fn in part.Prefab.GetComponentsInChildren<FlatNut>())
+                                    GameObject.Destroy(fn.gameObject);
+
+                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut to actual bolts.
+                                foreach (MarkAsHexnut mhx in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
+                                    Functions.ConvertToHexnut(mhx.gameObject);
+
+                                foreach (MarkAsFlatnut mfn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
+                                    Functions.ConvertToFlatNut(mfn.gameObject);
+
+                                break;
+                            }
+                    }
+
+                    foreach(MarkAsTransparent markedTransparent in part.Prefab.GetComponentsInChildren<MarkAsTransparent>())
+                    {
+                        TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
+                        
+                        GameObject transparentObject = GetTransparentReadyObject(tempData);
+
+                        transparentObject.transform.SetParent(markedTransparent.transform.parent);
+                        transparentObject.transform.localPosition = markedTransparent.transform.localPosition;
+                        transparentObject.transform.localRotation = markedTransparent.transform.localRotation;
+                        transparentObject.transform.localScale = markedTransparent.transform.localScale;
+
+                        GameObject.Destroy(markedTransparent.gameObject);
+                    }
+
+                    Debug.Log($"[SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                    GameObject.Destroy(part.Prefab.GetComponent<PrefabGenerator>());
+                }
+
                 try
                 {
                     SPL.InvokeFirstLoadEvent(); // We call the FirstLoad event. SPL handles it since is the class that has the delegate.
@@ -83,12 +171,20 @@ namespace SimplePartLoader
                 foreach (Part part in dummyParts)
                     modLoadedParts.Add(part);
 
+                foreach (Part part in prefabGenParts)
+                    modLoadedParts.Add(part);
+
                 foreach (Part part in modLoadedParts.ToList()) // Using toList allows to remove the part if required without errors. May not be the most efficent solution.
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
+                        Debug.LogWarning($"[SPL] The part {part.Prefab.name} has a missing component.");
                         modLoadedParts.Remove(part);
+                    }
+
+                    if (!part.Prefab.GetComponent<SPL_Part>())
+                    {
+                        part.Prefab.AddComponent<SPL_Part>();
                     }
                 }
             }
@@ -178,16 +274,7 @@ namespace SimplePartLoader
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
 
-            try
-            {
-                SPL.InvokeLoadFinish();
-            }
-            catch(Exception ex)
-            {
-                Debug.LogError("[SPL]: Something went wrong during load finished event! LoadFinish execution has been stopped. Error: ");
-                Debug.LogError(ex.ToString());
-                return;
-            }
+            SPL.InvokeLoadFinishedEvent();
         }
 
         /// <summary>

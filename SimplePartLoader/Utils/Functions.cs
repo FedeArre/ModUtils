@@ -14,7 +14,6 @@ namespace SimplePartLoader.Utils
         /// Internal usage only, gets a car part from his name and car
         /// </summary>
         /// <param name="partName">The name of the part</param>
-        /// <param name="carName">The car of the part</param>
         /// <returns>The prefab of the part if exists, null otherwise</returns>
         public static GameObject GetCarPart(string partName)
         {
@@ -29,6 +28,45 @@ namespace SimplePartLoader.Utils
             }
 
             return carPart;
+        }
+
+        /// <summary>
+        /// Given a GameObject converts it into a HexNut bolt. The MarkAsNut component is required!
+        /// </summary>
+        /// <param name="bolt">The GameObject to be converted</param>
+        public static void ConvertToHexnut(GameObject bolt)
+        {
+            bolt.AddComponent<CarProperties>();
+            bolt.AddComponent<DISABLER>();
+            HexNut hx = bolt.AddComponent<HexNut>();
+            MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
+            bolt.layer = LayerMask.NameToLayer("Bolts");
+
+            if (!bolt.GetComponent<BoxCollider>())
+                bolt.gameObject.AddComponent<BoxCollider>();
+
+            hx.DontDisableRenderer = mhx.DontDisableRenderer;
+            hx.Type = mhx.Type;
+
+            GameObject.Destroy(mhx);
+        }
+
+        /// <summary>
+        /// Given a GameObject converts it into a FlatNut bolt. The MarkAsFlat component is required!
+        /// </summary>
+        /// <param name="bolt">The GameObject to be converted</param>
+        public static void ConvertToFlatNut(GameObject bolt)
+        {
+            bolt.AddComponent<CarProperties>();
+            bolt.AddComponent<DISABLER>();
+            bolt.AddComponent<FlatNut>();
+
+            bolt.layer = LayerMask.NameToLayer("FlatBolts");
+
+            if (!bolt.GetComponent<BoxCollider>())
+                bolt.gameObject.AddComponent<BoxCollider>();
+
+            GameObject.Destroy(bolt.GetComponent<MarkAsFlatnut>());
         }
 
         /// <summary>

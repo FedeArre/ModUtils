@@ -16,18 +16,20 @@ namespace SimplePartLoader
         public delegate void LoadFinishDelegate();
         public static event LoadFinishDelegate LoadFinish;
 
+        public delegate void DataLoadedDelegate();
+        public static event DataLoadedDelegate DataLoaded;
+
         public static bool DEVELOPER_LOG = false;
 
-        internal static GameObject Player;
-
-        internal static tools PlayerTools;
-
+        // All availables paint types in the game
+        [Obsolete("This enum will be removed in SimplePartLoader 1.5, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
             OnlyPaint,
             OnlyPaintAndRust,
-            OnlyDirt
+            OnlyDirt,
+            OnlyPaintAndDirt
         }
 
         /// <summary>
@@ -140,16 +142,29 @@ namespace SimplePartLoader
                 throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             Part p = new Part(prefab, null, null);
-            p.Name = prefabName;
-            PartManager.dummyParts.Add(p);
-
-            Saver.modParts.Add(prefabName, prefab);
-
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
+
+            if (prefab.GetComponent<PrefabGenerator>())
+            {
+                PrefabGenerator prefabGen = prefab.GetComponent<PrefabGenerator>();
+                p.Name = prefabGen.PrefabName;
+                Saver.modParts.Add(p.Name, prefab);
+
+                PartManager.prefabGenParts.Add(p);
+                DevLog($"Dummy part (Using prefab generator) added into list ({prefabName})");
+            }
+            else
+            {
+                p.Name = prefabName;
+                Saver.modParts.Add(prefabName, prefab);
+
+                PartManager.dummyParts.Add(p);
+
+                DevLog($"Dummy part (Not using prefab generator) added into list ({prefabName})");
+            }
 
             return p;
         }
-
 
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
@@ -169,6 +184,9 @@ namespace SimplePartLoader
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
             {
+                if (comp is PrefabGenerator)
+                    continue;
+
                 if (!(comp is Transform) && !((comp is Renderer || comp is Collider || comp is MeshFilter) && ignoreBuiltin))
                 {
                     GameObject.Destroy(comp);
@@ -180,7 +198,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! {partName}");
+                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 
@@ -211,6 +229,8 @@ namespace SimplePartLoader
             p.CarProps.PrefabName = p.Name;
 
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
+
+            p.OriginalGameobject = carPart;
 
             Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
         }
@@ -305,19 +325,69 @@ namespace SimplePartLoader
             if (FirstLoad != null)
             {
                 DevLog("First load was invoked - Developer logging is enabled (Please disable before releasing your mod!)");
-                FirstLoad?.Invoke();
+                foreach(var handler in FirstLoad.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while loading a mod, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        
+                    }
+                }
             }
         }
 
         /// <summary>
         /// Invokes the LoadFinished event if any script is suscribed to it.
         /// </summary>
-        internal static void InvokeLoadFinish()
+        internal static void InvokeLoadFinishedEvent()
         {
             if (LoadFinish != null)
             {
-                DevLog("Load finish event was called");
-                LoadFinish?.Invoke();
+                DevLog("Load finish has been called - Developer logging is enabled (Please disable before releasing your mod!)");
+                foreach (var handler in LoadFinish.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while on load finish, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Invokes the DataLoaded event if any script is suscribed to it.
+        /// </summary>
+        internal static void InvokeDataLoadedEvent()
+        {
+            if (DataLoaded != null)
+            {
+                DevLog("Data loaded has been called - Developer logging is enabled (Please disable before releasing your mod!)");
+                foreach (var handler in DataLoaded.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("[SPL]: Exception caught while on data loaded event, you should report this to the mod developer.");
+                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+
+                    }
+                }
             }
         }
 
@@ -331,10 +401,11 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
+        // Compatibility
         [Obsolete("Use ModUtils.GetPlayer() instead!")]
-        public static GameObject GetPlayer() { return Player ? Player : GameObject.Find("Player"); }
+        public static GameObject GetPlayer() { return ModUtils.GetPlayer(); }
         
         [Obsolete("Use ModUtils.GetPlayerTools() instead!")]
-        public static tools GetPlayerTools() {  return PlayerTools ? PlayerTools : GameObject.Find("Player").GetComponent<tools>(); }
+        public static tools GetPlayerTools() { return ModUtils.GetPlayerTools(); }
     }
 }
