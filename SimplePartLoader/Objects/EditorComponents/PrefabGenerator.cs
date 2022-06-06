@@ -27,7 +27,8 @@ public class PrefabGenerator : MonoBehaviour
     public bool EnablePartOnCatalog = true;
     [Tooltip("The photo that will be shown on the catalog. 512x512")]
     public Texture2D CatalogImage;
-
+    [Tooltip("Renamed prefab name for this object. Leave empty if you are not changing it")]
+    public string RenamedPrefab;
     [Header("Other features")]
     [Tooltip("Enables the SimplePartLoader saving feature")]
     public bool SavingFeatureEnabled;
