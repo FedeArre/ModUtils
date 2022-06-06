@@ -140,10 +140,14 @@ namespace SimplePartLoader
 
                     foreach(MarkAsTransparent markedTransparent in part.Prefab.GetComponentsInChildren<MarkAsTransparent>())
                     {
-                        TransparentData tempData = new TransparentData(markedTransparent.name, null, markedTransparent.transform.localPosition, markedTransparent.transform.localRotation, false);
+                        TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
                         
                         GameObject transparentObject = GetTransparentReadyObject(tempData);
+
                         transparentObject.transform.SetParent(markedTransparent.transform.parent);
+                        transparentObject.transform.localPosition = markedTransparent.transform.localPosition;
+                        transparentObject.transform.localRotation = markedTransparent.transform.localRotation;
+                        transparentObject.transform.localScale = markedTransparent.transform.localScale;
 
                         GameObject.Destroy(markedTransparent.gameObject);
                     }

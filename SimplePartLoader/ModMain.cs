@@ -16,8 +16,8 @@ namespace SimplePartLoader
 
         public ModMain()
         {
-            Debug.LogError("SimplePartLoader is loading - Version: " + Version);
-            Debug.LogError("Developed by Federico Arredondo - www.github.com/FedeArre");
+            Debug.Log("SimplePartLoader is loading - Version: " + Version);
+            Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
         }
 
         public override void OnLoad()
