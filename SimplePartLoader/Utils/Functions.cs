@@ -38,14 +38,17 @@ namespace SimplePartLoader.Utils
         {
             bolt.AddComponent<CarProperties>();
             bolt.AddComponent<DISABLER>();
-            bolt.AddComponent<HexNut>();
-
+            HexNut hx = bolt.AddComponent<HexNut>();
+            MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
             bolt.layer = LayerMask.NameToLayer("Bolts");
 
             if (!bolt.GetComponent<BoxCollider>())
                 bolt.gameObject.AddComponent<BoxCollider>();
 
-            GameObject.Destroy(bolt.GetComponent<MarkAsHexnut>());
+            hx.DontDisableRenderer = mhx.DontDisableRenderer;
+            hx.Type = mhx.Type;
+
+            GameObject.Destroy(mhx);
         }
 
         /// <summary>

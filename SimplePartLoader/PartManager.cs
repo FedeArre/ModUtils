@@ -100,6 +100,11 @@ namespace SimplePartLoader
                         part.PartInfo.Thumbnail = data.CatalogImage;
                     }
 
+                    if(!String.IsNullOrWhiteSpace(data.RenamedPrefab))
+                    {
+                        part.PartInfo.RenamedPrefab = data.RenamedPrefab;
+                    }
+
                     if(data.SavingFeatureEnabled)
                         part.EnableDataSaving();
 
@@ -114,21 +119,33 @@ namespace SimplePartLoader
                             break;
 
                         case PrefabGenerator.AttachmentTypes.UseMarkedBolts:
-                            // We first remove all the FlatNut / HexNut on our part.
-                            foreach(HexNut hx in part.Prefab.GetComponentsInChildren<HexNut>())
-                                GameObject.Destroy(hx.gameObject);
-                            
-                            foreach (FlatNut fn in part.Prefab.GetComponentsInChildren<FlatNut>())
-                                GameObject.Destroy(fn.gameObject);
-                            
-                            // Now we need to convert our MarkAsFlatnut | MarkAsHexnut to actual bolts.
-                            foreach(MarkAsHexnut mhx in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
-                                Functions.ConvertToHexnut(mhx.gameObject);
-                            
-                            foreach(MarkAsFlatnut mfn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
-                                Functions.ConvertToFlatNut(mfn.gameObject);
+                            {
+                                // We first remove all the FlatNut / HexNut on our part.
+                                foreach (HexNut hx in part.Prefab.GetComponentsInChildren<HexNut>())
+                                    GameObject.Destroy(hx.gameObject);
 
-                            break;
+                                foreach (FlatNut fn in part.Prefab.GetComponentsInChildren<FlatNut>())
+                                    GameObject.Destroy(fn.gameObject);
+
+                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut to actual bolts.
+                                foreach (MarkAsHexnut mhx in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
+                                    Functions.ConvertToHexnut(mhx.gameObject);
+
+                                foreach (MarkAsFlatnut mfn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
+                                    Functions.ConvertToFlatNut(mfn.gameObject);
+
+                                break;
+                            }
+                    }
+
+                    foreach(MarkAsTransparent markedTransparent in part.Prefab.GetComponentsInChildren<MarkAsTransparent>())
+                    {
+                        TransparentData tempData = new TransparentData(markedTransparent.name, null, markedTransparent.transform.localPosition, markedTransparent.transform.localRotation, false);
+                        
+                        GameObject transparentObject = GetTransparentReadyObject(tempData);
+                        transparentObject.transform.SetParent(markedTransparent.transform.parent);
+
+                        GameObject.Destroy(markedTransparent.gameObject);
                     }
 
                     Debug.Log($"[SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
