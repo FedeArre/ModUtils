@@ -1,6 +1,6 @@
 # Localization
 
-SimplePartLoader allows to localize every part individually through the [Part.Localize](../part/localize.md) function, by default your part name (CarProperties.PartName) is used as part name to show in all the languages.
+SimplePartLoader allows to localize every part individually through the [Part.Localize](api/part/localize.md) function, by default your part name (CarProperties.PartName) is used as part name to show in all the languages.
 
 ```csharp
 using SimplePartLoader;
@@ -41,8 +41,9 @@ public ModMain()
 ```
 
 As you might notice, the language identifiers in the game are not written always on english, so this table will help you.
+
 Language | In-game name
--------- | ------------
+------- | ----------
 English | English
 Portuguese | Portuguese
 German | German
