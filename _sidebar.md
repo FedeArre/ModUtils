@@ -40,7 +40,3 @@
     - [Fixing broken parts](guides/fixing_dummy_parts.md)
     - [The painting system](guides/painting.md)
     - [Localization](guides/localization.md)
-    
-- **Useful data**
-    - [How car parts work](guides/how_parts_work.md)
-  
