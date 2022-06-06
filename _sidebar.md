@@ -32,14 +32,15 @@
         - [GetBodymatMaterial](api/paintingsystem/getbodymaterial.md)
         - [GetPaintRustMaterial](api/paintingsystem/getpaintrustmaterial.md)
         - [GetDirtMaterial](api/paintingsystem/getdirtmaterial.md)
-
-
+  
 - **Guides**
     - [First steps](guides/first_steps.md)
-    - [Transparents and the editor](guides/transparents.md)
-    - [What are dummy parts?](guides/dummy_parts.md)
-    - [Fixing broken dummy parts](guides/fixing_dummy_parts.md)
-    - [Changing the mesh of a dummy part](guides/fixing_dummy_parts.md)
-    - [Exporting from Blender](guides/blender_fix.md)
+    - [Prefab generator](guides/prefab_generator.md)
+    - [Parts from scratch](guides/create_part.md)
+    - [Fixing broken parts](guides/fixing_dummy_parts.md)
     - [The painting system](guides/painting.md)
     - [Localization](guides/localization.md)
+    
+- **Useful data**
+    - [How car parts work](guides/how_parts_work.md)
+  
