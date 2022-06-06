@@ -9,7 +9,9 @@ namespace SimplePartLoader
         public override string ID => "SimplePartLoader";
         public override string Name => "SimplePartLoader";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.3.1";
+        public override string Version => "v1.4.0";
+
+        public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         Transform PlayerTransform;
         bool PlayerOnCar;

@@ -74,7 +74,7 @@ namespace SimplePartLoader
                     SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
                     if(!part.CarProps)
                     {
-                        Debug.LogError($"[SPL]: Prefab generator was unable to create {part.Name}");
+                        Debug.LogWarning($"[SPL]: Prefab generator was unable to create {part.Name}");
                         continue;
                     }
 
@@ -178,7 +178,7 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[SPL] The part {part.Prefab.name} has a missing component.");
+                        Debug.LogWarning($"[SPL] The part {part.Prefab.name} has a missing component.");
                         modLoadedParts.Remove(part);
                     }
 

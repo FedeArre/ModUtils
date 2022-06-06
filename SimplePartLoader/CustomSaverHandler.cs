@@ -85,7 +85,7 @@ namespace SimplePartLoader
                 CarProperties carProps = data.GetComponent<CarProperties>();
                 if (!carProps)
                 {
-                    Debug.LogError("[SPL]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
+                    Debug.LogWarning("[SPL]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
                     continue;
                 }
 
