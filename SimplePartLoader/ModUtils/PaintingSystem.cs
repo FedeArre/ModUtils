@@ -29,16 +29,68 @@ namespace SimplePartLoader
                 return;
             }
 
-            Prefab.AddComponent<P3dPaintable>();
+            if(materialIndex == -1)
+            {
+                Prefab.AddComponent<P3dPaintable>();
 
-            P3dPaintableTexture paintableTexture = Prefab.AddComponent<P3dPaintableTexture>();
-            paintableTexture.Slot = new P3dSlot(materialIndex, "_MainTex");
-            paintableTexture.UpdateMaterial();
+                P3dPaintableTexture paintableTexture = Prefab.AddComponent<P3dPaintableTexture>();
+                paintableTexture.Slot = new P3dSlot(materialIndex, "_MainTex");
+                paintableTexture.UpdateMaterial();
 
-            Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
+                Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
 
-            part.CarProps.Paintable = true;
-            part.Paintable = true;
+                part.CarProps.Paintable = true;
+                part.Paintable = true;
+            }
+            else
+            {
+                Prefab.AddComponent<P3dPaintable>();
+
+                // Material checks
+                Renderer prefabRenderer = Prefab.GetComponent<Renderer>();
+                int l2Material_index = -1;
+
+                // Looking up the material or creating it.
+                for (int i = 0; i < prefabRenderer.materials.Length; i++)
+                {
+                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                    {
+                        l2Material_index = i;
+                        break;
+                    }
+                }
+
+                if (l2Material_index == -1)
+                {
+                    Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                    return;
+                }
+
+                // Now we add all the painting components
+                P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
+
+                P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
+
+                P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
+
+                P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
+
+                // Setting up the components
+
+                // Material cloner
+                materialCloner_l2.Index = l2Material_index;
+
+                // Paintable textures
+                paintableTexture_colorMap.Slot = p3dSlot_colorMap;
+
+                counter_colorMap.PaintableTexture = paintableTexture_colorMap;
+                counter_colorMap.Threshold = 0.1f;
+                counter_colorMap.enabled = false;
+
+                // Final details
+                part.Paintable = true;
+                part.CarProps.Paintable = true;
+            }
         }
 
         internal static void EnablePaintAndRust(Part part)
@@ -115,6 +167,7 @@ namespace SimplePartLoader
             part.CarProps.Paintable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
+
 
         internal static void EnableDirtOnly(Part part)
         {
