@@ -21,7 +21,7 @@ namespace SimplePartLoader
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        const string API_URL = "https://mygaragemod.xyz/api/Mods";
+        const string API_URL = "https://mygaragemod.xyz/api";
         GameObject UI_Prefab, UI_Error_Prefab, UI;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
@@ -31,7 +31,7 @@ namespace SimplePartLoader
         bool PlayerOnCar;
         
         // Mod delete
-        string[] modsToDelete = { "_SimplePartLoader.dll", "Extra Buildings.dll", "Autoupdater.dll" };
+        string[] modsToDelete = { "Extra Buildings.dll", "Autoupdater.dll" };
         
         // Mod shop
         AssetBundle Bundle;
@@ -57,9 +57,9 @@ namespace SimplePartLoader
                 }
             }
 
-            if(Directory.Exists(ModsFolderPath + "Autoupdater/"))
+            if (Directory.Exists(ModsFolderPath + "Autoupdater/"))
             {
-                Directory.Delete(ModsFolderPath + "Autoupdater/");
+                Directory.Delete(ModsFolderPath + "Autoupdater/", true);
             }
 
             // Mod shop
@@ -72,10 +72,12 @@ namespace SimplePartLoader
 
             // Autoupdater
             AutoupdaterBundle = AssetBundle.LoadFromMemory(Properties.Resources.autoupdater_ui_canvas);
-            UI_Prefab = Bundle.LoadAsset<GameObject>("Canvas");
-            UI_Error_Prefab = Bundle.LoadAsset<GameObject>("CanvasError");
+            UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Canvas");
+            UI_Error_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasError");
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
+            
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
+            AutoupdaterBundle.Unload(false);
         }
 
         public override void OnMenuLoad()
