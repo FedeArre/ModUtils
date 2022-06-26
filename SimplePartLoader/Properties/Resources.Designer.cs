@@ -63,6 +63,16 @@ namespace SimplePartLoader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] autoupdater_ui_canvas {
+            get {
+                object obj = ResourceManager.GetObject("autoupdater_ui_canvas", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] extra_buildings_models {
             get {
                 object obj = ResourceManager.GetObject("extra_buildings_models", resourceCulture);

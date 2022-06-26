@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimplePartLoader</RootNamespace>
-    <AssemblyName>_ModUtils</AssemblyName>
+    <AssemblyName>_SimplePartLoader</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -428,6 +428,9 @@
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
+    <Compile Include="Objects\Autoupdater\JSON_Mod.cs" />
+    <Compile Include="Objects\Autoupdater\JSON_ModList.cs" />
+    <Compile Include="Objects\Autoupdater\JSON_Mod_API_Result.cs" />
     <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />
     <Compile Include="Objects\CustomSaving\DataWrapper.cs" />
@@ -460,9 +463,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\autoupdater_ui_canvas" />
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
