@@ -154,9 +154,14 @@ namespace SimplePartLoader
             return carDetails;
         }
 
-        public static Vector3 GetShiftedCoords(Vector3 coordsToShift)
+        public static Vector3 UnshiftCoords(Vector3 coordsToUnshift)
         {
-            return coordsToShift - PlayerTools.saver.transform.root.position;
+            return coordsToUnshift - PlayerTools.saver.transform.root.position;
+        }
+
+        public static Vector3 ShiftCoords(Vector3 coordsToShift)
+        {
+            return coordsToShift + PlayerTools.saver.transform.root.position;
         }
     }
 }
