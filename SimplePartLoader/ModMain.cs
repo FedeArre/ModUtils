@@ -1,7 +1,6 @@
-﻿using Autoupdater;
+﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -37,9 +36,6 @@ namespace SimplePartLoader
         AssetBundle Bundle;
         GameObject ModShopPrefab;
         Material FloorMat;
-
-        readonly Vector3 POSITION_SHOP = new Vector3(722.5838f, 38.12f, -189.3593f);
-        readonly Vector3 ROTATION_SHOP = new Vector3(0f, 90f, 0f);
 
         public ModMain()
         {
@@ -158,7 +154,7 @@ namespace SimplePartLoader
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
-            GameObject shop = GameObject.Instantiate(ModShopPrefab, POSITION_SHOP, Quaternion.Euler(ROTATION_SHOP));
+            GameObject shop = GameObject.Instantiate(ModShopPrefab, new Vector3(722.5838f, 38.12f, -189.3593f), Quaternion.Euler(new Vector3(0, 90f, 0)));
             shop.transform.localScale = new Vector3(0.87f, 0.87f, 0.87f);
             shop.name = "EXTRA_BUILDINGS_MODSHOP";
 

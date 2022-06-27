@@ -425,9 +425,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Autoupdating.cs" />
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
+    <Compile Include="Objects\Autoupdater\AutoupdaterData.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod.cs" />
     <Compile Include="Objects\Autoupdater\JSON_ModList.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod_API_Result.cs" />

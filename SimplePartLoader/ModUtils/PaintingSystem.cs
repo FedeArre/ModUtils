@@ -29,7 +29,7 @@ namespace SimplePartLoader
                 return;
             }
 
-            if(materialIndex == -1)
+            if(materialIndex != -1)
             {
                 Prefab.AddComponent<P3dPaintable>();
 
