@@ -13,7 +13,7 @@ namespace SimplePartLoader
         private static tools PlayerTools;
         private static AudioManager AudioList;
         private static AudioSource Source;
-        
+
         private static MainCarProperties CurrentPlayerCar;
 
         internal static List<GameObject> Cars;
@@ -152,6 +152,11 @@ namespace SimplePartLoader
             carDetails.Car = NearestCar.GetComponent<MainCarProperties>();
             carDetails.Distance = CurrentLowestDistance;
             return carDetails;
+        }
+
+        public static Vector3 GetShiftedCoords(Vector3 coordsToShift)
+        {
+            return coordsToShift - PlayerTools.saver.transform.root.position;
         }
     }
 }
