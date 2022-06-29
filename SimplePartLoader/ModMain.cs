@@ -81,8 +81,14 @@ namespace SimplePartLoader
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
+                Debug.Log("[ModUtils]: Printing mod list.");
+                foreach(Mod m in ModLoader.mods)
+                {
+                    Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
+                }
                 return;
             }
+
 
             JSON_ModList jsonList = new JSON_ModList();
             foreach (Mod mod in ModLoader.mods)
