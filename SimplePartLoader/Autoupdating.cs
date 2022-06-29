@@ -1,16 +1,29 @@
-﻿using Autoupdater;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace SimplePartLoader
+[AttributeUsage(AttributeTargets.Assembly)]
+public class AutoupdaterID : Attribute
 {
-    public class Autoupdating : AutoupdaterData
-    {
-        public override string ModName => "ModUtils";
-        public override string ModId =>"ModUtils";
-        public override string ModVersion => "v1.0.0";
-    }
+    string id;
+    public AutoupdaterID() : this(string.Empty) { }
+    public AutoupdaterID(string txt) { id = txt; }
+    public string Value() { return id; }
 }
+
+[AttributeUsage(AttributeTargets.Assembly)]
+public class AutoupdaterName : Attribute
+{
+    string name;
+    public AutoupdaterName() : this(string.Empty) { }
+    public AutoupdaterName(string txt) { name = txt; }
+    public string Value() { return name; }
+}
+
+[AttributeUsage(AttributeTargets.Assembly)]
+public class AutoupdaterVersion : Attribute
+{
+    string ver;
+    public AutoupdaterVersion() : this(string.Empty) { }
+    public AutoupdaterVersion(string txt) { ver = txt; }
+    public string Value() { return ver; }
+}
+

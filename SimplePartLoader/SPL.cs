@@ -22,7 +22,7 @@ namespace SimplePartLoader
         public static bool DEVELOPER_LOG = false;
 
         // All availables paint types in the game
-        [Obsolete("This enum will be removed in SimplePartLoader 1.5, use PaintingSystem.Types instead!")]
+        [Obsolete("This enum will be removed in ModUtils v1.1, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
@@ -336,7 +336,6 @@ namespace SimplePartLoader
                         Debug.Log("[SPL]: Exception caught while loading a mod, you should report this to the mod developer.");
                         Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
                         Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
-                        
                     }
                 }
             }
