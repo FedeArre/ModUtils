@@ -20,7 +20,8 @@ namespace SimplePartLoader
         public static event DataLoadedDelegate DataLoaded;
 
         public static bool DEVELOPER_LOG = false;
-
+        internal static bool ENABLE_SAVE_DISSASAMBLE = false;
+        
         // All availables paint types in the game
         [Obsolete("This enum will be removed in ModUtils v1.1, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes

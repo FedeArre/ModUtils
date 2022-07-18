@@ -1,6 +1,7 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -156,6 +157,31 @@ namespace SimplePartLoader
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
                 CustomSaverHandler.NewGame();
 
+            SPL.ENABLE_SAVE_DISSASAMBLE = true;
+            if(SPL.ENABLE_SAVE_DISSASAMBLE)
+            {
+                Debug.Log("[ModUtils]: Save dissasembling has been enabled!");
+                SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
+                if (File.Exists(Application.persistentDataPath + "/save1/save.dat"))
+                {
+                    save.read();
+                    Debug.Log("[ModUtils]: Save file found, loading...");
+                    foreach(DictionaryEntry s in save.table)
+                    {
+                        Debug.Log("[SD]: " + s.Key + " | " + s.Value);
+                        if(s.Value is List<String>)
+                        {
+                            Debug.Log("[SD]: Entry above is string list, content: ");
+                            foreach(string str in (List<string>)s.Value)
+                            {
+                                Debug.Log("[SD]: " + str);
+                            }
+                        }
+                    }
+                    Debug.Log("[ModUtils]: Loaded " + save.table.Count + " entries.");
+                }
+            }
+            
             // Mod shop load
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
