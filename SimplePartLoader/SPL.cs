@@ -94,6 +94,8 @@ namespace SimplePartLoader
 
                 fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
 
+                fn.tight = true;
+                
                 if (!fn.GetComponent<BoxCollider>())
                     fn.gameObject.AddComponent<BoxCollider>();
             }

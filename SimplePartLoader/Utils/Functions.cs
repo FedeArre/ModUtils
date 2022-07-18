@@ -59,7 +59,7 @@ namespace SimplePartLoader.Utils
         {
             bolt.AddComponent<CarProperties>();
             bolt.AddComponent<DISABLER>();
-            bolt.AddComponent<FlatNut>();
+            bolt.AddComponent<FlatNut>().tight = true;
 
             bolt.layer = LayerMask.NameToLayer("FlatBolts");
 
