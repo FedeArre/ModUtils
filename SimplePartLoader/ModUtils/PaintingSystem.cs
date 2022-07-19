@@ -25,7 +25,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -62,7 +62,7 @@ namespace SimplePartLoader
 
                 if (l2Material_index == -1)
                 {
-                    Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                    Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                     return;
                 }
 
@@ -99,7 +99,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -121,7 +121,7 @@ namespace SimplePartLoader
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -175,7 +175,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -197,7 +197,7 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
@@ -229,7 +229,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -259,13 +259,13 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if(l2Material_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -331,7 +331,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[SPL]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -361,13 +361,13 @@ namespace SimplePartLoader
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[SPL]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -422,7 +422,7 @@ namespace SimplePartLoader
 
             if (!m)
             {
-                Debug.LogError("[SPL]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
             }
             return m;
         }
@@ -444,7 +444,7 @@ namespace SimplePartLoader
 
             if (!m)
             {
-                Debug.LogError("[SPL]: GetPaintRustMaterial was not able to retrive a paint/rust material. Make sure you are using it on FirstLoad event.");
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetPaintRustMaterial was not able to retrive a paint/rust material. Make sure you are using it on FirstLoad event.");
             }
             return m;
         }
@@ -466,7 +466,7 @@ namespace SimplePartLoader
 
             if (!m)
             {
-                Debug.LogError("[SPL]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
             }
             return m;
         }

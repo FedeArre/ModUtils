@@ -50,7 +50,7 @@ namespace SimplePartLoader
                 if (File.Exists(ModsFolderPath + s))
                 {
                     File.Delete(ModsFolderPath + s);
-                    Debug.Log($"[ModUtils]: Mod {s} has been replaced by ModUtils");
+                    Debug.Log($"[ModUtils/Legacy]: Mod {s} has been replaced by ModUtils");
                 }
             }
 
@@ -82,7 +82,7 @@ namespace SimplePartLoader
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
-                Debug.Log("[ModUtils]: Printing mod list.");
+                Debug.Log("[ModUtils/Main]: Printing mod list.");
                 foreach(Mod m in ModLoader.mods)
                 {
                     Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
@@ -105,7 +105,7 @@ namespace SimplePartLoader
             try
             {
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(API_URL + "/mods");
-                Debug.LogError(API_URL);
+                Debug.LogError("Current API url: " + API_URL);
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Accept = "application/json";
                 httpWebRequest.Method = "POST";
@@ -142,7 +142,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.Log("Error occured while trying to fetch updates, error: " + ex.ToString());
+                Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
                 GameObject.Instantiate(UI_Error_Prefab);
             }
         }
@@ -160,12 +160,12 @@ namespace SimplePartLoader
             SPL.ENABLE_SAVE_DISSASAMBLE = true;
             if(SPL.ENABLE_SAVE_DISSASAMBLE)
             {
-                Debug.Log("[ModUtils]: Save dissasembling has been enabled!");
+                Debug.Log("[ModUtils/Dev]: Save dissasembling has been enabled!");
                 SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
                 if (File.Exists(Application.persistentDataPath + "/save1/save.dat"))
                 {
                     save.read();
-                    Debug.Log("[ModUtils]: Save file found, loading...");
+                    Debug.Log("[ModUtils/Dev]: Save file found, loading...");
                     foreach(DictionaryEntry s in save.table)
                     {
                         Debug.Log("[SD]: " + s.Key + " | " + s.Value);
@@ -178,7 +178,7 @@ namespace SimplePartLoader
                             }
                         }
                     }
-                    Debug.Log("[ModUtils]: Loaded " + save.table.Count + " entries.");
+                    Debug.Log("[ModUtils/Dev]: Loaded " + save.table.Count + " entries.");
                 }
             }
             
@@ -250,8 +250,7 @@ namespace SimplePartLoader
         public void UI_ButtonYes()
         {
             string autoupdaterPath = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater\\Autoupdater.exe");
-            Debug.Log("UI button yes: Path is " + autoupdaterPath);
-
+            
             if (File.Exists(autoupdaterPath))
             {
                 GameObject.Destroy(UI);

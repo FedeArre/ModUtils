@@ -180,7 +180,7 @@ namespace SimplePartLoader
         {
             if (p == null) // Safety check
             {
-                Debug.LogError("[SPL]: Tried to do full copy into empty part");
+                Debug.LogError("[ModUtils/SPL/Error]: Tried to do full copy into empty part");
                 return;
             }
 
@@ -201,7 +201,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                Debug.LogError($"[SPL] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
+                Debug.LogError($"[ModUtils/SPL/Error] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 
@@ -235,7 +235,7 @@ namespace SimplePartLoader
 
             p.OriginalGameobject = carPart;
 
-            Debug.LogError($"[SPL]: {p.Name} was succesfully loaded");
+            Debug.LogError($"[ModUtils/SPL]: {p.Name} was succesfully loaded");
         }
 
         /// <summary>
@@ -245,7 +245,7 @@ namespace SimplePartLoader
         /// <param name="addToCatalog"></param>
         public static void ForcePartRegister(Part p, bool addToCatalog = false)
         {
-            Debug.LogError("[SPL]: Forcing register of part " + p.Name + " into the internal mod parts list.");
+            Debug.LogError("[ModUtils/SPL]: Forcing register of part " + p.Name + " into the internal mod parts list.");
 
             PartManager.modLoadedParts.Add(p);
             GameObject.DontDestroyOnLoad(p.Prefab);
@@ -336,9 +336,9 @@ namespace SimplePartLoader
                     }
                     catch(Exception ex)
                     {
-                        Debug.Log("[SPL]: Exception caught while loading a mod, you should report this to the mod developer.");
-                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while loading a mod, you should report this to the mod developer.");
+                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
                     }
                 }
             }
@@ -360,9 +360,9 @@ namespace SimplePartLoader
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log("[SPL]: Exception caught while on load finish, you should report this to the mod developer.");
-                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while on load finish, you should report this to the mod developer.");
+                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
                     }
                 }
             }
@@ -384,9 +384,9 @@ namespace SimplePartLoader
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log("[SPL]: Exception caught while on data loaded event, you should report this to the mod developer.");
-                        Debug.Log($"[SPL]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[SPL]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while on data loaded event, you should report this to the mod developer.");
+                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
+                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
 
                     }
                 }
@@ -400,12 +400,12 @@ namespace SimplePartLoader
         internal static void DevLog(string str)
         {
             if (DEVELOPER_LOG)
-                Debug.Log("[SPL]: " + str);
+                Debug.Log("[ModUtils/Dev/SPL]: " + str);
         }
 
         internal static void SplError(string str)
         {
-            Debug.LogError("[ModUtils-Error]: " + str);
+            Debug.LogError("[ModUtils/SPL/Error]: " + str);
             throw new Exception("ModUtils exception");
         }
         // Compatibility

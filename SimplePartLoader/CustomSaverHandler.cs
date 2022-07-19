@@ -25,8 +25,8 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.LogError("[SPL]: There was an issue trying to reset the custom data.");
-                Debug.LogError("[SPL]: " + ex.Message);
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to reset the custom data.");
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
                 return;
             }
         }
@@ -34,7 +34,7 @@ namespace SimplePartLoader
         public static void Load()
         {
             DataWrapper LoadedData;
-            Debug.Log("Starting loadign save dataaaa");
+            
             try
             {
                 if (!Directory.Exists(SavePath))
@@ -51,8 +51,8 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.LogError("[SPL]: There was an issue trying to load the custom data.");
-                Debug.LogError("[SPL]: " + ex.Message);
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to load the custom data.");
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
                 return;
             }
 
@@ -72,7 +72,7 @@ namespace SimplePartLoader
                 }
             }
 
-            Debug.Log($"[SPL]: Loading data was succesful, {LoadedData.Data.Count} entries have been loaded");
+            Debug.Log($"[ModUtils/SPL/Saving]: Loading data was succesful, {LoadedData.Data.Count} entries have been loaded");
             SPL.InvokeDataLoadedEvent();
         }
 
@@ -85,7 +85,7 @@ namespace SimplePartLoader
                 CarProperties carProps = data.GetComponent<CarProperties>();
                 if (!carProps)
                 {
-                    Debug.LogWarning("[SPL]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
+                    Debug.LogWarning("[ModUtils/SPL/Saving/Error]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
                     continue;
                 }
 
@@ -108,12 +108,12 @@ namespace SimplePartLoader
                     tw.Write(JsonConvert.SerializeObject(DataToSave));
                 }
 
-                Debug.Log($"[SPL]: Succesfully saved custom data ({DataToSave.Data.Count})");
+                Debug.Log($"[ModUtils/SPL/Saving]: Succesfully saved custom data ({DataToSave.Data.Count})");
             }
             catch(Exception ex)
             {
-                Debug.LogError("[SPL]: Saving was not succesful due to an exception.");
-                Debug.LogError("[SPL]: " + ex.Message);
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: Saving was not succesful due to an exception.");
+                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
             }
             
         }

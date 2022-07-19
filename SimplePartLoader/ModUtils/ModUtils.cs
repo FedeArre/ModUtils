@@ -68,7 +68,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[SPL]: Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
+                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -81,7 +81,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[SPL]: Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
+                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -94,7 +94,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[SPL]: Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
+                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -107,7 +107,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[SPL]: Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
+                Debug.LogError("[ModUtils/Utils/Error]: Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
             }
         }
 

@@ -74,7 +74,7 @@ namespace SimplePartLoader
                     SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
                     if(!part.CarProps)
                     {
-                        Debug.LogWarning($"[SPL]: Prefab generator was unable to create {part.Name}");
+                        Debug.LogWarning($"[ModUtils/SPL/Error]: Prefab generator was unable to create {part.Name}");
                         continue;
                     }
 
@@ -152,7 +152,7 @@ namespace SimplePartLoader
                         GameObject.Destroy(markedTransparent.gameObject);
                     }
 
-                    Debug.Log($"[SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                    Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
                     GameObject.Destroy(part.Prefab.GetComponent<PrefabGenerator>());
                 }
 
@@ -162,7 +162,7 @@ namespace SimplePartLoader
                 }
                 catch(Exception ex)
                 {
-                    Debug.LogError("[SPL]: Something went wrong during first load event! FirstLoad execution has been stopped. Error: ");
+                    Debug.LogError("[ModUtils/SPL/Error]: Something went wrong during first load event! FirstLoad execution has been stopped. Error: ");
                     Debug.LogError(ex.ToString());
                     return;
                 }
@@ -178,7 +178,7 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogWarning($"[SPL] The part {part.Prefab.name} has a missing component.");
+                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} has a missing component.");
                         modLoadedParts.Remove(part);
                     }
 

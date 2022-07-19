@@ -27,7 +27,7 @@ namespace SimplePartLoader.Utils
 
             AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
 
-            Debug.LogError($"[ModUtils]: Car {originalCar.name} cloned to prefab");
+            Debug.LogError($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
         }
 
 
@@ -77,7 +77,7 @@ namespace SimplePartLoader.Utils
         internal static void DevLog(string str)
         {
             if (ENABLE_CARBUILDING_DEBUG)
-                Debug.Log("[ModUtils-CarBuilding]: " + str);
+                Debug.Log("[ModUtils/CarBuilding]: " + str);
         }
     }
 }
