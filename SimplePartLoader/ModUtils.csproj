@@ -453,6 +453,7 @@
     </Compile>
     <Compile Include="SPL.cs" />
     <Compile Include="Objects\TransparentEdit.cs" />
+    <Compile Include="Utils\CarBuilding.cs" />
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="ModUtils\PaintingSystem.cs" />
