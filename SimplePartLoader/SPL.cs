@@ -44,23 +44,23 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                throw new Exception("SPL - Tried to create a part without valid AssetBundle");
+                SplError("Tried to create a part without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                throw new Exception("SPL - Tried to create a part without prefab name");
+                SplError("Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                throw new Exception($"SPL - Tried to create an already existing prefab ({prefabName})");
+                SplError($"Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             CarProperties prefabCarProp = prefab.GetComponent<CarProperties>();
             Partinfo prefabPartInfo = prefab.GetComponent<Partinfo>();
 
             if (!prefabCarProp || !prefabPartInfo)
-                throw new Exception("SPL - An essential component is missing!");
+                SplError("An essential component is missing! (Prefab: " + prefabName + ")");
 
             // Automatically add some components and also assign the correct layer.
             // Pickup and DISABLER for the part - Required so they work properly!
@@ -132,17 +132,17 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                throw new Exception("SPL - Tried to create a part without valid AssetBundle");
+                SplError("Tried to create a part without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                throw new Exception("SPL - Tried to create a part without prefab name");
+                SplError("Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                throw new Exception($"SPL - Tried to create an already existing prefab ({prefabName})");
+                SplError($"Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                throw new Exception($"SPL - Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             Part p = new Part(prefab, null, null);
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
@@ -403,6 +403,11 @@ namespace SimplePartLoader
                 Debug.Log("[SPL]: " + str);
         }
 
+        internal static void SplError(string str)
+        {
+            Debug.LogError("[ModUtils-Error]: " + str);
+            throw new Exception("ModUtils exception");
+        }
         // Compatibility
         [Obsolete("Use ModUtils.GetPlayer() instead!")]
         public static GameObject GetPlayer() { return ModUtils.GetPlayer(); }
