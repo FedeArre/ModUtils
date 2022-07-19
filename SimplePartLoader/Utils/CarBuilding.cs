@@ -18,21 +18,20 @@ namespace SimplePartLoader.Utils
 
             foreach (Component comp in originalCar.GetComponents<Component>())
             {
-                if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter)
+                if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
                     continue;
 
-                prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
-
                 DevLog($"Now copying component to base object ({comp})");
+                prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
             }
 
-            AttachPrefabChilds(originalCar, prefab); // Call the recursive function that copies all the child hierarchy.
+            AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
 
             Debug.LogError($"[ModUtils]: Car {originalCar.name} cloned to prefab");
         }
 
 
-        internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
+        public static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
             DevLog("Attaching childs to " + partToAttach.name);
 
