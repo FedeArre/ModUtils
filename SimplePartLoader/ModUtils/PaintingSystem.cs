@@ -470,5 +470,27 @@ namespace SimplePartLoader
             }
             return m;
         }
+        
+        public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)
+        {
+            Material[] matsOfPart = p.GetComponent<Renderer>().materials;
+
+            if (bodymatIndex != -1)
+            {
+                matsOfPart[bodymatIndex] = GetBodymatMaterial();
+            }
+
+            if (paintRustIndex != -1)
+            {
+                matsOfPart[paintRustIndex] = GetPaintRustMaterial();
+            }
+
+            if (dirtIndex != -1)
+            {
+                matsOfPart[dirtIndex] = GetDirtMaterial();
+            }
+
+            p.GetComponent<Renderer>().materials = matsOfPart;
+        }
     }
 }
