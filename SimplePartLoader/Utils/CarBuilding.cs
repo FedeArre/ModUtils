@@ -74,6 +74,38 @@ namespace SimplePartLoader.Utils
             }
         }
 
+        public static void UpdateTransparentsReferences(GameObject p)
+        {
+            foreach(transparents t in p.GetComponentsInChildren<transparents>())
+            {
+                foreach (transparents.dependantObjects dp in t.DEPENDANTS)
+                {
+                    foreach(transparents t2 in p.GetComponentsInChildren<transparents>())
+                    {
+                        if(t2.name == dp.dependant.name)
+                        {
+                            dp.dependant = t2.gameObject;
+                            break;
+                        }
+                    }
+                }
+
+                foreach (transparents.AttachingObjects at in t.ATTACHABLES)
+                {
+                    foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
+                    {
+                        if (t2.name == at.Attachable.name)
+                        {
+                            at.Attachable = t2.gameObject;
+                            break;
+                        }
+                    }
+                }
+
+
+            }
+        }
+
         internal static void DevLog(string str)
         {
             if (ENABLE_CARBUILDING_DEBUG)
