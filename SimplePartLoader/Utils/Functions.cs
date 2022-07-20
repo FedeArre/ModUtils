@@ -42,6 +42,8 @@ namespace SimplePartLoader.Utils
             MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
             bolt.layer = LayerMask.NameToLayer("Bolts");
 
+            bolt.GetComponent<Renderer>().material = ModUtils.NutMaterial;
+            
             if (!bolt.GetComponent<BoxCollider>())
                 bolt.gameObject.AddComponent<BoxCollider>();
 
@@ -63,6 +65,8 @@ namespace SimplePartLoader.Utils
 
             bolt.layer = LayerMask.NameToLayer("FlatBolts");
 
+            bolt.GetComponent<Renderer>().material = ModUtils.NutMaterial;
+            
             if (!bolt.GetComponent<BoxCollider>())
                 bolt.gameObject.AddComponent<BoxCollider>();
 

@@ -21,6 +21,8 @@ namespace SimplePartLoader
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
+        internal static Material NutMaterial;
+        
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");
@@ -40,6 +42,19 @@ namespace SimplePartLoader
 
             GameObject dummy = new GameObject("SPL_Dummy");
             dummy.AddComponent<SPL_CarTracking>().AddToAll();
+
+            // Nut material
+            foreach (GameObject go in PartManager.gameParts)
+            {
+                if (go != null)
+                {
+                    if (go.name == "DoorFR06")
+                    {
+                        NutMaterial = go.GetComponentInChildren<HexNut>().GetComponent<Renderer>().material;
+                        break;
+                    }
+                }
+            }
         }
 
         internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
