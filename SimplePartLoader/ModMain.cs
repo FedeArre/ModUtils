@@ -157,7 +157,6 @@ namespace SimplePartLoader
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
                 CustomSaverHandler.NewGame();
 
-            SPL.ENABLE_SAVE_DISSASAMBLE = true;
             if(SPL.ENABLE_SAVE_DISSASAMBLE)
             {
                 Debug.Log("[ModUtils/Dev]: Save dissasembling has been enabled!");

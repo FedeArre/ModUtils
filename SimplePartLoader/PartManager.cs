@@ -33,9 +33,9 @@ namespace SimplePartLoader
         internal static bool hasFirstLoadOccured = false;
 
         /// <summary>
-        /// A list that contains all objects from the game.
+        /// A list that contains all objects from the game. This is exposed since ModUtils v1.1.0. It is not recommended to use this list unless required.
         /// </summary>
-        internal static List<GameObject> gameParts;
+        public static List<GameObject> gameParts;
 
         /// <summary>
         /// Handles the OnLoad function when called.
@@ -59,6 +59,19 @@ namespace SimplePartLoader
                     if (part.GetComponent<SaleItem>().Item.GetComponent<CarProperties>())
                     {
                         gameParts.Add(part.GetComponent<SaleItem>().Item);
+                    }
+                }
+            }
+            
+            // Nut material
+            foreach (GameObject go in PartManager.gameParts)
+            {
+                if (go != null)
+                {
+                    if (go.name == "DoorFR06")
+                    {
+                        ModUtils.NutMaterial = go.GetComponentInChildren<HexNut>().GetComponent<Renderer>().material;
+                        break;
                     }
                 }
             }

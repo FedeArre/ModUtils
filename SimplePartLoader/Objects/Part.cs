@@ -108,6 +108,11 @@ namespace SimplePartLoader
             }
         }
 
+        public Transform[] GetTransforms()
+        {
+            return Prefab.GetComponentsInChildren<Transform>();
+        }
+        
         [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on SimplePartLoader 1.5. Use PaintingSystem.Types instead!")]
         public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
         {

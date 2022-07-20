@@ -30,6 +30,32 @@ namespace SimplePartLoader.Utils
             Debug.LogError($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
         }
 
+        public static void CopyPartIntoTransform(GameObject partToAdd, Transform location)
+        {
+            DevLog($"Copying part {partToAdd.name} into {location.name}");
+
+            GameObject addedPart = new GameObject();
+            addedPart.transform.SetParent(location);
+
+            addedPart.name = partToAdd.name;
+            addedPart.layer = partToAdd.layer;
+            addedPart.tag = partToAdd.tag;
+
+            addedPart.transform.localPosition = Vector3.zero;
+            addedPart.transform.localRotation = Quaternion.identity;
+            addedPart.transform.localScale = Vector3.one;
+
+            foreach (Component comp in partToAdd.GetComponents<Component>())
+            {
+                if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
+                    continue;
+
+                DevLog($"Now copying component to added part ({comp})");
+                addedPart.AddComponent(comp.GetType()).GetCopyOf(comp);
+            }
+            
+            AttachPrefabChilds(addedPart, partToAdd);
+        }
 
         public static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {

@@ -42,19 +42,6 @@ namespace SimplePartLoader
 
             GameObject dummy = new GameObject("SPL_Dummy");
             dummy.AddComponent<SPL_CarTracking>().AddToAll();
-
-            // Nut material
-            foreach (GameObject go in PartManager.gameParts)
-            {
-                if (go != null)
-                {
-                    if (go.name == "DoorFR06")
-                    {
-                        NutMaterial = go.GetComponentInChildren<HexNut>().GetComponent<Renderer>().material;
-                        break;
-                    }
-                }
-            }
         }
 
         internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
