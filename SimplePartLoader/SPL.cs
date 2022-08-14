@@ -121,7 +121,7 @@ namespace SimplePartLoader
             Saver.modParts.Add(p.CarProps.PrefabName, prefab);
 
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
-
+            Debug.Log("[ModUtils/SPL]: Succesfully loaded part (not-dummy) " + prefabName);
             return p; // We provide the Part instance so the developer can setup the transparents
         }
 

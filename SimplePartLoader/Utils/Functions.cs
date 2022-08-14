@@ -124,7 +124,7 @@ namespace SimplePartLoader.Utils
 
             pinfos = from property in pinfos
                      where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
-                     where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                     //where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
                      select property;
             foreach (var pinfo in pinfos)
             {
@@ -163,7 +163,7 @@ namespace SimplePartLoader.Utils
             }
 
             finfos = from field in finfos
-                     where field.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                     //where field.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
                      select field;
             foreach (var finfo in finfos)
             {

@@ -76,13 +76,65 @@ namespace SimplePartLoader
                 }
             }
 
+            SPL.DevLog("Starting first load check");
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
             {
+                SPL.DevLog("First load of the game");
                 // We create our parts from the prefab generator
-                foreach(Part part in prefabGenParts)
+                foreach (Part part in prefabGenParts)
                 {
                     PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
+
+                    foreach(Transform t in part.GetTransforms())
+                    {
+                        if(t.GetComponent<HexNut>())
+                        {
+                            HexNut hx = t.GetComponent<HexNut>();
+                            hx.gameObject.AddComponent<CarProperties>();
+                            hx.gameObject.AddComponent<DISABLER>();
+
+                            hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
+
+                            if (!hx.GetComponent<BoxCollider>())
+                                hx.gameObject.AddComponent<BoxCollider>();
+                        }
+                        else if (t.GetComponent<BoltNut>())
+                        {
+                            BoltNut bn = t.GetComponent<BoltNut>();
+                            bn.gameObject.AddComponent<CarProperties>();
+                            bn.gameObject.AddComponent<DISABLER>();
+
+                            bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
+
+                            if (!bn.GetComponent<BoxCollider>())
+                                bn.gameObject.AddComponent<BoxCollider>();
+                        }
+                        else if(t.GetComponent<FlatNut>())
+                        {
+                            FlatNut fn = t.GetComponent<FlatNut>();
+                            fn.gameObject.AddComponent<CarProperties>();
+                            fn.gameObject.AddComponent<DISABLER>();
+
+                            fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
+
+                            fn.tight = true;
+
+                            if (!fn.GetComponent<BoxCollider>())
+                                fn.gameObject.AddComponent<BoxCollider>();
+                        }
+                        else if(t.GetComponent<WeldCut>())
+                        {
+                            WeldCut wc = t.GetComponent<WeldCut>();
+                            wc.gameObject.AddComponent<CarProperties>();
+                            wc.gameObject.AddComponent<DISABLER>();
+
+                            wc.gameObject.layer = LayerMask.NameToLayer("Weld");
+
+                            if (!wc.GetComponent<MeshCollider>())
+                                wc.gameObject.AddComponent<MeshCollider>().convex = true;
+                        }
+                    }
 
                     SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
                     if(!part.CarProps)
@@ -168,6 +220,8 @@ namespace SimplePartLoader
                     Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
                     GameObject.Destroy(part.Prefab.GetComponent<PrefabGenerator>());
                 }
+                
+                SPL.DevLog("Finished prefab generator stuff - Now invoking first load");
 
                 try
                 {
@@ -179,6 +233,8 @@ namespace SimplePartLoader
                     Debug.LogError(ex.ToString());
                     return;
                 }
+
+                SPL.DevLog("Part registering");
                 
                 // Now we add all our dummy parts into modLoadedParts and do a small safety check to see if all our parts are fine.
                 foreach (Part part in dummyParts)
@@ -201,7 +257,8 @@ namespace SimplePartLoader
                     }
                 }
             }
-                
+            SPL.DevLog("Injecting into catalog & localization stuff");
+
             // Parts catalog - We need to add our custom parts into the Junkyard part list since the parts catalog uses it as reference.
             GameObject junkyardListParent = GameObject.Find("PartsParent");
             GameObject carList = GameObject.Find("CarsParent"); // Car list of the game - Used for adding transparents
@@ -212,8 +269,21 @@ namespace SimplePartLoader
 
             Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
+            if(SPL.DEVELOPER_LOG)
+            {
+                Debug.Log("[ModUtils/SPL]: Parts catalog has been modified. New size: " + jpl.Parts.Length);
+                foreach (Part p in modLoadedParts)
+                {
+                    Debug.Log($"[ModUtils/SPL]: Added part: {p.Name} (GameObject name: {p.Prefab}");
+                }
+            }
             foreach (Part p in modLoadedParts)
             {
+                if(!p.Prefab)
+                {
+                    Debug.LogError("[ModUtils/SPL/Error]: Null part safety on modLoadedParts, name: " + p.Name);
+                    continue;
+                }
                 GameObject.DontDestroyOnLoad(p.Prefab);
 
                 jpl.Parts[sizeBeforeModify] = p.Prefab;
