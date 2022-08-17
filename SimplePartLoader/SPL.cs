@@ -23,7 +23,7 @@ namespace SimplePartLoader
         internal static bool ENABLE_SAVE_DISSASAMBLE = false;
         
         // All availables paint types in the game
-        [Obsolete("This enum will be removed in ModUtils v1.1, use PaintingSystem.Types instead!")]
+        [Obsolete("This enum will be removed in ModUtils v1.1.1, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
@@ -132,7 +132,7 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns></returns>
-        public static Part LoadDummy(AssetBundle bundle, string prefabName)
+        public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = false)
         {
             // Safety checks
             if (!bundle)
@@ -149,6 +149,7 @@ namespace SimplePartLoader
                 SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             Part p = new Part(prefab, null, null);
+            p.UseBetterCopy = betterCopy;
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 
             if (prefab.GetComponent<PrefabGenerator>())
@@ -219,7 +220,7 @@ namespace SimplePartLoader
                     if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter)
                         continue;
 
-                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, p.UseBetterCopy);
                     
                     DevLog($"Now copying component to base object ({comp})");
                 }

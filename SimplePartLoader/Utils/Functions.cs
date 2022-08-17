@@ -99,7 +99,7 @@ namespace SimplePartLoader.Utils
         /// </summary>
         /// <param name="other">The target component</param>
         /// <param name="comp">The target component</param>
-        public static void CopyComponentData(Component comp, Component other)
+        public static void CopyComponentData(Component comp, Component other, bool preciseCloning)
         {
             Type type = comp.GetType();
 
@@ -122,10 +122,20 @@ namespace SimplePartLoader.Utils
                 pinfos = pinfos.Concat(derivedType.GetProperties(Extension.bindingFlags));
             }
 
-            pinfos = from property in pinfos
-                     where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
-                     //where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
-                     select property;
+            if (preciseCloning)
+            {
+                pinfos = from property in pinfos
+                         where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
+                         select property;
+            }
+            else
+            {
+                pinfos = from property in pinfos
+                         where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
+                         where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                         select property;
+            }
+
             foreach (var pinfo in pinfos)
             {
                 if (pinfo.CanWrite)

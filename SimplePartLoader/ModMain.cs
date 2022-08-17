@@ -153,7 +153,7 @@ namespace SimplePartLoader
         {
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-            
+
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)

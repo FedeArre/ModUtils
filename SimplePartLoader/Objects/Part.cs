@@ -21,7 +21,8 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
-
+        internal bool UseBetterCopy;
+        
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo)
         {
             Prefab = prefab;
