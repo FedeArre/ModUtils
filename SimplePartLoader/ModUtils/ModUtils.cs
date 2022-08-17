@@ -23,8 +23,6 @@ namespace SimplePartLoader
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
-        internal static Material NutMaterial;
-        
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");

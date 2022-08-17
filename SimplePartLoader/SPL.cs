@@ -83,8 +83,6 @@ namespace SimplePartLoader
 
                 hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
 
-                hx.GetComponent<Renderer>().material = ModUtils.NutMaterial;
-                
                 if (!hx.GetComponent<BoxCollider>())
                         hx.gameObject.AddComponent<BoxCollider>();
             }
@@ -98,8 +96,6 @@ namespace SimplePartLoader
 
                 fn.tight = true;
 
-                fn.GetComponent<Renderer>().material = ModUtils.NutMaterial;
-                
                 if (!fn.GetComponent<BoxCollider>())
                     fn.gameObject.AddComponent<BoxCollider>();
             }

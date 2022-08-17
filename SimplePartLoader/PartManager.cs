@@ -62,19 +62,6 @@ namespace SimplePartLoader
                     }
                 }
             }
-            
-            // Nut material
-            foreach (GameObject go in PartManager.gameParts)
-            {
-                if (go != null)
-                {
-                    if (go.name == "DoorFR06")
-                    {
-                        ModUtils.NutMaterial = go.GetComponentInChildren<HexNut>().GetComponent<Renderer>().material;
-                        break;
-                    }
-                }
-            }
 
             SPL.DevLog("Starting first load check");
             // We need to check if this is the first load.
