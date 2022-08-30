@@ -22,9 +22,9 @@ namespace SimplePartLoader.Utils
             return comp as T;
         }
 
-        public static T AddComponent<T>(this GameObject go, T toAdd) where T : Component
+        public static T AddComponent<T>(this GameObject go, T toAdd, bool preciseCloning) where T : Component
         {
-            return go.AddComponent(toAdd.GetType()).GetCopyOf(toAdd) as T;
+            return go.AddComponent(toAdd.GetType()).GetCopyOf(toAdd, preciseCloning) as T;
         }
     }
 }

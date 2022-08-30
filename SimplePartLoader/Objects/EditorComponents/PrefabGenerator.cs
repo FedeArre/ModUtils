@@ -13,7 +13,9 @@ public class PrefabGenerator : MonoBehaviour
     [Header("Mesh change")]
     [Tooltip("If you are using a new mesh for the prefab")]
     public bool EnableMeshChange;
-
+    [Tooltip("If the part should use the materials from the prefab, from the dummy original (the original part you are copying) or automatic setup for the painting system")]
+    public MaterialSettingTypes UseMaterialsFrom = MaterialSettingTypes.Prefab;
+    
     [Header("Car Properties")]
     [Tooltip("The part name that will be shown in-game")]
     public string PartName;
@@ -25,7 +27,7 @@ public class PrefabGenerator : MonoBehaviour
     public bool EnablePartOnJunkyard = false;
     [Tooltip("Enables the part appearing on the catalog")]
     public bool EnablePartOnCatalog = true;
-    [Tooltip("The photo that will be shown on the catalog. 512x512")]
+    [Tooltip("The photo that will be shown on the catalog. At least 500x500")]
     public Texture2D CatalogImage;
     [Tooltip("Renamed prefab name for this object. Leave empty if you are not changing it")]
     public string RenamedPrefab;
@@ -34,12 +36,23 @@ public class PrefabGenerator : MonoBehaviour
     public bool SavingFeatureEnabled;
     [Tooltip("Change the attachment type of the part")]
     public AttachmentTypes AttachmentType = AttachmentTypes.Default;
-
+    [Tooltip("Enables part to get chromed")]
+    public bool EnableChromed = false;
+    [Tooltip("Removes all the bolts that are not marked bolts")]
+    public bool RemoveNonMarkedBolts = false;
+    
     public enum AttachmentTypes
     {
         Default,
         Prytool,
         Hand,
         UseMarkedBolts
+    }
+
+    public enum MaterialSettingTypes
+    {
+        Prefab,
+        DummyOriginal,
+        PaintingSetup
     }
 }

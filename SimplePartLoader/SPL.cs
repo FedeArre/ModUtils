@@ -20,7 +20,7 @@ namespace SimplePartLoader
         public static event DataLoadedDelegate DataLoaded;
 
         public static bool DEVELOPER_LOG = false;
-        internal static bool ENABLE_SAVE_DISSASAMBLE = false;
+        public static bool ENABLE_SAVE_DISSASAMBLE = false;
         
         // All availables paint types in the game
         [Obsolete("This enum will be removed in ModUtils v1.1.1, use PaintingSystem.Types instead!")]
@@ -82,20 +82,32 @@ namespace SimplePartLoader
                 hx.gameObject.AddComponent<DISABLER>();
 
                 hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
-
+                hx.tight = true;
+                
                 if (!hx.GetComponent<BoxCollider>())
                         hx.gameObject.AddComponent<BoxCollider>();
             }
 
-            foreach(FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
+            foreach (BoltNut bn in prefab.GetComponentsInChildren<BoltNut>())
+            {
+                bn.gameObject.AddComponent<CarProperties>();
+                bn.gameObject.AddComponent<DISABLER>();
+
+                bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                bn.tight = true;
+
+                if (!bn.GetComponent<BoxCollider>())
+                    bn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
             {
                 fn.gameObject.AddComponent<CarProperties>();
                 fn.gameObject.AddComponent<DISABLER>();
 
                 fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
-
                 fn.tight = true;
-
+                
                 if (!fn.GetComponent<BoxCollider>())
                     fn.gameObject.AddComponent<BoxCollider>();
             }
@@ -106,7 +118,8 @@ namespace SimplePartLoader
                 wc.gameObject.AddComponent<DISABLER>();
 
                 wc.gameObject.layer = LayerMask.NameToLayer("Weld");
-
+                wc.welded = true;
+                
                 if (!wc.GetComponent<MeshCollider>())
                     wc.gameObject.AddComponent<MeshCollider>().convex = true;
             }
@@ -128,6 +141,12 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns></returns>
+        [Obsolete("This method will be removed in the future, use LoadDummy with 3 parameters instead!")]
+        public static Part LoadDummy(AssetBundle bundle, string prefabName)
+        {
+            return LoadDummy(bundle, prefabName, false);
+        }
+        
         public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = false)
         {
             // Safety checks
@@ -223,7 +242,7 @@ namespace SimplePartLoader
             }
 
             if (!doNotCopyChilds)
-                AttachPrefabChilds(p.Prefab, carPart); // Call the recursive function that copies all the child hierarchy.
+                AttachPrefabChilds(p.Prefab, carPart, p.UseBetterCopy); // Call the recursive function that copies all the child hierarchy.
 
             // Setting things up so the game knows what part is this (and also the Saver)
             p.CarProps = p.Prefab.GetComponent<CarProperties>();
@@ -278,7 +297,7 @@ namespace SimplePartLoader
             }
         }
 
-        internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
+        internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original, bool preciseCloning)
         {
             DevLog("Attaching childs to " + partToAttach.name);
 
@@ -304,20 +323,20 @@ namespace SimplePartLoader
 
                     if (!childObject.GetComponent(comp.GetType()))
                     {
-                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, preciseCloning);
 
                         DevLog("Copying component " + comp.GetType());
                     }
                     else
                     {
-                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), preciseCloning);
 
                         DevLog("Cloning component" + comp.GetType());
                     }
                 }
 
                 if (original.transform.GetChild(i).childCount != 0)
-                    AttachPrefabChilds(childObject, original.transform.GetChild(i).gameObject);
+                    AttachPrefabChilds(childObject, original.transform.GetChild(i).gameObject, preciseCloning);
             }
         }
 

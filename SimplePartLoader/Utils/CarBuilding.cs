@@ -22,7 +22,7 @@ namespace SimplePartLoader.Utils
                     continue;
 
                 DevLog($"Now copying component to base object ({comp})");
-                prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                prefab.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
 
             AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
@@ -51,7 +51,7 @@ namespace SimplePartLoader.Utils
                     continue;
 
                 DevLog($"Now copying component to added part ({comp})");
-                addedPart.AddComponent(comp.GetType()).GetCopyOf(comp);
+                addedPart.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
             
             AttachPrefabChilds(addedPart, partToAdd);
@@ -83,13 +83,13 @@ namespace SimplePartLoader.Utils
 
                     if (!childObject.GetComponent(comp.GetType()))
                     {
-                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, true);
 
                         DevLog("Copying component " + comp.GetType());
                     }
                     else
                     {
-                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), true);
 
                         DevLog("Cloning component" + comp.GetType());
                     }
@@ -105,43 +105,94 @@ namespace SimplePartLoader.Utils
             bool referenceUpdated = false;
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
             {
-                foreach (transparents.dependantObjects dp in t.DEPENDANTS)
+                if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
                 {
-                    referenceUpdated = false;
-                    foreach(transparents t2 in p.GetComponentsInChildren<transparents>())
+                    transparents.dependantObjects[] newDependants = new transparents.dependantObjects[t.DEPENDANTS.Length];
+                    for(int i = 0; i < t.DEPENDANTS.Length; i++)
                     {
-                        if(t2.name == dp.dependant.name)
+                        transparents.dependantObjects dp = t.DEPENDANTS[i];
+                        newDependants[i] = new transparents.dependantObjects();
+                        referenceUpdated = false;
+                        
+                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
-                            dp.dependant = t2.gameObject;
-                            referenceUpdated = true;
-                            break;
+                            if(t2 == null)
+                            {
+                                continue;
+                            }
+
+                            if(dp.dependant == null)
+                            {
+                                continue;
+                            }
+                            if (t2.name == dp.dependant.name)
+                            {
+                                newDependants[i].dependant = t2.gameObject;
+                                referenceUpdated = true;
+                                break;
+                            }
+                        }
+                        if (!referenceUpdated)
+                        {
+                            if(dp.dependant == null)
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object (null) not found in " + p.name + ", on part " + t.name);
+                            else
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object " + dp.dependant.name + " not found in " + p.name + ", on part " + t.name);
                         }
                     }
-
-                    if(!referenceUpdated)
-                    {
-                        Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object " + dp.dependant.name + " not found in " + p.name);
-                    }
+                    t.DEPENDANTS = newDependants;
                 }
-
-                foreach (transparents.AttachingObjects at in t.ATTACHABLES)
+                /*
+                Debug.Log("now ttacables");
+                if (t.ATTACHABLES != null && t.ATTACHABLES.Length > 0)
                 {
-                    referenceUpdated = false;
-                    foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
+                    transparents.AttachingObjects[] newAttachables = new transparents.AttachingObjects[t.ATTACHABLES.Length];
+                    Debug.Log("ENTERING");
+                    for (int i = 0; i < t.ATTACHABLES.Length; i++)
                     {
-                        if (t2.name == at.Attachable.name)
+                        Debug.Log("in for");
+                        transparents.AttachingObjects dp = t.ATTACHABLES[i];
+                        newAttachables[i] = new transparents.AttachingObjects();
+                        referenceUpdated = false;
+
+                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
-                            at.Attachable = t2.gameObject;
-                            referenceUpdated = true;
-                            break;
+                            Debug.Log(dp.Attachable);
+                            Debug.Log(newAttachables[i]);
+                            Debug.Log(newAttachables[i].Attachable);
+                            if (t2 == null)
+                            {
+                                Debug.Log("t2 is null");
+                                continue;
+                            }
+
+                            if (dp.Attachable == null)
+                            {
+                                Debug.Log("dp.attachable is null");
+                                continue;
+                            }
+
+                            if (t2.name == dp.Attachable.name)
+                            {
+                                newAttachables[i].Attachable = t2.gameObject;
+                                referenceUpdated = true;
+                                break;
+                            }
+                        }
+                        Debug.Log("EXIT, CODE" + referenceUpdated);
+                        if (!referenceUpdated)
+                        {
+                            if (dp.Attachable == null)
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object (null) not found in " + p.name);
+                            else
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + dp.Attachable.name + " not found in " + p.name);
                         }
                     }
-
-                    if (!referenceUpdated)
-                    {
-                        Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + at.Attachable.name + " not found in " + p.name);
-                    }
+                    Debug.Log("main exit setting it off");
+                    t.ATTACHABLES = newAttachables;
                 }
+                Debug.Log("bye");*/
+
             }
         }
 

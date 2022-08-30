@@ -447,6 +447,7 @@
     <Compile Include="Objects\CustomSaving\DataWrapper.cs" />
     <Compile Include="Objects\CustomSaving\SaveData.cs" />
     <Compile Include="Objects\CustomSaving\SavingHandlerMono.cs" />
+    <Compile Include="Objects\EditorComponents\MarkAsBoltnut.cs" />
     <Compile Include="Objects\EditorComponents\MarkAsTransparent.cs" />
     <Compile Include="Objects\EditorComponents\PrefabGenerator.cs" />
     <Compile Include="Objects\EditorComponents\MarkAsFlatnut.cs" />
