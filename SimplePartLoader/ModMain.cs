@@ -23,7 +23,7 @@ namespace SimplePartLoader
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        const string API_URL = "https://mygaragemod.xyz/api";
+        public const string API_URL = "https://mygaragemod.xyz/api";
         GameObject UI_Prefab, UI_Error_Prefab, UI;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
@@ -91,8 +91,7 @@ namespace SimplePartLoader
                 }
                 return;
             }
-
-
+            Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
             JSON_ModList jsonList = new JSON_ModList();
             foreach (Mod mod in ModLoader.mods)
             {
@@ -147,6 +146,9 @@ namespace SimplePartLoader
                 Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
                 GameObject.Instantiate(UI_Error_Prefab);
             }
+
+            // Enable heartbeat
+            KeepAlive.GetInstance().Ready();
         }
 
         public override void OnLoad()
