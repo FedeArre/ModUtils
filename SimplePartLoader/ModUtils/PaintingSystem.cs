@@ -157,6 +157,7 @@ namespace SimplePartLoader
             counter_rust.PaintableTexture = paintableTexture_rust;
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
+            counter_rust.Color = new Color(0, 0, 0, 1f);
 
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
@@ -309,6 +310,7 @@ namespace SimplePartLoader
             counter_rust.PaintableTexture = paintableTexture_rust;
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
+            counter_rust.Color = new Color(0, 0, 0, 1f);
 
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
@@ -317,7 +319,8 @@ namespace SimplePartLoader
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
-
+            counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
+            
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
