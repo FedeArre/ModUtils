@@ -70,6 +70,38 @@ namespace SimplePartLoader.Utils
         }
 
         /// <summary>
+        /// Given a GameObject converts it into a FlatNut bolt. The MarkAsFlat component is required!
+        /// </summary>
+        /// <param name="bolt">The GameObject to be converted</param>
+        public static void ConvertToBoltNut(GameObject bolt)
+        {
+            bolt.AddComponent<CarProperties>();
+            bolt.AddComponent<DISABLER>();
+            BoltNut bn = bolt.AddComponent<BoltNut>();
+            MarkAsBoltnut mbn = bolt.GetComponent<MarkAsBoltnut>();
+            
+            bolt.layer = LayerMask.NameToLayer("Bolts");
+
+            if (!bolt.GetComponent<BoxCollider>())
+                bolt.gameObject.AddComponent<BoxCollider>();
+
+            bn.DontDisableRenderer = mbn.DontDisableRenderer;
+            bn.AffectsGrandParent1 = mbn.AffectsGrandParent1;
+            bn.AffectsGrandParent2 = mbn.AffectsGrandParent2;
+            bn.AffectsGrandParent3 = mbn.AffectsGrandParent3;
+            bn.MatchTypeToBolt = mbn.MatchTypeToBolt;
+            bn.DisallowDistantBreaking = mbn.DisallowDistantBreaking;
+            bn.NotImportant = mbn.NotImportant;
+            bn.ChildrenHaveToBeRemoved = mbn.ChildrenHaveToBeRemoved;
+
+            bn.otherobjectName = mbn.OtherObjectName;
+            bn.otherobjectNameL = mbn.OtherObjectName;
+            bn.otherobjectNameR = mbn.OtherObjectName;
+            
+            GameObject.Destroy(mbn);
+        }
+
+        /// <summary>
         /// Gets the absolute path to a transform
         /// </summary>
         /// <param name="transform">Transform to get the path of</param>

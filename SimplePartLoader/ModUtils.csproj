@@ -436,6 +436,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autoupdating.cs" />
+    <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
     <Compile Include="Utils\KeepAlive.cs" />
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="ModUtils\ModUtils.cs" />

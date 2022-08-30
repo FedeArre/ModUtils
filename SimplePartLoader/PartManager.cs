@@ -1,5 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using RVP;
+using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -83,7 +84,9 @@ namespace SimplePartLoader
 
                             hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
                             hx.tight = true;
-                            
+
+                            hx.gameObject.AddComponent<InternalMarker>();
+
                             if (!hx.GetComponent<BoxCollider>())
                                 hx.gameObject.AddComponent<BoxCollider>();
                         }
@@ -95,7 +98,9 @@ namespace SimplePartLoader
 
                             bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
                             bn.tight = true;
-                            
+
+                            bn.gameObject.AddComponent<InternalMarker>();
+
                             if (!bn.GetComponent<BoxCollider>())
                                 bn.gameObject.AddComponent<BoxCollider>();
                         }
@@ -107,7 +112,9 @@ namespace SimplePartLoader
 
                             fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
                             fn.tight = true;
-                            
+
+                            fn.gameObject.AddComponent<InternalMarker>();
+
                             if (!fn.GetComponent<BoxCollider>())
                                 fn.gameObject.AddComponent<BoxCollider>();
                         }
@@ -119,13 +126,16 @@ namespace SimplePartLoader
 
                             wc.gameObject.layer = LayerMask.NameToLayer("Weld");
                             wc.welded = true;
-                            
+
+                            wc.gameObject.AddComponent<InternalMarker>();
+
                             if (!wc.GetComponent<MeshCollider>())
                                 wc.gameObject.AddComponent<MeshCollider>().convex = true;
                         }
                     }
 
                     SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
+
                     if(!part.CarProps)
                     {
                         Debug.LogWarning($"[ModUtils/SPL/Error]: Prefab generator was unable to create {part.Name}");
@@ -136,6 +146,39 @@ namespace SimplePartLoader
                     {
                         part.CarProps.PartName = data.PartName;
                         part.CarProps.PartNameExtension = "";
+                    }
+
+                    // Remove all bolts that are nor marked.
+                    if(data.RemoveNonMarkedBolts)
+                    {
+                        foreach(var bolt in part.Prefab.GetComponentsInChildren<HexNut>())
+                        {
+                            if(!bolt.GetComponent<InternalMarker>())
+                            {
+                                GameObject.Destroy(bolt.gameObject);
+                            }
+                        }
+                        foreach (var bolt in part.Prefab.GetComponentsInChildren<FlatNut>())
+                        {
+                            if (!bolt.GetComponent<InternalMarker>())
+                            {
+                                GameObject.Destroy(bolt.gameObject);
+                            }
+                        }
+                        foreach (var bolt in part.Prefab.GetComponentsInChildren<BoltNut>())
+                        {
+                            if (!bolt.GetComponent<InternalMarker>())
+                            {
+                                GameObject.Destroy(bolt.gameObject);
+                            }
+                        }
+                        foreach (var bolt in part.Prefab.GetComponentsInChildren<WeldCut>())
+                        {
+                            if (!bolt.GetComponent<InternalMarker>())
+                            {
+                                GameObject.Destroy(bolt.gameObject);
+                            }
+                        }
                     }
 
                     if(data.NewPrice != 0)
@@ -149,7 +192,27 @@ namespace SimplePartLoader
                     part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
                     part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
 
-                    if(data.CatalogImage)
+                    // Mesh stuff
+                    if (data.EnableMeshChange)
+                    {
+                        switch(data.UseMaterialsFrom)
+                        {
+                            case PrefabGenerator.MaterialSettingTypes.DummyOriginal:
+                                part.GetComponent<Renderer>().materials = part.GetDummyOriginal().GetComponent<Renderer>().materials;
+                                break;
+                            case PrefabGenerator.MaterialSettingTypes.PaintingSetup:
+                                PaintingSystem.SetMaterialsForObject(part, 2, 0, 1);
+                                part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);
+                                break;
+                        }
+                    }
+
+                    if(data.EnableChromed)
+                    {
+                        part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
+                    }
+
+                    if (data.CatalogImage)
                     {
                         part.PartInfo.Thumbnail = data.CatalogImage;
                     }
@@ -174,19 +237,33 @@ namespace SimplePartLoader
 
                         case PrefabGenerator.AttachmentTypes.UseMarkedBolts:
                             {
-                                // We first remove all the FlatNut / HexNut on our part.
+                                // We first remove all the FlatNut / HexNut / BoltNut on our part.
                                 foreach (HexNut hx in part.Prefab.GetComponentsInChildren<HexNut>())
-                                    GameObject.Destroy(hx.gameObject);
-
+                                {
+                                    if (!hx.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(hx.gameObject);
+                                }
                                 foreach (FlatNut fn in part.Prefab.GetComponentsInChildren<FlatNut>())
-                                    GameObject.Destroy(fn.gameObject);
+                                {
+                                    if (!fn.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(fn.gameObject);
+                                }
+                                
+                                foreach (BoltNut bn in part.Prefab.GetComponentsInChildren<BoltNut>())
+                                {
+                                    if(!bn.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(bn.gameObject);
+                                }
 
-                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut to actual bolts.
+                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut / MarkAsBoltnut to actual bolts.
                                 foreach (MarkAsHexnut mhx in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
                                     Functions.ConvertToHexnut(mhx.gameObject);
 
                                 foreach (MarkAsFlatnut mfn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
                                     Functions.ConvertToFlatNut(mfn.gameObject);
+
+                                foreach (MarkAsBoltnut mbn in part.Prefab.GetComponentsInChildren<MarkAsBoltnut>())
+                                    Functions.ConvertToBoltNut(mbn.gameObject);
 
                                 break;
                             }
