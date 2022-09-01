@@ -25,7 +25,7 @@ namespace SimplePartLoader
        
         // Autoupdater
         public const string API_URL = "https://mygaragemod.xyz/api";
-        GameObject UI_Prefab, UI_Error_Prefab, UI;
+        GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -76,6 +76,9 @@ namespace SimplePartLoader
             AutoupdaterBundle = AssetBundle.LoadFromMemory(Properties.Resources.autoupdater_ui_canvas);
             UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Canvas");
             UI_Error_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasError");
+            UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
+            UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
+            
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -95,6 +98,24 @@ namespace SimplePartLoader
                 return;
             }
             Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
+
+            // Check for broken ModUtils autoupdater installation
+            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
+            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
+            bool brokenInstallation = false;
+            
+            if(!Directory.Exists(autoupdaterDirectory) || !File.Exists(autoupdaterPath))
+            {
+                Debug.Log("[ModUtils/Autoupdater/Error]: Autoupdater is not installed properly!");
+                GameObject.Instantiate(UI_BrokenInstallation_Prefab);
+                brokenInstallation = true;
+            }
+
+            if(SPL.DEVELOPER_LOG)
+            {
+                GameObject.Instantiate(UI_DeveloperLogEnabled_Prefab);
+            }
+            
             JSON_ModList jsonList = new JSON_ModList();
             foreach (Mod mod in ModLoader.mods)
             {
@@ -126,7 +147,7 @@ namespace SimplePartLoader
 
                     List<JSON_Mod_API_Result> jsonObj = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
 
-                    if (jsonObj.Count > 0)
+                    if (jsonObj.Count > 0 && !brokenInstallation)
                     {
                         // Updates available.
                         UI = GameObject.Instantiate(UI_Prefab);
@@ -152,6 +173,7 @@ namespace SimplePartLoader
 
             // Enable heartbeat
             KeepAlive.GetInstance().Ready();
+
         }
 
         public override void OnLoad()
