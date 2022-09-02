@@ -7,15 +7,15 @@ using UnityEngine;
 
 internal class MarkAsBoltnut : MonoBehaviour
 {
-    public string OtherObjectName;
+    public string OtherObjectName = "";
     
-    public bool MatchTypeToBolt;
-    public bool AffectsGrandParent1;
-    public bool AffectsGrandParent2;
-    public bool AffectsGrandParent3;
-    public bool DisallowDistantBreaking;
-    public bool NotImportant;
-    public bool ChildrenHaveToBeRemoved;
-    public bool DontDisableRenderer;
+    public bool MatchTypeToBolt = false;
+    public bool AffectsGrandParent1 = false;
+    public bool AffectsGrandParent2 = false;
+    public bool AffectsGrandParent3 = false;
+    public bool DisallowDistantBreaking = false;
+    public bool NotImportant = false;
+    public bool ChildrenHaveToBeRemoved = false;
+    public bool DontDisableRenderer = false;
 }
 

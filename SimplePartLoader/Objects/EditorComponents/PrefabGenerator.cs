@@ -38,8 +38,6 @@ public class PrefabGenerator : MonoBehaviour
     public AttachmentTypes AttachmentType = AttachmentTypes.Default;
     [Tooltip("Enables part to get chromed")]
     public bool EnableChromed = false;
-    [Tooltip("Removes all the bolts that are not marked bolts")]
-    public bool RemoveNonMarkedBolts = false;
     
     public enum AttachmentTypes
     {

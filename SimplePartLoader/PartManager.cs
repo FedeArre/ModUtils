@@ -148,39 +148,6 @@ namespace SimplePartLoader
                         part.CarProps.PartNameExtension = "";
                     }
 
-                    // Remove all bolts that are nor marked.
-                    if(data.RemoveNonMarkedBolts)
-                    {
-                        foreach(var bolt in part.Prefab.GetComponentsInChildren<HexNut>())
-                        {
-                            if(!bolt.GetComponent<InternalMarker>())
-                            {
-                                GameObject.Destroy(bolt.gameObject);
-                            }
-                        }
-                        foreach (var bolt in part.Prefab.GetComponentsInChildren<FlatNut>())
-                        {
-                            if (!bolt.GetComponent<InternalMarker>())
-                            {
-                                GameObject.Destroy(bolt.gameObject);
-                            }
-                        }
-                        foreach (var bolt in part.Prefab.GetComponentsInChildren<BoltNut>())
-                        {
-                            if (!bolt.GetComponent<InternalMarker>())
-                            {
-                                GameObject.Destroy(bolt.gameObject);
-                            }
-                        }
-                        foreach (var bolt in part.Prefab.GetComponentsInChildren<WeldCut>())
-                        {
-                            if (!bolt.GetComponent<InternalMarker>())
-                            {
-                                GameObject.Destroy(bolt.gameObject);
-                            }
-                        }
-                    }
-
                     if(data.NewPrice != 0)
                     {
                         if (data.NewPrice < 0)
