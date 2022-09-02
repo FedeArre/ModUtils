@@ -272,6 +272,7 @@ namespace SimplePartLoader
                     foreach(MarkAsTransparent markedTransparent in part.Prefab.GetComponentsInChildren<MarkAsTransparent>())
                     {
                         TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
+                        tempData.MeshToUse = part.GetComponent<MeshFilter>().sharedMesh;
                         
                         GameObject transparentObject = GetTransparentReadyObject(tempData);
 
@@ -470,6 +471,11 @@ namespace SimplePartLoader
             transparentComponent.ATTACHABLES = t.AttachingObjects;
             transparentComponent.DEPENDANTS = t.DependantObjects;
             transparentComponent.SavePosition = t.SavePosition;
+
+            if(t.MeshToUse)
+            {
+                transparentObject.GetComponent<MeshFilter>().sharedMesh = t.MeshToUse;
+            }
 
             if (t.PartThatNeedsToBeOff != null)
             {

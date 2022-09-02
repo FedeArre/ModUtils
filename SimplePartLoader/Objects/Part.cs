@@ -36,6 +36,12 @@ namespace SimplePartLoader
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
+            MeshFilter mf = Prefab.GetComponent<MeshFilter>();
+            if(mf)
+            {
+                td.MeshToUse = mf.mesh;
+            }
+            
             PartManager.transparentData.Add(td);
         }
 
@@ -43,6 +49,12 @@ namespace SimplePartLoader
         public void SetupTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, Vector3 scale, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, scale, testingModeEnable);
+            MeshFilter mf = Prefab.GetComponent<MeshFilter>();
+            if (mf)
+            {
+                td.MeshToUse = mf.mesh;
+            }
+            
             PartManager.transparentData.Add(td);
         }
         
@@ -59,6 +71,12 @@ namespace SimplePartLoader
         public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
+            MeshFilter mf = Prefab.GetComponent<MeshFilter>();
+            if (mf)
+            {
+                td.MeshToUse = mf.mesh;
+            }
+
             PartManager.transparentData.Add(td);
             return td;
         }
