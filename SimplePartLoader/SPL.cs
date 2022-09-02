@@ -136,19 +136,26 @@ namespace SimplePartLoader
         }
 
         /// <summary>
-        /// Allows to load a dummy part into the memory for getitng his properties later.
+        /// Allows to load a dummy part into the memory to setup it on runtime
         /// </summary>
         /// <param name="bundle">The bundle in which the prefab is located. Has to be loaded!</param>
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
-        /// <returns></returns>
-        [Obsolete("This method will be removed in the future, use LoadDummy with 3 parameters instead!")]
+        /// <returns>The Part instance</returns>
         public static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
             return LoadDummy(bundle, prefabName, false);
         }
-        
-        public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = false)
+
+        /// <summary>
+        /// Allows to load a dummy part into the memory to setup it on runtime
+        /// </summary>
+        /// <param name="bundle">The bundle in which the prefab is located. Has to be loaded!</param>
+        /// <param name="prefabName">The name of the prefab to be loaded</param>
+        /// <param name="betterCopy">Enables a more precise cloning method</param>
+        /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
+        /// <returns>The Part instance</returns>
+        public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = true)
         {
             // Safety checks
             if (!bundle)
@@ -300,6 +307,21 @@ namespace SimplePartLoader
             }
         }
 
+        /// <summary>
+        /// Updates the DEPENDANTS and ATTACHABLES for the specified part
+        /// </summary>
+        /// <param name="part">The part to update</param>
+        public static void UpdateTransparentsReference(Part part)
+        {
+            CarBuilding.UpdateTransparentsReferences(part.Prefab);
+        }
+
+        /// <summary>
+        /// Recursive function that copies all the child hierarchy from a car part into a dummy part.
+        /// </summary>
+        /// <param name="partToAttach">The parent (top on hierarchy) GameObject that get the clones</param>
+        /// <param name="original">The original part to be copied</param>
+        /// <param name="preciseCloning">Precise cloning enabled</param>
         internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original, bool preciseCloning)
         {
             DevLog("Attaching childs to " + partToAttach.name);
@@ -426,12 +448,18 @@ namespace SimplePartLoader
                 Debug.Log("[ModUtils/Dev/SPL]: " + str);
         }
 
+        /// <summary>
+        /// Shows an error on log, then generates an exception
+        /// </summary>
+        /// <param name="str">The error to show</param>
+        /// <exception cref="Exception">Generic exception to stop execution</exception>
         internal static void SplError(string str)
         {
             Debug.LogError("[ModUtils/SPL/Error]: " + str);
             throw new Exception("ModUtils exception");
         }
-        // Compatibility
+        
+        // Compatibility for older versions
         [Obsolete("Use ModUtils.GetPlayer() instead!")]
         public static GameObject GetPlayer() { return ModUtils.GetPlayer(); }
         

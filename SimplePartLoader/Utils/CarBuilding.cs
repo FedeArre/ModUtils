@@ -10,8 +10,16 @@ namespace SimplePartLoader.Utils
 {
     public class CarBuilding
     {
+        /// <summary>
+        /// Enables the debug mode for car building functions
+        /// </summary>
         public static bool ENABLE_CARBUILDING_DEBUG = false;
 
+        /// <summary>
+        /// Copies the car from the given car prefab to the given car object
+        /// </summary>
+        /// <param name="originalCar">The original car</param>
+        /// <param name="prefab">The prefab that will store the car clone</param>
         public static void CopyCarToPrefab(GameObject originalCar, GameObject prefab)
         {
             prefab.layer = originalCar.layer;
@@ -27,9 +35,14 @@ namespace SimplePartLoader.Utils
 
             AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
 
-            Debug.LogError($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
+            Debug.Log($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
         }
 
+        /// <summary>
+        /// Copies the given GameObject into the specified transform as child of it
+        /// </summary>
+        /// <param name="partToAdd">The part to add</param>
+        /// <param name="location">The trasnform that will be the parent of the part</param>
         public static void CopyPartIntoTransform(GameObject partToAdd, Transform location)
         {
             DevLog($"Copying part {partToAdd.name} into {location.name}");
@@ -57,6 +70,11 @@ namespace SimplePartLoader.Utils
             AttachPrefabChilds(addedPart, partToAdd);
         }
 
+        /// <summary>
+        /// Recursive function that copies all the child hierarchy from a car part into a dummy part.
+        /// </summary>
+        /// <param name="partToAttach">The parent (top on hierarchy) GameObject that get the clones</param>
+        /// <param name="original">The original part to be copied</param>
         public static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
             DevLog("Attaching childs to " + partToAttach.name);
@@ -100,6 +118,10 @@ namespace SimplePartLoader.Utils
             }
         }
 
+        /// <summary>
+        /// Updates all the DEPENDANTS and ATTACHABLES on the given GameObject
+        /// </summary>
+        /// <param name="p">The GameObject that will be updated</param>
         public static void UpdateTransparentsReferences(GameObject p)
         {
             bool referenceUpdated = false;
@@ -142,60 +164,13 @@ namespace SimplePartLoader.Utils
                     }
                     t.DEPENDANTS = newDependants;
                 }
-                /*
-                Debug.Log("now ttacables");
-                if (t.ATTACHABLES != null && t.ATTACHABLES.Length > 0)
-                {
-                    transparents.AttachingObjects[] newAttachables = new transparents.AttachingObjects[t.ATTACHABLES.Length];
-                    Debug.Log("ENTERING");
-                    for (int i = 0; i < t.ATTACHABLES.Length; i++)
-                    {
-                        Debug.Log("in for");
-                        transparents.AttachingObjects dp = t.ATTACHABLES[i];
-                        newAttachables[i] = new transparents.AttachingObjects();
-                        referenceUpdated = false;
-
-                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
-                        {
-                            Debug.Log(dp.Attachable);
-                            Debug.Log(newAttachables[i]);
-                            Debug.Log(newAttachables[i].Attachable);
-                            if (t2 == null)
-                            {
-                                Debug.Log("t2 is null");
-                                continue;
-                            }
-
-                            if (dp.Attachable == null)
-                            {
-                                Debug.Log("dp.attachable is null");
-                                continue;
-                            }
-
-                            if (t2.name == dp.Attachable.name)
-                            {
-                                newAttachables[i].Attachable = t2.gameObject;
-                                referenceUpdated = true;
-                                break;
-                            }
-                        }
-                        Debug.Log("EXIT, CODE" + referenceUpdated);
-                        if (!referenceUpdated)
-                        {
-                            if (dp.Attachable == null)
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object (null) not found in " + p.name);
-                            else
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + dp.Attachable.name + " not found in " + p.name);
-                        }
-                    }
-                    Debug.Log("main exit setting it off");
-                    t.ATTACHABLES = newAttachables;
-                }
-                Debug.Log("bye");*/
-
             }
         }
 
+        /// <summary>
+        /// Internal function to log stuff when debug mode is enabled
+        /// </summary>
+        /// <param name="str">The message to show on log</param>
         internal static void DevLog(string str)
         {
             if (ENABLE_CARBUILDING_DEBUG)
