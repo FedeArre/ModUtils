@@ -21,6 +21,7 @@ namespace SimplePartLoader
 
         public static bool DEVELOPER_LOG = false;
         public static bool ENABLE_SAVE_DISSASAMBLE = false;
+        public static bool PREFAB_NAME_COLLISION_CHECK = false;
         
         // All availables paint types in the game
         [Obsolete("This enum will be removed in ModUtils v1.1.1, use PaintingSystem.Types instead!")]

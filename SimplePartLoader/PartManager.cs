@@ -375,6 +375,27 @@ namespace SimplePartLoader
                 }
             }
 
+            if(SPL.PREFAB_NAME_COLLISION_CHECK)
+            {
+                Debug.Log("[ModUtils/SPL/PrefabNameCollisionCheck]: Checking for prefab name collisions...");
+                List<string> prefabNames = new List<string>();
+                foreach (GameObject go in gameParts)
+                {
+                    CarProperties cp = go.GetComponent<CarProperties>();
+                    if (!cp)
+                        continue;
+                    
+                    if (prefabNames.Contains(cp.PrefabName))
+                    {
+                        Debug.LogError($"[ModUtils/SPL/PrefabNameCollisionCheck]: Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
+                    }
+                    else
+                    {
+                        prefabNames.Add(cp.PrefabName);
+                    }
+                }
+            }
+
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
 
             // We know load our transparents. We have to load them for the junkyard parts, car prefabs.
