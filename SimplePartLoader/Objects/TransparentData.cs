@@ -14,7 +14,8 @@ namespace SimplePartLoader
         public transparents.AttachingObjects[] AttachingObjects;
         public transparents.dependantObjects[] DependantObjects;
         public int SavePosition;
-
+        public Mesh MeshToUse;
+        
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, bool testingModeEnable)
         {
             Name = name;

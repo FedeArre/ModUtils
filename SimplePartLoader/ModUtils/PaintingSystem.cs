@@ -10,6 +10,11 @@ namespace SimplePartLoader
 {
     public class PaintingSystem
     {
+        static Material ChromeMaterial = null;
+        static Material PaintRustMaterial = null;
+        static Material DirtMaterial = null;
+        static Material BaseMaterial = null;
+        
         public enum Types
         {
             FullPaintingSupport = 1,
@@ -157,6 +162,7 @@ namespace SimplePartLoader
             counter_rust.PaintableTexture = paintableTexture_rust;
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
+            counter_rust.Color = new Color(0, 0, 0, 1f);
 
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
@@ -309,6 +315,7 @@ namespace SimplePartLoader
             counter_rust.PaintableTexture = paintableTexture_rust;
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
+            counter_rust.Color = new Color(0, 0, 0, 1f);
 
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
@@ -317,7 +324,8 @@ namespace SimplePartLoader
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
-
+            counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
+            
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -407,68 +415,94 @@ namespace SimplePartLoader
 
         public static Material GetDirtMaterial()
         {
-            Material m = null;
-            
-            foreach(GameObject go in PartManager.gameParts)
+            if (!DirtMaterial)
             {
-                if(go != null)
+                foreach (GameObject go in PartManager.gameParts)
                 {
-                    if(go.name == "DoorFR06")
+                    if (go != null)
                     {
-                        m = go.GetComponent<Renderer>().materials[1];
+                        if (go.name == "DoorFR06")
+                        {
+                            DirtMaterial = go.GetComponent<Renderer>().materials[1];
+                        }
                     }
                 }
             }
 
-            if (!m)
+            if (!DirtMaterial)
             {
                 Debug.LogError("[ModUtils/PaintingSystem/Error]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
             }
-            return m;
+            return DirtMaterial;
         }
 
         public static Material GetPaintRustMaterial()
         {
-            Material m = null;
-
-            foreach (GameObject go in PartManager.gameParts)
+            if (!PaintRustMaterial)
             {
-                if (go != null)
+                foreach (GameObject go in PartManager.gameParts)
                 {
-                    if (go.name == "DoorFR06")
+                    if (go != null)
                     {
-                        m = go.GetComponent<Renderer>().materials[0];
+                        if (go.name == "DoorFR06")
+                        {
+                            PaintRustMaterial = go.GetComponent<Renderer>().materials[0];
+                        }
                     }
                 }
             }
 
-            if (!m)
+            if (!PaintRustMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetPaintRustMaterial was not able to retrive a paint/rust material. Make sure you are using it on FirstLoad event.");
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetPaintRustMaterial was not able to retrive a paint-rust material. Make sure you are using it on FirstLoad event.");
             }
-            return m;
+            return PaintRustMaterial;
         }
 
         public static Material GetBodymatMaterial()
         {
-            Material m = null;
-
-            foreach (GameObject go in PartManager.gameParts)
+            if (!BaseMaterial)
             {
-                if (go != null)
+                foreach (GameObject go in PartManager.gameParts)
                 {
-                    if (go.name == "DoorFR06")
+                    if (go != null)
                     {
-                        m = go.GetComponent<Renderer>().materials[2];
+                        if (go.name == "DoorFR06")
+                        {
+                            BaseMaterial = go.GetComponent<Renderer>().materials[2];
+                        }
                     }
                 }
             }
 
-            if (!m)
+            if (!BaseMaterial)
             {
                 Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
             }
-            return m;
+            return BaseMaterial;
+        }
+
+        public static Material GetChromeMaterial()
+        {
+            if(!ChromeMaterial)
+            {
+                foreach (GameObject go in PartManager.gameParts)
+                {
+                    if (go != null)
+                    {
+                        if (go.name == "DoorFR06")
+                        {
+                            ChromeMaterial = go.GetComponent<CarProperties>().ChromeMat;
+                        }
+                    }
+                }
+            }
+            
+            if (!ChromeMaterial)
+            {
+                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetChromeMaterial was not able to retrive the chrome material. Make sure you are using it on FirstLoad event.");
+            }
+            return ChromeMaterial;
         }
         
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)

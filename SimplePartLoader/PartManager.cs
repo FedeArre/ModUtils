@@ -1,5 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using RVP;
+using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -62,19 +63,6 @@ namespace SimplePartLoader
                     }
                 }
             }
-            
-            // Nut material
-            foreach (GameObject go in PartManager.gameParts)
-            {
-                if (go != null)
-                {
-                    if (go.name == "DoorFR06")
-                    {
-                        ModUtils.NutMaterial = go.GetComponentInChildren<HexNut>().GetComponent<Renderer>().material;
-                        break;
-                    }
-                }
-            }
 
             SPL.DevLog("Starting first load check");
             // We need to check if this is the first load.
@@ -95,6 +83,9 @@ namespace SimplePartLoader
                             hx.gameObject.AddComponent<DISABLER>();
 
                             hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                            hx.tight = true;
+
+                            hx.gameObject.AddComponent<InternalMarker>();
 
                             if (!hx.GetComponent<BoxCollider>())
                                 hx.gameObject.AddComponent<BoxCollider>();
@@ -106,6 +97,9 @@ namespace SimplePartLoader
                             bn.gameObject.AddComponent<DISABLER>();
 
                             bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                            bn.tight = true;
+
+                            bn.gameObject.AddComponent<InternalMarker>();
 
                             if (!bn.GetComponent<BoxCollider>())
                                 bn.gameObject.AddComponent<BoxCollider>();
@@ -117,8 +111,9 @@ namespace SimplePartLoader
                             fn.gameObject.AddComponent<DISABLER>();
 
                             fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
-
                             fn.tight = true;
+
+                            fn.gameObject.AddComponent<InternalMarker>();
 
                             if (!fn.GetComponent<BoxCollider>())
                                 fn.gameObject.AddComponent<BoxCollider>();
@@ -130,6 +125,9 @@ namespace SimplePartLoader
                             wc.gameObject.AddComponent<DISABLER>();
 
                             wc.gameObject.layer = LayerMask.NameToLayer("Weld");
+                            wc.welded = true;
+
+                            wc.gameObject.AddComponent<InternalMarker>();
 
                             if (!wc.GetComponent<MeshCollider>())
                                 wc.gameObject.AddComponent<MeshCollider>().convex = true;
@@ -137,6 +135,7 @@ namespace SimplePartLoader
                     }
 
                     SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
+
                     if(!part.CarProps)
                     {
                         Debug.LogWarning($"[ModUtils/SPL/Error]: Prefab generator was unable to create {part.Name}");
@@ -160,7 +159,27 @@ namespace SimplePartLoader
                     part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
                     part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
 
-                    if(data.CatalogImage)
+                    // Mesh stuff
+                    if (data.EnableMeshChange)
+                    {
+                        switch(data.UseMaterialsFrom)
+                        {
+                            case PrefabGenerator.MaterialSettingTypes.DummyOriginal:
+                                part.GetComponent<Renderer>().materials = part.GetDummyOriginal().GetComponent<Renderer>().materials;
+                                break;
+                            case PrefabGenerator.MaterialSettingTypes.PaintingSetup:
+                                PaintingSystem.SetMaterialsForObject(part, 2, 0, 1);
+                                part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);
+                                break;
+                        }
+                    }
+
+                    if(data.EnableChromed)
+                    {
+                        part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
+                    }
+
+                    if (data.CatalogImage)
                     {
                         part.PartInfo.Thumbnail = data.CatalogImage;
                     }
@@ -185,19 +204,33 @@ namespace SimplePartLoader
 
                         case PrefabGenerator.AttachmentTypes.UseMarkedBolts:
                             {
-                                // We first remove all the FlatNut / HexNut on our part.
+                                // We first remove all the FlatNut / HexNut / BoltNut on our part.
                                 foreach (HexNut hx in part.Prefab.GetComponentsInChildren<HexNut>())
-                                    GameObject.Destroy(hx.gameObject);
-
+                                {
+                                    if (!hx.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(hx.gameObject);
+                                }
                                 foreach (FlatNut fn in part.Prefab.GetComponentsInChildren<FlatNut>())
-                                    GameObject.Destroy(fn.gameObject);
+                                {
+                                    if (!fn.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(fn.gameObject);
+                                }
+                                
+                                foreach (BoltNut bn in part.Prefab.GetComponentsInChildren<BoltNut>())
+                                {
+                                    if(!bn.GetComponent<InternalMarker>())
+                                        GameObject.Destroy(bn.gameObject);
+                                }
 
-                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut to actual bolts.
+                                // Now we need to convert our MarkAsFlatnut | MarkAsHexnut / MarkAsBoltnut to actual bolts.
                                 foreach (MarkAsHexnut mhx in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
                                     Functions.ConvertToHexnut(mhx.gameObject);
 
                                 foreach (MarkAsFlatnut mfn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
                                     Functions.ConvertToFlatNut(mfn.gameObject);
+
+                                foreach (MarkAsBoltnut mbn in part.Prefab.GetComponentsInChildren<MarkAsBoltnut>())
+                                    Functions.ConvertToBoltNut(mbn.gameObject);
 
                                 break;
                             }
@@ -206,6 +239,7 @@ namespace SimplePartLoader
                     foreach(MarkAsTransparent markedTransparent in part.Prefab.GetComponentsInChildren<MarkAsTransparent>())
                     {
                         TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
+                        tempData.MeshToUse = part.GetComponent<MeshFilter>().sharedMesh;
                         
                         GameObject transparentObject = GetTransparentReadyObject(tempData);
 
@@ -309,6 +343,27 @@ namespace SimplePartLoader
                 }
             }
 
+            if(SPL.PREFAB_NAME_COLLISION_CHECK)
+            {
+                Debug.Log("[ModUtils/SPL/PrefabNameCollisionCheck]: Checking for prefab name collisions...");
+                List<string> prefabNames = new List<string>();
+                foreach (GameObject go in gameParts)
+                {
+                    CarProperties cp = go.GetComponent<CarProperties>();
+                    if (!cp)
+                        continue;
+                    
+                    if (prefabNames.Contains(cp.PrefabName))
+                    {
+                        Debug.LogError($"[ModUtils/SPL/PrefabNameCollisionCheck]: Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
+                    }
+                    else
+                    {
+                        prefabNames.Add(cp.PrefabName);
+                    }
+                }
+            }
+
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
 
             // We know load our transparents. We have to load them for the junkyard parts, car prefabs.
@@ -383,6 +438,11 @@ namespace SimplePartLoader
             transparentComponent.ATTACHABLES = t.AttachingObjects;
             transparentComponent.DEPENDANTS = t.DependantObjects;
             transparentComponent.SavePosition = t.SavePosition;
+
+            if(t.MeshToUse)
+            {
+                transparentObject.GetComponent<MeshFilter>().sharedMesh = t.MeshToUse;
+            }
 
             if (t.PartThatNeedsToBeOff != null)
             {

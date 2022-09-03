@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace SimplePartLoader
+namespace SimplePartLoader.Objects.EditorComponents
 {
-    public class SPL_Part : MonoBehaviour
+    internal class InternalMarker : MonoBehaviour
     {
-        // Empty - Just used to identify if a part was added by SPL!
     }
 }

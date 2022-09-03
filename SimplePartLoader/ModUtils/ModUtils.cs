@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rewired;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,7 +14,8 @@ namespace SimplePartLoader
         private static tools PlayerTools;
         private static AudioManager AudioList;
         private static AudioSource Source;
-
+        private static Player RewiredPlayer;
+        
         private static MainCarProperties CurrentPlayerCar;
 
         internal static List<GameObject> Cars;
@@ -21,13 +23,12 @@ namespace SimplePartLoader
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
-        internal static Material NutMaterial;
-        
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");
             PlayerTools = Player.GetComponent<tools>();
-
+            RewiredPlayer = ReInput.players.GetPlayer(0);
+            
             GameObject PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();
@@ -110,6 +111,19 @@ namespace SimplePartLoader
             else
             {
                 Debug.LogError("[ModUtils/Utils/Error]: Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
+            }
+        }
+
+        public static Player GetKeyPlayer()
+        {
+            if (RewiredPlayer != null)
+            {
+                return RewiredPlayer;
+            }
+            else
+            {
+                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetKeyPlayer but Rewired has not started yet, make sure to GetKeyPlayer this after OnLoad!");
+                return null;
             }
         }
 

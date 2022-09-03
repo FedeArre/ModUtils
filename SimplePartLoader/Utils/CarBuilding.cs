@@ -10,8 +10,16 @@ namespace SimplePartLoader.Utils
 {
     public class CarBuilding
     {
+        /// <summary>
+        /// Enables the debug mode for car building functions
+        /// </summary>
         public static bool ENABLE_CARBUILDING_DEBUG = false;
 
+        /// <summary>
+        /// Copies the car from the given car prefab to the given car object
+        /// </summary>
+        /// <param name="originalCar">The original car</param>
+        /// <param name="prefab">The prefab that will store the car clone</param>
         public static void CopyCarToPrefab(GameObject originalCar, GameObject prefab)
         {
             prefab.layer = originalCar.layer;
@@ -22,14 +30,19 @@ namespace SimplePartLoader.Utils
                     continue;
 
                 DevLog($"Now copying component to base object ({comp})");
-                prefab.AddComponent(comp.GetType()).GetCopyOf(comp);
+                prefab.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
 
             AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
 
-            Debug.LogError($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
+            Debug.Log($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
         }
 
+        /// <summary>
+        /// Copies the given GameObject into the specified transform as child of it
+        /// </summary>
+        /// <param name="partToAdd">The part to add</param>
+        /// <param name="location">The trasnform that will be the parent of the part</param>
         public static void CopyPartIntoTransform(GameObject partToAdd, Transform location)
         {
             DevLog($"Copying part {partToAdd.name} into {location.name}");
@@ -51,12 +64,17 @@ namespace SimplePartLoader.Utils
                     continue;
 
                 DevLog($"Now copying component to added part ({comp})");
-                addedPart.AddComponent(comp.GetType()).GetCopyOf(comp);
+                addedPart.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
             
             AttachPrefabChilds(addedPart, partToAdd);
         }
 
+        /// <summary>
+        /// Recursive function that copies all the child hierarchy from a car part into a dummy part.
+        /// </summary>
+        /// <param name="partToAttach">The parent (top on hierarchy) GameObject that get the clones</param>
+        /// <param name="original">The original part to be copied</param>
         public static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
             DevLog("Attaching childs to " + partToAttach.name);
@@ -83,13 +101,13 @@ namespace SimplePartLoader.Utils
 
                     if (!childObject.GetComponent(comp.GetType()))
                     {
-                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp);
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, true);
 
                         DevLog("Copying component " + comp.GetType());
                     }
                     else
                     {
-                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()));
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), true);
 
                         DevLog("Cloning component" + comp.GetType());
                     }
@@ -100,51 +118,59 @@ namespace SimplePartLoader.Utils
             }
         }
 
+        /// <summary>
+        /// Updates all the DEPENDANTS and ATTACHABLES on the given GameObject
+        /// </summary>
+        /// <param name="p">The GameObject that will be updated</param>
         public static void UpdateTransparentsReferences(GameObject p)
         {
             bool referenceUpdated = false;
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
             {
-                foreach (transparents.dependantObjects dp in t.DEPENDANTS)
+                if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
                 {
-                    referenceUpdated = false;
-                    foreach(transparents t2 in p.GetComponentsInChildren<transparents>())
+                    transparents.dependantObjects[] newDependants = new transparents.dependantObjects[t.DEPENDANTS.Length];
+                    for(int i = 0; i < t.DEPENDANTS.Length; i++)
                     {
-                        if(t2.name == dp.dependant.name)
+                        transparents.dependantObjects dp = t.DEPENDANTS[i];
+                        newDependants[i] = new transparents.dependantObjects();
+                        referenceUpdated = false;
+                        
+                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
-                            dp.dependant = t2.gameObject;
-                            referenceUpdated = true;
-                            break;
+                            if(t2 == null)
+                            {
+                                continue;
+                            }
+
+                            if(dp.dependant == null)
+                            {
+                                continue;
+                            }
+                            if (t2.name == dp.dependant.name)
+                            {
+                                newDependants[i].dependant = t2.gameObject;
+                                referenceUpdated = true;
+                                break;
+                            }
+                        }
+                        if (!referenceUpdated)
+                        {
+                            if(dp.dependant == null)
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object (null) not found in " + p.name + ", on part " + t.name);
+                            else
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object " + dp.dependant.name + " not found in " + p.name + ", on part " + t.name);
                         }
                     }
-
-                    if(!referenceUpdated)
-                    {
-                        Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object " + dp.dependant.name + " not found in " + p.name);
-                    }
-                }
-
-                foreach (transparents.AttachingObjects at in t.ATTACHABLES)
-                {
-                    referenceUpdated = false;
-                    foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
-                    {
-                        if (t2.name == at.Attachable.name)
-                        {
-                            at.Attachable = t2.gameObject;
-                            referenceUpdated = true;
-                            break;
-                        }
-                    }
-
-                    if (!referenceUpdated)
-                    {
-                        Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + at.Attachable.name + " not found in " + p.name);
-                    }
+                    t.DEPENDANTS = newDependants;
                 }
             }
         }
 
+        /// <summary>
+        /// Internal function to log stuff when debug mode is enabled
+        /// </summary>
+        /// <param name="str">The message to show on log</param>
         internal static void DevLog(string str)
         {
             if (ENABLE_CARBUILDING_DEBUG)

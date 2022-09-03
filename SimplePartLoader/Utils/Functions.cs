@@ -42,8 +42,6 @@ namespace SimplePartLoader.Utils
             MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
             bolt.layer = LayerMask.NameToLayer("Bolts");
 
-            bolt.GetComponent<Renderer>().material = ModUtils.NutMaterial;
-            
             if (!bolt.GetComponent<BoxCollider>())
                 bolt.gameObject.AddComponent<BoxCollider>();
 
@@ -65,12 +63,42 @@ namespace SimplePartLoader.Utils
 
             bolt.layer = LayerMask.NameToLayer("FlatBolts");
 
-            bolt.GetComponent<Renderer>().material = ModUtils.NutMaterial;
-            
             if (!bolt.GetComponent<BoxCollider>())
                 bolt.gameObject.AddComponent<BoxCollider>();
 
             GameObject.Destroy(bolt.GetComponent<MarkAsFlatnut>());
+        }
+
+        /// <summary>
+        /// Given a GameObject converts it into a FlatNut bolt. The MarkAsFlat component is required!
+        /// </summary>
+        /// <param name="bolt">The GameObject to be converted</param>
+        public static void ConvertToBoltNut(GameObject bolt)
+        {
+            bolt.AddComponent<CarProperties>();
+            bolt.AddComponent<DISABLER>();
+            BoltNut bn = bolt.AddComponent<BoltNut>();
+            MarkAsBoltnut mbn = bolt.GetComponent<MarkAsBoltnut>();
+            
+            bolt.layer = LayerMask.NameToLayer("Bolts");
+
+            if (!bolt.GetComponent<BoxCollider>())
+                bolt.gameObject.AddComponent<BoxCollider>();
+
+            bn.DontDisableRenderer = mbn.DontDisableRenderer;
+            bn.AffectsGrandParent1 = mbn.AffectsGrandParent1;
+            bn.AffectsGrandParent2 = mbn.AffectsGrandParent2;
+            bn.AffectsGrandParent3 = mbn.AffectsGrandParent3;
+            bn.MatchTypeToBolt = mbn.MatchTypeToBolt;
+            bn.DisallowDistantBreaking = mbn.DisallowDistantBreaking;
+            bn.NotImportant = mbn.NotImportant;
+            bn.ChildrenHaveToBeRemoved = mbn.ChildrenHaveToBeRemoved;
+
+            bn.otherobjectName = mbn.OtherObjectName;
+            bn.otherobjectNameL = mbn.OtherObjectName;
+            bn.otherobjectNameR = mbn.OtherObjectName;
+            
+            GameObject.Destroy(mbn);
         }
 
         /// <summary>
@@ -99,7 +127,7 @@ namespace SimplePartLoader.Utils
         /// </summary>
         /// <param name="other">The target component</param>
         /// <param name="comp">The target component</param>
-        public static void CopyComponentData(Component comp, Component other)
+        public static void CopyComponentData(Component comp, Component other, bool preciseCloning)
         {
             Type type = comp.GetType();
 
@@ -122,10 +150,20 @@ namespace SimplePartLoader.Utils
                 pinfos = pinfos.Concat(derivedType.GetProperties(Extension.bindingFlags));
             }
 
-            pinfos = from property in pinfos
-                     where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
-                     //where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
-                     select property;
+            if (preciseCloning)
+            {
+                pinfos = from property in pinfos
+                         where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
+                         select property;
+            }
+            else
+            {
+                pinfos = from property in pinfos
+                         where !(type == typeof(Rigidbody) && property.Name == "inertiaTensor") // Special case for Rigidbodies inertiaTensor which isn't catched for some reason.
+                         where !property.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(ObsoleteAttribute))
+                         select property;
+            }
+
             foreach (var pinfo in pinfos)
             {
                 if (pinfo.CanWrite)
