@@ -172,8 +172,9 @@ namespace SimplePartLoader
             }
 
             // Enable heartbeat
-            KeepAlive.GetInstance().Ready();
-
+            
+            if(!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
+                KeepAlive.GetInstance().Ready();
         }
 
         public override void OnLoad()

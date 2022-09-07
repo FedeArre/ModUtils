@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -15,6 +16,7 @@ namespace SimplePartLoader
     {
         private static KeepAlive Instance;
         string serializedJson;
+        private HttpClient client = new HttpClient();
         
         private KeepAlive()
         {
@@ -37,26 +39,18 @@ namespace SimplePartLoader
 
             var timer = new System.Threading.Timer((e) =>
             {
-                SendCurrentStatus();
+                Task.Run(SendCurrentStatus);
             }, null, startTimeSpan, periodTimeSpan);
         }
 
-        private void SendCurrentStatus()
+        private async void SendCurrentStatus()
         {
+            // TODO: Test this!
             Debug.Log("[ModUtils/KeepAlive]: Sending status");
             try
             {
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/alive");
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.Method = "POST";
-
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(serializedJson);
-                }
-                
-                httpWebRequest.GetResponseAsync();
+                var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
+                _ = await client.PostAsync(ModMain.API_URL + "/alive", content);
             }
             catch (Exception ex)
             {
