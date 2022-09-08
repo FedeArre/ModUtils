@@ -106,7 +106,7 @@ namespace SimplePartLoader
                 Prefab.AddComponent<RemoveWindow>();
 
                 Prefab.layer = LayerMask.NameToLayer("Windows");
-                Prefab.tag = "Window";
+                //Prefab.tag = "Window";
             }
         }
 
@@ -132,7 +132,7 @@ namespace SimplePartLoader
                 Prefab.AddComponent<RemoveWindow>();
 
                 Prefab.layer = LayerMask.NameToLayer("Windows");
-                //Prefab.tag = "Window";
+                Prefab.tag = "Window";
             }
         }
 
