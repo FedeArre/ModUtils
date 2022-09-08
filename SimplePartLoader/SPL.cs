@@ -249,7 +249,7 @@ namespace SimplePartLoader
 
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, p.UseBetterCopy);
                     
-                    DevLog($"Now copying component to base object ({comp})");
+                    DevLog(p, $"Now copying component to base object ({comp})");
                 }
             }
 
@@ -449,6 +449,17 @@ namespace SimplePartLoader
         {
             if (DEVELOPER_LOG)
                 Debug.Log("[ModUtils/Dev/SPL]: " + str);
+        }
+
+        internal static void DevLog(Part p, string str)
+        {
+            if(p.Mod != null)
+            {
+                if(p.Mod.Settings.EnableDeveloperLog)
+                {
+                    Debug.Log($"[ModUtils/Dev/SPL]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
+                }
+            }
         }
 
         /// <summary>

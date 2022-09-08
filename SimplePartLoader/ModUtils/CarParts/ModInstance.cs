@@ -30,11 +30,18 @@ namespace SimplePartLoader
             get { return settings; }
         }
 
+        public string Name
+        {
+            get { return Mod.Name;  }
+        }
+        
         internal ModInstance(Mod mod)
         {
             thisMod = mod;
             loadedParts = new List<Part>();
             settings = new ModSettings(this);
+
+            Debug.Log($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
         }
 
         public Part Load(AssetBundle bundle, string prefabName)
@@ -82,7 +89,10 @@ namespace SimplePartLoader
                 // Now we create the part and add it to the list.
                 Part part = new Part(prefab, prefabCarProp, prefabPartInfo, prefab.GetComponent<Renderer>(), this);
                 PartManager.modLoadedParts.Add(part);
-
+                loadedParts.Add(part);
+                
+                part.PartType = PartTypes.FULL_PART;
+                
                 Saver.modParts.Add(part.CarProps.PrefabName, prefab);
 
                 Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
@@ -97,15 +107,20 @@ namespace SimplePartLoader
                 Saver.modParts.Add(p.Name, prefab);
 
                 PartManager.prefabGenParts.Add(p);
+                loadedParts.Add(p);
+
+                p.PartType = PartTypes.DUMMY_PREFABGEN;
                 Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (dummy part with Prefab generator) {prefabName} from {thisMod.Name}");
             }
             else
             {
                 p.Name = prefabName;
                 Saver.modParts.Add(prefabName, prefab);
-
+                
                 PartManager.dummyParts.Add(p);
+                loadedParts.Add(p);
 
+                p.PartType = PartTypes.DUMMY;
                 Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (dummy part) {prefabName} from {thisMod.Name}");
             }
 

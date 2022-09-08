@@ -240,8 +240,8 @@ namespace SimplePartLoader
         {
             GameObject transparentObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
-            GameObject.Destroy(transparentObject.GetComponent<BoxCollider>());
-            GameObject.Destroy(transparentObject.GetComponent<Renderer>());
+            DestroyConsideringSetting(t.Owner, transparentObject.GetComponent<BoxCollider>());
+            DestroyConsideringSetting(t.Owner, transparentObject.GetComponent<Renderer>());
 
             transparentObject.name = t.Name; // Renamed prefab is the one that the game uses for looking for transparent. Prefab name in car props is used for identify which prefab has to be loaded.
 
@@ -457,15 +457,16 @@ namespace SimplePartLoader
                 {
                     TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
                     tempData.MeshToUse = part.GetComponent<MeshFilter>().sharedMesh;
-
+                    tempData.Owner = part;
+                    
                     GameObject transparentObject = GetTransparentReadyObject(tempData);
 
                     transparentObject.transform.SetParent(markedTransparent.transform.parent);
                     transparentObject.transform.localPosition = markedTransparent.transform.localPosition;
                     transparentObject.transform.localRotation = markedTransparent.transform.localRotation;
                     transparentObject.transform.localScale = markedTransparent.transform.localScale;
-
-                    GameObject.Destroy(markedTransparent.gameObject);
+                    
+                    DestroyConsideringSetting(part, markedTransparent.gameObject);
                 }
 
                 Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
@@ -474,6 +475,19 @@ namespace SimplePartLoader
         }
 
         public static void DestroyConsideringSetting(Part p, GameObject toDestroy)
+        {
+            if (p.Mod != null)
+            {
+                if (p.Mod.Settings.EnableImmediateDestroys)
+                    GameObject.DestroyImmediate(toDestroy);
+                else
+                    GameObject.Destroy(toDestroy);
+            }
+            else
+                GameObject.Destroy(toDestroy);
+        }
+        
+        public static void DestroyConsideringSetting(Part p, Component toDestroy)
         {
             if (p.Mod != null)
             {

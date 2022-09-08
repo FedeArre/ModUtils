@@ -24,12 +24,20 @@ namespace SimplePartLoader
         internal bool SavingEnabled;
         internal bool UseBetterCopy;
 
+        private PartTypes Type;
         private ModInstance modInstance;
+        
         public ModInstance Mod
         {
             get { return modInstance; }
         }
         
+        public PartTypes PartType
+        {
+            get { return Type; }
+            internal set { Type = value; }
+        }
+
         public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, Renderer renderer, ModInstance modInstance)
         {
             Prefab = prefab;
@@ -48,7 +56,8 @@ namespace SimplePartLoader
             {
                 td.MeshToUse = mf.mesh;
             }
-            
+
+            td.Owner = this;
             PartManager.transparentData.Add(td);
         }
 
@@ -61,7 +70,8 @@ namespace SimplePartLoader
             {
                 td.MeshToUse = mf.mesh;
             }
-            
+
+            td.Owner = this;
             PartManager.transparentData.Add(td);
         }
         
@@ -84,6 +94,7 @@ namespace SimplePartLoader
                 td.MeshToUse = mf.mesh;
             }
 
+            td.Owner = this;
             PartManager.transparentData.Add(td);
             return td;
         }
@@ -204,5 +215,12 @@ namespace SimplePartLoader
             if(Prefab.GetComponent<PickupWindow>())
                 GameObject.Destroy(Prefab.GetComponent<PickupWindow>());
         }
+    }
+
+    public enum PartTypes
+    {
+        FULL_PART = 1,
+        DUMMY_PREFABGEN,
+        DUMMY
     }
 }
