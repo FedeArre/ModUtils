@@ -23,6 +23,8 @@ namespace SimplePartLoader
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
+        internal static List<ModInstance> RegisteredMods = new List<ModInstance>();
+        
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");
@@ -178,6 +180,23 @@ namespace SimplePartLoader
         public static Vector3 ShiftCoords(Vector3 coordsToShift)
         {
             return coordsToShift + PlayerTools.saver.transform.root.position;
+        }
+
+        // Car parts update
+        public static ModInstance RegisterMod(Mod mod)
+        {
+            foreach(ModInstance mi in RegisteredMods)
+            {
+                if(mod.ID == mi.Mod.ID)
+                {
+                    Debug.LogError($"[ModUtils/ModRegister/Error]: Tried to register mod {mod.ID} but it is already registered!");
+                    return null;
+                }
+            }
+
+            ModInstance modInstance = new ModInstance(mod);
+            RegisteredMods.Add(modInstance);
+            return modInstance;
         }
     }
 }

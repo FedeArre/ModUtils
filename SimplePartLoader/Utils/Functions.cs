@@ -208,5 +208,56 @@ namespace SimplePartLoader.Utils
                 finfo.SetValue(comp, finfo.GetValue(other));
             }
         }
+
+        public static void BoltingSetup(GameObject prefab)
+        {
+            foreach (HexNut hx in prefab.GetComponentsInChildren<HexNut>())
+            {
+                hx.gameObject.AddComponent<CarProperties>();
+                hx.gameObject.AddComponent<DISABLER>();
+
+                hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                hx.tight = true;
+
+                if (!hx.GetComponent<BoxCollider>())
+                    hx.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (BoltNut bn in prefab.GetComponentsInChildren<BoltNut>())
+            {
+                bn.gameObject.AddComponent<CarProperties>();
+                bn.gameObject.AddComponent<DISABLER>();
+
+                bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                bn.tight = true;
+
+                if (!bn.GetComponent<BoxCollider>())
+                    bn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
+            {
+                fn.gameObject.AddComponent<CarProperties>();
+                fn.gameObject.AddComponent<DISABLER>();
+
+                fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
+                fn.tight = true;
+
+                if (!fn.GetComponent<BoxCollider>())
+                    fn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (WeldCut wc in prefab.GetComponentsInChildren<WeldCut>())
+            {
+                wc.gameObject.AddComponent<CarProperties>();
+                wc.gameObject.AddComponent<DISABLER>();
+
+                wc.gameObject.layer = LayerMask.NameToLayer("Weld");
+                wc.welded = true;
+
+                if (!wc.GetComponent<MeshCollider>())
+                    wc.gameObject.AddComponent<MeshCollider>().convex = true;
+            }
+        }
     }
 }

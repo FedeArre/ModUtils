@@ -125,7 +125,7 @@ namespace SimplePartLoader
                     wc.gameObject.AddComponent<MeshCollider>().convex = true;
             }
 
-            Part p = new Part(prefab, prefabCarProp, prefabPartInfo, prefab.GetComponent<Renderer>());
+            Part p = new Part(prefab, prefabCarProp, prefabPartInfo, prefab.GetComponent<Renderer>(), null);
             PartManager.modLoadedParts.Add(p);
 
             Saver.modParts.Add(p.CarProps.PrefabName, prefab);
@@ -171,7 +171,7 @@ namespace SimplePartLoader
             if (!prefab)
                 SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
-            Part p = new Part(prefab, null, null, null);
+            Part p = new Part(prefab, null, null, null, null);
             
             p.UseBetterCopy = betterCopy;
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change

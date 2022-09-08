@@ -23,13 +23,20 @@ namespace SimplePartLoader
 
         internal bool SavingEnabled;
         internal bool UseBetterCopy;
+
+        private ModInstance modInstance;
+        public ModInstance Mod
+        {
+            get { return modInstance; }
+        }
         
-        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, Renderer renderer)
+        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, Renderer renderer, ModInstance modInstance)
         {
             Prefab = prefab;
             CarProps = carProp;
             PartInfo = partinfo;
             Renderer = renderer;
+            this.modInstance = modInstance;
         }
 
         [Obsolete("SetupTransparent will be removed on the future, use AddTransparent instead!")]
