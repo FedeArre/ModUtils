@@ -511,16 +511,31 @@ namespace SimplePartLoader
 
             if (bodymatIndex != -1)
             {
+                if (matsOfPart.Length <= bodymatIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
                 matsOfPart[bodymatIndex] = GetBodymatMaterial();
             }
 
             if (paintRustIndex != -1)
             {
+                if (matsOfPart.Length <= paintRustIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
                 matsOfPart[paintRustIndex] = GetPaintRustMaterial();
             }
 
             if (dirtIndex != -1)
             {
+                if (matsOfPart.Length <= dirtIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
                 matsOfPart[dirtIndex] = GetDirtMaterial();
             }
 
