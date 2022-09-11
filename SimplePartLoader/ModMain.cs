@@ -18,7 +18,11 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.1.0"; bool TESTING_VERSION_REMEMBER = true;
+        public override string Version => "v1.1.0"; 
+        
+        bool TESTING_VERSION_REMEMBER = true;
+        string TESTING_VERSION_NUMBER = "1.2-beta2";
+        
 
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -46,7 +50,7 @@ namespace SimplePartLoader
             Debug.Log("ModUtils is loading - Version: " + Version);
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
-                Debug.Log("This is a testing version - remember to report bugs and send feedback");
+                Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";

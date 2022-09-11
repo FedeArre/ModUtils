@@ -15,7 +15,10 @@ namespace SimplePartLoader.Objects
             if (!cl)
                 return;
 
-            cl.LightRend = cl.transform.parent.GetComponent<MeshRenderer>();
+            if(!cl.transform.parent || cl.transform.parent.GetComponent<transparents>())
+                cl.LightRend = cl.transform.GetComponent<MeshRenderer>();
+            else
+                cl.LightRend = cl.transform.parent.GetComponent<MeshRenderer>();
             
             if (cl.High)
             {

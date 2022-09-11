@@ -286,7 +286,10 @@ namespace SimplePartLoader
                     if (t.GetComponent<HexNut>())
                     {
                         HexNut hx = t.GetComponent<HexNut>();
-                        hx.gameObject.AddComponent<CarProperties>();
+                        CarProperties cp = hx.gameObject.AddComponent<CarProperties>();
+                        cp.Attached = true;
+                        cp.DMGdisplacepart = true;
+                        
                         hx.gameObject.AddComponent<DISABLER>();
 
                         hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
@@ -300,7 +303,10 @@ namespace SimplePartLoader
                     else if (t.GetComponent<BoltNut>())
                     {
                         BoltNut bn = t.GetComponent<BoltNut>();
-                        bn.gameObject.AddComponent<CarProperties>();
+                        CarProperties cp = bn.gameObject.AddComponent<CarProperties>();
+                        cp.Attached = true;
+                        cp.DMGdisplacepart = true;
+                        
                         bn.gameObject.AddComponent<DISABLER>();
 
                         bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
@@ -314,7 +320,10 @@ namespace SimplePartLoader
                     else if (t.GetComponent<FlatNut>())
                     {
                         FlatNut fn = t.GetComponent<FlatNut>();
-                        fn.gameObject.AddComponent<CarProperties>();
+                        CarProperties cp = fn.gameObject.AddComponent<CarProperties>();
+                        cp.Attached = true;
+                        cp.DMGdisplacepart = true;
+                        
                         fn.gameObject.AddComponent<DISABLER>();
 
                         fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
@@ -328,7 +337,10 @@ namespace SimplePartLoader
                     else if (t.GetComponent<WeldCut>())
                     {
                         WeldCut wc = t.GetComponent<WeldCut>();
-                        wc.gameObject.AddComponent<CarProperties>();
+                        CarProperties cp = wc.gameObject.AddComponent<CarProperties>();
+                        cp.Attached = true;
+                        cp.DMGdisplacepart = true;
+                        
                         wc.gameObject.AddComponent<DISABLER>();
 
                         wc.gameObject.layer = LayerMask.NameToLayer("Weld");

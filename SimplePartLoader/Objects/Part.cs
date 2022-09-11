@@ -107,7 +107,7 @@ namespace SimplePartLoader
         public void UsePrytoolAttachment()
         {
             if(Prefab.GetComponent<Pickup>())
-                GameObject.Destroy(Prefab.GetComponent<Pickup>());
+                DestroyConsiderSetting(Prefab.GetComponent<Pickup>());
 
             if (!Prefab.GetComponent<PickupWindow>())
             {
@@ -133,7 +133,7 @@ namespace SimplePartLoader
         public void UseHandAttachment()
         {
             if (Prefab.GetComponent<Pickup>())
-                GameObject.Destroy(Prefab.GetComponent<Pickup>());
+                DestroyConsiderSetting(Prefab.GetComponent<Pickup>());
 
             if (!Prefab.GetComponent<PickupHand>())
             {
@@ -193,30 +193,60 @@ namespace SimplePartLoader
         {
             foreach (WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
             {
-                GameObject.Destroy(wc.gameObject);
+                DestroyConsiderSetting(wc.gameObject);
             }
 
             foreach (BoltNut bn in Prefab.GetComponentsInChildren<BoltNut>())
             {
-                GameObject.Destroy(bn.gameObject);
+                DestroyConsiderSetting(bn.gameObject);
             }
 
             foreach (HexNut hn in Prefab.GetComponentsInChildren<HexNut>())
             {
-                GameObject.Destroy(hn.gameObject);
+                DestroyConsiderSetting(hn.gameObject);
             }
 
             if (Prefab.GetComponent<RemoveWindow>())
-                GameObject.Destroy(Prefab.GetComponent<RemoveWindow>());
+                DestroyConsiderSetting(Prefab.GetComponent<RemoveWindow>());
 
             if(Prefab.GetComponent<PickupHand>())
-                GameObject.Destroy(Prefab.GetComponent<PickupHand>());
+                DestroyConsiderSetting(Prefab.GetComponent<PickupHand>());
 
             if(Prefab.GetComponent<PickupWindow>())
-                GameObject.Destroy(Prefab.GetComponent<PickupWindow>());
+                DestroyConsiderSetting(Prefab.GetComponent<PickupWindow>());
+        }
+        
+        private void DestroyConsiderSetting(Component c)
+        {
+            if (modInstance != null)
+            {
+                if (modInstance.Settings.EnableImmediateDestroys)
+                    GameObject.DestroyImmediate(c);
+                else
+                    GameObject.Destroy(c);
+            }
+            else
+            {
+                GameObject.Destroy(c);
+            }
+        }
+        private void DestroyConsiderSetting(GameObject c)
+        {
+            if (modInstance != null)
+            {
+                if (modInstance.Settings.EnableImmediateDestroys)
+                    GameObject.DestroyImmediate(c);
+                else
+                    GameObject.Destroy(c);
+            }
+            else
+            {
+                GameObject.Destroy(c);
+            }
         }
     }
 
+    
     public enum PartTypes
     {
         FULL_PART = 1,

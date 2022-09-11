@@ -61,7 +61,8 @@ namespace SimplePartLoader
                 SPL.SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
-            
+            prefab.transform.localScale = Vector3.one; // We set the scale to 1,1,1 to prevent any weird scaling issues
+
             // Now we determinate the type of part we are loading.
             // If it has CarProperties and Partinfo is a full part.
             // If it has PrefabGenerator ww know is a dummy with prefab gen.

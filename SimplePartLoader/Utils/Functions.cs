@@ -36,8 +36,12 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToHexnut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+            
             bolt.AddComponent<DISABLER>();
+            
             HexNut hx = bolt.AddComponent<HexNut>();
             MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
             bolt.layer = LayerMask.NameToLayer("Bolts");
@@ -57,7 +61,10 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToFlatNut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+
             bolt.AddComponent<DISABLER>();
             bolt.AddComponent<FlatNut>().tight = true;
 
@@ -75,7 +82,10 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToBoltNut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+
             bolt.AddComponent<DISABLER>();
             BoltNut bn = bolt.AddComponent<BoltNut>();
             MarkAsBoltnut mbn = bolt.GetComponent<MarkAsBoltnut>();
@@ -213,7 +223,10 @@ namespace SimplePartLoader.Utils
         {
             foreach (HexNut hx in prefab.GetComponentsInChildren<HexNut>())
             {
-                hx.gameObject.AddComponent<CarProperties>();
+                CarProperties cp = hx.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
                 hx.gameObject.AddComponent<DISABLER>();
 
                 hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
@@ -225,7 +238,10 @@ namespace SimplePartLoader.Utils
 
             foreach (BoltNut bn in prefab.GetComponentsInChildren<BoltNut>())
             {
-                bn.gameObject.AddComponent<CarProperties>();
+                CarProperties cp = bn.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
                 bn.gameObject.AddComponent<DISABLER>();
 
                 bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
@@ -237,7 +253,10 @@ namespace SimplePartLoader.Utils
 
             foreach (FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
             {
-                fn.gameObject.AddComponent<CarProperties>();
+                CarProperties cp = fn.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
                 fn.gameObject.AddComponent<DISABLER>();
 
                 fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
@@ -249,7 +268,10 @@ namespace SimplePartLoader.Utils
 
             foreach (WeldCut wc in prefab.GetComponentsInChildren<WeldCut>())
             {
-                wc.gameObject.AddComponent<CarProperties>();
+                CarProperties cp = wc.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+
                 wc.gameObject.AddComponent<DISABLER>();
 
                 wc.gameObject.layer = LayerMask.NameToLayer("Weld");
