@@ -24,6 +24,10 @@ namespace SimplePartLoader
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
         internal static List<ModInstance> RegisteredMods = new List<ModInstance>();
+        public static List<ModInstance> ModInstances
+        {
+            get { return RegisteredMods; }
+        }
         
         internal static void OnLoadCalled()
         {
