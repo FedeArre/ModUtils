@@ -482,7 +482,16 @@ namespace SimplePartLoader
                 }
 
                 Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
-                GameObject.Destroy(part.Prefab.GetComponent<PrefabGenerator>());
+                
+                // Destroy some stuff
+                DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());
+                
+                foreach (var bn in part.Prefab.GetComponentsInChildren<MarkAsBoltnut>())
+                    DestroyConsideringSetting(part, bn);
+                foreach (var bn in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
+                    DestroyConsideringSetting(part, bn);
+                foreach (var bn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
+                    DestroyConsideringSetting(part, bn);
             }
         }
 

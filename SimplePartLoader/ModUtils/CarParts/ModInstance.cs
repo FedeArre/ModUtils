@@ -96,6 +96,11 @@ namespace SimplePartLoader
                 
                 Saver.modParts.Add(part.CarProps.PrefabName, prefab);
 
+                if (part.Mod.Settings.AutomaticFitsToCar != null)
+                {
+                    part.PartInfo.FitsToCar = part.Mod.Settings.AutomaticFitsToCar;
+                }
+
                 Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
                 return part; // We provide the Part instance so the developer can setup the transparents
             }

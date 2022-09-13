@@ -215,6 +215,12 @@ namespace SimplePartLoader
                 Debug.LogError("[ModUtils/SPL/Error]: Tried to do full copy into empty part");
                 return;
             }
+            
+            if(p.Prefab.GetComponents<Component>() == null)
+            {
+                Debug.Log("[ModUtils/SPL/Error]: The part that was going to be copied had a null component. Part: " + p.Name);
+                return;
+            }
 
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
@@ -252,7 +258,7 @@ namespace SimplePartLoader
                     DevLog(p, $"Now copying component to base object ({comp})");
                 }
             }
-
+            
             if (!doNotCopyChilds)
                 AttachPrefabChilds(p.Prefab, carPart, p.UseBetterCopy); // Call the recursive function that copies all the child hierarchy.
 
@@ -260,12 +266,19 @@ namespace SimplePartLoader
             p.CarProps = p.Prefab.GetComponent<CarProperties>();
             p.PartInfo = p.Prefab.GetComponent<Partinfo>();
             p.Renderer = p.Prefab.GetComponent<Renderer>();
-            
+
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
-
+            if(p.Mod != null)
+            {
+                if(p.Mod.Settings.AutomaticFitsToCar != null)
+                {
+                    p.PartInfo.FitsToCar = p.Mod.Settings.AutomaticFitsToCar;
+                }
+            }
+            
             p.OriginalGameobject = carPart;
 
             Debug.LogError($"[ModUtils/SPL]: {p.Name} was succesfully loaded");

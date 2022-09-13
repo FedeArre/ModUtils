@@ -12,6 +12,7 @@ namespace SimplePartLoader
         private bool DeveloperLog = false;
         private bool Immediate = false;
         private bool Cloning = true;
+        private string[] FitsToCar;
         
         public ModInstance Mod
         {
@@ -34,6 +35,12 @@ namespace SimplePartLoader
         {
             get { return Cloning; }
             set { Cloning = value; }
+        }
+
+        public string[] AutomaticFitsToCar
+        {
+            get { return FitsToCar; }
+            set { FitsToCar = value; }   
         }
         
         internal ModSettings(ModInstance _modInstance)
