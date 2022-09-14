@@ -507,7 +507,7 @@ namespace SimplePartLoader
         
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)
         {
-            Material[] matsOfPart = p.GetComponent<Renderer>().materials;
+            Material[] matsOfPart = p.Renderer.materials;
 
             if (bodymatIndex != -1)
             {
@@ -539,7 +539,7 @@ namespace SimplePartLoader
                 matsOfPart[dirtIndex] = GetDirtMaterial();
             }
 
-            p.GetComponent<Renderer>().materials = matsOfPart;
+            p.Renderer.materials = matsOfPart;
         }
     }
 }

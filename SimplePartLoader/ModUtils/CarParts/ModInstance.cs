@@ -132,5 +132,30 @@ namespace SimplePartLoader
 
             return p;
         }
+
+        public Furniture LoadFurniture(AssetBundle bundle, string prefabName)
+        {
+            // Safety checks
+            if (!bundle)
+                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a furniture without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a part without prefab name");
+
+            if (Saver.modParts.ContainsKey(prefabName))
+                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create an already existing prefab ({prefabName})");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+
+            FurnitureGenerator furnitureGen = prefab.GetComponent<FurnitureGenerator>();
+            if (!furnitureGen)
+                Debug.Log($"[ModUtils/Furniture/Error]: {prefabName} has no Furniture Generator component");
+            
+            GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
+
+            
+        }
     }
 }

@@ -437,10 +437,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autoupdating.cs" />
+    <Compile Include="FurnitureManager.cs" />
     <Compile Include="ModUtils\CarParts\ModInstance.cs" />
     <Compile Include="ModUtils\CarParts\ModSettings.cs" />
+    <Compile Include="Objects\EditorComponents\FurnitureGenerator.cs" />
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
+    <Compile Include="Objects\Furniture\Furniture.cs" />
+    <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
     <Compile Include="Objects\LightFix.cs" />
+    <Compile Include="Objects\Furniture\SaleFurniture.cs" />
     <Compile Include="Utils\CommonFixes.cs" />
     <Compile Include="Utils\KeepAlive.cs" />
     <Compile Include="CustomSaverHandler.cs" />
