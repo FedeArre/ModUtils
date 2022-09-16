@@ -22,7 +22,7 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
-        internal bool UseBetterCopy;
+        public bool UseBetterCopy;
 
         private PartTypes Type;
         private ModInstance modInstance;
@@ -45,6 +45,11 @@ namespace SimplePartLoader
             PartInfo = partinfo;
             Renderer = renderer;
             this.modInstance = modInstance;
+
+            if(modInstance != null)
+            {
+                UseBetterCopy = modInstance.Settings.PreciseCloning;
+            }
         }
 
         [Obsolete("SetupTransparent will be removed on the future, use AddTransparent instead!")]

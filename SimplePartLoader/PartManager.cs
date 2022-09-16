@@ -353,6 +353,12 @@ namespace SimplePartLoader
                     }
                 }
 
+                if(!data.EnableMeshChange && part.GetComponent<MeshFilter>())
+                {
+                    Debug.LogError($"[ModUtils/SPL/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
+                    continue;
+                }
+                
                 // We clone to our prefab
                 SPL.CopyPartToPrefab(part, data.CopiesFrom, data.EnableMeshChange);
 
@@ -469,10 +475,13 @@ namespace SimplePartLoader
                 {
                     TransparentData tempData = new TransparentData(markedTransparent.name, null, Vector3.zero, Quaternion.identity, false);
                     tempData.MeshToUse = part.GetComponent<MeshFilter>().sharedMesh;
+                    tempData.SavePosition = markedTransparent.SavePosition;
                     tempData.Owner = part;
                     
                     GameObject transparentObject = GetTransparentReadyObject(tempData);
 
+                    transparentObject.GetComponent<transparents>().Type = markedTransparent.Type;
+                    
                     transparentObject.transform.SetParent(markedTransparent.transform.parent);
                     transparentObject.transform.localPosition = markedTransparent.transform.localPosition;
                     transparentObject.transform.localRotation = markedTransparent.transform.localRotation;

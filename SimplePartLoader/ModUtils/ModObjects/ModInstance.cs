@@ -12,6 +12,7 @@ namespace SimplePartLoader
     {
         private Mod thisMod;
         private List<Part> loadedParts;
+        private List<Furniture> loadedFurniture;
         private ModSettings settings;
 
         public List<Part> Parts
@@ -20,6 +21,12 @@ namespace SimplePartLoader
             internal set { loadedParts = value; }
         }
 
+        public List<Furniture> Furnitures
+        {
+            get { return loadedFurniture; }
+            internal set { loadedFurniture = value; }
+        }
+        
         public Mod Mod
         {
             get { return thisMod; }
@@ -39,6 +46,7 @@ namespace SimplePartLoader
         {
             thisMod = mod;
             loadedParts = new List<Part>();
+            loadedFurniture = new List<Furniture>();
             settings = new ModSettings(this);
 
             Debug.Log($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
@@ -155,7 +163,21 @@ namespace SimplePartLoader
             
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 
+            if(FurnitureManager.Furnitures.ContainsKey(furnitureGen.PrefabName))
+            {
+                Debug.Log($"[ModUtils/Furniture/Error]: {furnitureGen.PrefabName} prefab name is already on use!");
+                return null;
+            }
             
+            Furniture furn = new Furniture(prefab, furnitureGen);
+
+            furn.Mod = this;
+
+            loadedFurniture.Add(furn);
+            FurnitureManager.Furnitures.Add(furn.PrefabName, furn);
+            Debug.Log($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
+            
+            return furn;
         }
     }
 }

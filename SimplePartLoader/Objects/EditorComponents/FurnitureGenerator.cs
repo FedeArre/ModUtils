@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-internal class FurnitureGenerator : MonoBehaviour
+public class FurnitureGenerator : MonoBehaviour
 {
     [Header("Basic settings")]
     [Tooltip("Internal name that the furniture uses to identify itself internally")]

@@ -21,12 +21,11 @@ namespace SimplePartLoader
         public override string Version => "v1.1.0"; 
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "1.2-beta3";
+        string TESTING_VERSION_NUMBER = "1.2-beta5";
         
 
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
-       
         // Autoupdater
         public const string API_URL = "https://mygaragemod.xyz/api";
         GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
@@ -185,7 +184,8 @@ namespace SimplePartLoader
         {
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-
+            FurnitureManager.LoadFurniture();
+            
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -247,6 +247,7 @@ namespace SimplePartLoader
                 return;
 
             CustomSaverHandler.Save();
+            FurnitureManager.SaveFurniture();
         }
         
         // For mod utils
