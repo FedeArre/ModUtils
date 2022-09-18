@@ -172,6 +172,7 @@ namespace SimplePartLoader
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
+            part.CarProps.Fairable = true;
         }
 
 
@@ -226,6 +227,7 @@ namespace SimplePartLoader
 
             // Final details
             part.Paintable = true;
+            part.CarProps.Fairable = true;
             part.CarProps.Washable = true;
         }
 
@@ -330,6 +332,7 @@ namespace SimplePartLoader
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
+            part.CarProps.Fairable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
@@ -410,6 +413,7 @@ namespace SimplePartLoader
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
+            part.CarProps.Fairable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 

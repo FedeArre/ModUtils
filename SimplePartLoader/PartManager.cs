@@ -368,6 +368,81 @@ namespace SimplePartLoader
                     continue;
                 }
 
+                // Now we remove all specific childs / move them.
+                foreach(ChildDestroy cd in part.Prefab.GetComponentsInChildren<ChildDestroy>())
+                {
+                    foreach(Transform t in part.GetTransforms())
+                    {
+                        if (cd.StartsWith)
+                        {
+                            if (t.name.StartsWith(cd.ChildName))
+                                DestroyConsideringSetting(part, t.gameObject);
+                        }
+                        else if (cd.EndsWith)
+                        {
+                            if (t.name.EndsWith(cd.ChildName))
+                                DestroyConsideringSetting(part, t.gameObject);
+                        }
+                        else
+                        {
+                            if (t.name == cd.ChildName)
+                                DestroyConsideringSetting(part, t.gameObject);
+                        }
+                    }
+                }
+                
+                foreach (ChildMove cd in part.Prefab.GetComponentsInChildren<ChildMove>())
+                {
+                    foreach (Transform t in part.GetTransforms())
+                    {
+                        if (cd.StartsWith)
+                        {
+                            if (t.name.StartsWith(cd.ChildName))
+                            {
+                                if(cd.Move)
+                                {
+                                    t.localPosition = cd.NewPosition;
+                                }
+                                
+                                if(cd.Rotate)
+                                {
+                                    t.localEulerAngles = cd.NewRotation;
+                                }
+                            }
+                        }
+                        else if (cd.EndsWith)
+                        {
+                            if (t.name.EndsWith(cd.ChildName))
+                            {
+                                if (cd.Move)
+                                {
+                                    t.localPosition = cd.NewPosition;
+                                }
+
+                                if (cd.Rotate)
+                                {
+                                    t.localEulerAngles = cd.NewRotation;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (t.name == cd.ChildName)
+                            {
+                                if (cd.Move)
+                                {
+                                    t.localPosition = cd.NewPosition;
+                                }
+
+                                if (cd.Rotate)
+                                {
+                                    t.localEulerAngles = cd.NewRotation;
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 // Setting part name if set
                 if (!String.IsNullOrWhiteSpace(data.PartName))
                 {
@@ -500,6 +575,11 @@ namespace SimplePartLoader
                 foreach (var bn in part.Prefab.GetComponentsInChildren<MarkAsHexnut>())
                     DestroyConsideringSetting(part, bn);
                 foreach (var bn in part.Prefab.GetComponentsInChildren<MarkAsFlatnut>())
+                    DestroyConsideringSetting(part, bn);
+
+                foreach (var bn in part.Prefab.GetComponentsInChildren<ChildMove>())
+                    DestroyConsideringSetting(part, bn);
+                foreach (var bn in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                     DestroyConsideringSetting(part, bn);
             }
         }
