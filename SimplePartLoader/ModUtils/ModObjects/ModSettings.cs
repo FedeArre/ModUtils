@@ -12,6 +12,8 @@ namespace SimplePartLoader
         private bool DeveloperLog = false;
         private bool Immediate = false;
         private bool Cloning = true;
+        private bool CullShader = false;
+        private bool BetterPaint = false;
         private string[] FitsToCar;
         
         public ModInstance Mod
@@ -41,6 +43,18 @@ namespace SimplePartLoader
         {
             get { return FitsToCar; }
             set { FitsToCar = value; }   
+        }
+        
+        public bool HighPaintResolution
+        {
+            get { return BetterPaint; }
+            set { BetterPaint = value; }
+        }
+
+        public bool UseBackfaceShader
+        {
+            get { return CullShader; }
+            set { CullShader = value; }
         }
         
         internal ModSettings(ModInstance _modInstance)

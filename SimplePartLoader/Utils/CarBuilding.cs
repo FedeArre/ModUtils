@@ -54,6 +54,8 @@ namespace SimplePartLoader.Utils
             addedPart.layer = partToAdd.layer;
             addedPart.tag = partToAdd.tag;
 
+            addedPart.SetActive(partToAdd.activeSelf);
+
             addedPart.transform.localPosition = Vector3.zero;
             addedPart.transform.localRotation = Quaternion.identity;
             addedPart.transform.localScale = Vector3.one;

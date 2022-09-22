@@ -83,8 +83,9 @@ namespace SimplePartLoader
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
-            
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
+
+            PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
             AutoupdaterBundle.Unload(false);
         }
 
