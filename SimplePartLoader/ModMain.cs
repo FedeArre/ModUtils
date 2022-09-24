@@ -21,9 +21,8 @@ namespace SimplePartLoader
         public override string Version => "v1.1.0"; 
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "1.2-beta5";
+        string TESTING_VERSION_NUMBER = "1.2-beta6";
         
-
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
@@ -86,11 +85,17 @@ namespace SimplePartLoader
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
 
             PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
+            PaintingSystem.CullBaseMaterial = AutoupdaterBundle.LoadAsset<Material>("testMat");
             AutoupdaterBundle.Unload(false);
+
+            ModUtils.SetupSteamworks();
         }
 
         public override void OnMenuLoad()
         {
+            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
+            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
+
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
@@ -99,13 +104,17 @@ namespace SimplePartLoader
                 {
                     Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
+
+                // Enable heartbeat
+
+                if (!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
+                    KeepAlive.GetInstance().Ready();
+                
                 return;
             }
             Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
 
             // Check for broken ModUtils autoupdater installation
-            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
-            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
             bool brokenInstallation = false;
             
             if(!Directory.Exists(autoupdaterDirectory) || !File.Exists(autoupdaterPath))
@@ -174,11 +183,6 @@ namespace SimplePartLoader
                 Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
                 GameObject.Instantiate(UI_Error_Prefab);
             }
-
-            // Enable heartbeat
-            
-            if(!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
-                KeepAlive.GetInstance().Ready();
         }
 
         public override void OnLoad()

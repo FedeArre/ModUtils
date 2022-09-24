@@ -38,6 +38,18 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Mirror">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mirror.Authenticators">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.Authenticators.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mirror.Components">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.Components.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Newtonsoft.Json.dll</HintPath>
@@ -438,6 +450,8 @@
   <ItemGroup>
     <Compile Include="Autoupdating.cs" />
     <Compile Include="FurnitureManager.cs" />
+    <Compile Include="ModUtils\ModObjects\EACheck.cs" />
+    <Compile Include="ModUtils\ModObjects\EarlyAccessJson.cs" />
     <Compile Include="ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />

@@ -1,7 +1,9 @@
-﻿using SimplePartLoader.Utils;
+﻿using Newtonsoft.Json;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -14,6 +16,9 @@ namespace SimplePartLoader
         private List<Part> loadedParts;
         private List<Furniture> loadedFurniture;
         private ModSettings settings;
+
+        internal bool RequiresSteamCheck = false;
+        internal bool Checked = false;
 
         public List<Part> Parts
         {
@@ -178,6 +183,69 @@ namespace SimplePartLoader
             Debug.Log($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
             
             return furn;
+        }
+
+        public void EnableEarlyAccessCheck()
+        {
+            RequiresSteamCheck = true;
+        }
+
+        internal async void Check(ulong SteamID)
+        {
+            Debug.Log($"Checking for {SteamID} at mod {Mod.Name}");
+            if (!RequiresSteamCheck)
+                return;
+
+            EarlyAccessJson eaJson = new EarlyAccessJson();
+            eaJson.ModId = Mod.ID;
+            eaJson.SteamId = SteamID.ToString();
+
+            bool allowed = false;
+            
+            try
+            {
+                string json = JsonConvert.SerializeObject(eaJson);
+                
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var result = await KeepAlive.GetInstance().client.PostAsync(ModMain.API_URL + "/eacheck", content);
+                string contents = await result.Content.ReadAsStringAsync();
+
+                if (contents == "true")
+                    allowed = true;
+                
+                Checked = true;
+            }
+            catch(Exception ex)
+            {
+                Debug.LogError("[ModUtils/EACheck/Error]: An exception occured");
+                Debug.LogError(ex);
+            }
+
+            if(!allowed)
+            {
+                Debug.Log("[ModUtils/EACheck]: User is not allowed to use this mod - " + Mod.Name);
+                foreach (Part p in Parts)
+                {
+                    if (PartManager.modLoadedParts.Contains(p))
+                        PartManager.modLoadedParts.Remove(p);
+
+                    if (PartManager.dummyParts.Contains(p))
+                        PartManager.dummyParts.Remove(p);
+
+                    if (PartManager.prefabGenParts.Remove(p))
+                        PartManager.prefabGenParts.Remove(p);
+
+                    GameObject.Destroy(p.Prefab);
+                }
+
+                foreach(Furniture f in Furnitures)
+                {
+                    FurnitureManager.Furnitures.Remove(f);
+                }
+
+                Parts.Clear();
+                Furnitures.Clear();
+            }
         }
     }
 }

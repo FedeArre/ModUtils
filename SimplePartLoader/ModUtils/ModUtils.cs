@@ -15,7 +15,6 @@ namespace SimplePartLoader
         private static AudioManager AudioList;
         private static AudioSource Source;
         private static Player RewiredPlayer;
-        
         private static MainCarProperties CurrentPlayerCar;
 
         internal static List<GameObject> Cars;
@@ -29,6 +28,12 @@ namespace SimplePartLoader
             get { return RegisteredMods; }
         }
         
+        internal static void SetupSteamworks()
+        {
+            GameObject ModLoader = GameObject.Find("ModLoader");
+            ModLoader.AddComponent<EACheck>();
+        }
+
         internal static void OnLoadCalled()
         {
             Player = GameObject.Find("Player");

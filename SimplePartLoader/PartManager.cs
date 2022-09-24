@@ -64,6 +64,12 @@ namespace SimplePartLoader
                 }
             }
 
+            if(!GameObject.Find("ModLoader").GetComponent<EACheck>())
+            {
+                Debug.Log("[ModUtils/Safety]: EACheck could not be found. This is a safety check. Please report this to the developer of the mod that is causing this.");
+                return;
+            }
+
             SPL.DevLog("Starting first load check");
             // We need to check if this is the first load.
             if (!hasFirstLoadOccured)
@@ -99,6 +105,16 @@ namespace SimplePartLoader
                     {
                         Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} has a missing component.");
                         modLoadedParts.Remove(part);
+                    }
+
+                    if(part.Mod != null)
+                    {
+                        if(part.Mod.RequiresSteamCheck && !part.Mod.Checked)
+                        {
+                            Debug.Log($"[ModUtils/SPL/Safety]: Removing {part.Prefab.name}");
+                            GameObject.Destroy(part.Prefab);
+                            modLoadedParts.Remove(part);
+                        }
                     }
 
                     if (!part.Prefab.GetComponent<SPL_Part>())

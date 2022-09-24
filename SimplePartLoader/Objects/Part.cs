@@ -23,7 +23,8 @@ namespace SimplePartLoader
 
         internal bool SavingEnabled;
         public bool UseBetterCopy;
-
+        public ShaderSettings ForceShaderStatus = ShaderSettings.NONE;
+        
         private PartTypes Type;
         private ModInstance modInstance;
         
@@ -257,5 +258,12 @@ namespace SimplePartLoader
         FULL_PART = 1,
         DUMMY_PREFABGEN,
         DUMMY
+    }
+
+    public enum ShaderSettings
+    {
+        NONE = 0,
+        FORCE_BACKSIDE,
+        FORCE_DOUBLESIDED
     }
 }

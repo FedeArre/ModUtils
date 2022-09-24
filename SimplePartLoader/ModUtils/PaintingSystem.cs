@@ -14,9 +14,8 @@ namespace SimplePartLoader
         static Material PaintRustMaterial = null;
         static Material DirtMaterial = null;
         static Material BaseMaterial = null;
-        static Material CullBaseMaterial = null;
+        internal static Material CullBaseMaterial = null;
         internal static Shader BackfaceShader = null;
-
         public enum Types
         {
             FullPaintingSupport = 1,
@@ -507,14 +506,12 @@ namespace SimplePartLoader
                         if (go.name == "DoorFR06")
                         {
                             BaseMaterial = go.GetComponent<Renderer>().materials[2];
-                            CullBaseMaterial = Material.Instantiate(BaseMaterial);
-                            CullBaseMaterial.shader = BackfaceShader;
-                            CullBaseMaterial.color = new Color(0f, 0f, 0f, 1f);
                         }
                     }
                 }
             }
 
+            Debug.Log("GET DOYMAT MATERIAL: " + BaseMaterial + "  " + useBackfaceShader + " .. " + CullBaseMaterial);
             if (!BaseMaterial)
             {
                 Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
@@ -534,6 +531,7 @@ namespace SimplePartLoader
                         if (go.name == "DoorFR06")
                         {
                             ChromeMaterial = go.GetComponent<CarProperties>().ChromeMat;
+                            ChromeMaterial.shader = Shader.Find("Azerilo/Double Sided Standard");
                         }
                     }
                 }
@@ -560,7 +558,14 @@ namespace SimplePartLoader
                 bool shader = false;
                 if(p.Mod != null)
                 {
-                    shader = p.Mod.Settings.UseBackfaceShader;
+                    if(p.ForceShaderStatus != ShaderSettings.NONE)
+                    {
+                        shader = p.ForceShaderStatus == ShaderSettings.FORCE_BACKSIDE;
+                    }
+                    else
+                    {
+                        shader = p.Mod.Settings.UseBackfaceShader;
+                    }
                 }
                 matsOfPart[bodymatIndex] = GetBodymatMaterial(shader);
             }

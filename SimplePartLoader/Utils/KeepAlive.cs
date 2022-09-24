@@ -16,7 +16,7 @@ namespace SimplePartLoader
     {
         private static KeepAlive Instance;
         string serializedJson;
-        private HttpClient client = new HttpClient();
+        public HttpClient client = new HttpClient();
         
         private KeepAlive()
         {
