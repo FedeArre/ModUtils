@@ -138,6 +138,12 @@ namespace SimplePartLoader.Utils
                         newDependants[i] = new transparents.dependantObjects();
                         referenceUpdated = false;
                         
+                        if(dp == null || dp.dependant == null)
+                        {
+                            continue;
+                        }
+
+                        int savePosition = dp.dependant.GetComponent<transparents>().SavePosition;
                         foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
                             if(t2 == null)
@@ -149,7 +155,7 @@ namespace SimplePartLoader.Utils
                             {
                                 continue;
                             }
-                            if (t2.name == dp.dependant.name)
+                            if (t2.name == dp.dependant.name && t2.SavePosition == savePosition)
                             {
                                 newDependants[i].dependant = t2.gameObject;
                                 referenceUpdated = true;
@@ -165,6 +171,51 @@ namespace SimplePartLoader.Utils
                         }
                     }
                     t.DEPENDANTS = newDependants;
+                }
+
+                // Attachables
+                if (t.ATTACHABLES != null && t.ATTACHABLES.Length > 0)
+                {
+                    transparents.AttachingObjects[] newAttachables = new transparents.AttachingObjects[t.ATTACHABLES.Length];
+                    for (int i = 0; i < t.ATTACHABLES.Length; i++)
+                    {
+                        transparents.AttachingObjects dp = t.ATTACHABLES[i];
+                        newAttachables[i] = new transparents.AttachingObjects();
+                        referenceUpdated = false;
+
+                        if(dp == null || dp.Attachable == null)
+                        {
+                            continue;
+                        }
+
+                        int savePosition = dp.Attachable.GetComponent<transparents>().SavePosition;
+                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
+                        {
+                            if (t2 == null)
+                            {
+                                continue;
+                            }
+
+                            if (dp.Attachable == null)
+                            {
+                                continue;
+                            }
+                            if (t2.name == dp.Attachable.name && t2.SavePosition == savePosition)
+                            {
+                                newAttachables[i].Attachable = t2.gameObject;
+                                referenceUpdated = true;
+                                break;
+                            }
+                        }
+                        if (!referenceUpdated)
+                        {
+                            if (dp.Attachable == null)
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object (null) not found in " + p.name + ", on part " + t.name);
+                            else
+                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + dp.Attachable.name + " not found in " + p.name + ", on part " + t.name);
+                        }
+                    }
+                    t.ATTACHABLES = newAttachables;
                 }
             }
         }

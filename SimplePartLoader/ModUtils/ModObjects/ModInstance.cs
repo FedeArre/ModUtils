@@ -20,6 +20,8 @@ namespace SimplePartLoader
         internal bool RequiresSteamCheck = false;
         internal bool Checked = false;
 
+        internal bool Thumbnails = false;
+        
         public List<Part> Parts
         {
             get { return loadedParts; }
@@ -190,6 +192,12 @@ namespace SimplePartLoader
             RequiresSteamCheck = true;
         }
 
+        public void GenerateThumbnails()
+        {
+            Thumbnails = true;
+            PartManager.ThumbnailGeneratorEnabled = true;
+        }
+        
         internal async void Check(ulong SteamID)
         {
             Debug.Log($"Checking for {SteamID} at mod {Mod.Name}");

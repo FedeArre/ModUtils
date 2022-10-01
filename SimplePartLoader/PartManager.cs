@@ -38,6 +38,8 @@ namespace SimplePartLoader
         /// </summary>
         public static List<GameObject> gameParts;
 
+        internal static bool ThumbnailGeneratorEnabled = false;
+
         /// <summary>
         /// Handles the OnLoad function when called.
         /// </summary>
@@ -243,6 +245,12 @@ namespace SimplePartLoader
 
             if (!hasFirstLoadOccured)
                 hasFirstLoadOccured = true;
+
+            if(ThumbnailGeneratorEnabled)
+            {
+                GameObject PictureTake = new GameObject("ModUtils_Snapshoter");
+                PictureTake.AddComponent<ModUtils_Snapshoter>();
+            }
 
             SPL.InvokeLoadFinishedEvent();
         }

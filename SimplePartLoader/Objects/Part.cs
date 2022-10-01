@@ -27,6 +27,8 @@ namespace SimplePartLoader
         
         private PartTypes Type;
         private ModInstance modInstance;
+
+        public bool RotateThumbnail;
         
         public ModInstance Mod
         {

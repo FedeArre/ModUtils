@@ -69,6 +69,11 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Windows.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RuntimePreviewGenerator.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\RuntimePreviewGenerator.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Core" />
@@ -499,6 +504,7 @@
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="ModUtils\PaintingSystem.cs" />
+    <Compile Include="Utils\ModUtils_Snapshoter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
