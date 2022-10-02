@@ -492,8 +492,24 @@ namespace SimplePartLoader
                     switch (data.UseMaterialsFrom)
                     {
                         case PrefabGenerator.MaterialSettingTypes.DummyOriginal:
-                            part.GetComponent<Renderer>().materials = part.GetDummyOriginal().GetComponent<Renderer>().materials;
+                            Material[] dummyMats = part.GetDummyOriginal().GetComponent<Renderer>().materials;
+                            if (dummyMats.Length == part.Renderer.materials.Length)
+                                part.Renderer.materials = dummyMats;
+                            else if (dummyMats.Length < part.Renderer.materials.Length)
+                            {
+                                Material[] newMats = part.Renderer.materials;
+                                for (int i = 0; i < dummyMats.Length; i++)
+                                    newMats[i] = dummyMats[i];
+                                
+                                part.Renderer.materials = newMats;
+                            }
+                            else
+                            {
+                                Debug.Log($"[ModUtils/PaintingSystem/Error]: {part.Prefab} prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}. This is only a warning, but you should fix it.");
+                                part.Renderer.materials = dummyMats;
+                            }
                             break;
+                            
                         case PrefabGenerator.MaterialSettingTypes.PaintingSetup:
                             PaintingSystem.SetMaterialsForObject(part, 2, 0, 1);
                             part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);

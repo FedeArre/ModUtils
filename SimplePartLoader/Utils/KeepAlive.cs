@@ -45,7 +45,6 @@ namespace SimplePartLoader
 
         private async void SendCurrentStatus()
         {
-            // TODO: Test this!
             Debug.Log("[ModUtils/KeepAlive]: Sending status");
             try
             {
