@@ -45,6 +45,8 @@ namespace SimplePartLoader
 
                 Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
 
+                CheckHighResolutionPaint(part, paintableTexture);
+
                 part.CarProps.Paintable = true;
                 part.Paintable = true;
             }
