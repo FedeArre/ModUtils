@@ -281,5 +281,34 @@ namespace SimplePartLoader.Utils
                     wc.gameObject.AddComponent<MeshCollider>().convex = true;
             }
         }
+
+        public static void RemoveDisplacementFromBolts(Part p)
+        {
+            CarProperties cp = null;
+            foreach(var a in p.Prefab.GetComponentsInChildren<HexNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<WeldCut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<FlatNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<BoltNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+        }
     }
 }

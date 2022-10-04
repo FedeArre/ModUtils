@@ -19,6 +19,8 @@ namespace SimplePartLoader
 
         internal bool RequiresSteamCheck = false;
         internal bool Checked = false;
+        
+        internal bool CheckedAndAllowed = false;
 
         internal bool Thumbnails = false;
         
@@ -47,6 +49,11 @@ namespace SimplePartLoader
         public string Name
         {
             get { return Mod.Name;  }
+        }
+
+        public bool CheckAllow
+        {
+            get { return CheckedAndAllowed; }
         }
         
         internal ModInstance(Mod mod)
@@ -220,7 +227,8 @@ namespace SimplePartLoader
 
                 if (contents == "true")
                     allowed = true;
-                
+
+                CheckedAndAllowed = allowed;
                 Checked = true;
             }
             catch(Exception ex)

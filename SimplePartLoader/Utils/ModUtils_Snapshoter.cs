@@ -41,11 +41,6 @@ namespace SimplePartLoader.Utils
                         instanciated.GetComponent<P3dPaintableTexture>().Activate();
                     }
 
-                    if(instanciated.GetComponent<CarProperties>().Interior)
-                    {
-                        instanciated.GetComponent<Renderer>().material = matParent.GetComponent<CarMaterials>().Interior1;
-                    }
-                    
                     foreach (var a in instanciated.GetComponentsInChildren<HexNut>())
                     {
                         GameObject.DestroyImmediate(a.gameObject);

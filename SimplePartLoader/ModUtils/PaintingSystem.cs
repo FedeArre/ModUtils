@@ -25,6 +25,13 @@ namespace SimplePartLoader
             OnlyPaintAndDirt
         }
 
+        public enum PartPaintResolution
+        {
+            Low = 1,
+            Medium = 2,
+            High = 3
+        }
+        
         internal static void EnablePaintOnly(Part part, int materialIndex)
         {
             GameObject Prefab = part.Prefab;
@@ -93,8 +100,7 @@ namespace SimplePartLoader
 
                 counter_colorMap.PaintableTexture = paintableTexture_colorMap;
                 counter_colorMap.Threshold = 0.1f;
-                counter_colorMap.enabled = false;
-                counter_colorMap.DownsampleSteps = 5;                
+                counter_colorMap.enabled = false;          
 
                 CheckHighResolutionPaint(part, paintableTexture_colorMap);
                 
@@ -169,12 +175,10 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-            counter_rust.DownsampleSteps = 5;
             
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-            counter_colorMap.DownsampleSteps = 5;
             
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
             
@@ -235,7 +239,6 @@ namespace SimplePartLoader
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
-            counter_dirt.DownsampleSteps = 5;
             
             // Final details
             part.CarProps.Washable = true;
@@ -319,7 +322,7 @@ namespace SimplePartLoader
 
             paintableTexture_rust.Slot = p3dSlot_rustDirt;
             paintableTexture_rust.Group = 100;
-
+            
             paintableTexture_dirt.Slot = p3dSlot_dirt;
             paintableTexture_dirt.Group = 5;
 
@@ -328,18 +331,15 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-            counter_rust.DownsampleSteps = 5;
             
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-            counter_colorMap.DownsampleSteps = 5;
             
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
-            counter_dirt.DownsampleSteps = 5;
 
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
             
@@ -438,10 +438,20 @@ namespace SimplePartLoader
         {
             if(p.Mod != null)
             {
-                if(p.Mod.Settings.HighPaintResolution)
+                switch(p.Mod.Settings.PaintResolution)
                 {
-                    texture.Width = 1024;
-                    texture.Height = 1024;
+                    case PartPaintResolution.High:
+                        texture.Width = 2048;
+                        texture.Height = 2048;
+                        break;
+                    case PartPaintResolution.Medium:
+                        texture.Width = 1024;
+                        texture.Height = 1024;
+                        break;
+                    case PartPaintResolution.Low:
+                        texture.Width = 512;
+                        texture.Height = 512;
+                        break;
                 }
             }
         }

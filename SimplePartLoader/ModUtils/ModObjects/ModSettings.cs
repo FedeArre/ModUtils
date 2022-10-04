@@ -13,7 +13,7 @@ namespace SimplePartLoader
         private bool Immediate = false;
         private bool Cloning = true;
         private bool CullShader = false;
-        private bool BetterPaint = false;
+        private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
         
         public ModInstance Mod
@@ -45,10 +45,10 @@ namespace SimplePartLoader
             set { FitsToCar = value; }   
         }
         
-        public bool HighPaintResolution
+        public PaintingSystem.PartPaintResolution PaintResolution
         {
-            get { return BetterPaint; }
-            set { BetterPaint = value; }
+            get { return PaintRes; }
+            set { PaintRes = value; }
         }
 
         public bool UseBackfaceShader
