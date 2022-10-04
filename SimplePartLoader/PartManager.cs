@@ -582,6 +582,23 @@ namespace SimplePartLoader
                             foreach (MarkAsBoltnut mbn in part.Prefab.GetComponentsInChildren<MarkAsBoltnut>())
                                 Functions.ConvertToBoltNut(mbn.gameObject);
 
+                            // Also, we make the part actually use bolts
+                            part.Prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
+                            part.Prefab.tag = "Untagged";
+                            
+                            Pickup prefabPickup = part.Prefab.AddComponent<Pickup>();
+                            prefabPickup.canHold = true;
+                            prefabPickup.tempParent = GameObject.Find("hand");
+                            prefabPickup.SphereCOl = GameObject.Find("SphereCollider");
+
+                            if (part.Prefab.GetComponent<PickupHand>())
+                                DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupHand>());
+
+                            if (part.Prefab.GetComponent<PickupWindow>())
+                                DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupWindow>());
+                            
+                            if (part.Prefab.GetComponent<RemoveWindow>())
+                                DestroyConsideringSetting(part, part.Prefab.GetComponent<RemoveWindow>());
                             break;
                         }
                 }
