@@ -21,7 +21,7 @@ namespace SimplePartLoader
         public override string Version => "v1.1.0"; 
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "1.2-rc1";
+        string TESTING_VERSION_NUMBER = "1.2-rc3";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 

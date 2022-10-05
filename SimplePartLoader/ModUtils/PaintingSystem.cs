@@ -290,6 +290,14 @@ namespace SimplePartLoader
                 return;
             }
 
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if(orMesh)
+            {
+                meshToUse = orMesh.Mesh;
+            }
+
             // Now we create our painting components.
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
             P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
@@ -331,15 +339,18 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
+            counter_rust.MaskMesh = meshToUse;
             
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-            
+            counter_colorMap.MaskMesh = meshToUse;
+
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
+            counter_dirt.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
             

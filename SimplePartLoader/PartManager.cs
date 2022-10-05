@@ -40,6 +40,9 @@ namespace SimplePartLoader
 
         internal static bool ThumbnailGeneratorEnabled = false;
 
+        internal static List<string> CarCategoriesToAdd = new List<string>();
+        
+        internal static List<string> EngineCategoriesToAdd = new List<string>();
         /// <summary>
         /// Handles the OnLoad function when called.
         /// </summary>
@@ -250,6 +253,26 @@ namespace SimplePartLoader
             {
                 GameObject PictureTake = new GameObject("ModUtils_Snapshoter");
                 PictureTake.AddComponent<ModUtils_Snapshoter>();
+            }
+
+            // Load custom categories
+            if(CarCategoriesToAdd.Count != 0 || EngineCategoriesToAdd.Count != 0)
+            {
+                CatalogueManager catalog = Resources.FindObjectsOfTypeAll<CatalogueManager>().First();
+                
+                foreach (string s in CarCategoriesToAdd)
+                {
+                    TMPro.TMP_Dropdown.OptionData newItem = new TMPro.TMP_Dropdown.OptionData();
+                    newItem.text = s;
+                    catalog.CarDropdown.options.Add(newItem);
+                }
+
+                foreach (string s in EngineCategoriesToAdd)
+                {
+                    TMPro.TMP_Dropdown.OptionData newItem = new TMPro.TMP_Dropdown.OptionData();
+                    newItem.text = s;
+                    catalog.EngineDropdown.options.Add(newItem);
+                }
             }
 
             SPL.InvokeLoadFinishedEvent();
@@ -546,6 +569,7 @@ namespace SimplePartLoader
                         part.UseHandAttachment();
                         break;
 
+                    case PrefabGenerator.AttachmentTypes.ForceUseMarkedBolts:
                     case PrefabGenerator.AttachmentTypes.UseMarkedBolts:
                         {
                             // We first remove all the FlatNut / HexNut / BoltNut on our part.
@@ -583,22 +607,35 @@ namespace SimplePartLoader
                                 Functions.ConvertToBoltNut(mbn.gameObject);
 
                             // Also, we make the part actually use bolts
-                            part.Prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
-                            part.Prefab.tag = "Untagged";
-                            
-                            Pickup prefabPickup = part.Prefab.AddComponent<Pickup>();
-                            prefabPickup.canHold = true;
-                            prefabPickup.tempParent = GameObject.Find("hand");
-                            prefabPickup.SphereCOl = GameObject.Find("SphereCollider");
+                            if(data.AttachmentType == PrefabGenerator.AttachmentTypes.ForceUseMarkedBolts)
+                            {
+                                part.Prefab.layer = LayerMask.NameToLayer("Ignore Raycast");
+                                part.Prefab.tag = "Untagged";
 
-                            if (part.Prefab.GetComponent<PickupHand>())
-                                DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupHand>());
+                                Pickup prefabPickup = part.Prefab.AddComponent<Pickup>();
+                                prefabPickup.canHold = true;
+                                prefabPickup.tempParent = GameObject.Find("hand");
+                                prefabPickup.SphereCOl = GameObject.Find("SphereCollider");
 
-                            if (part.Prefab.GetComponent<PickupWindow>())
-                                DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupWindow>());
+                                if (part.Prefab.GetComponent<PickupHand>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupHand>());
+
+                                if (part.Prefab.GetComponent<PickupWindow>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupWindow>());
+
+                                if (part.Prefab.GetComponent<RemoveWindow>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<RemoveWindow>());
+
+                                if (part.Prefab.GetComponent<PickupDoor>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupDoor>());
+
+                                if (part.Prefab.GetComponent<PickupSpring>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<PickupSpring>());
+                                
+                                if (part.Prefab.GetComponent<OpenDoor>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<OpenDoor>());
+                            }
                             
-                            if (part.Prefab.GetComponent<RemoveWindow>())
-                                DestroyConsideringSetting(part, part.Prefab.GetComponent<RemoveWindow>());
                             break;
                         }
                 }

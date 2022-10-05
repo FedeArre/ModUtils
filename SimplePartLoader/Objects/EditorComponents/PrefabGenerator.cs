@@ -44,7 +44,8 @@ public class PrefabGenerator : MonoBehaviour
         Default,
         Prytool,
         Hand,
-        UseMarkedBolts
+        UseMarkedBolts,
+        ForceUseMarkedBolts
     }
 
     public enum MaterialSettingTypes

@@ -207,5 +207,17 @@ namespace SimplePartLoader
             RegisteredMods.Add(modInstance);
             return modInstance;
         }
+
+        public static void RegisterEngineCategory(string name)
+        {
+            if (!PartManager.EngineCategoriesToAdd.Contains(name))
+                PartManager.EngineCategoriesToAdd.Add(name);
+        }
+
+        public static void RegisterCarCategory(string name)
+        {
+            if (!PartManager.CarCategoriesToAdd.Contains(name))
+                PartManager.CarCategoriesToAdd.Add(name);
+        }
     }
 }

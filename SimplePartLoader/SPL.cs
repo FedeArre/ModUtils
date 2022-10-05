@@ -277,6 +277,11 @@ namespace SimplePartLoader
                 {
                     p.PartInfo.FitsToCar = p.Mod.Settings.AutomaticFitsToCar;
                 }
+                
+                if (p.Mod.Settings.AutomaticFitsToEngine != null)
+                {
+                    p.PartInfo.FitsToEngine = p.Mod.Settings.AutomaticFitsToEngine;
+                }
             }
             
             p.OriginalGameobject = carPart;

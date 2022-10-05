@@ -15,6 +15,7 @@ namespace SimplePartLoader
         private bool CullShader = false;
         private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
+        private string[] FitsToEngine;
         
         public ModInstance Mod
         {
@@ -44,7 +45,12 @@ namespace SimplePartLoader
             get { return FitsToCar; }
             set { FitsToCar = value; }   
         }
-        
+        public string[] AutomaticFitsToEngine
+        {
+            get { return FitsToEngine; }
+            set { FitsToEngine = value; }
+        }
+
         public PaintingSystem.PartPaintResolution PaintResolution
         {
             get { return PaintRes; }

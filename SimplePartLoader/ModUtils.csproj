@@ -463,6 +463,7 @@
     <Compile Include="Objects\EditorComponents\ChildMove.cs" />
     <Compile Include="Objects\EditorComponents\FurnitureGenerator.cs" />
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
+    <Compile Include="Objects\EditorComponents\OriginalMesh.cs" />
     <Compile Include="Objects\Furniture\Furniture.cs" />
     <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
     <Compile Include="Objects\Furniture\Saving\FurnitureData.cs" />

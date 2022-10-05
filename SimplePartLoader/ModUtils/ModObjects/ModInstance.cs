@@ -123,6 +123,11 @@ namespace SimplePartLoader
                     part.PartInfo.FitsToCar = part.Mod.Settings.AutomaticFitsToCar;
                 }
 
+                if (part.Mod.Settings.AutomaticFitsToEngine != null)
+                {
+                    part.PartInfo.FitsToEngine = part.Mod.Settings.AutomaticFitsToEngine;
+                }
+                
                 Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
