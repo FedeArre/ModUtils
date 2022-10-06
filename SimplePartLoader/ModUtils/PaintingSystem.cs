@@ -31,7 +31,7 @@ namespace SimplePartLoader
             Medium = 2,
             High = 3
         }
-        
+
         internal static void EnablePaintOnly(Part part, int materialIndex)
         {
             GameObject Prefab = part.Prefab;
@@ -534,7 +534,6 @@ namespace SimplePartLoader
                 }
             }
 
-            Debug.Log("GET DOYMAT MATERIAL: " + BaseMaterial + "  " + useBackfaceShader + " .. " + CullBaseMaterial);
             if (!BaseMaterial)
             {
                 Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
