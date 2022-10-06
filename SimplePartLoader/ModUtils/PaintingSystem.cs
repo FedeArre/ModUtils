@@ -47,6 +47,7 @@ namespace SimplePartLoader
                 Prefab.AddComponent<P3dPaintable>();
 
                 P3dPaintableTexture paintableTexture = Prefab.AddComponent<P3dPaintableTexture>();
+                paintableTexture.Color = Color.gray;
                 paintableTexture.Slot = new P3dSlot(materialIndex, "_MainTex");
                 paintableTexture.UpdateMaterial();
 
