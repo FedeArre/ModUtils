@@ -36,8 +36,12 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToHexnut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+            
             bolt.AddComponent<DISABLER>();
+            
             HexNut hx = bolt.AddComponent<HexNut>();
             MarkAsHexnut mhx = bolt.GetComponent<MarkAsHexnut>();
             bolt.layer = LayerMask.NameToLayer("Bolts");
@@ -57,7 +61,10 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToFlatNut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+
             bolt.AddComponent<DISABLER>();
             bolt.AddComponent<FlatNut>().tight = true;
 
@@ -75,7 +82,10 @@ namespace SimplePartLoader.Utils
         /// <param name="bolt">The GameObject to be converted</param>
         public static void ConvertToBoltNut(GameObject bolt)
         {
-            bolt.AddComponent<CarProperties>();
+            CarProperties cp = bolt.AddComponent<CarProperties>();
+            cp.Attached = true;
+            cp.DMGdisplacepart = true;
+
             bolt.AddComponent<DISABLER>();
             BoltNut bn = bolt.AddComponent<BoltNut>();
             MarkAsBoltnut mbn = bolt.GetComponent<MarkAsBoltnut>();
@@ -206,6 +216,98 @@ namespace SimplePartLoader.Utils
             foreach (var finfo in finfos)
             {
                 finfo.SetValue(comp, finfo.GetValue(other));
+            }
+        }
+
+        public static void BoltingSetup(GameObject prefab)
+        {
+            foreach (HexNut hx in prefab.GetComponentsInChildren<HexNut>())
+            {
+                CarProperties cp = hx.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
+                hx.gameObject.AddComponent<DISABLER>();
+
+                hx.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                hx.tight = true;
+
+                if (!hx.GetComponent<BoxCollider>())
+                    hx.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (BoltNut bn in prefab.GetComponentsInChildren<BoltNut>())
+            {
+                CarProperties cp = bn.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
+                bn.gameObject.AddComponent<DISABLER>();
+
+                bn.gameObject.layer = LayerMask.NameToLayer("Bolts");
+                bn.tight = true;
+
+                if (!bn.GetComponent<BoxCollider>())
+                    bn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (FlatNut fn in prefab.GetComponentsInChildren<FlatNut>())
+            {
+                CarProperties cp = fn.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+                
+                fn.gameObject.AddComponent<DISABLER>();
+
+                fn.gameObject.layer = LayerMask.NameToLayer("FlatBolts");
+                fn.tight = true;
+
+                if (!fn.GetComponent<BoxCollider>())
+                    fn.gameObject.AddComponent<BoxCollider>();
+            }
+
+            foreach (WeldCut wc in prefab.GetComponentsInChildren<WeldCut>())
+            {
+                CarProperties cp = wc.gameObject.AddComponent<CarProperties>();
+                cp.Attached = true;
+                cp.DMGdisplacepart = true;
+
+                wc.gameObject.AddComponent<DISABLER>();
+
+                wc.gameObject.layer = LayerMask.NameToLayer("Weld");
+                wc.welded = true;
+
+                if (!wc.GetComponent<MeshCollider>())
+                    wc.gameObject.AddComponent<MeshCollider>().convex = true;
+            }
+        }
+
+        public static void RemoveDisplacementFromBolts(Part p)
+        {
+            CarProperties cp = null;
+            foreach(var a in p.Prefab.GetComponentsInChildren<HexNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<WeldCut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<FlatNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
+            }
+            foreach (var a in p.Prefab.GetComponentsInChildren<BoltNut>())
+            {
+                cp = a.GetComponent<CarProperties>();
+                if (cp)
+                    cp.DMGdisplacepart = false;
             }
         }
     }

@@ -18,11 +18,13 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.0.0"; bool TESTING_VERSION_REMEMBER = true;
-
+        public override string Version => "v1.2.0"; 
+        
+        bool TESTING_VERSION_REMEMBER = false;
+        string TESTING_VERSION_NUMBER = "1.2-rc3";
+        
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
-       
         // Autoupdater
         public const string API_URL = "https://mygaragemod.xyz/api";
         GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
@@ -46,7 +48,7 @@ namespace SimplePartLoader
             Debug.Log("ModUtils is loading - Version: " + Version);
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
-                Debug.Log("This is a testing version - remember to report bugs and send feedback");
+                Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -80,13 +82,20 @@ namespace SimplePartLoader
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
-            
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
+
+            PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
+            PaintingSystem.CullBaseMaterial = AutoupdaterBundle.LoadAsset<Material>("testMat");
             AutoupdaterBundle.Unload(false);
+
+            ModUtils.SetupSteamworks();
         }
 
         public override void OnMenuLoad()
         {
+            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
+            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
+
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
@@ -95,13 +104,17 @@ namespace SimplePartLoader
                 {
                     Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
+
+                // Enable heartbeat
+
+                if (!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
+                    KeepAlive.GetInstance().Ready();
+                
                 return;
             }
             Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
 
             // Check for broken ModUtils autoupdater installation
-            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
-            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
             bool brokenInstallation = false;
             
             if(!Directory.Exists(autoupdaterDirectory) || !File.Exists(autoupdaterPath))
@@ -170,17 +183,14 @@ namespace SimplePartLoader
                 Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
                 GameObject.Instantiate(UI_Error_Prefab);
             }
-
-            // Enable heartbeat
-            KeepAlive.GetInstance().Ready();
-
         }
 
         public override void OnLoad()
         {
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-
+            FurnitureManager.LoadFurniture();
+            
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -242,6 +252,7 @@ namespace SimplePartLoader
                 return;
 
             CustomSaverHandler.Save();
+            FurnitureManager.SaveFurniture();
         }
         
         // For mod utils

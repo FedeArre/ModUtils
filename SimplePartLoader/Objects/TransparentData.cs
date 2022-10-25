@@ -15,6 +15,13 @@ namespace SimplePartLoader
         public transparents.dependantObjects[] DependantObjects;
         public int SavePosition;
         public Mesh MeshToUse;
+
+        private Part createdBy;
+        public Part Owner
+        {
+            get { return createdBy; }
+            internal set { createdBy = value; }
+        }
         
         public TransparentData(string name, string attachesTo, Vector3 localPos, Quaternion localRot, bool testingModeEnable)
         {

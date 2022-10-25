@@ -38,13 +38,14 @@ public class PrefabGenerator : MonoBehaviour
     public AttachmentTypes AttachmentType = AttachmentTypes.Default;
     [Tooltip("Enables part to get chromed")]
     public bool EnableChromed = false;
-    
+
     public enum AttachmentTypes
     {
         Default,
         Prytool,
         Hand,
-        UseMarkedBolts
+        UseMarkedBolts,
+        ForceUseMarkedBolts
     }
 
     public enum MaterialSettingTypes

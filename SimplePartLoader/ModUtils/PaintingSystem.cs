@@ -14,7 +14,8 @@ namespace SimplePartLoader
         static Material PaintRustMaterial = null;
         static Material DirtMaterial = null;
         static Material BaseMaterial = null;
-        
+        internal static Material CullBaseMaterial = null;
+        internal static Shader BackfaceShader = null;
         public enum Types
         {
             FullPaintingSupport = 1,
@@ -22,6 +23,13 @@ namespace SimplePartLoader
             OnlyPaintAndRust,
             OnlyDirt,
             OnlyPaintAndDirt
+        }
+
+        public enum PartPaintResolution
+        {
+            Low = 1,
+            Medium = 2,
+            High = 3
         }
 
         internal static void EnablePaintOnly(Part part, int materialIndex)
@@ -39,10 +47,13 @@ namespace SimplePartLoader
                 Prefab.AddComponent<P3dPaintable>();
 
                 P3dPaintableTexture paintableTexture = Prefab.AddComponent<P3dPaintableTexture>();
+                paintableTexture.Color = Color.gray;
                 paintableTexture.Slot = new P3dSlot(materialIndex, "_MainTex");
                 paintableTexture.UpdateMaterial();
 
                 Prefab.AddComponent<P3dMaterialCloner>().Index = materialIndex;
+
+                CheckHighResolutionPaint(part, paintableTexture);
 
                 part.CarProps.Paintable = true;
                 part.Paintable = true;
@@ -77,7 +88,7 @@ namespace SimplePartLoader
                 P3dPaintableTexture paintableTexture_colorMap = Prefab.AddComponent<P3dPaintableTexture>();
 
                 P3dChangeCounter counter_colorMap = Prefab.AddComponent<P3dChangeCounter>();
-
+                
                 P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
 
                 // Setting up the components
@@ -90,8 +101,10 @@ namespace SimplePartLoader
 
                 counter_colorMap.PaintableTexture = paintableTexture_colorMap;
                 counter_colorMap.Threshold = 0.1f;
-                counter_colorMap.enabled = false;
+                counter_colorMap.enabled = false;          
 
+                CheckHighResolutionPaint(part, paintableTexture_colorMap);
+                
                 // Final details
                 part.Paintable = true;
                 part.CarProps.Paintable = true;
@@ -163,15 +176,18 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-
+            
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-
+            
+            CheckHighResolutionPaint(part, paintableTexture_colorMap);
+            
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
+            part.CarProps.Fairable = true;
         }
 
 
@@ -223,9 +239,9 @@ namespace SimplePartLoader
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
-
+            counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
+            
             // Final details
-            part.Paintable = true;
             part.CarProps.Washable = true;
         }
 
@@ -275,6 +291,14 @@ namespace SimplePartLoader
                 return;
             }
 
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if(orMesh)
+            {
+                meshToUse = orMesh.Mesh;
+            }
+
             // Now we create our painting components.
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
             P3dMaterialCloner materialCloner_paint = Prefab.AddComponent<P3dMaterialCloner>();
@@ -301,13 +325,13 @@ namespace SimplePartLoader
 
             // Paintable textures
             paintableTexture_colorMap.Slot = p3dSlot_colorMap;
-
+            
             paintableTexture_grungeMap.Slot = p3dSlot_grungeMap;
             paintableTexture_grungeMap.Group = 100;
 
             paintableTexture_rust.Slot = p3dSlot_rustDirt;
             paintableTexture_rust.Group = 100;
-
+            
             paintableTexture_dirt.Slot = p3dSlot_dirt;
             paintableTexture_dirt.Group = 5;
 
@@ -316,20 +340,26 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-
+            counter_rust.MaskMesh = meshToUse;
+            
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
+            counter_colorMap.MaskMesh = meshToUse;
 
             counter_dirt.PaintableTexture = paintableTexture_dirt;
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
+            counter_dirt.MaskMesh = meshToUse;
+
+            CheckHighResolutionPaint(part, paintableTexture_colorMap);
             
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
+            part.CarProps.Fairable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
         }
 
@@ -405,12 +435,37 @@ namespace SimplePartLoader
 
             paintableTexture_dirt.Slot = p3dSlot_dirt;
             paintableTexture_dirt.Group = 5;
+            
+            CheckHighResolutionPaint(part, paintableTexture_colorMap);
 
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
             part.CarProps.Washable = true;
+            part.CarProps.Fairable = true;
             part.CarProps.DMGdeformMesh = true; // NOTE! As a side effect this will enable mesh deform on crashes.
+        }
+
+        public static void CheckHighResolutionPaint(Part p, P3dPaintableTexture texture)
+        {
+            if(p.Mod != null)
+            {
+                switch(p.Mod.Settings.PaintResolution)
+                {
+                    case PartPaintResolution.High:
+                        texture.Width = 2048;
+                        texture.Height = 2048;
+                        break;
+                    case PartPaintResolution.Medium:
+                        texture.Width = 1024;
+                        texture.Height = 1024;
+                        break;
+                    case PartPaintResolution.Low:
+                        texture.Width = 512;
+                        texture.Height = 512;
+                        break;
+                }
+            }
         }
 
         public static Material GetDirtMaterial()
@@ -461,6 +516,11 @@ namespace SimplePartLoader
 
         public static Material GetBodymatMaterial()
         {
+            return GetBodymatMaterial(false);
+        }
+        
+        public static Material GetBodymatMaterial(bool useBackfaceShader = false)
+        {
             if (!BaseMaterial)
             {
                 foreach (GameObject go in PartManager.gameParts)
@@ -479,7 +539,8 @@ namespace SimplePartLoader
             {
                 Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
             }
-            return BaseMaterial;
+            
+            return useBackfaceShader ? CullBaseMaterial : BaseMaterial;
         }
 
         public static Material GetChromeMaterial()
@@ -493,6 +554,7 @@ namespace SimplePartLoader
                         if (go.name == "DoorFR06")
                         {
                             ChromeMaterial = go.GetComponent<CarProperties>().ChromeMat;
+                            ChromeMaterial.shader = Shader.Find("Azerilo/Double Sided Standard");
                         }
                     }
                 }
@@ -507,24 +569,51 @@ namespace SimplePartLoader
         
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)
         {
-            Material[] matsOfPart = p.GetComponent<Renderer>().materials;
+            Material[] matsOfPart = p.Renderer.materials;
 
             if (bodymatIndex != -1)
             {
-                matsOfPart[bodymatIndex] = GetBodymatMaterial();
+                if (matsOfPart.Length <= bodymatIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
+                bool shader = false;
+                if(p.Mod != null)
+                {
+                    if(p.ForceShaderStatus != ShaderSettings.NONE)
+                    {
+                        shader = p.ForceShaderStatus == ShaderSettings.FORCE_BACKSIDE;
+                    }
+                    else
+                    {
+                        shader = p.Mod.Settings.UseBackfaceShader;
+                    }
+                }
+                matsOfPart[bodymatIndex] = GetBodymatMaterial(shader);
             }
 
             if (paintRustIndex != -1)
             {
+                if (matsOfPart.Length <= paintRustIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
                 matsOfPart[paintRustIndex] = GetPaintRustMaterial();
             }
 
             if (dirtIndex != -1)
             {
+                if (matsOfPart.Length <= dirtIndex)
+                {
+                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    return;
+                }
                 matsOfPart[dirtIndex] = GetDirtMaterial();
             }
 
-            p.GetComponent<Renderer>().materials = matsOfPart;
+            p.Renderer.materials = matsOfPart;
         }
     }
 }

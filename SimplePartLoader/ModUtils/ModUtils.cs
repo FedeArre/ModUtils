@@ -15,13 +15,24 @@ namespace SimplePartLoader
         private static AudioManager AudioList;
         private static AudioSource Source;
         private static Player RewiredPlayer;
-        
         private static MainCarProperties CurrentPlayerCar;
 
         internal static List<GameObject> Cars;
 
         public delegate void OnPlayerCarChangeDelegate();
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
+
+        internal static List<ModInstance> RegisteredMods = new List<ModInstance>();
+        public static List<ModInstance> ModInstances
+        {
+            get { return RegisteredMods; }
+        }
+        
+        internal static void SetupSteamworks()
+        {
+            GameObject ModLoader = GameObject.Find("ModLoader");
+            ModLoader.AddComponent<EACheck>();
+        }
 
         internal static void OnLoadCalled()
         {
@@ -178,6 +189,35 @@ namespace SimplePartLoader
         public static Vector3 ShiftCoords(Vector3 coordsToShift)
         {
             return coordsToShift + PlayerTools.saver.transform.root.position;
+        }
+
+        // Car parts update
+        public static ModInstance RegisterMod(Mod mod)
+        {
+            foreach(ModInstance mi in RegisteredMods)
+            {
+                if(mod.ID == mi.Mod.ID)
+                {
+                    Debug.LogError($"[ModUtils/ModRegister/Error]: Tried to register mod {mod.ID} but it is already registered!");
+                    return null;
+                }
+            }
+
+            ModInstance modInstance = new ModInstance(mod);
+            RegisteredMods.Add(modInstance);
+            return modInstance;
+        }
+
+        public static void RegisterEngineCategory(string name)
+        {
+            if (!PartManager.EngineCategoriesToAdd.Contains(name))
+                PartManager.EngineCategoriesToAdd.Add(name);
+        }
+
+        public static void RegisterCarCategory(string name)
+        {
+            if (!PartManager.CarCategoriesToAdd.Contains(name))
+                PartManager.CarCategoriesToAdd.Add(name);
         }
     }
 }

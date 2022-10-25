@@ -41,6 +41,7 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid, if the prefab already exists or if essential components are missing</exception>
         /// <returns></returns>
+        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadPart(AssetBundle bundle, string prefabName)
         {
             // Safety checks
@@ -125,7 +126,7 @@ namespace SimplePartLoader
                     wc.gameObject.AddComponent<MeshCollider>().convex = true;
             }
 
-            Part p = new Part(prefab, prefabCarProp, prefabPartInfo, prefab.GetComponent<Renderer>());
+            Part p = new Part(prefab, prefabCarProp, prefabPartInfo, prefab.GetComponent<Renderer>(), null);
             PartManager.modLoadedParts.Add(p);
 
             Saver.modParts.Add(p.CarProps.PrefabName, prefab);
@@ -142,6 +143,7 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns>The Part instance</returns>
+        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
             return LoadDummy(bundle, prefabName, false);
@@ -155,6 +157,7 @@ namespace SimplePartLoader
         /// <param name="betterCopy">Enables a more precise cloning method</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns>The Part instance</returns>
+        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = true)
         {
             // Safety checks
@@ -171,7 +174,7 @@ namespace SimplePartLoader
             if (!prefab)
                 SplError($"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
-            Part p = new Part(prefab, null, null, null);
+            Part p = new Part(prefab, null, null, null, null);
             
             p.UseBetterCopy = betterCopy;
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
@@ -212,6 +215,12 @@ namespace SimplePartLoader
                 Debug.LogError("[ModUtils/SPL/Error]: Tried to do full copy into empty part");
                 return;
             }
+            
+            if(p.Prefab.GetComponents<Component>() == null)
+            {
+                Debug.Log("[ModUtils/SPL/Error]: The part that was going to be copied had a null component. Part: " + p.Name);
+                return;
+            }
 
             // We first delete all the components from our part.
             foreach (Component comp in p.Prefab.GetComponents<Component>())
@@ -246,10 +255,10 @@ namespace SimplePartLoader
 
                     p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, p.UseBetterCopy);
                     
-                    DevLog($"Now copying component to base object ({comp})");
+                    DevLog(p, $"Now copying component to base object ({comp})");
                 }
             }
-
+            
             if (!doNotCopyChilds)
                 AttachPrefabChilds(p.Prefab, carPart, p.UseBetterCopy); // Call the recursive function that copies all the child hierarchy.
 
@@ -257,12 +266,24 @@ namespace SimplePartLoader
             p.CarProps = p.Prefab.GetComponent<CarProperties>();
             p.PartInfo = p.Prefab.GetComponent<Partinfo>();
             p.Renderer = p.Prefab.GetComponent<Renderer>();
-            
+
             p.CarProps.PREFAB = p.Prefab;
             p.CarProps.PrefabName = p.Name;
 
             p.PartInfo.RenamedPrefab = String.IsNullOrEmpty(carPart.GetComponent<Partinfo>().RenamedPrefab) ? carPart.transform.name : carPart.GetComponent<Partinfo>().RenamedPrefab; // Fixes transparents breaking after reloading
-
+            if(p.Mod != null)
+            {
+                if(p.Mod.Settings.AutomaticFitsToCar != null)
+                {
+                    p.PartInfo.FitsToCar = p.Mod.Settings.AutomaticFitsToCar;
+                }
+                
+                if (p.Mod.Settings.AutomaticFitsToEngine != null)
+                {
+                    p.PartInfo.FitsToEngine = p.Mod.Settings.AutomaticFitsToEngine;
+                }
+            }
+            
             p.OriginalGameobject = carPart;
 
             Debug.LogError($"[ModUtils/SPL]: {p.Name} was succesfully loaded");
@@ -446,6 +467,17 @@ namespace SimplePartLoader
         {
             if (DEVELOPER_LOG)
                 Debug.Log("[ModUtils/Dev/SPL]: " + str);
+        }
+
+        internal static void DevLog(Part p, string str)
+        {
+            if(p.Mod != null)
+            {
+                if(p.Mod.Settings.EnableDeveloperLog)
+                {
+                    Debug.Log($"[ModUtils/Dev/SPL]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
+                }
+            }
         }
 
         /// <summary>

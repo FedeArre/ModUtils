@@ -22,14 +22,37 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
-        internal bool UseBetterCopy;
+        public bool UseBetterCopy;
+        public ShaderSettings ForceShaderStatus = ShaderSettings.NONE;
         
-        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, Renderer renderer)
+        private PartTypes Type;
+        private ModInstance modInstance;
+
+        public bool RotateThumbnail;
+        
+        public ModInstance Mod
+        {
+            get { return modInstance; }
+        }
+        
+        public PartTypes PartType
+        {
+            get { return Type; }
+            internal set { Type = value; }
+        }
+
+        public Part(GameObject prefab, CarProperties carProp, Partinfo partinfo, Renderer renderer, ModInstance modInstance)
         {
             Prefab = prefab;
             CarProps = carProp;
             PartInfo = partinfo;
             Renderer = renderer;
+            this.modInstance = modInstance;
+
+            if(modInstance != null)
+            {
+                UseBetterCopy = modInstance.Settings.PreciseCloning;
+            }
         }
 
         [Obsolete("SetupTransparent will be removed on the future, use AddTransparent instead!")]
@@ -41,7 +64,8 @@ namespace SimplePartLoader
             {
                 td.MeshToUse = mf.mesh;
             }
-            
+
+            td.Owner = this;
             PartManager.transparentData.Add(td);
         }
 
@@ -54,7 +78,8 @@ namespace SimplePartLoader
             {
                 td.MeshToUse = mf.mesh;
             }
-            
+
+            td.Owner = this;
             PartManager.transparentData.Add(td);
         }
         
@@ -77,6 +102,7 @@ namespace SimplePartLoader
                 td.MeshToUse = mf.mesh;
             }
 
+            td.Owner = this;
             PartManager.transparentData.Add(td);
             return td;
         }
@@ -89,7 +115,7 @@ namespace SimplePartLoader
         public void UsePrytoolAttachment()
         {
             if(Prefab.GetComponent<Pickup>())
-                GameObject.Destroy(Prefab.GetComponent<Pickup>());
+                DestroyConsiderSetting(Prefab.GetComponent<Pickup>());
 
             if (!Prefab.GetComponent<PickupWindow>())
             {
@@ -99,7 +125,7 @@ namespace SimplePartLoader
                 Prefab.AddComponent<RemoveWindow>();
 
                 Prefab.layer = LayerMask.NameToLayer("Windows");
-                Prefab.tag = "Window";
+                //Prefab.tag = "Window";
             }
         }
 
@@ -115,7 +141,7 @@ namespace SimplePartLoader
         public void UseHandAttachment()
         {
             if (Prefab.GetComponent<Pickup>())
-                GameObject.Destroy(Prefab.GetComponent<Pickup>());
+                DestroyConsiderSetting(Prefab.GetComponent<Pickup>());
 
             if (!Prefab.GetComponent<PickupHand>())
             {
@@ -125,7 +151,7 @@ namespace SimplePartLoader
                 Prefab.AddComponent<RemoveWindow>();
 
                 Prefab.layer = LayerMask.NameToLayer("Windows");
-                //Prefab.tag = "Window";
+                Prefab.tag = "Window";
             }
         }
 
@@ -175,27 +201,71 @@ namespace SimplePartLoader
         {
             foreach (WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
             {
-                GameObject.Destroy(wc.gameObject);
+                DestroyConsiderSetting(wc.gameObject);
             }
 
             foreach (BoltNut bn in Prefab.GetComponentsInChildren<BoltNut>())
             {
-                GameObject.Destroy(bn.gameObject);
+                DestroyConsiderSetting(bn.gameObject);
             }
 
             foreach (HexNut hn in Prefab.GetComponentsInChildren<HexNut>())
             {
-                GameObject.Destroy(hn.gameObject);
+                DestroyConsiderSetting(hn.gameObject);
             }
 
             if (Prefab.GetComponent<RemoveWindow>())
-                GameObject.Destroy(Prefab.GetComponent<RemoveWindow>());
+                DestroyConsiderSetting(Prefab.GetComponent<RemoveWindow>());
 
             if(Prefab.GetComponent<PickupHand>())
-                GameObject.Destroy(Prefab.GetComponent<PickupHand>());
+                DestroyConsiderSetting(Prefab.GetComponent<PickupHand>());
 
             if(Prefab.GetComponent<PickupWindow>())
-                GameObject.Destroy(Prefab.GetComponent<PickupWindow>());
+                DestroyConsiderSetting(Prefab.GetComponent<PickupWindow>());
         }
+        
+        private void DestroyConsiderSetting(Component c)
+        {
+            if (modInstance != null)
+            {
+                if (modInstance.Settings.EnableImmediateDestroys)
+                    GameObject.DestroyImmediate(c);
+                else
+                    GameObject.Destroy(c);
+            }
+            else
+            {
+                GameObject.Destroy(c);
+            }
+        }
+        private void DestroyConsiderSetting(GameObject c)
+        {
+            if (modInstance != null)
+            {
+                if (modInstance.Settings.EnableImmediateDestroys)
+                    GameObject.DestroyImmediate(c);
+                else
+                    GameObject.Destroy(c);
+            }
+            else
+            {
+                GameObject.Destroy(c);
+            }
+        }
+    }
+
+    
+    public enum PartTypes
+    {
+        FULL_PART = 1,
+        DUMMY_PREFABGEN,
+        DUMMY
+    }
+
+    public enum ShaderSettings
+    {
+        NONE = 0,
+        FORCE_BACKSIDE,
+        FORCE_DOUBLESIDED
     }
 }

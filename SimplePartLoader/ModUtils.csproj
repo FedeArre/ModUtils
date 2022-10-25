@@ -38,6 +38,18 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Mirror">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mirror.Authenticators">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.Authenticators.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Mirror.Components">
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.Components.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Newtonsoft.Json.dll</HintPath>
@@ -57,9 +69,15 @@
       <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Windows.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="RuntimePreviewGenerator.Runtime, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>F:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\RuntimePreviewGenerator.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -436,7 +454,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Autoupdating.cs" />
+    <Compile Include="FurnitureManager.cs" />
+    <Compile Include="ModUtils\ModObjects\EACheck.cs" />
+    <Compile Include="ModUtils\ModObjects\EarlyAccessJson.cs" />
+    <Compile Include="ModUtils\ModObjects\ModInstance.cs" />
+    <Compile Include="ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />
+    <Compile Include="Objects\EditorComponents\ChildMove.cs" />
+    <Compile Include="Objects\EditorComponents\FurnitureGenerator.cs" />
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
+    <Compile Include="Objects\EditorComponents\OriginalMesh.cs" />
+    <Compile Include="Objects\Furniture\Furniture.cs" />
+    <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
+    <Compile Include="Objects\Furniture\Saving\FurnitureData.cs" />
+    <Compile Include="Objects\Furniture\Saving\FurnitureWrapper.cs" />
+    <Compile Include="Objects\Furniture\Saving\ModUtilsFurniture.cs" />
+    <Compile Include="Objects\LightFix.cs" />
+    <Compile Include="Objects\Furniture\SaleFurniture.cs" />
+    <Compile Include="Utils\CommonFixes.cs" />
     <Compile Include="Utils\KeepAlive.cs" />
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="ModUtils\ModUtils.cs" />
@@ -470,6 +505,7 @@
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="ModUtils\PaintingSystem.cs" />
+    <Compile Include="Utils\ModUtils_Snapshoter.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
