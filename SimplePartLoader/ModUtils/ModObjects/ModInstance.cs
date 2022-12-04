@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -267,6 +268,39 @@ namespace SimplePartLoader
                 Parts.Clear();
                 Furnitures.Clear();
             }
+        }
+
+        public Car LoadCar(AssetBundle bundle, string carObject, string emptyObject, string transparentsObject)
+        {
+            // Safety checks
+            if (!bundle)
+                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
+                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without car / empty / transparents name");
+
+            GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
+            GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
+            GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
+            
+            if (!carPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
+            
+            if (!emptyCarPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+            
+            if (!transparentsPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+
+            CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
+            if(!carGen)
+                Debug.LogError($"[ModUtils/CarGen/Error]: {carObject} has no Car Generator component");
+
+            Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
+            car.loadedBy = this;
+
+            MainCarGenerator.RegisteredCars.Add(car);
+            return car;
         }
     }
 }

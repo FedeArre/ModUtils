@@ -1,5 +1,6 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
+using SimplePartLoader.CarGen;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,6 +90,7 @@ namespace SimplePartLoader
             AutoupdaterBundle.Unload(false);
 
             ModUtils.SetupSteamworks();
+            MainCarGenerator.BaseSetup();
         }
 
         public override void OnMenuLoad()

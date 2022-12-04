@@ -1,5 +1,6 @@
 ﻿using Assets.SimpleLocalization;
 using RVP;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
@@ -148,6 +149,8 @@ namespace SimplePartLoader
                     Debug.Log($"[ModUtils/SPL]: Added part: {p.Name} (GameObject name: {p.Prefab}");
                 }
             }
+            
+            
             foreach (Part p in modLoadedParts)
             {
                 if(!p.Prefab)
@@ -247,7 +250,10 @@ namespace SimplePartLoader
             }
 
             if (!hasFirstLoadOccured)
+            {
                 hasFirstLoadOccured = true;
+                MainCarGenerator.StartCarGen();
+            }
 
             if(ThumbnailGeneratorEnabled)
             {
@@ -314,8 +320,11 @@ namespace SimplePartLoader
             }
 
             if (t.TestingEnabled)
-               transparentObject.AddComponent<TransparentEdit>().transparentData = t;
-
+            {
+                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled"); ;
+                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+            }
+            
             return transparentObject;
         }
 
