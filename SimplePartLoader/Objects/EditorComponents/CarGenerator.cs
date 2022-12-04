@@ -41,10 +41,8 @@ public class CarGenerator : MonoBehaviour
     [Header("Fixes & settings (Don't touch if you don't know what are you doing!)")]
     public bool EnableAttachFix = true;
     public bool EnableAutomaticPartCount = true;
-    public bool AutoMainCarPropertiesSetup = true;
     public bool TransparentReferenceUpdate = true;
     public bool BoneTargetTransformFix = true;
-    public bool HandbrakeCableBoneFix = true;
     public bool FixLights = true;
     public bool DisableModUtilsTemplateSetup = false;
 }

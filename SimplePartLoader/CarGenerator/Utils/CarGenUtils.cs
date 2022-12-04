@@ -55,7 +55,7 @@ namespace SimplePartLoader.CarGen
                     isParentCustom = true;
                 }
 
-                GameObject part = PartLookup(t.name, isParentCustom, car.exceptionsObject);
+                GameObject part = PartLookup(t.name, isParentCustom, car.exceptionsObject, t.Type);
 
                 if (!part)
                 {
@@ -83,13 +83,12 @@ namespace SimplePartLoader.CarGen
 
                 if (t2.GetComponent<CarProperties>() && !t2.name.ToLower().Contains("pivot") && !t2.name.ToLower().Contains("wheelcont"))
                     return false;
-
             }
 
             return true;
         }
 
-        internal static GameObject PartLookup(string name, bool parentIsCustom, BuildingExceptions exceptions)
+        internal static GameObject PartLookup(string name, bool parentIsCustom, BuildingExceptions exceptions, int type)
         {
             GameObject foundPart = null;
 
@@ -112,12 +111,28 @@ namespace SimplePartLoader.CarGen
                         CarProperties carProps = part.GetComponent<CarProperties>();
                         if(carProps.PrefabName != exceptions.ExceptionList[name])
                         {
+                            Debug.Log($"EXCEPTION HIT: {carProps.PrefabName} - {exceptions.ExceptionList[name]}");
                             foundPart = null;
+                            continue;
                         }
                     }
 
+                    // TODO: Consider if this two are a good idea
+                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom)
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+                    
+                    if(foundPart.GetComponent<CarProperties>().Type != type)
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+                    
                     if (foundPart)
                         break;
+
                 }
             }
 
@@ -140,8 +155,18 @@ namespace SimplePartLoader.CarGen
                         CarProperties carProps = part.GetComponent<CarProperties>();
                         if (carProps.PrefabName != exceptions.ExceptionList[name])
                         {
+                            Debug.Log($"EXCEPTION HIT: {carProps.PrefabName} - {exceptions.ExceptionList[name]}");
+
                             foundPart = null;
+                            continue;
                         }
+                    }
+                    
+                    // TODO: Consider if this two are a good idea
+                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom)
+                    {
+                        foundPart = null;
+                        continue;
                     }
 
                     if (foundPart)

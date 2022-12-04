@@ -49,12 +49,36 @@ namespace SimplePartLoader.CarGen
                 car.OnSetupCarTemplate?.Invoke(car.emptyCarPrefab);
                 car.OnSetupCarTemplate?.Invoke(car.carPrefab);
 
+                if (!car.carGeneratorData.DisableModUtilsTemplateSetup)
+                    baseData.ForceTemplateExceptions(car.exceptionsObject);
+
                 // Now, we can build our car
                 BuildCar(car);
 
                 // Last, inject our car into the game
                 Array.Resize(ref CarsComp.Cars, CarsComp.Cars.Length + 1);
                 CarsComp.Cars[CarsComp.Cars.Length - 1] = car.carPrefab;
+
+                // Saving setup
+                if (Saver.modParts.ContainsKey(car.carGeneratorData.CarName))
+                {
+                    Debug.LogError("[ModUtils/CarGen/Error]: Name collision detected! " + car.carGeneratorData.CarName);
+                }
+
+                Saver.modParts.Add(car.carGeneratorData.CarName, car.emptyCarPrefab);
+
+                car.emptyCarPrefab.name = car.carGeneratorData.CarName;
+                car.carPrefab.name = car.carGeneratorData.CarName;
+
+                MainCarProperties mcpEmpty = car.emptyCarPrefab.GetComponent<MainCarProperties>();
+                mcpEmpty.CarName = car.carGeneratorData.CarName;
+                mcpEmpty.CarPrice = car.carGeneratorData.CarPrice;
+                mcpEmpty.PREFAB = car.emptyCarPrefab;
+
+                MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
+                mcp.CarName = car.carGeneratorData.CarName;
+                mcp.CarPrice = car.carGeneratorData.CarPrice;
+                mcp.PREFAB = car.emptyCarPrefab;
             }
         }
 
@@ -86,6 +110,7 @@ namespace SimplePartLoader.CarGen
             baseData.PostBuild(car.carPrefab, car);
             car.OnPostBuild?.Invoke(car.carPrefab);
 
+            // Since painting generally crashes the creation, this will help developers
             if(car.EnableDebug)
             {
                 foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
@@ -95,6 +120,122 @@ namespace SimplePartLoader.CarGen
                         Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
                     }
                 }
+            }
+
+            // Attach fix
+            if(car.carGeneratorData.EnableAttachFix)
+            {
+                MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
+                foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
+                {
+                    partinfo.fixedImportantBolts = 0f;
+                    partinfo.fixedwelds = 0f;
+                    partinfo.attachedwelds = 0f;
+                    partinfo.ImportantBolts = 0f;
+                    partinfo.tightnuts = 0f;
+                    partinfo.attachedbolts = 0f;
+
+                    if (!String.IsNullOrEmpty(partinfo.RenamedPrefab))
+                        partinfo.gameObject.name = partinfo.RenamedPrefab;
+                }
+
+                foreach (CarProperties carProps in car.carPrefab.transform.GetComponentsInChildren<CarProperties>())
+                {
+                    carProps.MainProperties = mcp;
+                }
+
+                foreach (HexNut hexNut in car.carPrefab.GetComponentsInChildren<HexNut>())
+                {
+                    hexNut.tight = true;
+                    hexNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
+                    hexNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
+                }
+
+                foreach (FlatNut flatNut in car.carPrefab.GetComponentsInChildren<FlatNut>())
+                {
+                    flatNut.tight = true;
+                    
+                    if (car.EnableDebug && !flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
+                    }
+
+                    flatNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
+                    flatNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
+                }
+
+                foreach (BoltNut boltNut in car.carPrefab.GetComponentsInChildren<BoltNut>())
+                {
+                    boltNut.ReStart();
+                    boltNut.tight = true;
+
+                    if (car.EnableDebug && !boltNut.gameObject.transform.parent.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
+                        continue;
+                    }
+                    boltNut.gameObject.transform.parent.GetComponent<Partinfo>().ImportantBolts += 1f;
+                    boltNut.gameObject.transform.parent.GetComponent<Partinfo>().fixedImportantBolts += 1f;
+                    if (car.EnableDebug && !boltNut.otherobject)
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                        continue;
+                    }
+                    
+                    if (car.EnableDebug && !boltNut.otherobject.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
+                        continue;
+                    }
+                    
+                    boltNut.otherobject.GetComponent<Partinfo>().fixedImportantBolts += 1f;
+                    boltNut.otherobject.GetComponent<Partinfo>().ImportantBolts += 1f;
+                }
+
+                foreach (WeldCut weldCut in car.carPrefab.GetComponentsInChildren<WeldCut>())
+                {
+                    weldCut.ReStart();
+                    weldCut.welded = true;
+                    weldCut.gameObject.transform.parent.GetComponent<Partinfo>().fixedwelds += 1f;
+                    weldCut.gameObject.transform.parent.GetComponent<Partinfo>().attachedwelds += 1f;
+
+                    if (car.EnableDebug && !weldCut.otherobject)
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
+                        continue;
+                    }
+                    
+                    if (car.EnableDebug && !weldCut.otherobject.GetComponent<Partinfo>())
+                    {
+                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
+                        continue;
+                    }
+                    
+                    weldCut.otherobject.GetComponent<Partinfo>().fixedwelds += 1f;
+                    weldCut.otherobject.GetComponent<Partinfo>().attachedwelds += 1f;
+                }
+            }
+
+            if(car.carGeneratorData.EnableAutomaticPartCount)
+            {
+                int partCount = 0;
+                CarProperties[] componentsInChildren = car.carPrefab.GetComponentsInChildren<CarProperties>();
+                for (int i = 0; i < componentsInChildren.Length; i++)
+                {
+                    if (componentsInChildren[i].SinglePart)
+                    {
+                        partCount++;
+                    }
+                }
+                
+                car.carPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
+                car.emptyCarPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
+            }
+
+            if (car.carGeneratorData.FixLights)
+            {
+                CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
+                CommonFixes.Windows(car.carPrefab, car.EnableDebug);
             }
         }
     }

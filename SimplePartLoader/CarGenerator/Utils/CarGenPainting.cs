@@ -8,10 +8,13 @@ using UnityEngine;
 
 namespace SimplePartLoader.CarGen
 {
-    internal class CarGenPainting
+    public class CarGenPainting
     {
-        internal static void EnablePaintOnly(GameObject Prefab, PaintingSystem.PartPaintResolution res)
+        public static void EnablePaintOnly(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
+            if (!Prefab)
+                return;
+
             if (Prefab.GetComponent<P3dPaintable>())
             {
                 Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
@@ -64,8 +67,11 @@ namespace SimplePartLoader.CarGen
             CheckHighResolutionPaint(Prefab, res);
         }
 
-        internal static void EnablePaintAndRust(GameObject Prefab, PaintingSystem.PartPaintResolution res)
+        public static void EnablePaintAndRust(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
+            if (!Prefab)
+                return;
+
             if (Prefab.GetComponent<P3dPaintable>())
             {
                 Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
@@ -136,8 +142,11 @@ namespace SimplePartLoader.CarGen
         }
 
 
-        internal static void EnableDirtOnly(GameObject Prefab, PaintingSystem.PartPaintResolution res)
+        public static void EnableDirtOnly(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
+            if (!Prefab)
+                return;
+
             if (Prefab.GetComponent<P3dPaintable>())
             {
                 Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
@@ -185,8 +194,11 @@ namespace SimplePartLoader.CarGen
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
         }
 
-        internal static void EnableFullSupport(GameObject Prefab, PaintingSystem.PartPaintResolution res)
+        public static void EnableFullSupport(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
+            if (!Prefab)
+                return;
+
             if (Prefab.GetComponent<P3dPaintable>())
             {
                 Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
@@ -294,8 +306,11 @@ namespace SimplePartLoader.CarGen
             CheckHighResolutionPaint(Prefab, res);
         }
 
-        internal static void EnablePaintAndDirt(GameObject Prefab, PaintingSystem.PartPaintResolution res)
+        public static void EnablePaintAndDirt(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
+            if (!Prefab)
+                return;
+
             if (Prefab.GetComponent<P3dPaintable>())
             {
                 Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
@@ -371,8 +386,8 @@ namespace SimplePartLoader.CarGen
         internal static void CheckHighResolutionPaint(GameObject Prefab, PaintingSystem.PartPaintResolution res)
         {
             P3dPaintableTexture texture = Prefab.GetComponent<P3dPaintableTexture>();
-            
-            switch(res)
+
+            switch (res)
             {
                 case PaintingSystem.PartPaintResolution.High:
                     texture.Width = 2048;
@@ -389,5 +404,5 @@ namespace SimplePartLoader.CarGen
             }
         }
     }
-    
+
 }

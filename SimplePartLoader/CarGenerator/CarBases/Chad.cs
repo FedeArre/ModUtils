@@ -19,6 +19,13 @@ namespace SimplePartLoader.CarGen
             return (GameObject)cachedResources.Load("Chad");
         }
 
+        public void ForceTemplateExceptions(BuildingExceptions exceptions)
+        {
+            exceptions.ExceptionList["CylinderBlock"] = "CylinderBlockV8";
+            exceptions.ExceptionList["GearBox06"] = "GearBox07";
+            exceptions.ExceptionList["Rim"] = "Rim15Ch5";
+        }
+        
         public void PostBuild(GameObject objective, Car car)
         {
             // Bone target fix
@@ -34,6 +41,28 @@ namespace SimplePartLoader.CarGen
                     scr.LocalStrtetchTarget = scr.transform.parent.Find("DummyPivHbrak");
                 }
             }
+
+            // ModUtils Chad template
+            if (car.carGeneratorData.DisableModUtilsTemplateSetup)
+                return;
+
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "MiddlePanelLipC07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "TrunkDoorC07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "LRockerpanelC07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "RRockerpanelC07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "CowlPanel07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "Hood07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "DoorFL07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "DoorFR07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelFL07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelRL07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelRR07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "FrontValance07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "RearValance07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelFR07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "Roof07").gameObject, PaintingSystem.PartPaintResolution.Low);
+
+            
         }
 
         public void SetupTemplate(GameObject objective, Car car)
@@ -432,6 +461,5 @@ namespace SimplePartLoader.CarGen
             FrontGroup.antiRollBarForce = 0.6f;
             RearGroup.antiRollBarForce = 1f;
         }
-
     }
 }

@@ -12,5 +12,6 @@ namespace SimplePartLoader.CarGen
         GameObject GetCar();
         void SetupTemplate(GameObject objective, Car car);
         void PostBuild(GameObject objective, Car car);
+        void ForceTemplateExceptions(BuildingExceptions exceptions);
     }
 }
