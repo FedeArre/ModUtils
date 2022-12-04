@@ -246,8 +246,8 @@ namespace SimplePartLoader.CarGen
 
             vehController.powertrain = vehPowertrain;
 
-            WheelFR = objective.transform.Find("FrontSusp/CrossmemmberF100/WheelContParentFR/WheelControllerFR").GetComponent<WheelController>();
-            WheelFL = objective.transform.Find("FrontSusp/CrossmemmberF100/WheelContParentFL/WheelControllerFL").GetComponent<WheelController>();
+            WheelFR = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFR/WheelControllerFR").GetComponent<WheelController>();
+            WheelFL = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFL/WheelControllerFL").GetComponent<WheelController>();
             WheelRR = objective.transform.Find("RearSusp/WheelControllerRR").GetComponent<WheelController>();
             WheelRL = objective.transform.Find("RearSusp/WheelControllerRL").GetComponent<WheelController>();
 

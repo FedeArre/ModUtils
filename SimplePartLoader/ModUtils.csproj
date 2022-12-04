@@ -458,7 +458,8 @@
     <Compile Include="CarGenerator\Car.cs" />
     <Compile Include="CarGenerator\CarBases\Chad.cs" />
     <Compile Include="CarGenerator\CarBases\ICarBase.cs" />
-    <Compile Include="CarGenerator\CarGenUtils.cs" />
+    <Compile Include="CarGenerator\Utils\CarGenPainting.cs" />
+    <Compile Include="CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="CarGenerator\MainCarGenerator.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="ModUtils\ModObjects\EACheck.cs" />

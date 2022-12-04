@@ -93,6 +93,10 @@ namespace SimplePartLoader.CarGen
         {
             GameObject foundPart = null;
 
+            // Hardcoded exceptions
+            if (name == "Spacer")
+                return null;
+            
             // Fast lookup, only by GameObject name (Works for almost all parts)
             foreach(GameObject part in PartManager.gameParts)
             {

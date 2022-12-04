@@ -1,4 +1,5 @@
-﻿using SimplePartLoader.Utils;
+﻿using PaintIn3D;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace SimplePartLoader.CarGen
                 
                 // First, clone our base to our empty.
                 CarBuilding.CopyCarToPrefab(baseData.GetCar(), car.emptyCarPrefab);
+                CarBuilding.CopyCarToPrefab(baseData.GetCar(), car.carPrefab);
 
                 // Then, destroy all transparents requested by user
                 foreach (string transparent in car.carGeneratorData.TransparentsToDelete)
@@ -83,6 +85,17 @@ namespace SimplePartLoader.CarGen
 
             baseData.PostBuild(car.carPrefab, car);
             car.OnPostBuild?.Invoke(car.carPrefab);
+
+            if(car.EnableDebug)
+            {
+                foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
+                {
+                    if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
+                    {
+                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                    }
+                }
+            }
         }
     }
 }
