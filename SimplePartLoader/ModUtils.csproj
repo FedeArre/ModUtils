@@ -461,6 +461,7 @@
     <Compile Include="CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="CarGenerator\MainCarGenerator.cs" />
+    <Compile Include="ErrorMessageHandler.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="ModUtils\ModObjects\EACheck.cs" />
     <Compile Include="ModUtils\ModObjects\EarlyAccessJson.cs" />

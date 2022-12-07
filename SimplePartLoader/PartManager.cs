@@ -321,7 +321,13 @@ namespace SimplePartLoader
 
             if (t.TestingEnabled)
             {
-                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled"); ;
+                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled");
+                if(t.Owner.Mod != null)
+                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part added by mod {t.Owner.Mod.Name}");
+                
+                if(t.Owner.CarProps)
+                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
+
                 transparentObject.AddComponent<TransparentEdit>().transparentData = t;
             }
             

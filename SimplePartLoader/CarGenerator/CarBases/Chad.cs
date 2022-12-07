@@ -33,7 +33,11 @@ namespace SimplePartLoader.CarGen
             {
                 if (scr.transform.childCount != 0 && scr.transform.GetChild(0).name.Contains("Pivot"))
                 {
-                    scr.LocalStrtetchTarget = scr.transform.GetChild(0);
+                    // Account for the case that DummyPivot is at index 1 instead of 0
+                    if(scr.LocalStrtetchTarget != null && scr.LocalStrtetchTarget.name == "DummyPivot")
+                    {
+                        scr.LocalStrtetchTarget = scr.transform.GetChild(0).name != "DummyPivot" ? scr.transform.GetChild(1) : scr.transform.GetChild(0);
+                    }
                     scr.targetTransform = null;
                 }
                 else if (scr.transform.name == "HandbbrakeCable07")

@@ -209,6 +209,7 @@ namespace SimplePartLoader
         {
             Thumbnails = true;
             PartManager.ThumbnailGeneratorEnabled = true;
+            ErrorMessageHandler.GetInstance().ThumbnaiLGeneratorEnabled = true;
         }
         
         internal async void Check(ulong SteamID)
@@ -246,6 +247,8 @@ namespace SimplePartLoader
             if(!allowed)
             {
                 Debug.Log("[ModUtils/EACheck]: User is not allowed to use this mod - " + Mod.Name);
+                ErrorMessageHandler.GetInstance().DisabledModList.Add(Mod.Name);
+                
                 foreach (Part p in Parts)
                 {
                     if (PartManager.modLoadedParts.Contains(p))
@@ -257,6 +260,19 @@ namespace SimplePartLoader
                     if (PartManager.prefabGenParts.Remove(p))
                         PartManager.prefabGenParts.Remove(p);
 
+                    if (p.CarProps)
+                    {
+                        Saver.modParts[p.CarProps.PrefabName] = null;
+                    }
+                    else
+                    {
+                        PrefabGenerator pg = p.Prefab.GetComponent<PrefabGenerator>();
+                        if (pg)
+                            Saver.modParts[pg.PrefabName] = null;
+                        else
+                            Saver.modParts[p.Name] = null;
+                    }
+                    
                     GameObject.Destroy(p.Prefab);
                 }
 
