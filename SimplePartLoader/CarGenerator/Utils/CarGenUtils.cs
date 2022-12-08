@@ -24,7 +24,7 @@ namespace SimplePartLoader.CarGen
             }
         }
 
-        public static Transform LookupValidTransform(GameObject root, string name)
+        public static Transform LookupValidTransform(GameObject root, string name, bool onlyRootPart = false)
         {
             foreach(Transform t in root.transform.GetComponentsInChildren<Transform>())
             {
@@ -32,6 +32,9 @@ namespace SimplePartLoader.CarGen
                 {
                     if(!t.GetComponent<transparents>())
                     {
+                        if (onlyRootPart && !t.GetComponent<Partinfo>())
+                            continue;
+                        
                         return t;
                     }
                 }
@@ -61,6 +64,7 @@ namespace SimplePartLoader.CarGen
                 {
                     if (car.EnableDebug)
                         Debug.LogWarning("[ModUtils/CarGen/PartLookup/Warning]: Part lookup could not find part for " + t.name);
+                    
                     continue;
                 }
 
@@ -111,7 +115,6 @@ namespace SimplePartLoader.CarGen
                         CarProperties carProps = part.GetComponent<CarProperties>();
                         if(carProps.PrefabName != exceptions.ExceptionList[name])
                         {
-                            Debug.Log($"EXCEPTION HIT: {carProps.PrefabName} - {exceptions.ExceptionList[name]}");
                             foundPart = null;
                             continue;
                         }

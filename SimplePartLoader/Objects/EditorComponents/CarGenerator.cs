@@ -17,14 +17,6 @@ public class CarGenerator : MonoBehaviour
     public Mesh V8EngineFuelLine;
     public Mesh Inline6FuelLine;
     
-    [Header("Custom meshes - Radiator hoses")]
-    public Mesh Inline4RadiatorHoseUpper;
-    public Mesh Inline4RadiatorHoseLower;
-    public Mesh V8RadiatorHoseUpper;
-    public Mesh V8RadiatorHoseLower;
-    public Mesh I6RadiatorHoseUpper;
-    public Mesh I6RadiatorHoseLower;
-    
     [Header("Custom meshes - Brake line")]
     public bool EnableCustomBrakeLine;
     public Mesh BrakeLineMesh;
@@ -45,6 +37,8 @@ public class CarGenerator : MonoBehaviour
     public bool BoneTargetTransformFix = true;
     public bool FixLights = true;
     public bool DisableModUtilsTemplateSetup = false;
+    public bool EnableAutomaticPainting = true;
+    public bool EnableAutomaticFluidSetup = true;
 }
 
 public enum CarBase

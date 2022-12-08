@@ -31,18 +31,31 @@ namespace SimplePartLoader.CarGen
             // Bone target fix
             foreach (MyBoneSCR scr in objective.GetComponentsInChildren<MyBoneSCR>())
             {
-                if (scr.transform.childCount != 0 && scr.transform.GetChild(0).name.Contains("Pivot"))
+                if (scr.transform.childCount != 0)
                 {
-                    // Account for the case that DummyPivot is at index 1 instead of 0
-                    if(scr.LocalStrtetchTarget != null && scr.LocalStrtetchTarget.name == "DummyPivot")
+                    if(scr.LocalStrtetchTarget != null)
                     {
-                        scr.LocalStrtetchTarget = scr.transform.GetChild(0).name != "DummyPivot" ? scr.transform.GetChild(1) : scr.transform.GetChild(0);
+                        Transform newBone = null;
+                        foreach (Transform t in scr.transform)
+                        {
+                            if (t.name == scr.LocalStrtetchTarget.name)
+                            {
+                                newBone = t;
+                                break;
+                            }
+                        }
+                        
+                        if (newBone)
+                        {
+                            scr.LocalStrtetchTarget = newBone;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"[ModUtils/CarGen/BoneFix/Chad]: Could not find bone for {scr.LocalStrtetchTarget.name} ({scr.LocalStrtetchTarget.parent.name})");
+                        }
                     }
+                        
                     scr.targetTransform = null;
-                }
-                else if (scr.transform.name == "HandbbrakeCable07")
-                {
-                    scr.LocalStrtetchTarget = scr.transform.parent.Find("DummyPivHbrak");
                 }
             }
 
@@ -50,23 +63,84 @@ namespace SimplePartLoader.CarGen
             if (car.carGeneratorData.DisableModUtilsTemplateSetup)
                 return;
 
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "MiddlePanelLipC07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "TrunkDoorC07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "LRockerpanelC07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "RRockerpanelC07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "CowlPanel07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "Hood07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "DoorFL07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "DoorFR07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelFL07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelRL07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelRR07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "FrontValance07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "RearValance07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "QuarterpanelFR07").gameObject, PaintingSystem.PartPaintResolution.Low);
-            CarGenPainting.EnableFullSupport(CarGenUtils.LookupValidTransform(objective, "Roof07").gameObject, PaintingSystem.PartPaintResolution.Low);
+            Transform SeatDriver = CarGenUtils.LookupValidTransform(car.carPrefab, "SeatFL06");
+            Transform SeatPassanger = CarGenUtils.LookupValidTransform(car.carPrefab, "SeatFR06");
 
-            
+            if (SeatDriver)
+                CommonFixes.FixPart(SeatDriver.gameObject, FixType.DriverPassangerSeat);
+
+            if (SeatPassanger)
+                CommonFixes.FixPart(SeatPassanger.gameObject, FixType.DriverPassangerSeat);
+
+            // All fluid fixes
+            Transform engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlockV8");
+            if (engine)
+            {
+                engine.name = "CylinderBlock";
+
+                CommonFixes.FixPart(engine.gameObject, FixType.Dipstick);
+                CommonFixes.FixPart(engine.Find("OilPan07/OilPan07").gameObject, FixType.Oilpan);
+                CommonFixes.FixPart(engine.Find("CylinderHeadR07/CylinderHeadR07/CylinderHeadCoverR07/CylinderHeadCoverR07").gameObject, FixType.CylinderHeadCover);
+
+                FLUID OilContainerComponent = engine.Find("OilPan07/OilPan07/OilFluidContainer").GetComponent<FLUID>();
+
+                OilContainerComponent.FluidSize = 2f;
+                OilContainerComponent.Condition = 1f;
+
+                OilContainerComponent.transform.parent.GetComponent<CarProperties>().FluidSize = 2f;
+                OilContainerComponent.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
+            }
+
+            Transform radiator = objective.transform.Find("RadiatorSupport07/RadiatorSupport07/Radiator07/Radiator07");
+            if(radiator)
+            {
+                CommonFixes.FixPart(radiator.gameObject, FixType.Radiator);
+                FLUID CoolantFluid = radiator.Find("CoolantFluidContainer").GetComponent<FLUID>();
+
+                CoolantFluid.FluidSize = 6f;
+                CoolantFluid.Condition = 1f;
+                CoolantFluid.transform.parent.GetComponent<CarProperties>().FluidSize = 6f;
+                CoolantFluid.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
+            }
+
+            Transform gasTank = objective.transform.Find("FloorTrunk07/FloorTrunk07/GasTank07/GasTank07");
+            if(gasTank)
+            {
+                CommonFixes.FixPart(gasTank.gameObject, FixType.FuelTank);
+
+                FLUID FuelTankComponent = gasTank.Find("FuelContainer").GetComponent<FLUID>();
+                
+                FuelTankComponent.Condition = 1;
+                FuelTankComponent.FluidSize = 25f;
+                FuelTankComponent.transform.parent.GetComponent<CarProperties>().FluidSize = 25f;
+                FuelTankComponent.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
+            }
+
+            Transform brakeFluidContainer = objective.transform.Find("Firewall07/Firewall07/BrakeMasterCylinder07/BrakeMasterCylinder07");
+            if(brakeFluidContainer)
+            {
+                CommonFixes.FixPart(brakeFluidContainer.gameObject, FixType.BrakeCylinder);
+                FLUID BrakeFluidComponent =  brakeFluidContainer.Find("BrakeFluidContainer").GetComponent<FLUID>();
+
+                BrakeFluidComponent.FluidSize = BrakeFluidComponent.ContainerSize;
+                BrakeFluidComponent.Condition = 1f;
+                BrakeFluidComponent.transform.parent.GetComponent<CarProperties>().FluidSize = BrakeFluidComponent.ContainerSize - 0.01f;
+                BrakeFluidComponent.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
+            }
+
+            // Window lifts
+            Transform WindowLiftHandleLeft = objective.transform.Find("Firewall07/Firewall07/DoorFL07/DoorFL07/WindowLiftFLC07/WindowLiftFLC07/WIndowHandle.003");
+            Transform WindowLiftTransparentLeft = objective.transform.Find("Firewall07/Firewall07/DoorFL07/DoorFL07/WindowLiftFLC07/WindowLiftFLC07/WindowFL07");
+
+            if(WindowLiftHandleLeft && WindowLiftTransparentLeft)
+                WindowLiftHandleLeft.GetComponent<WindowLift>().Window = WindowLiftTransparentLeft.gameObject;
+
+            Transform WindowLiftHandleRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WIndowHandle.003");
+            Transform WindowLiftTransparentRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WindowFR07");
+
+            if(WindowLiftTransparentLeft && WindowLiftTransparentRight)
+                WindowLiftHandleRight.GetComponent<WindowLift>().Window = WindowLiftTransparentRight.gameObject;
+
         }
 
         public void SetupTemplate(GameObject objective, Car car)

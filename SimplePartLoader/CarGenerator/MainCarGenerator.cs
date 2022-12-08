@@ -90,16 +90,14 @@ namespace SimplePartLoader.CarGen
             if(car.carGeneratorData.TransparentReferenceUpdate)
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab);
 
+            Debug.Log($"HOLA{car.carGeneratorData.BoneTargetTransformFix}");
             if(car.carGeneratorData.BoneTargetTransformFix)
             {
                 foreach (MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
                 {
                     if (scr.thisTransform != null)
                     {
-                        if (scr.thisTransform.root != car.carPrefab.transform)
-                        {
-                            scr.thisTransform = scr.transform;
-                        }
+                        scr.thisTransform = scr.transform;
                     }
                 }
             }
@@ -109,18 +107,6 @@ namespace SimplePartLoader.CarGen
 
             baseData.PostBuild(car.carPrefab, car);
             car.OnPostBuild?.Invoke(car.carPrefab);
-
-            // Since painting generally crashes the creation, this will help developers
-            if(car.EnableDebug)
-            {
-                foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
-                {
-                    if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
-                    {
-                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
-                    }
-                }
-            }
 
             // Attach fix
             if(car.carGeneratorData.EnableAttachFix)
@@ -236,6 +222,45 @@ namespace SimplePartLoader.CarGen
             {
                 CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
                 CommonFixes.Windows(car.carPrefab, car.EnableDebug);
+            }
+            
+            if (car.carGeneratorData.EnableAutomaticPainting)
+            {
+                foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())
+                {
+                    CarProperties cp = pi.GetComponent<CarProperties>();
+                    if (!cp)
+                        continue;
+                    
+                    if(cp.Paintable && cp.Washable && cp.MeshRepairable)
+                    {
+                        CarGenPainting.EnableFullSupport(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                    }
+                    else if(cp.Paintable && !cp.Washable && cp.MeshRepairable)
+                    {
+                        CarGenPainting.EnablePaintOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                    }
+                    else if(cp.Paintable && cp.Washable && !cp.MeshRepairable)
+                    {
+                        CarGenPainting.EnablePaintAndDirt(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                    }
+                    else if(!cp.Paintable && cp.Washable)
+                    {
+                        CarGenPainting.EnableDirtOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                    }
+                }
+            }
+
+            // Since painting generally crashes the creation, this will help developers
+            if (car.EnableDebug)
+            {
+                foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
+                {
+                    if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
+                    {
+                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                    }
+                }
             }
         }
     }
