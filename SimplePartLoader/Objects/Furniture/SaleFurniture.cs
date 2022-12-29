@@ -12,6 +12,7 @@ namespace SimplePartLoader
         private Furniture SellingFurniture;
         private Vector3 Position;
         private Vector3 Rotation;
+        private SpawnSpot Spot;
 
         public static readonly Vector3 DEFAULT_MODSHOP_LOCATION = new Vector3(655.4157f, 55.2303f, -43.4625f);
         
@@ -32,5 +33,11 @@ namespace SimplePartLoader
             get { return Rotation; }
             set { Rotation = value; }
         }
+        public SpawnSpot Spawn
+        {
+            internal get { return Spot; }
+            set { Spot = value; }
+        }
+
     }
 }

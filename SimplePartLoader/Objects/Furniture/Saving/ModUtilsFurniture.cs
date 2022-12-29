@@ -13,6 +13,8 @@ namespace SimplePartLoader.Objects.Furniture.Saving
         public string PrefabName;
         public SimplePartLoader.Furniture furnitureRef;
         bool InTrailer = false;
+
+        FixedJoint Joint = null;
         
         void Start()
         {
@@ -25,15 +27,42 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 
         public void OnDrop()
         {
-            if (furnitureRef.BehaveAsFurniture)
-                StartCoroutine(FreezeRoutine());
+            if(furnitureRef.TrailerAttaching && Joint)
+            {
+                return;
+            }
+            
+            if (furnitureRef.FreezeType == FurnitureGenerator.FreezeTypeEnum.Instant)
+            {
+                Rigidbody rb = GetComponent<Rigidbody>();
+                if (rb)
+                { 
+                    rb.isKinematic = true;
+                }
+                return;
+            }
+            
+            StartCoroutine(FreezeRoutine());
         }
 
         public void OnPickup()
         {
             StopCoroutine(FreezeRoutine());
+            
+            if (Joint)
+                GameObject.Destroy(Joint);
         }
 
+        public void OnBuy()
+        {
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb)
+            {
+                rb.isKinematic = false;
+                StartCoroutine(FreezeRoutine());
+            }
+        }
+        
         IEnumerator FreezeRoutine()
         {
             Rigidbody rb = GetComponent<Rigidbody>();
@@ -45,7 +74,8 @@ namespace SimplePartLoader.Objects.Furniture.Saving
                     yield return 0;
                 }
 
-                rb.isKinematic = true;
+                if(furnitureRef.FreezeType != FurnitureGenerator.FreezeTypeEnum.NoFreeze)
+                    rb.isKinematic = true;
             }
         }
         
@@ -54,7 +84,19 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 		    if (other.gameObject.name == "InsideCol" && transform.name != "CarLift")
 		    {
 			    InTrailer = true;
-		    }
+                if (!Joint)
+                {
+                    Joint = gameObject.AddComponent<FixedJoint>();
+                    Joint.connectedBody = other.attachedRigidbody;
+                    Joint.enableCollision = false;
+
+                    Rigidbody rb = GetComponent<Rigidbody>();
+                    if (rb)
+                    {
+                        rb.isKinematic = false;
+                    }
+                }
+            }
 	    }
 
 	    public void OnTriggerExit(Collider other)

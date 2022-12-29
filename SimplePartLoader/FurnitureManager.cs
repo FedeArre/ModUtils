@@ -41,19 +41,24 @@ namespace SimplePartLoader
 
                 furniture.layer = LayerMask.NameToLayer("Items");
                 
-                //GameObject.Destroy(furniture.GetComponent<MooveItem>());
                 GameObject.Destroy(furniture.GetComponent<ModUtilsFurniture>());
                 GameObject.DestroyImmediate(furniture.GetComponent<Rigidbody>());
-                
-                SaleItem si = furniture.AddComponent<SaleItem>();
+
+                CustomFurnitureSaleItem si = furniture.AddComponent<CustomFurnitureSaleItem>();
                 si.Price = sf.Furniture.Price;
-                si.Item = sf.Furniture.Prefab;
-                si.SpawnSpot = spawnSpot;
+                si.Prefab = sf.Furniture.Prefab;
+                si.Name = sf.Furniture.Name;
+                si.Tip = sf.Furniture.Tip;
+
+                if (sf.Spawn != null)
+                    si.SpawnSpot = sf.Spawn.Get();
+                else
+                    si.SpawnSpot = spawnSpot.transform;
                 
                 furniture.transform.position = sf.Pos;
                 furniture.transform.eulerAngles = sf.Rot;
 
-                furniture.name = sf.Furniture.Name;
+                furniture.name = "MODUTILS_SALEFURNITURE_" + sf.Furniture.Name;
                 
                 // Localization of the part
                 foreach (var dictionary in LocalizationManager.Dictionary)

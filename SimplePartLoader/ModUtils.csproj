@@ -473,12 +473,14 @@
     <Compile Include="Objects\EditorComponents\FurnitureGenerator.cs" />
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
     <Compile Include="Objects\EditorComponents\OriginalMesh.cs" />
+    <Compile Include="Objects\EditorComponents\FurnitureCollider.cs" />
     <Compile Include="Objects\Furniture\CustomFurnitureSaleItem.cs" />
     <Compile Include="Objects\Furniture\Furniture.cs" />
     <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
     <Compile Include="Objects\Furniture\Saving\FurnitureData.cs" />
     <Compile Include="Objects\Furniture\Saving\FurnitureWrapper.cs" />
     <Compile Include="Objects\Furniture\Saving\ModUtilsFurniture.cs" />
+    <Compile Include="Objects\Furniture\SpawnSpot.cs" />
     <Compile Include="Objects\LightFix.cs" />
     <Compile Include="Objects\Furniture\SaleFurniture.cs" />
     <Compile Include="Utils\CommonFixes.cs" />
