@@ -21,8 +21,8 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.2.0"; 
         
-        bool TESTING_VERSION_REMEMBER = false;
-        string TESTING_VERSION_NUMBER = "1.2-rc3";
+        bool TESTING_VERSION_REMEMBER = true;
+        string TESTING_VERSION_NUMBER = "1.3-pb1";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -191,7 +191,7 @@ namespace SimplePartLoader
         {
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-            FurnitureManager.LoadFurniture();
+            FurnitureManager.SetupFurniture();
             
             PlayerTransform = ModUtils.GetPlayer().transform;
 
@@ -254,9 +254,38 @@ namespace SimplePartLoader
                 return;
 
             CustomSaverHandler.Save();
-            FurnitureManager.SaveFurniture();
         }
-        
+
+        public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
+        {
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+            
+            if (isBarn)
+            {
+
+            }
+            else
+            {
+                FurnitureManager.SaveFurniture(saver);
+            }
+        }
+
+        public override void OnSaveSystemLoad(SaveSystem saver, bool isBarn)
+        {
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+            
+            if (isBarn)
+            {
+
+            }
+            else
+            {
+                FurnitureManager.LoadFurniture(saver);
+            }
+        }
+
         // For mod utils
         public override void Update()
         {

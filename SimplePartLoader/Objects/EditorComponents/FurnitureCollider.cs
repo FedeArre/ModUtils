@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimplePartLoader.Objects.Furniture.Saving;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,5 +12,12 @@ public class FurnitureCollider : MonoBehaviour
     {
         gameObject.name = "MODUTILS_FURNITURECOLL_" + gameObject.name;
         gameObject.layer = LayerMask.NameToLayer("Items");
+    }
+
+    void OnDestroy()
+    {
+        ModUtilsFurniture muf = transform.GetComponent<ModUtilsFurniture>();
+        if (muf)
+            muf.ChildDestroyed();
     }
 }

@@ -106,5 +106,10 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 			    InTrailer = false;
 		    }
 	    }
+
+        public void ChildDestroyed()
+        {
+            GameObject.Destroy(this);
+        }
     }
 }

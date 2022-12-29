@@ -28,19 +28,19 @@ namespace SimplePartLoader
             get { return FurnitureList; }
         }
         
-        public static void LoadFurniture()
+        public static void SetupFurniture()
         {
             ModUtils.GetPlayer().AddComponent<PlayerFurniturePickup>();
-            
+
             GameObject spawnSpot = new GameObject("SPAWN_POINT_FURNITURE_MODUTILS");
             spawnSpot.transform.position = new Vector3(660.2147f, 56.3729f, -83.6104f);
-            
-            foreach(SaleFurniture sf in SaleItems)
+
+            foreach (SaleFurniture sf in SaleItems)
             {
                 GameObject furniture = GameObject.Instantiate(sf.Furniture.Prefab);
 
                 furniture.layer = LayerMask.NameToLayer("Items");
-                
+
                 GameObject.Destroy(furniture.GetComponent<ModUtilsFurniture>());
                 GameObject.DestroyImmediate(furniture.GetComponent<Rigidbody>());
 
@@ -54,12 +54,12 @@ namespace SimplePartLoader
                     si.SpawnSpot = sf.Spawn.Get();
                 else
                     si.SpawnSpot = spawnSpot.transform;
-                
+
                 furniture.transform.position = sf.Pos;
                 furniture.transform.eulerAngles = sf.Rot;
 
                 furniture.name = "MODUTILS_SALEFURNITURE_" + sf.Furniture.Name;
-                
+
                 // Localization of the part
                 foreach (var dictionary in LocalizationManager.Dictionary)
                 {
@@ -69,30 +69,33 @@ namespace SimplePartLoader
                     dictionary.Value.Add(sf.Furniture.Prefab.name, sf.Furniture.Name);
                 }
             }
+        }
 
-            // Check if new save.
-            if (PlayerPrefs.GetFloat("LoadLevel") == 0f) // New game check
-            {
-                if (File.Exists(SavePath + FileName))
-                    File.Delete(SavePath + FileName);
-
-                return;
-            }
-
-            if (!File.Exists(SavePath + FileName))
-                return;
-
+        public static void LoadFurniture(SaveSystem ss)
+        {
             Debug.Log($"[ModUtils/Furniture/Loader]: Starting furniture loader.");
-            // We load the data now
-            using (StreamReader r = new StreamReader(SavePath + FileName))
+            string jsonToUse = (string)ss.get("ModUtilsFurnitureSave", "");
+
+            SaveData = null;
+            if (File.Exists(SavePath + FileName) && jsonToUse == "")
             {
-                string json = r.ReadToEnd();
+                // We load the data now
+                using (StreamReader r = new StreamReader(SavePath + FileName))
+                {
+                    string json = r.ReadToEnd();
 
-                if (String.IsNullOrEmpty(json))
-                    return;
+                    if (String.IsNullOrEmpty(json))
+                        return;
 
-                SaveData = JsonConvert.DeserializeObject<FurnitureWrapper>(json);
+                    SaveData = JsonConvert.DeserializeObject<FurnitureWrapper>(json);
+                }
             }
+            else if (jsonToUse != "")
+            {
+                SaveData = JsonConvert.DeserializeObject<FurnitureWrapper>(jsonToUse);
+            }
+            else
+                return;
             
             Debug.Log($"[ModUtils/Furniture/Loader]: Trying to load {SaveData.Furnitures.Count} furnitures.");
             // And then with the data loaded we load the Furnitures
@@ -118,7 +121,7 @@ namespace SimplePartLoader
             Debug.Log($"[ModUtils/Furniture/Loader]: Furniture load finished.");
         }
 
-        public static void SaveFurniture()
+        public static void SaveFurniture(SaveSystem ss)
         {
             SaveData = new FurnitureWrapper();
             
@@ -143,15 +146,15 @@ namespace SimplePartLoader
                 SaveData.Furnitures.Add(fw);
             }
 
-            if (!Directory.Exists(SavePath))
-                Directory.CreateDirectory(SavePath);
-
-            using (TextWriter tw = new StreamWriter(SavePath + FileName))
+            try
             {
-                tw.Write(JsonConvert.SerializeObject(SaveData));
+                ss.add("ModUtilsFurnitureSave", JsonConvert.SerializeObject(SaveData));
+                Debug.Log($"[ModUtils/Furniture/Saver]: Succesfully saved {AllFurnitures.Length} furnitures.");
             }
-            
-            Debug.Log($"[ModUtils/Furniture/Saver]: Succesfully saved {AllFurnitures.Length} furnitures.");
+            catch (Exception ex)
+            {
+                Debug.LogError("[ModUtils/Furniture/Saver/Error]: Saving went wrong - Exception: " + ex.Message);
+            }
         }
     }
 }

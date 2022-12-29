@@ -159,7 +159,7 @@ namespace SimplePartLoader.Objects.Furniture
                     }
                 }
 
-                if (Input.GetMouseButtonUp(0) && CurrentlyHoldingFurniture) // Furniture dropped
+                if ((Input.GetMouseButtonUp(0) && CurrentlyHoldingFurniture) || (CurrentlyHoldingFurniture && Input.GetKeyDown(KeyCode.Escape))) // Furniture dropped
                 {
                     foreach (Collider c in CurrentlyHoldingFurniture.GetComponentsInChildren<Collider>())
                     {
