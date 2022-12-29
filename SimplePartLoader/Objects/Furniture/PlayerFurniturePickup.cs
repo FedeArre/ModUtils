@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimplePartLoader.Objects.Furniture.Saving;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,36 +10,83 @@ namespace SimplePartLoader.Objects.Furniture
 {
     internal class PlayerFurniturePickup : MonoBehaviour
     {
-        bool DoingHack = false, HackLastFrame = false;
+        Transform PlayerHand;
+        Transform CurrentlyHoldingFurniture = null;
+
+        string LookText;
+        string PriceToShow;
+        string TipToShow;
+
+        bool ShowText;
         
-        void LateUpdate()
+        TMPro.TMP_Text LookingText;
+        UnityEngine.UI.Text PriceText;
+        TMPro.TMP_Text TipsText;
+
+        void Start()
+        {
+            PlayerHand = GameObject.Find("hand").transform;
+
+            LookingText = ModUtils.GetPlayerTools().LookingText;
+            PriceText = ModUtils.GetPlayerTools().PriceText;
+            TipsText = ModUtils.GetPlayerTools().TipsText;
+        }
+
+        void Update()
         {
             RaycastHit rcHit;
-            if (tools.tool == 1 || DoingHack)
+
+            if ((tools.tool == 22 || tools.tool == 1) && tools.helditem == "Nothing")
             {
                 if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, ~LayerMask.NameToLayer("Items")))
                 {
-                    if (rcHit.collider.transform.root.name.StartsWith("MODUTILS_FURNITURE_H_"))
+                    Debug.Log(rcHit.collider);
+                    if (rcHit.collider.transform.name.StartsWith("MODUTILS_FURNITURE_")) // If looking at ModUtils furniture
                     {
-                        DoingHack = true;
+                        // TODO: Show furniture data here.
+
+                        if(Input.GetMouseButtonDown(0))
+                        {
+                            Debug.Log("AAAA");
+                            if (rcHit.collider.transform.name[19] == 'F' && tools.tool != 22)
+                                return;
+
+                            PlayerHand.position = rcHit.point;
+                            Debug.Log("X2D");
+                            CurrentlyHoldingFurniture = rcHit.collider.transform;
+                            CurrentlyHoldingFurniture.SetParent(PlayerHand);
+                            CurrentlyHoldingFurniture.GetComponent<Rigidbody>().isKinematic = true;
+                            CurrentlyHoldingFurniture.GetComponent<ModUtilsFurniture>().OnPickup();
+                            Debug.Log("XD");
+                            foreach (Collider c in CurrentlyHoldingFurniture.GetComponentsInChildren<Collider>())
+                            {
+                                if (c.name.StartsWith("MODUTILS_FURNITURECOLL_") || c.name.StartsWith("MODUTILS_FURNITURE_"))
+                                    c.enabled = false;
+                            }
+                            Debug.Log("XDD");
+                        }
                     }
-                    else if (DoingHack)
-                        DoingHack = false;
+                    else if(rcHit.collider.transform.name.StartsWith("MODUTILS_FURNITURECOLL_"))
+                    {
+                        
+                    }
                 }
-                else if (DoingHack)
-                    DoingHack = false;
             }
 
-            if (DoingHack)
+            Debug.Log("A: " + CurrentlyHoldingFurniture);
+            if (Input.GetMouseButtonUp(0) && CurrentlyHoldingFurniture) // Furniture dropped
             {
-                tools.tool = 22;
-                HackLastFrame = true;
-            }
+                Debug.Log("ButtonLeft");
+                foreach (Collider c in CurrentlyHoldingFurniture.GetComponentsInChildren<Collider>())
+                {
+                    if (c.name.StartsWith("MODUTILS_FURNITURECOLL_") || c.name.StartsWith("MODUTILS_FURNITURE_"))
+                        c.enabled = true;
+                }
 
-            if (HackLastFrame && !DoingHack)
-            {
-                tools.tool = 1;
-                HackLastFrame = false;
+                CurrentlyHoldingFurniture.SetParent(null);
+                CurrentlyHoldingFurniture.GetComponent<Rigidbody>().isKinematic = false;
+                CurrentlyHoldingFurniture.GetComponent<ModUtilsFurniture>().OnDrop();
+                CurrentlyHoldingFurniture = null;
             }
         }
     }

@@ -22,9 +22,6 @@ namespace SimplePartLoader.CarGen
 
         internal static void StartCarGen()
         {
-            GameObject CarsParent = GameObject.Find("CarsParent");
-            CarList CarsComp = CarsParent.GetComponent<CarList>();
-            
             foreach (Car car in RegisteredCars)
             {
                 ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
@@ -37,11 +34,15 @@ namespace SimplePartLoader.CarGen
                 foreach (string transparent in car.carGeneratorData.TransparentsToDelete)
                 {
                     CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent);
+                    CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent);
                 }
 
                 // Add custom transparents to our car
                 CarBuilding.AttachPrefabChilds(car.emptyCarPrefab, car.transparentsObject);
+                CarBuilding.AttachPrefabChilds(car.carPrefab, car.transparentsObject);
+                
                 CarBuilding.UpdateTransparentsReferences(car.emptyCarPrefab);
+                CarBuilding.UpdateTransparentsReferences(car.carPrefab);
 
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
@@ -55,10 +56,6 @@ namespace SimplePartLoader.CarGen
                 // Now, we can build our car
                 BuildCar(car);
 
-                // Last, inject our car into the game
-                Array.Resize(ref CarsComp.Cars, CarsComp.Cars.Length + 1);
-                CarsComp.Cars[CarsComp.Cars.Length - 1] = car.carPrefab;
-
                 // Saving setup
                 if (Saver.modParts.ContainsKey(car.carGeneratorData.CarName))
                 {
@@ -66,7 +63,7 @@ namespace SimplePartLoader.CarGen
                 }
 
                 Saver.modParts.Add(car.carGeneratorData.CarName, car.emptyCarPrefab);
-
+                
                 car.emptyCarPrefab.name = car.carGeneratorData.CarName;
                 car.carPrefab.name = car.carGeneratorData.CarName;
 
@@ -79,6 +76,21 @@ namespace SimplePartLoader.CarGen
                 mcp.CarName = car.carGeneratorData.CarName;
                 mcp.CarPrice = car.carGeneratorData.CarPrice;
                 mcp.PREFAB = car.emptyCarPrefab;
+
+                GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
+                GameObject.DontDestroyOnLoad(car.carPrefab);
+            }
+        }
+
+        internal static void AddCars()
+        {
+            GameObject CarsParent = GameObject.Find("CarsParent");
+            CarList CarsComp = CarsParent.GetComponent<CarList>();
+            
+            foreach (Car car in RegisteredCars)
+            {
+                Array.Resize(ref CarsComp.Cars, CarsComp.Cars.Length + 1);
+                CarsComp.Cars[CarsComp.Cars.Length - 1] = car.carPrefab;
             }
         }
 

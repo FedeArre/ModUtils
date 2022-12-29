@@ -31,6 +31,7 @@ namespace SimplePartLoader.CarGen
             // Bone target fix
             foreach (MyBoneSCR scr in objective.GetComponentsInChildren<MyBoneSCR>())
             {
+                Debug.Log($"Bone found at {scr.name} ({Utils.Functions.GetTransformPath(scr.transform)})");
                 if (scr.transform.childCount != 0)
                 {
                     if(scr.LocalStrtetchTarget != null)
@@ -138,7 +139,7 @@ namespace SimplePartLoader.CarGen
             Transform WindowLiftHandleRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WIndowHandle.003");
             Transform WindowLiftTransparentRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WindowFR07");
 
-            if(WindowLiftTransparentLeft && WindowLiftTransparentRight)
+            if(WindowLiftHandleRight && WindowLiftTransparentRight)
                 WindowLiftHandleRight.GetComponent<WindowLift>().Window = WindowLiftTransparentRight.gameObject;
 
         }
@@ -219,10 +220,11 @@ namespace SimplePartLoader.CarGen
             Hbrake.GetComponent<MeshCollider>().isTrigger = true;
 
             // NWH vehicle controller creation (So does not overlap with Chad stuff)
-            RecreateNWH(objective, mcp);
+            if(!car.carGeneratorData.Disable_NWH_Rebuild)
+                RecreateNWH(objective, mcp, car.carGeneratorData.EnableAWD);
 
             // Fix crash sound
-            objective.GetComponent<RVP.VehicleParent>().crashSnd = objective.transform.Find("CrashSound").GetComponent<AudioSource>();
+            objective.GetComponent<RVP.VehicleDamage>().crashSnd = objective.transform.Find("CrashSound").GetComponent<AudioSource>();
 
             // Fixing particle system (Smoke)
             SMOKE smokeComponent = objective.transform.Find("ExhaustSmoke").GetComponent<SMOKE>();
@@ -261,7 +263,7 @@ namespace SimplePartLoader.CarGen
             }
         }
 
-        internal static void RecreateNWH(GameObject objective, MainCarProperties mainCarProps)
+        internal static void RecreateNWH(GameObject objective, MainCarProperties mainCarProps, bool awd = false)
         {
             WheelController WheelFR, WheelFL, WheelRL, WheelRR;
             WheelComponent NWH_WheelFR, NWH_WheelFL, NWH_WheelRR, NWH_WheelRL;
@@ -423,69 +425,105 @@ namespace SimplePartLoader.CarGen
             FrontGroup.FindBelongingWheels();
             RearGroup.FindBelongingWheels();
 
-            // Differentials fix
-            DifferentialComponent RearDiff = new DifferentialComponent("Rear Differential", NWH_WheelRL, NWH_WheelRR), FrontDiff = new DifferentialComponent("Front Differential", NWH_WheelFL, NWH_WheelFR), TransferCase = new DifferentialComponent("TransferCase", FrontDiff, RearDiff);
-            List<DifferentialComponent> Diffs = new List<DifferentialComponent>();
-            Diffs.Add(RearDiff);
-            Diffs.Add(TransferCase);
-            Diffs.Add(FrontDiff);
+            // Differentials setup
+            // If Chad is setup for AWD but misses transfer case it wont work, that's why both types are supported
+            if (awd) 
+            {
+                DifferentialComponent RearDiff = new DifferentialComponent("Rear Differential", NWH_WheelRL, NWH_WheelRR);
+                DifferentialComponent FrontDiff = new DifferentialComponent("Front Differential", NWH_WheelFL, NWH_WheelFR);
+                DifferentialComponent TransferCase = new DifferentialComponent("TransferCase", FrontDiff, RearDiff);
+                
+                List<DifferentialComponent> Diffs = new List<DifferentialComponent>();
+                Diffs.Add(RearDiff);
+                Diffs.Add(TransferCase);
+                Diffs.Add(FrontDiff);
 
-            TransferCase.biasAB = 1;
-            TransferCase.coastRamp = 0.5f;
-            TransferCase.powerRamp = 1;
-            TransferCase.preload = 10;
-            TransferCase.slipTorque = 1000;
-            TransferCase.stiffness = 1;
-            TransferCase.inertia = 0.02f;
-            TransferCase.input = vehPowertrain.transmission;
-            TransferCase.differentialType = DifferentialComponent.Type.Locked;
+                TransferCase.biasAB = 1;
+                TransferCase.coastRamp = 0.5f;
+                TransferCase.powerRamp = 1;
+                TransferCase.preload = 10;
+                TransferCase.slipTorque = 1000;
+                TransferCase.stiffness = 1;
+                TransferCase.inertia = 0.02f;
+                TransferCase.input = vehPowertrain.transmission;
+                TransferCase.differentialType = DifferentialComponent.Type.Locked;
 
-            RearDiff.input = TransferCase;
-            RearDiff.biasAB = 0.5f;
-            RearDiff.coastRamp = 0.5f;
-            RearDiff.powerRamp = 1;
-            RearDiff.preload = 10;
-            RearDiff.slipTorque = 10000;
-            RearDiff.stiffness = 0.5f;
+                RearDiff.input = TransferCase;
+                RearDiff.biasAB = 0.5f;
+                RearDiff.coastRamp = 0.5f;
+                RearDiff.powerRamp = 1;
+                RearDiff.preload = 10;
+                RearDiff.slipTorque = 10000;
+                RearDiff.stiffness = 0.5f;
 
-            FrontDiff.input = TransferCase;
-            FrontDiff.biasAB = 0.5f;
-            FrontDiff.coastRamp = 0.5f;
-            FrontDiff.powerRamp = 1;
-            FrontDiff.preload = 5;
-            FrontDiff.slipTorque = 1200;
-            FrontDiff.stiffness = 0.5f;
-            FrontDiff.differentialType = DifferentialComponent.Type.Open;
+                FrontDiff.input = TransferCase;
+                FrontDiff.biasAB = 0.5f;
+                FrontDiff.coastRamp = 0.5f;
+                FrontDiff.powerRamp = 1;
+                FrontDiff.preload = 5;
+                FrontDiff.slipTorque = 1200;
+                FrontDiff.stiffness = 0.5f;
+                FrontDiff.differentialType = DifferentialComponent.Type.Open;
 
-            OutputSelector outputSelectorFR = new OutputSelector();
-            OutputSelector outputSelectorFL = new OutputSelector();
-            OutputSelector outputSelectorRL = new OutputSelector();
-            OutputSelector outputSelectorRR = new OutputSelector();
-            OutputSelector outputSelectorFrontDiff = new OutputSelector();
-            OutputSelector outputSelectorRearDiff = new OutputSelector();
-            OutputSelector outputSelectorTransfer = new OutputSelector();
-            outputSelectorFR.name = "WheelWheelControllerFR";
-            outputSelectorFL.name = "WheelWheelControllerFL";
-            outputSelectorRL.name = "WheelWheelControllerRL";
-            outputSelectorRR.name = "WheelWheelControllerRR";
-            outputSelectorFrontDiff.name = "Front Differential";
-            outputSelectorRearDiff.name = "Rear Differential";
-            outputSelectorTransfer.name = "TransferCase";
+                OutputSelector outputSelectorFR = new OutputSelector();
+                OutputSelector outputSelectorFL = new OutputSelector();
+                OutputSelector outputSelectorRL = new OutputSelector();
+                OutputSelector outputSelectorRR = new OutputSelector();
+                OutputSelector outputSelectorFrontDiff = new OutputSelector();
+                OutputSelector outputSelectorRearDiff = new OutputSelector();
+                OutputSelector outputSelectorTransfer = new OutputSelector();
+                outputSelectorFR.name = "WheelWheelControllerFR";
+                outputSelectorFL.name = "WheelWheelControllerFL";
+                outputSelectorRL.name = "WheelWheelControllerRL";
+                outputSelectorRR.name = "WheelWheelControllerRR";
+                outputSelectorFrontDiff.name = "Front Differential";
+                outputSelectorRearDiff.name = "Rear Differential";
+                outputSelectorTransfer.name = "TransferCase";
 
-            vehPowertrain.transmission.outputA = TransferCase;
+                vehPowertrain.transmission.outputA = TransferCase;
 
-            CarGenUtils.SetPrivatePropertyValue(newTransmission, "outputASelector", outputSelectorTransfer);
-            CarGenUtils.SetPrivatePropertyValue(FrontDiff, "outputASelector", outputSelectorFL);
-            CarGenUtils.SetPrivatePropertyValue(FrontDiff, "outputBSelector", outputSelectorFR);
-            CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputASelector", outputSelectorRL);
-            CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputBSelector", outputSelectorRR);
-            CarGenUtils.SetPrivatePropertyValue(TransferCase, "outputASelector", outputSelectorFrontDiff);
-            CarGenUtils.SetPrivatePropertyValue(TransferCase, "outputBSelector", outputSelectorRearDiff);
-            CarGenUtils.SetPrivatePropertyValue(vehPowertrain.transmission, "outputASelector", outputSelectorTransfer);
+                CarGenUtils.SetPrivatePropertyValue(newTransmission, "outputASelector", outputSelectorTransfer);
+                CarGenUtils.SetPrivatePropertyValue(FrontDiff, "outputASelector", outputSelectorFL);
+                CarGenUtils.SetPrivatePropertyValue(FrontDiff, "outputBSelector", outputSelectorFR);
+                CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputASelector", outputSelectorRL);
+                CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputBSelector", outputSelectorRR);
+                CarGenUtils.SetPrivatePropertyValue(TransferCase, "outputASelector", outputSelectorFrontDiff);
+                CarGenUtils.SetPrivatePropertyValue(TransferCase, "outputBSelector", outputSelectorRearDiff);
+                CarGenUtils.SetPrivatePropertyValue(vehPowertrain.transmission, "outputASelector", outputSelectorTransfer);
 
-            vehPowertrain.differentials = Diffs;
+                vehPowertrain.differentials = Diffs;
 
-            mainCarProps.AWD = true; // Not really Chad 1:1 but making devs life easier by allowing AWD when they want
+                mainCarProps.AWD = true;
+            }
+            else
+            {
+                DifferentialComponent RearDiff = new DifferentialComponent("Rear Differential", NWH_WheelRL, NWH_WheelRR);
+                List<DifferentialComponent> Diffs = new List<DifferentialComponent>();
+                Diffs.Add(RearDiff);
+
+                RearDiff.input = newTransmission;
+                RearDiff.biasAB = 0.5f;
+                RearDiff.coastRamp = 0.5f;
+                RearDiff.powerRamp = 1;
+                RearDiff.preload = 10;
+                RearDiff.slipTorque = 10000;
+                RearDiff.stiffness = 0.1f;
+
+                OutputSelector outputSelectorRL = new OutputSelector();
+                OutputSelector outputSelectorRR = new OutputSelector();
+                OutputSelector outputSelectorRearDiff = new OutputSelector();
+                
+                outputSelectorRL.name = "WheelWheelControllerRL";
+                outputSelectorRR.name = "WheelWheelControllerRR";
+                outputSelectorRearDiff.name = "Rear Differential";
+
+                CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputASelector", outputSelectorRL);
+                CarGenUtils.SetPrivatePropertyValue(RearDiff, "outputBSelector", outputSelectorRR);
+                CarGenUtils.SetPrivatePropertyValue(vehPowertrain.transmission, "outputASelector", outputSelectorRearDiff);
+
+                vehPowertrain.transmission.outputA = RearDiff;
+                vehPowertrain.differentials = Diffs;
+            }
 
             // Rigind module fix.
             RiggingModuleWrapper RigidWrapper = objective.GetComponent<RiggingModuleWrapper>();

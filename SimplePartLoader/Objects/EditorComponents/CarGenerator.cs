@@ -39,6 +39,8 @@ public class CarGenerator : MonoBehaviour
     public bool DisableModUtilsTemplateSetup = false;
     public bool EnableAutomaticPainting = true;
     public bool EnableAutomaticFluidSetup = true;
+    public bool EnableAWD = false;
+    public bool Disable_NWH_Rebuild = false;
 }
 
 public enum CarBase

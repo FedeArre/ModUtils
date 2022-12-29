@@ -41,7 +41,7 @@ namespace SimplePartLoader
 
                 furniture.layer = LayerMask.NameToLayer("Items");
                 
-                GameObject.Destroy(furniture.GetComponent<MooveItem>());
+                //GameObject.Destroy(furniture.GetComponent<MooveItem>());
                 GameObject.Destroy(furniture.GetComponent<ModUtilsFurniture>());
                 GameObject.DestroyImmediate(furniture.GetComponent<Rigidbody>());
                 
@@ -102,8 +102,8 @@ namespace SimplePartLoader
                     furniture.transform.position = new Vector3(fd.X, fd.Y, fd.Z);
                     furniture.transform.eulerAngles = new Vector3(fd.rX, fd.rY, fd.rZ);
 
-                    if (furniture.GetComponent<Rigidbody>() && f.BehaveAsFurniture)
-                        GameObject.DestroyImmediate(furniture.GetComponent<Rigidbody>());
+                    /*if (furniture.GetComponent<Rigidbody>() && f.BehaveAsFurniture)
+                        GameObject.DestroyImmediate(furniture.GetComponent<Rigidbody>());*/
                 }
                 else
                 {

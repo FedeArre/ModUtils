@@ -281,6 +281,7 @@ namespace SimplePartLoader
                 }
             }
 
+            MainCarGenerator.AddCars();
             SPL.InvokeLoadFinishedEvent();
         }
 
