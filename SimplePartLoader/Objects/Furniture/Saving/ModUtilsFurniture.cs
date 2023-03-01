@@ -15,6 +15,8 @@ namespace SimplePartLoader.Objects.Furniture.Saving
         bool InTrailer = false;
 
         FixedJoint Joint = null;
+        bool CanPickup = false;
+        bool PreventFreeze = false;
         
         void Start()
         {
@@ -27,10 +29,14 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 
         public void OnDrop()
         {
+            Debug.Log("ModUtilsFurniture ONDROP call!");
             if(furnitureRef.TrailerAttaching && Joint)
             {
                 return;
             }
+
+            CanPickup = true;
+            PreventFreeze = false;
             
             if (furnitureRef.FreezeType == FurnitureGenerator.FreezeTypeEnum.Instant)
             {
@@ -47,6 +53,11 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 
         public void OnPickup()
         {
+            Debug.Log("ModUtilsFurniture ONPICKUP call!");
+            
+            PreventFreeze = true;
+            CanPickup = false;
+            
             StopCoroutine(FreezeRoutine());
             
             if (Joint)
@@ -55,6 +66,7 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 
         public void OnBuy()
         {
+            Debug.Log("ModUtilsFurniture ONBUY call!");
             Rigidbody rb = GetComponent<Rigidbody>();
             if (rb)
             {
@@ -65,25 +77,30 @@ namespace SimplePartLoader.Objects.Furniture.Saving
         
         IEnumerator FreezeRoutine()
         {
+            Debug.Log("ModUtilsFurniture FREEZEROUTINE call!");
             Rigidbody rb = GetComponent<Rigidbody>();
             if(rb)
             {
                 yield return new WaitForSeconds(1);
-                while(rb.velocity.magnitude > 0.1f || InTrailer)
+                while(rb.velocity.magnitude > 0.05f || InTrailer)
                 {
                     yield return 0;
                 }
 
-                if(furnitureRef.FreezeType != FurnitureGenerator.FreezeTypeEnum.NoFreeze)
+                if(furnitureRef.FreezeType != FurnitureGenerator.FreezeTypeEnum.NoFreeze && !PreventFreeze)
                     rb.isKinematic = true;
+
+                if(!PreventFreeze)
+                    CanPickup = false;
             }
         }
         
         public void OnTriggerEnter(Collider other)
 	    {
-		    if (other.gameObject.name == "InsideCol" && transform.name != "CarLift")
+		    if (CanPickup && other.gameObject.name == "InsideCol" && transform.name != "CarLift")
 		    {
-			    InTrailer = true;
+                Debug.Log("ModUtilsFurniture ONTRIGGERENTER(TRUE) call!");
+                InTrailer = true;
                 if (!Joint)
                 {
                     Joint = gameObject.AddComponent<FixedJoint>();
@@ -103,12 +120,14 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 	    {
 		    if (other.gameObject.name == "InsideCol")
 		    {
-			    InTrailer = false;
+                Debug.Log("ModUtilsFurniture ONTRIGGERXIT(TRUE) call!");
+                InTrailer = false;
 		    }
 	    }
 
         public void ChildDestroyed()
         {
+            Debug.Log("ModUtilsFurniture CHILDDESTROY call!");
             GameObject.Destroy(this);
         }
     }

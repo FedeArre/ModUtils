@@ -22,7 +22,7 @@ namespace SimplePartLoader
         public override string Version => "v1.2.0"; 
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "1.3-pb1";
+        string TESTING_VERSION_NUMBER = "1.3-pb3-furniture-fix";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 

@@ -57,6 +57,10 @@ namespace SimplePartLoader.Objects.Furniture
                             if (rcHit.collider.transform.name[19] == 'F' && tools.tool != 22)
                                 return;
 
+                            Joint jointToDestroy = rcHit.collider.GetComponent<Joint>();
+                            if (jointToDestroy)
+                                GameObject.Destroy(jointToDestroy);
+                            
                             PlayerHand.position = rcHit.point;
 
                             CurrentlyHoldingFurniture = rcHit.collider.transform;

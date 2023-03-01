@@ -109,7 +109,7 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} has a missing component.");
+                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
                         modLoadedParts.Remove(part);
                     }
 
@@ -418,7 +418,7 @@ namespace SimplePartLoader
 
                 if(!data.EnableMeshChange && part.GetComponent<MeshFilter>())
                 {
-                    Debug.LogError($"[ModUtils/SPL/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
+                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
                     continue;
                 }
                 
@@ -427,7 +427,7 @@ namespace SimplePartLoader
 
                 if (!part.CarProps)
                 {
-                    Debug.LogError($"[ModUtils/SPL/Error]: Prefab generator was unable to create {part.Name}");
+                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Prefab generator was unable to create {part.Name}");
                     continue;
                 }
 
@@ -554,6 +554,9 @@ namespace SimplePartLoader
                             part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);
                             break;
                     }
+
+                    if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable)
+                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Mesh from {data.PrefabName} is not readable. This will cause the part to not be loaded properly. Please make the mesh readable.");
                 }
 
                 // To enable chroming on our part
