@@ -567,6 +567,9 @@ namespace SimplePartLoader
 
                 if (data.CatalogImage)
                 {
+                    if (data.CatalogImage.width < 500 || data.CatalogImage.height < 500)
+                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Thumbnail of {data.PrefabName} is too small! Size has to be at least 500x500!");
+
                     part.PartInfo.Thumbnail = data.CatalogImage;
                 }
 
