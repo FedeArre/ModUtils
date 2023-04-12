@@ -27,7 +27,7 @@ namespace SimplePartLoader
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        public const string API_URL = "https://mygaragemod.xyz/api";
+        public const string API_URL = "https://modding.fedes.uy/api";
         GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;

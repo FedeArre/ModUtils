@@ -44,5 +44,10 @@ namespace SimplePartLoader.CarGen
         {
             OnPostBuild = function;
         }
+
+        public void AddException(string partName, string prefabName)
+        {
+            exceptionsObject.AddException(partName, prefabName);
+        }
     }
 }

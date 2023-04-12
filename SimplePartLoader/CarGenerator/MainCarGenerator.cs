@@ -99,11 +99,12 @@ namespace SimplePartLoader.CarGen
             // Build our car
             CarGenUtils.RecursiveCarBuild(car);
 
-            if(car.carGeneratorData.TransparentReferenceUpdate)
+            Debug.Log("ModUtilsTEST:POSTBUILD1");
+            if (car.carGeneratorData.TransparentReferenceUpdate)
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab);
 
-            Debug.Log($"HOLA{car.carGeneratorData.BoneTargetTransformFix}");
-            if(car.carGeneratorData.BoneTargetTransformFix)
+            Debug.Log("ModUtilsTEST:POSTUPD");
+            if (car.carGeneratorData.BoneTargetTransformFix)
             {
                 foreach (MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
                 {
@@ -113,7 +114,8 @@ namespace SimplePartLoader.CarGen
                     }
                 }
             }
-            
+
+            Debug.Log("ModUtilsTEST:POSTBUILD2");            
             // Post build
             ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
 
@@ -149,11 +151,12 @@ namespace SimplePartLoader.CarGen
                     hexNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
                 }
 
+                Debug.Log("ModUtilsTEST:POSTBUILD33");
                 foreach (FlatNut flatNut in car.carPrefab.GetComponentsInChildren<FlatNut>())
                 {
                     flatNut.tight = true;
                     
-                    if (car.EnableDebug && !flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
+                    if (!flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
                     }
@@ -167,7 +170,7 @@ namespace SimplePartLoader.CarGen
                     boltNut.ReStart();
                     boltNut.tight = true;
 
-                    if (car.EnableDebug && !boltNut.gameObject.transform.parent.GetComponent<Partinfo>())
+                    if (!boltNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
                         continue;
@@ -180,7 +183,7 @@ namespace SimplePartLoader.CarGen
                         continue;
                     }
                     
-                    if (car.EnableDebug && !boltNut.otherobject.GetComponent<Partinfo>())
+                    if (!boltNut.otherobject.GetComponent<Partinfo>())
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
                         continue;
@@ -190,20 +193,23 @@ namespace SimplePartLoader.CarGen
                     boltNut.otherobject.GetComponent<Partinfo>().ImportantBolts += 1f;
                 }
 
+                Debug.Log("ModUtilsTEST:POSTBUILD5");
                 foreach (WeldCut weldCut in car.carPrefab.GetComponentsInChildren<WeldCut>())
                 {
                     weldCut.ReStart();
                     weldCut.welded = true;
+                    Debug.Log(weldCut.gameObject.name);
+                    Debug.Log(weldCut.transform.parent.name);
                     weldCut.gameObject.transform.parent.GetComponent<Partinfo>().fixedwelds += 1f;
                     weldCut.gameObject.transform.parent.GetComponent<Partinfo>().attachedwelds += 1f;
 
-                    if (car.EnableDebug && !weldCut.otherobject)
+                    if (!weldCut.otherobject)
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
                         continue;
                     }
                     
-                    if (car.EnableDebug && !weldCut.otherobject.GetComponent<Partinfo>())
+                    if (!weldCut.otherobject.GetComponent<Partinfo>())
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
                         continue;
@@ -213,9 +219,10 @@ namespace SimplePartLoader.CarGen
                     weldCut.otherobject.GetComponent<Partinfo>().attachedwelds += 1f;
                 }
             }
-
+            Debug.Log("FINISHPOSTBUILD");
             if(car.carGeneratorData.EnableAutomaticPartCount)
             {
+                Debug.Log("AA");
                 int partCount = 0;
                 CarProperties[] componentsInChildren = car.carPrefab.GetComponentsInChildren<CarProperties>();
                 for (int i = 0; i < componentsInChildren.Length; i++)
@@ -228,14 +235,17 @@ namespace SimplePartLoader.CarGen
                 
                 car.carPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
                 car.emptyCarPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
+                Debug.Log("AA2");
             }
 
+            Debug.Log("AA33");
             if (car.carGeneratorData.FixLights)
             {
                 CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
                 CommonFixes.Windows(car.carPrefab, car.EnableDebug);
             }
-            
+
+            Debug.Log("ModUtilsTEST:POSTBUILD11");
             if (car.carGeneratorData.EnableAutomaticPainting)
             {
                 foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())

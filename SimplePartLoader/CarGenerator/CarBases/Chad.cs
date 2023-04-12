@@ -64,15 +64,6 @@ namespace SimplePartLoader.CarGen
             if (car.carGeneratorData.DisableModUtilsTemplateSetup)
                 return;
 
-            Transform SeatDriver = CarGenUtils.LookupValidTransform(car.carPrefab, "SeatFL06");
-            Transform SeatPassanger = CarGenUtils.LookupValidTransform(car.carPrefab, "SeatFR06");
-
-            if (SeatDriver)
-                CommonFixes.FixPart(SeatDriver.gameObject, FixType.DriverPassangerSeat);
-
-            if (SeatPassanger)
-                CommonFixes.FixPart(SeatPassanger.gameObject, FixType.DriverPassangerSeat);
-
             // All fluid fixes
             Transform engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlockV8");
             if (engine)
@@ -248,6 +239,31 @@ namespace SimplePartLoader.CarGen
                 else if (scr.transform.name == "HandbbrakeCable07")
                 {
                     scr.LocalStrtetchTarget = scr.transform.parent.Find("DummyPivHbrak");
+                }
+                else if (scr.transform.name == "RearAxle07")
+                {
+                    Transform NonRot1 = null, NonRot2 = null;
+
+                    foreach (Transform child in objective.transform.Find("RearSusp").GetComponentsInChildren<Transform>())
+                    {
+                        if (child.name == "NonROtVIsualANDrAxlePivot")
+                        {
+                            if (NonRot1)
+                                NonRot2 = child;
+                            else
+                                NonRot1 = child;
+                        }
+
+                        if (NonRot1 && NonRot2)
+                            break;
+                    }
+
+                    scr.targetTransform = NonRot2;
+                    scr.targetTransformB = NonRot1;
+                }
+                else if (scr.transform.name == "DriveShaft07")
+                {
+                    scr.targetTransform = objective.transform.Find("RearSusp/RearAxle07/Pivotdriveshaft");
                 }
             }
 
@@ -524,43 +540,6 @@ namespace SimplePartLoader.CarGen
                 vehPowertrain.transmission.outputA = RearDiff;
                 vehPowertrain.differentials = Diffs;
             }
-
-            // Rigind module fix.
-            RiggingModuleWrapper RigidWrapper = objective.GetComponent<RiggingModuleWrapper>();
-            RiggingModule RigidModule = new RiggingModule();
-            Bone Bone1 = new Bone(), Bone2 = new Bone();
-            Transform NonRot1 = null, NonRot2 = null;
-
-            foreach (Transform child in objective.transform.Find("RearSusp").GetComponentsInChildren<Transform>())
-            {
-                if (child.name == "NonROtVIsualANDrAxlePivot")
-                {
-                    if (NonRot1)
-                        NonRot2 = child;
-                    else
-                        NonRot1 = child;
-                }
-
-                if (NonRot1 && NonRot2)
-                    break;
-            }
-
-            Transform DriveshaftPivot = objective.transform.Find("RearSusp/RearAxle07/Pivotdriveshaft");
-
-            Bone1.doubleSided = true;
-            Bone1.thisTransform = objective.transform.Find("RearSusp/RearAxle07");
-            Bone1.targetTransform = NonRot2;
-            Bone1.targetTransformB = NonRot1;
-
-            Bone2.lookAtTarget = true;
-            Bone2.stretchToTarget = true;
-            Bone2.targetTransform = DriveshaftPivot;
-            Bone2.thisTransform = objective.transform.Find("EngineTranny/DriveShaft07");
-
-            RigidModule.bones = new List<Bone>();
-            RigidModule.bones.Add(Bone1);
-            RigidModule.bones.Add(Bone2);
-            RigidWrapper.module = RigidModule;
 
             // Brakes & some other stuff
             Brakes vehBrakes = new Brakes();

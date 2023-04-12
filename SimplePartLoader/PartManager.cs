@@ -434,6 +434,11 @@ namespace SimplePartLoader
                 // Now we remove all specific childs / move them.
                 foreach(ChildDestroy cd in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                 {
+                    if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
+                    {
+                        Debug.Log($"[ModUtils/SPL/PrefabGen/DevLog]: Part {part.Prefab.name} - Trying to destroy {cd.name} (SW: {cd.StartsWith} | EW: {cd.EndsWith})");
+                    }
+
                     foreach(Transform t in part.GetTransforms())
                     {
                         if (cd.StartsWith)
