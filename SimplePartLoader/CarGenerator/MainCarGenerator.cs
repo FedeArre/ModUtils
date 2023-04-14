@@ -44,6 +44,20 @@ namespace SimplePartLoader.CarGen
                 CarBuilding.UpdateTransparentsReferences(car.emptyCarPrefab);
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab);
 
+                // We setup the car information already (Makes debugging easier)
+                car.emptyCarPrefab.name = car.carGeneratorData.CarName;
+                car.carPrefab.name = car.carGeneratorData.CarName;
+
+                MainCarProperties mcpEmpty = car.emptyCarPrefab.GetComponent<MainCarProperties>();
+                mcpEmpty.CarName = car.carGeneratorData.CarName;
+                mcpEmpty.CarPrice = car.carGeneratorData.CarPrice;
+                mcpEmpty.PREFAB = car.emptyCarPrefab;
+
+                MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
+                mcp.CarName = car.carGeneratorData.CarName;
+                mcp.CarPrice = car.carGeneratorData.CarPrice;
+                mcp.PREFAB = car.emptyCarPrefab;
+
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
                 baseData.SetupTemplate(car.carPrefab, car);
@@ -64,19 +78,6 @@ namespace SimplePartLoader.CarGen
 
                 Saver.modParts.Add(car.carGeneratorData.CarName, car.emptyCarPrefab);
                 
-                car.emptyCarPrefab.name = car.carGeneratorData.CarName;
-                car.carPrefab.name = car.carGeneratorData.CarName;
-
-                MainCarProperties mcpEmpty = car.emptyCarPrefab.GetComponent<MainCarProperties>();
-                mcpEmpty.CarName = car.carGeneratorData.CarName;
-                mcpEmpty.CarPrice = car.carGeneratorData.CarPrice;
-                mcpEmpty.PREFAB = car.emptyCarPrefab;
-
-                MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
-                mcp.CarName = car.carGeneratorData.CarName;
-                mcp.CarPrice = car.carGeneratorData.CarPrice;
-                mcp.PREFAB = car.emptyCarPrefab;
-
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
             }
@@ -118,6 +119,16 @@ namespace SimplePartLoader.CarGen
             Debug.Log("ModUtilsTEST:POSTBUILD2");            
             // Post build
             ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
+
+            // Force part name already so is easy to work on
+            if(car.carGeneratorData.EnableAttachFix)
+            {
+                foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
+                {
+                    if (!String.IsNullOrEmpty(partinfo.RenamedPrefab))
+                        partinfo.gameObject.name = partinfo.RenamedPrefab;
+                }
+            }
 
             baseData.PostBuild(car.carPrefab, car);
             car.OnPostBuild?.Invoke(car.carPrefab);

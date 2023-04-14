@@ -188,9 +188,20 @@ namespace SimplePartLoader.CarGen
             if(wiresMain)
             {
                 transparents wiresMainTransparent = wiresMain.GetComponent<transparents>();
-                wiresMainTransparent.ChildrenMesh = car.carGeneratorData.Inline4BatteryWires;
-                wiresMainTransparent.ChildrenMesh1 = car.carGeneratorData.V8EngineBatteryWires;
-                wiresMainTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6BatteryWires;
+                if(car.carGeneratorData.Inline4BatteryWires)
+                {
+                    wiresMainTransparent.ChildrenMesh = car.carGeneratorData.Inline4BatteryWires;
+                }
+
+                if(car.carGeneratorData.V8EngineBatteryWires)
+                {
+                    wiresMainTransparent.ChildrenMesh1 = car.carGeneratorData.V8EngineBatteryWires;
+                }
+
+                if(car.carGeneratorData.Inline6BatteryWires)
+                {
+                    wiresMainTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6BatteryWires;
+                }
             }
 
             // Fuel line setup
@@ -198,9 +209,21 @@ namespace SimplePartLoader.CarGen
             if(fuelLine)
             {
                 transparents fuelLineTransparent = fuelLine.GetComponent<transparents>();
-                fuelLineTransparent.ChildrenMesh = car.carGeneratorData.Inline4FuelLine;
-                fuelLineTransparent.ChildrenMesh1 = car.carGeneratorData.V8EngineFuelLine;
-                fuelLineTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6FuelLine;
+
+                if (car.carGeneratorData.Inline4FuelLine)
+                {
+                    fuelLineTransparent.ChildrenMesh = car.carGeneratorData.Inline4FuelLine;
+                }
+
+                if (car.carGeneratorData.V8EngineFuelLine)
+                {
+                    fuelLineTransparent.ChildrenMesh1 = car.carGeneratorData.V8EngineFuelLine;
+                }
+
+                if (car.carGeneratorData.Inline6FuelLine)
+                {
+                    fuelLineTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6FuelLine;
+                }
             }
 
             // Handbrake fix
