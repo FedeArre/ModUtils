@@ -238,7 +238,7 @@ namespace SimplePartLoader
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
         }
 
-        public override void Continue()
+        /*public override void Continue()
         {
             Debug.Log("[ModUtilsMPTEST]: Continue event called -> Generating all dependant calls");
 
@@ -249,18 +249,18 @@ namespace SimplePartLoader
 
             GameObject dummyObject = new GameObject("SPL_Dummy");
             dummyObject.AddComponent<SavingHandlerMono>().Load();
-        }
+        }*/
 
-        public override void OnSaveFinish()
+        /*public override void OnSaveFinish()
         {
             Debug.Log("[ModUtilsMPTEST]: OnSaveFinish event called -> Generating all dependant calls");
 
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
-
+        
             CustomSaverHandler.Save();
-        }
+        }*/
 
         public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
         {
@@ -268,12 +268,9 @@ namespace SimplePartLoader
 
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
-            
-            if (isBarn)
-            {
 
-            }
-            else
+            CustomSaverHandler.Save(saver, isBarn);
+            if (!isBarn)
             {
                 FurnitureManager.SaveFurniture(saver);
             }
@@ -285,13 +282,13 @@ namespace SimplePartLoader
 
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
-            
-            if (isBarn)
-            {
 
-            }
-            else
-            {
+            // We execute the Load method
+            // A dummy is required because we need a frame between the actual object load and the data load
+            GameObject dummyObject = new GameObject("SPL_Dummy");
+            dummyObject.AddComponent<SavingHandlerMono>().Load(saver, isBarn);
+
+            if (!isBarn) {
                 FurnitureManager.LoadFurniture(saver);
             }
         }

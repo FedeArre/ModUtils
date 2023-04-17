@@ -442,20 +442,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Autoupdating.cs" />
-    <Compile Include="CarGenerator\BuildingExceptions.cs" />
-    <Compile Include="CarGenerator\Car.cs" />
-    <Compile Include="CarGenerator\CarBases\Chad.cs" />
-    <Compile Include="CarGenerator\CarBases\ICarBase.cs" />
-    <Compile Include="CarGenerator\Utils\CarGenPainting.cs" />
-    <Compile Include="CarGenerator\Utils\CarGenUtils.cs" />
-    <Compile Include="CarGenerator\MainCarGenerator.cs" />
+    <Compile Include="Features\Autoupdating.cs" />
+    <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
+    <Compile Include="Features\CarGenerator\Car.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
+    <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
+    <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
+    <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
     <Compile Include="FurnitureManager.cs" />
-    <Compile Include="ModUtils\ModObjects\EACheck.cs" />
-    <Compile Include="ModUtils\ModObjects\EarlyAccessJson.cs" />
-    <Compile Include="ModUtils\ModObjects\ModInstance.cs" />
-    <Compile Include="ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\EACheck.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Objects\EditorComponents\CarGenerator.cs" />
     <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />
     <Compile Include="Objects\EditorComponents\ChildMove.cs" />
@@ -472,10 +472,10 @@
     <Compile Include="Objects\Furniture\SpawnSpot.cs" />
     <Compile Include="Objects\LightFix.cs" />
     <Compile Include="Objects\Furniture\SaleFurniture.cs" />
-    <Compile Include="Utils\CommonFixes.cs" />
-    <Compile Include="Utils\KeepAlive.cs" />
+    <Compile Include="Features\CommonFixes.cs" />
+    <Compile Include="Features\KeepAlive.cs" />
     <Compile Include="CustomSaverHandler.cs" />
-    <Compile Include="ModUtils\ModUtils.cs" />
+    <Compile Include="Features\ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod.cs" />
     <Compile Include="Objects\Autoupdater\JSON_ModList.cs" />
@@ -493,19 +493,19 @@
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
-    <Compile Include="PartManager.cs" />
+    <Compile Include="Features\SimplePartLoader\PartManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="SPL.cs" />
+    <Compile Include="Features\SimplePartLoader\SPL.cs" />
     <Compile Include="Objects\TransparentEdit.cs" />
     <Compile Include="Utils\CarBuilding.cs" />
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
-    <Compile Include="ModUtils\PaintingSystem.cs" />
+    <Compile Include="Features\SimplePartLoader\PaintingSystem.cs" />
     <Compile Include="Utils\ModUtils_Snapshoter.cs" />
   </ItemGroup>
   <ItemGroup>

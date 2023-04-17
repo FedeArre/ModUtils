@@ -10,17 +10,26 @@ namespace SimplePartLoader
 {
     internal class SavingHandlerMono : MonoBehaviour
     {
-        public void Load()
+        SaveSystem _saver;
+        bool _isBarn;
+
+        public void Load(SaveSystem saver, bool isBarn)
         {
+            _saver = saver;
+            _isBarn = isBarn;
+
             StartCoroutine(LoadCoroutine());
         }
 
         IEnumerator LoadCoroutine()
         {
+            // Wait a frame and load the stuff
             yield return 0;
 
-            CustomSaverHandler.Load();
-            GameObject.Destroy(this.gameObject);
+            CustomSaverHandler.Load(_saver, _isBarn);
+
+            yield return 0;
+            GameObject.DestroyImmediate(gameObject);
         }
     }
 }

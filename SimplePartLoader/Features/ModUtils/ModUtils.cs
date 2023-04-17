@@ -10,12 +10,12 @@ namespace SimplePartLoader
 {
     public class ModUtils
     {
-        private static GameObject Player;
-        private static tools PlayerTools;
-        private static AudioManager AudioList;
-        private static AudioSource Source;
-        private static Player RewiredPlayer;
-        private static MainCarProperties CurrentPlayerCar;
+        public static GameObject Player { get; internal set; }
+        public static tools PlayerTools { get; internal set; }
+        public static AudioManager AudioList { get; internal set; }
+        public static AudioSource Source { get; internal set; }
+        public static Player RewiredPlayer { get; internal set; }
+        public static MainCarProperties CurrentPlayerCar { get; internal set; }
 
         internal static List<GameObject> Cars;
 

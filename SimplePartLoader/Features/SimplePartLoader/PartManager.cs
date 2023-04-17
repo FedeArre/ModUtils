@@ -1,4 +1,5 @@
 ﻿using Assets.SimpleLocalization;
+using KCC;
 using RVP;
 using SimplePartLoader.CarGen;
 using SimplePartLoader.Objects.EditorComponents;
@@ -111,11 +112,8 @@ namespace SimplePartLoader
                     {
                         Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
                         modLoadedParts.Remove(part);
+                        continue;
                     }
-
-                    CarProperties carProps = part.Prefab.GetComponent<CarProperties>();
-                    if (!String.IsNullOrEmpty(carProps.PrefabName) && carProps.PrefabName != part.Prefab.name)
-                        part.Prefab.name = carProps.PrefabName;
 
                     if(part.Mod != null)
                     {
