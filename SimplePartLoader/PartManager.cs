@@ -113,6 +113,10 @@ namespace SimplePartLoader
                         modLoadedParts.Remove(part);
                     }
 
+                    CarProperties carProps = part.Prefab.GetComponent<CarProperties>();
+                    if (!String.IsNullOrEmpty(carProps.PrefabName) && carProps.PrefabName != part.Prefab.name)
+                        part.Prefab.name = carProps.PrefabName;
+
                     if(part.Mod != null)
                     {
                         if(part.Mod.RequiresSteamCheck && !part.Mod.Checked)

@@ -189,6 +189,8 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
+            Debug.Log("[ModUtilsMPTEST]: OnLoad event called -> Generating all dependant calls");
+
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
             FurnitureManager.SetupFurniture();
@@ -238,6 +240,8 @@ namespace SimplePartLoader
 
         public override void Continue()
         {
+            Debug.Log("[ModUtilsMPTEST]: Continue event called -> Generating all dependant calls");
+
             // Custom saving
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)
@@ -249,6 +253,8 @@ namespace SimplePartLoader
 
         public override void OnSaveFinish()
         {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveFinish event called -> Generating all dependant calls");
+
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
@@ -258,6 +264,8 @@ namespace SimplePartLoader
 
         public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
         {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemSave event called -> Generating all dependant calls");
+
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
             
@@ -273,6 +281,8 @@ namespace SimplePartLoader
 
         public override void OnSaveSystemLoad(SaveSystem saver, bool isBarn)
         {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemLoad event called -> Generating all dependant calls");
+
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
             

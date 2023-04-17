@@ -20,6 +20,9 @@ namespace SimplePartLoader
         
         private KeepAlive()
         {
+            // UNSAFE! This has to be removed after ModUtils backend update!
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
             // Keep the json to post on memory
             JSON_ModList jsonList = new JSON_ModList();
             foreach (Mod mod in ModLoader.mods)
@@ -32,7 +35,7 @@ namespace SimplePartLoader
                 jsonList.mods.Add(jsonMod);
             }
             serializedJson = JsonConvert.SerializeObject(jsonList);
-            
+
             // Repeating the heartbeat func
             var startTimeSpan = TimeSpan.Zero;
             var periodTimeSpan = TimeSpan.FromMinutes(1);
