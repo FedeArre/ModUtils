@@ -294,6 +294,15 @@ namespace SimplePartLoader.CarGen
                         Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
                     }
                 }
+
+                foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())
+                {
+                    if (pi.fixedwelds != 0)
+                        Debug.Log($"[ModUtils/CarGen/PostBuild/Debug]: {pi} ({pi.name}) has {pi.fixedwelds} WeldCuts");
+
+                    if (pi.fixedImportantBolts != 0)
+                        Debug.Log($"[ModUtils/CarGen/PostBuild/Debug]: {pi} ({pi.name}) has {pi.fixedImportantBolts} BoltNuts");
+                }
             }
         }
     }
