@@ -45,9 +45,9 @@ namespace SimplePartLoader.CarGen
             OnPostBuild = function;
         }
 
-        public void AddException(string partName, string prefabName)
+        public void AddException(string partName, string prefabName, bool forceFittingIgnoringModUtilsConditions = false)
         {
-            exceptionsObject.AddException(partName, prefabName);
+            exceptionsObject.AddException(partName, prefabName, forceFittingIgnoringModUtilsConditions);
         }
     }
 }

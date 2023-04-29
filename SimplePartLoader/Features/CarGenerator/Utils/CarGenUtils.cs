@@ -121,13 +121,13 @@ namespace SimplePartLoader.CarGen
                     }
 
                     // TODO: Consider if this two are a good idea
-                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom)
+                    if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
                     {
                         foundPart = null;
                         continue;
                     }
                     
-                    if(foundPart.GetComponent<CarProperties>().Type != type)
+                    if(foundPart.GetComponent<CarProperties>().Type != type && !exceptions.IgnoringStatusForPart(name))
                     {
                         foundPart = null;
                         continue;
@@ -165,8 +165,7 @@ namespace SimplePartLoader.CarGen
                         }
                     }
                     
-                    // TODO: Consider if this two are a good idea
-                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom)
+                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom && !exceptions.IgnoringStatusForPart(name))
                     {
                         foundPart = null;
                         continue;

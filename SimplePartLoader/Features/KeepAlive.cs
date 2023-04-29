@@ -48,7 +48,6 @@ namespace SimplePartLoader
 
         private async void SendCurrentStatus()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Sending status");
             try
             {
                 var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
@@ -68,7 +67,7 @@ namespace SimplePartLoader
 
         public void Ready()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Enabled!");
+            Debug.Log("[ModUtils/KeepAlive]: Enabled!"); 
         }
     }
 }
