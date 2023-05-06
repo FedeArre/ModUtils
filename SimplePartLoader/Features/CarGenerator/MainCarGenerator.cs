@@ -100,11 +100,9 @@ namespace SimplePartLoader.CarGen
             // Build our car
             CarGenUtils.RecursiveCarBuild(car);
 
-            Debug.Log("ModUtilsTEST:POSTBUILD1");
             if (car.carGeneratorData.TransparentReferenceUpdate)
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab);
 
-            Debug.Log("ModUtilsTEST:POSTUPD");
             if (car.carGeneratorData.BoneTargetTransformFix)
             {
                 foreach (MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
@@ -116,7 +114,6 @@ namespace SimplePartLoader.CarGen
                 }
             }
 
-            Debug.Log("ModUtilsTEST:POSTBUILD2");            
             // Post build
             ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
 
@@ -162,7 +159,6 @@ namespace SimplePartLoader.CarGen
                     hexNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
                 }
 
-                Debug.Log("ModUtilsTEST:POSTBUILD33");
                 foreach (FlatNut flatNut in car.carPrefab.GetComponentsInChildren<FlatNut>())
                 {
                     flatNut.tight = true;
@@ -204,7 +200,6 @@ namespace SimplePartLoader.CarGen
                     boltNut.otherobject.GetComponent<Partinfo>().ImportantBolts += 1f;
                 }
 
-                Debug.Log("ModUtilsTEST:POSTBUILD5");
                 foreach (WeldCut weldCut in car.carPrefab.GetComponentsInChildren<WeldCut>())
                 {
                     weldCut.ReStart();
@@ -230,10 +225,9 @@ namespace SimplePartLoader.CarGen
                     weldCut.otherobject.GetComponent<Partinfo>().attachedwelds += 1f;
                 }
             }
-            Debug.Log("FINISHPOSTBUILD");
+
             if(car.carGeneratorData.EnableAutomaticPartCount)
             {
-                Debug.Log("AA");
                 int partCount = 0;
                 CarProperties[] componentsInChildren = car.carPrefab.GetComponentsInChildren<CarProperties>();
                 for (int i = 0; i < componentsInChildren.Length; i++)
@@ -246,17 +240,14 @@ namespace SimplePartLoader.CarGen
                 
                 car.carPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
                 car.emptyCarPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
-                Debug.Log("AA2");
             }
 
-            Debug.Log("AA33");
             if (car.carGeneratorData.FixLights)
             {
                 CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
                 CommonFixes.Windows(car.carPrefab, car.EnableDebug);
             }
 
-            Debug.Log("ModUtilsTEST:POSTBUILD11");
             if (car.carGeneratorData.EnableAutomaticPainting)
             {
                 foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())

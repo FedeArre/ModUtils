@@ -1,4 +1,7 @@
 ﻿using Autoupdater.Objects;
+using ModUI;
+using ModUI.Settings;
+using static ModUI.Settings.ModSettings;
 using Newtonsoft.Json;
 using SimplePartLoader.CarGen;
 using System;
@@ -10,25 +13,30 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
+using System.Net.Http;
+using System.Threading.Tasks;
+using UnityEngine.ProBuilder;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod
+    public class ModMain : Mod, IModDescription, IModSettings
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.2.0"; 
+        public override string Version => "v1.3.0";
         
-        bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "1.3-pb3-furniture-fix";
+        bool TESTING_VERSION_REMEMBER = false;
+        string TESTING_VERSION_NUMBER = "1.3-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
+        public string Description => "Allows you to create awesome stuff!";
+
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
-        GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
+        GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_ModUI_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -43,6 +51,9 @@ namespace SimplePartLoader
         AssetBundle Bundle;
         GameObject ModShopPrefab;
         Material FloorMat;
+
+        // Mod settings
+        internal static ModUI.Settings.ModSettings.Toggle TelemetryToggle;
 
         public ModMain()
         {
@@ -81,6 +92,7 @@ namespace SimplePartLoader
             UI_Error_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasError");
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
+            UI_ModUI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasModUI");
             
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -95,6 +107,12 @@ namespace SimplePartLoader
 
         public override void OnMenuLoad()
         {
+            if (!File.Exists(Application.dataPath + "/../Mods/!!ModUI.dll"))
+            {
+                ModUIPrompt();
+                return;
+            }
+
             string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
             string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
 
@@ -108,9 +126,7 @@ namespace SimplePartLoader
                 }
 
                 // Enable heartbeat
-
-                if (!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
-                    KeepAlive.GetInstance().Ready();
+                KeepAlive.GetInstance().Ready();
                 
                 return;
             }
@@ -162,11 +178,11 @@ namespace SimplePartLoader
 
                     List<JSON_Mod_API_Result> jsonObj = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
 
-                    if (jsonObj.Count > 0 && !brokenInstallation)
+                    if (jsonObj.Count > 0 && !brokenInstallation && !UI)
                     {
                         // Updates available.
                         UI = GameObject.Instantiate(UI_Prefab);
-                        foreach (Button btt in UI.GetComponentsInChildren<Button>())
+                        foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
                         {
                             if (btt.name == "ButtonNo")
                             {
@@ -236,6 +252,36 @@ namespace SimplePartLoader
             shopSupportCube.transform.localPosition = new Vector3(657.1829f, 51.2f, -46.6193f);
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
+        }
+
+        internal void ModUIPrompt()
+        {
+            UI = GameObject.Instantiate(UI_ModUI_Prefab);
+            foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
+            {
+                if (btt.name == "ButtonNo")
+                {
+                    btt.onClick.AddListener(UI_ButtonNo);
+                }
+                else if (btt.name == "ButtonYes")
+                {
+                    btt.onClick.AddListener(ModUIPrompt_ButtonYesAsync);
+                }
+            }
+        }
+
+        internal void ModUIPrompt_ButtonYesAsync()
+        {
+            using (WebClient client = new WebClient())
+            {
+                client.DownloadFile("https://github.com/FedeArre/mg-mods-collection/releases/download/modui/ModUI.dll", Application.dataPath + "/../Mods/!!ModUI.dll");
+                Process.Start("steam://rungameid/1578390");
+                Process[] processes = Process.GetProcessesByName(Application.productName);
+                foreach (Process process in processes)
+                {
+                    process.Kill();
+                }
+            }
         }
 
         /*public override void Continue()
@@ -337,5 +383,16 @@ namespace SimplePartLoader
                 Application.Quit(0);
             }
         }
+
+        public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
+        {
+            TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);
+            modSettings.AddLabel("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
+            modSettings.AddSpace();
+            modSettings.AddSpace();
+            modSettings.AddSpace();
+        }
+
+        public void ModSettingsLoaded() { }
     }
 }

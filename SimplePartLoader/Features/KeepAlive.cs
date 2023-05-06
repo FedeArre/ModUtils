@@ -48,6 +48,9 @@ namespace SimplePartLoader
 
         private async void SendCurrentStatus()
         {
+            if(!ModMain.TelemetryToggle.Value) 
+                return;
+
             try
             {
                 var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
