@@ -25,7 +25,7 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.3.0";
+        public override string Version => "v1.3.0"; // AssemblyInfo
         
         bool TESTING_VERSION_REMEMBER = false;
         string TESTING_VERSION_NUMBER = "1.3-rc2";
@@ -36,7 +36,7 @@ namespace SimplePartLoader
 
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
-        GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_ModUI_Prefab;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -78,6 +78,21 @@ namespace SimplePartLoader
                 Directory.Delete(ModsFolderPath + "Autoupdater/", true);
             }
 
+            if (Directory.Exists(ModsFolderPath + "NewAutoupdater/"))
+            {
+                Directory.Delete(ModsFolderPath + "NewAutoupdater/", true);
+            }
+
+            if (Directory.Exists(ModsFolderPath + "ModUtilsUpdating/"))
+            {
+                Directory.Delete(ModsFolderPath + "ModUtilsUpdating/", true);
+            }
+
+            if (File.Exists(ModsFolderPath + "modUtilsDownloader.exe"))
+            {
+                File.Delete(ModsFolderPath + "modUtilsDownloader.exe");
+            }
+
             // Mod shop
             Bundle = AssetBundle.LoadFromMemory(Properties.Resources.extra_buildings_models);
 
@@ -92,9 +107,10 @@ namespace SimplePartLoader
             UI_Error_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasError");
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
-            UI_ModUI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasModUI");
+            UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
             
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
+            UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
 
             PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
@@ -107,15 +123,6 @@ namespace SimplePartLoader
 
         public override void OnMenuLoad()
         {
-            if (!File.Exists(Application.dataPath + "/../Mods/!!ModUI.dll"))
-            {
-                ModUIPrompt();
-                return;
-            }
-
-            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
-            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
-
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
@@ -130,76 +137,10 @@ namespace SimplePartLoader
                 
                 return;
             }
-            Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
-
-            // Check for broken ModUtils autoupdater installation
-            bool brokenInstallation = false;
-            
-            if(!Directory.Exists(autoupdaterDirectory) || !File.Exists(autoupdaterPath))
-            {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Autoupdater is not installed properly!");
-                GameObject.Instantiate(UI_BrokenInstallation_Prefab);
-                brokenInstallation = true;
-            }
 
             if(SPL.DEVELOPER_LOG)
             {
                 GameObject.Instantiate(UI_DeveloperLogEnabled_Prefab);
-            }
-            
-            JSON_ModList jsonList = new JSON_ModList();
-            foreach (Mod mod in ModLoader.mods)
-            {
-                JSON_Mod jsonMod = new JSON_Mod();
-
-                jsonMod.modId = mod.ID;
-                jsonMod.version = mod.Version;
-
-                jsonList.mods.Add(jsonMod);
-            }
-
-            try
-            {
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(API_URL + "/mods");
-                Debug.LogError("Current API url: " + API_URL);
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.Method = "POST";
-
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(JsonConvert.SerializeObject(jsonList));
-                }
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    var result = streamReader.ReadToEnd();
-
-                    List<JSON_Mod_API_Result> jsonObj = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
-
-                    if (jsonObj.Count > 0 && !brokenInstallation && !UI)
-                    {
-                        // Updates available.
-                        UI = GameObject.Instantiate(UI_Prefab);
-                        foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
-                        {
-                            if (btt.name == "ButtonNo")
-                            {
-                                btt.onClick.AddListener(UI_ButtonNo);
-                            }
-                            else if (btt.name == "ButtonYes")
-                            {
-                                btt.onClick.AddListener(UI_ButtonYes);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
-                GameObject.Instantiate(UI_Error_Prefab);
             }
         }
 
@@ -252,36 +193,6 @@ namespace SimplePartLoader
             shopSupportCube.transform.localPosition = new Vector3(657.1829f, 51.2f, -46.6193f);
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
-        }
-
-        internal void ModUIPrompt()
-        {
-            UI = GameObject.Instantiate(UI_ModUI_Prefab);
-            foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
-            {
-                if (btt.name == "ButtonNo")
-                {
-                    btt.onClick.AddListener(UI_ButtonNo);
-                }
-                else if (btt.name == "ButtonYes")
-                {
-                    btt.onClick.AddListener(ModUIPrompt_ButtonYesAsync);
-                }
-            }
-        }
-
-        internal void ModUIPrompt_ButtonYesAsync()
-        {
-            using (WebClient client = new WebClient())
-            {
-                client.DownloadFile("https://github.com/FedeArre/mg-mods-collection/releases/download/modui/ModUI.dll", Application.dataPath + "/../Mods/!!ModUI.dll");
-                Process.Start("steam://rungameid/1578390");
-                Process[] processes = Process.GetProcessesByName(Application.productName);
-                foreach (Process process in processes)
-                {
-                    process.Kill();
-                }
-            }
         }
 
         /*public override void Continue()
@@ -339,7 +250,6 @@ namespace SimplePartLoader
             }
         }
 
-        // For mod utils
         public override void Update()
         {
             if (PlayerTransform)
@@ -361,29 +271,7 @@ namespace SimplePartLoader
                 }
             }
         }
-
-        // Autoupdater
-
-        public void UI_ButtonNo()
-        {
-            if (UI)
-                GameObject.Destroy(UI);
-        }
-
-        public void UI_ButtonYes()
-        {
-            string autoupdaterPath = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater\\Autoupdater.exe");
-            
-            if (File.Exists(autoupdaterPath))
-            {
-                GameObject.Destroy(UI);
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.FileName = autoupdaterPath;
-                System.Diagnostics.Process.Start(startInfo);
-                Application.Quit(0);
-            }
-        }
-
+         
         public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
         {
             TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);

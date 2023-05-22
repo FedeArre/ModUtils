@@ -446,7 +446,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Features\Autoupdating.cs" />
+    <Compile Include="Features\Autoupdating\Autoupdating.cs" />
+    <Compile Include="Features\Autoupdating\DownloadData.cs" />
     <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
     <Compile Include="Features\CarGenerator\Car.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
@@ -456,7 +457,7 @@
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
     <Compile Include="FurnitureManager.cs" />
-    <Compile Include="Features\ModUtils\ModObjects\EACheck.cs" />
+    <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
