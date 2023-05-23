@@ -456,6 +456,7 @@
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
+    <Compile Include="Features\Computer\ComputerUI.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
@@ -524,7 +525,9 @@
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\Computer.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

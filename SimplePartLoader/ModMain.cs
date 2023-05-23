@@ -16,6 +16,7 @@ using Debug = UnityEngine.Debug;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine.ProBuilder;
+using SimplePartLoader.Features.Computer;
 
 namespace SimplePartLoader
 {
@@ -61,6 +62,9 @@ namespace SimplePartLoader
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
+
+            // Loading Computer scripts
+            var assembly = System.Reflection.Assembly.Load(Properties.Resources.Computer);
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -108,7 +112,10 @@ namespace SimplePartLoader
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
-            
+
+            ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
+            ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
+
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -151,7 +158,8 @@ namespace SimplePartLoader
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
             FurnitureManager.SetupFurniture();
-            
+            ComputerUI.LoadComputerTable();
+
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -269,6 +277,11 @@ namespace SimplePartLoader
                         ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
                     }
                 }
+            }
+
+            if(Input.GetKeyDown(KeyCode.M))
+            {
+                ComputerUI.Open();
             }
         }
          
