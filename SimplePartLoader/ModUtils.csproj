@@ -457,6 +457,7 @@
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
     <Compile Include="Features\Computer\ComputerUI.cs" />
+    <Compile Include="Features\SharedRaycasts.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />

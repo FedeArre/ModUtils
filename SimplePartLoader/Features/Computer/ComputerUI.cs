@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using SimplePartLoader;
 
-namespace SimplePartLoader.Features.Computer
+namespace SimplePartLoader.Features
 {
     public class ComputerUI
     {

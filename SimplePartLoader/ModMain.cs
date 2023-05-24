@@ -3,6 +3,7 @@ using ModUI;
 using ModUI.Settings;
 using static ModUI.Settings.ModSettings;
 using Newtonsoft.Json;
+using SimplePartLoader;
 using SimplePartLoader.CarGen;
 using System;
 using System.Collections;
@@ -16,7 +17,7 @@ using Debug = UnityEngine.Debug;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine.ProBuilder;
-using SimplePartLoader.Features.Computer;
+using SimplePartLoader.Features;
 
 namespace SimplePartLoader
 {
@@ -279,6 +280,10 @@ namespace SimplePartLoader
                 }
             }
 
+            if (SharedRaycasts.EnableSharedRaycasting)
+                SharedRaycasts.Update();
+
+            // TESTING ONLY!!
             if(Input.GetKeyDown(KeyCode.M))
             {
                 ComputerUI.Open();
