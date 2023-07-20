@@ -68,6 +68,10 @@ namespace SimplePartLoader
                     case FixType.FuelTank:
                         FuelTankFix(prefab, printData);
                         break;
+
+                    case FixType.Cluster:
+                        Cluster(prefab, printData);
+                        break;
                 }
             }
             catch(Exception ex)
@@ -185,10 +189,7 @@ namespace SimplePartLoader
         internal static void SeatFix(GameObject prefab, bool printData)
         {
             if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Seat]: Applying seat fix to {prefab}");
-
-            Transform Seat = prefab.transform.Find("SitDrive");
-            Seat.GetComponent<Sit>().seat = prefab;
+                Debug.Log($"[ModUtils/CommonFix/Seat]: COMPATIBILITY! - Seat fix tried to be applied to {prefab} (Fix is not needed anymore)");
         }
         
         internal static void Windows(GameObject prefab, bool printData)
@@ -210,6 +211,38 @@ namespace SimplePartLoader
                 }
             }
         }
+        internal static void Cluster(GameObject prefab, bool printData)
+        {
+            if (printData)
+                Debug.Log($"[ModUtils/CommonFix/Cluster]: Applying cluster fix to {prefab}");
+
+            CarProperties clusterProps = prefab.GetComponent<CarProperties>();
+
+            Transform batLight = prefab.transform.Find("BatLight");
+            Transform high = prefab.transform.Find("High");
+            Transform left = prefab.transform.Find("Left");
+            Transform right = prefab.transform.Find("Right");
+
+            if(batLight)
+                clusterProps.ClusterBat = batLight.gameObject;
+            else if (printData)
+                Debug.Log("[ModUtils/CommonFix/Cluster]: BatLight not found at prefab " + prefab);
+
+            if (high)
+                clusterProps.ClusterHigh = high.gameObject;
+            else if (printData)
+                Debug.Log("[ModUtils/CommonFix/Cluster]: High not found at prefab " + prefab);
+            
+            if (left)
+                clusterProps.ClusterL = left.gameObject;
+            else if (printData)
+                Debug.Log("[ModUtils/CommonFix/Cluster]: Left not found at prefab " + prefab);
+            
+            if (right)
+                clusterProps.ClusterR = right.gameObject;
+            else if (printData)
+                Debug.Log("[ModUtils/CommonFix/Cluster]: Right not found at prefab " + prefab);
+        }
     }
 
     public enum FixType
@@ -222,6 +255,7 @@ namespace SimplePartLoader
         CylinderHeadCover,
         Oilpan,
         DriverPassangerSeat,
-        Windows
+        Windows,
+        Cluster
     }
 }

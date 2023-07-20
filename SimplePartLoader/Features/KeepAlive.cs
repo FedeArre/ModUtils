@@ -20,8 +20,11 @@ namespace SimplePartLoader
         
         private KeepAlive()
         {
+            // UNSAFE! This has to be removed after ModUtils backend update!
+            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+
             // Keep the json to post on memory
-            JSON_ModList jsonList = new JSON_ModList();
+            JSON_ModList jsonList = new JSON_ModList(-1);
             foreach (Mod mod in ModLoader.mods)
             {
                 JSON_Mod jsonMod = new JSON_Mod();
@@ -32,7 +35,7 @@ namespace SimplePartLoader
                 jsonList.mods.Add(jsonMod);
             }
             serializedJson = JsonConvert.SerializeObject(jsonList);
-            
+
             // Repeating the heartbeat func
             var startTimeSpan = TimeSpan.Zero;
             var periodTimeSpan = TimeSpan.FromMinutes(1);
@@ -43,9 +46,25 @@ namespace SimplePartLoader
             }, null, startTimeSpan, periodTimeSpan);
         }
 
+        public void UpdateJsonList(int buildId)
+        {
+            JSON_ModList jsonList = new JSON_ModList(buildId);
+            foreach (Mod mod in ModLoader.mods)
+            {
+                JSON_Mod jsonMod = new JSON_Mod();
+
+                jsonMod.modId = mod.ID;
+                jsonMod.version = mod.Version;
+
+                jsonList.mods.Add(jsonMod);
+            }
+            serializedJson = JsonConvert.SerializeObject(jsonList);
+        }
         private async void SendCurrentStatus()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Sending status");
+            if(!ModMain.TelemetryToggle.Value) // If telemetry is not enabled, :(
+                return;
+
             try
             {
                 var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
@@ -65,7 +84,7 @@ namespace SimplePartLoader
 
         public void Ready()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Enabled!");
+            Debug.Log("[ModUtils/KeepAlive]: Enabled!"); 
         }
     }
 }

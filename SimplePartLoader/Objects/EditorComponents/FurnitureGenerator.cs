@@ -16,9 +16,20 @@ public class FurnitureGenerator : MonoBehaviour
     public float Price = 0f;
 
     [Header("Furniture settings")]
-    [Tooltip("Set it as furniture? Makes only movable with move tool and freezes after a bit")]
-    public bool EnableFurnitureBehaviour = true;
-    [Tooltip("Only for parts that have furniture behaviour. Allows to move with hand")]
-    public bool AllowHandPicking = false;
+    [Tooltip("Type of freezing that the furniture will use")]
+    public FreezeTypeEnum FreezeType = FreezeTypeEnum.NoFreeze;
+
+    [Tooltip("If move tool is required to move the furniture")]
+    public bool RequiresMoveTool;
+
+    [Tooltip("Forces the furniture to freeze on trailers")]
+    public bool FreezeOnTrailer;
+    
+    public enum FreezeTypeEnum
+    {
+        NoFreeze,
+        WaitUntilStill,
+        Instant
+    }
 }
 

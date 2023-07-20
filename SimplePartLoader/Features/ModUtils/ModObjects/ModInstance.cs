@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -208,6 +209,7 @@ namespace SimplePartLoader
         {
             Thumbnails = true;
             PartManager.ThumbnailGeneratorEnabled = true;
+            ErrorMessageHandler.GetInstance().ThumbnaiLGeneratorEnabled = true;
         }
         
         internal async void Check(ulong SteamID)
@@ -245,6 +247,8 @@ namespace SimplePartLoader
             if(!allowed)
             {
                 Debug.Log("[ModUtils/EACheck]: User is not allowed to use this mod - " + Mod.Name);
+                ErrorMessageHandler.GetInstance().DisabledModList.Add(Mod.Name);
+                
                 foreach (Part p in Parts)
                 {
                     if (PartManager.modLoadedParts.Contains(p))
@@ -256,6 +260,19 @@ namespace SimplePartLoader
                     if (PartManager.prefabGenParts.Remove(p))
                         PartManager.prefabGenParts.Remove(p);
 
+                    if (p.CarProps)
+                    {
+                        Saver.modParts[p.CarProps.PrefabName] = null;
+                    }
+                    else
+                    {
+                        PrefabGenerator pg = p.Prefab.GetComponent<PrefabGenerator>();
+                        if (pg)
+                            Saver.modParts[pg.PrefabName] = null;
+                        else
+                            Saver.modParts[p.Name] = null;
+                    }
+                    
                     GameObject.Destroy(p.Prefab);
                 }
 
@@ -267,6 +284,39 @@ namespace SimplePartLoader
                 Parts.Clear();
                 Furnitures.Clear();
             }
+        }
+
+        public Car LoadCar(AssetBundle bundle, string carObject, string emptyObject, string transparentsObject)
+        {
+            // Safety checks
+            if (!bundle)
+                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
+                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without car / empty / transparents name");
+
+            GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
+            GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
+            GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
+            
+            if (!carPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
+            
+            if (!emptyCarPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+            
+            if (!transparentsPrefab)
+                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+
+            CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
+            if(!carGen)
+                Debug.LogError($"[ModUtils/CarGen/Error]: {carObject} has no Car Generator component");
+
+            Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
+            car.loadedBy = this;
+
+            MainCarGenerator.RegisteredCars.Add(car);
+            return car;
         }
     }
 }

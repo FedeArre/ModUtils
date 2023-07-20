@@ -1,5 +1,10 @@
 ﻿using Autoupdater.Objects;
+using ModUI;
+using ModUI.Settings;
+using static ModUI.Settings.ModSettings;
 using Newtonsoft.Json;
+using SimplePartLoader;
+using SimplePartLoader.CarGen;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,25 +14,31 @@ using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
+using System.Net.Http;
+using System.Threading.Tasks;
+using UnityEngine.ProBuilder;
+using SimplePartLoader.Features;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod
+    public class ModMain : Mod, IModDescription, IModSettings
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.2.0"; 
+        public override string Version => "v1.3.0"; // AssemblyInfo
         
         bool TESTING_VERSION_REMEMBER = false;
-        string TESTING_VERSION_NUMBER = "1.2-rc3";
+        string TESTING_VERSION_NUMBER = "1.3-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
+        public string Description => "Allows you to create awesome stuff!";
+
         // Autoupdater
-        public const string API_URL = "https://mygaragemod.xyz/api";
-        GameObject UI_Prefab, UI_Error_Prefab, UI, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab;
+        public const string API_URL = "https://modding.fedes.uy/api";
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -43,12 +54,18 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
+        // Mod settings
+        internal static ModUI.Settings.ModSettings.Toggle TelemetryToggle;
+
         public ModMain()
         {
             Debug.Log("ModUtils is loading - Version: " + Version);
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
+
+            // Loading Computer scripts
+            var assembly = System.Reflection.Assembly.Load(Properties.Resources.Computer);
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -66,6 +83,21 @@ namespace SimplePartLoader
                 Directory.Delete(ModsFolderPath + "Autoupdater/", true);
             }
 
+            if (Directory.Exists(ModsFolderPath + "NewAutoupdater/"))
+            {
+                Directory.Delete(ModsFolderPath + "NewAutoupdater/", true);
+            }
+
+            if (Directory.Exists(ModsFolderPath + "ModUtilsUpdating/"))
+            {
+                Directory.Delete(ModsFolderPath + "ModUtilsUpdating/", true);
+            }
+
+            if (File.Exists(ModsFolderPath + "modUtilsDownloader.exe"))
+            {
+                File.Delete(ModsFolderPath + "modUtilsDownloader.exe");
+            }
+
             // Mod shop
             Bundle = AssetBundle.LoadFromMemory(Properties.Resources.extra_buildings_models);
 
@@ -80,8 +112,13 @@ namespace SimplePartLoader
             UI_Error_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasError");
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
-            
+            UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
+
+            ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
+            ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
+
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
+            UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
 
             PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
@@ -89,13 +126,11 @@ namespace SimplePartLoader
             AutoupdaterBundle.Unload(false);
 
             ModUtils.SetupSteamworks();
+            MainCarGenerator.BaseSetup();
         }
 
         public override void OnMenuLoad()
         {
-            string autoupdaterDirectory = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater");
-            string autoupdaterPath = autoupdaterDirectory + "\\Autoupdater.exe";
-
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
@@ -106,91 +141,26 @@ namespace SimplePartLoader
                 }
 
                 // Enable heartbeat
-
-                if (!File.Exists(autoupdaterPath + "\\disableStatus.txt"))
-                    KeepAlive.GetInstance().Ready();
+                KeepAlive.GetInstance().Ready();
                 
                 return;
-            }
-            Debug.Log("[ModUtils/Autoupdater]: Autoupdater check");
-
-            // Check for broken ModUtils autoupdater installation
-            bool brokenInstallation = false;
-            
-            if(!Directory.Exists(autoupdaterDirectory) || !File.Exists(autoupdaterPath))
-            {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Autoupdater is not installed properly!");
-                GameObject.Instantiate(UI_BrokenInstallation_Prefab);
-                brokenInstallation = true;
             }
 
             if(SPL.DEVELOPER_LOG)
             {
                 GameObject.Instantiate(UI_DeveloperLogEnabled_Prefab);
             }
-            
-            JSON_ModList jsonList = new JSON_ModList();
-            foreach (Mod mod in ModLoader.mods)
-            {
-                JSON_Mod jsonMod = new JSON_Mod();
-
-                jsonMod.modId = mod.ID;
-                jsonMod.version = mod.Version;
-
-                jsonList.mods.Add(jsonMod);
-            }
-
-            try
-            {
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(API_URL + "/mods");
-                Debug.LogError("Current API url: " + API_URL);
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.Method = "POST";
-
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
-                {
-                    streamWriter.Write(JsonConvert.SerializeObject(jsonList));
-                }
-
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
-                {
-                    var result = streamReader.ReadToEnd();
-
-                    List<JSON_Mod_API_Result> jsonObj = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
-
-                    if (jsonObj.Count > 0 && !brokenInstallation)
-                    {
-                        // Updates available.
-                        UI = GameObject.Instantiate(UI_Prefab);
-                        foreach (Button btt in UI.GetComponentsInChildren<Button>())
-                        {
-                            if (btt.name == "ButtonNo")
-                            {
-                                btt.onClick.AddListener(UI_ButtonNo);
-                            }
-                            else if (btt.name == "ButtonYes")
-                            {
-                                btt.onClick.AddListener(UI_ButtonYes);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
-                GameObject.Instantiate(UI_Error_Prefab);
-            }
         }
 
         public override void OnLoad()
         {
+            Debug.Log("[ModUtilsMPTEST]: OnLoad event called -> Generating all dependant calls");
+
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-            FurnitureManager.LoadFurniture();
-            
+            FurnitureManager.SetupFurniture();
+            ComputerUI.LoadComputerTable();
+
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -234,8 +204,10 @@ namespace SimplePartLoader
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
         }
 
-        public override void Continue()
+        /*public override void Continue()
         {
+            Debug.Log("[ModUtilsMPTEST]: Continue event called -> Generating all dependant calls");
+
             // Custom saving
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)
@@ -243,19 +215,50 @@ namespace SimplePartLoader
 
             GameObject dummyObject = new GameObject("SPL_Dummy");
             dummyObject.AddComponent<SavingHandlerMono>().Load();
-        }
+        }*/
 
-        public override void OnSaveFinish()
+        /*public override void OnSaveFinish()
         {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveFinish event called -> Generating all dependant calls");
+
             // Custom data saving is not enabled for survival mode!
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
-
-            CustomSaverHandler.Save();
-            FurnitureManager.SaveFurniture();
-        }
         
-        // For mod utils
+            CustomSaverHandler.Save();
+        }*/
+
+        public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
+        {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemSave event called -> Generating all dependant calls");
+
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+
+            CustomSaverHandler.Save(saver, isBarn);
+            if (!isBarn)
+            {
+                FurnitureManager.SaveFurniture(saver);
+            }
+        }
+
+        public override void OnSaveSystemLoad(SaveSystem saver, bool isBarn)
+        {
+            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemLoad event called -> Generating all dependant calls");
+
+            if (ModUtils.GetPlayerTools().MapMagic)
+                return;
+
+            // We execute the Load method
+            // A dummy is required because we need a frame between the actual object load and the data load
+            GameObject dummyObject = new GameObject("SPL_Dummy");
+            dummyObject.AddComponent<SavingHandlerMono>().Load(saver, isBarn);
+
+            if (!isBarn) {
+                FurnitureManager.LoadFurniture(saver);
+            }
+        }
+
         public override void Update()
         {
             if (PlayerTransform)
@@ -276,28 +279,26 @@ namespace SimplePartLoader
                     }
                 }
             }
-        }
 
-        // Autoupdater
+            if (SharedRaycasts.EnableSharedRaycasting)
+                SharedRaycasts.Update();
 
-        public void UI_ButtonNo()
-        {
-            if (UI)
-                GameObject.Destroy(UI);
-        }
-
-        public void UI_ButtonYes()
-        {
-            string autoupdaterPath = Path.Combine(Application.dataPath, "..\\Mods\\NewAutoupdater\\Autoupdater.exe");
-            
-            if (File.Exists(autoupdaterPath))
+            // TESTING ONLY!!
+            if(Input.GetKeyDown(KeyCode.M))
             {
-                GameObject.Destroy(UI);
-                System.Diagnostics.ProcessStartInfo startInfo = new System.Diagnostics.ProcessStartInfo();
-                startInfo.FileName = autoupdaterPath;
-                System.Diagnostics.Process.Start(startInfo);
-                Application.Quit(0);
+                ComputerUI.Open();
             }
         }
+         
+        public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
+        {
+            TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);
+            modSettings.AddLabel("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
+            modSettings.AddSpace();
+            modSettings.AddSpace();
+            modSettings.AddSpace();
+        }
+
+        public void ModSettingsLoaded() { }
     }
 }

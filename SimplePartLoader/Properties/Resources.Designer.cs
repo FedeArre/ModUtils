@@ -73,6 +73,16 @@ namespace SimplePartLoader.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Computer {
+            get {
+                object obj = ResourceManager.GetObject("Computer", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] extra_buildings_models {
             get {
                 object obj = ResourceManager.GetObject("extra_buildings_models", resourceCulture);

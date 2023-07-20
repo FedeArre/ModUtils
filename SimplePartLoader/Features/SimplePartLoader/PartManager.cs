@@ -1,5 +1,7 @@
 ﻿using Assets.SimpleLocalization;
+using KCC;
 using RVP;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
@@ -108,8 +110,9 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} has a missing component.");
+                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
                         modLoadedParts.Remove(part);
+                        continue;
                     }
 
                     if(part.Mod != null)
@@ -148,6 +151,8 @@ namespace SimplePartLoader
                     Debug.Log($"[ModUtils/SPL]: Added part: {p.Name} (GameObject name: {p.Prefab}");
                 }
             }
+            
+            
             foreach (Part p in modLoadedParts)
             {
                 if(!p.Prefab)
@@ -247,7 +252,10 @@ namespace SimplePartLoader
             }
 
             if (!hasFirstLoadOccured)
+            {
                 hasFirstLoadOccured = true;
+                MainCarGenerator.StartCarGen();
+            }
 
             if(ThumbnailGeneratorEnabled)
             {
@@ -275,6 +283,7 @@ namespace SimplePartLoader
                 }
             }
 
+            MainCarGenerator.AddCars();
             SPL.InvokeLoadFinishedEvent();
         }
 
@@ -314,8 +323,17 @@ namespace SimplePartLoader
             }
 
             if (t.TestingEnabled)
-               transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+            {
+                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled");
+                if(t.Owner.Mod != null)
+                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part added by mod {t.Owner.Mod.Name}");
+                
+                if(t.Owner.CarProps)
+                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
 
+                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+            }
+            
             return transparentObject;
         }
 
@@ -402,7 +420,7 @@ namespace SimplePartLoader
 
                 if(!data.EnableMeshChange && part.GetComponent<MeshFilter>())
                 {
-                    Debug.LogError($"[ModUtils/SPL/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
+                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
                     continue;
                 }
                 
@@ -411,13 +429,18 @@ namespace SimplePartLoader
 
                 if (!part.CarProps)
                 {
-                    Debug.LogError($"[ModUtils/SPL/Error]: Prefab generator was unable to create {part.Name}");
+                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Prefab generator was unable to create {part.Name}");
                     continue;
                 }
 
                 // Now we remove all specific childs / move them.
                 foreach(ChildDestroy cd in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                 {
+                    if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
+                    {
+                        Debug.Log($"[ModUtils/SPL/PrefabGen/DevLog]: Part {part.Prefab.name} - Trying to destroy {cd.name} (SW: {cd.StartsWith} | EW: {cd.EndsWith})");
+                    }
+
                     foreach(Transform t in part.GetTransforms())
                     {
                         if (cd.StartsWith)
@@ -538,6 +561,9 @@ namespace SimplePartLoader
                             part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);
                             break;
                     }
+
+                    if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable)
+                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Mesh from {data.PrefabName} is not readable. This will cause the part to not be loaded properly. Please make the mesh readable.");
                 }
 
                 // To enable chroming on our part
@@ -548,6 +574,9 @@ namespace SimplePartLoader
 
                 if (data.CatalogImage)
                 {
+                    if (data.CatalogImage.width < 500 || data.CatalogImage.height < 500)
+                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Thumbnail of {data.PrefabName} is too small! Size has to be at least 500x500!");
+
                     part.PartInfo.Thumbnail = data.CatalogImage;
                 }
 

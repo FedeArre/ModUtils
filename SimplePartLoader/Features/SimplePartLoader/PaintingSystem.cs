@@ -567,6 +567,13 @@ namespace SimplePartLoader
             return ChromeMaterial;
         }
         
+        /// <summary>
+        /// Sets the painting materials for a given Part. If index is -1 no material is affected for that type
+        /// </summary>
+        /// <param name="p">The part to get the painting</param>
+        /// <param name="bodymatIndex">Not to be confused with the paintable material. Black material that hides the one-sided paintable material</param>
+        /// <param name="paintRustIndex">Should be always at index 0, paintable material</param>
+        /// <param name="dirtIndex">Should be always at index 1, dirt material</param>
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)
         {
             Material[] matsOfPart = p.Renderer.materials;

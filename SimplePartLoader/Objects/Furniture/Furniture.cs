@@ -16,9 +16,11 @@ namespace SimplePartLoader
         private string InternalName;
         private string DisplayName;
         private float FurniturePrice;
-        private bool FurnitureBehaviour;
-        private bool UsingHandPickup;
-
+        private bool UseMoveTool;
+        private FurnitureGenerator.FreezeTypeEnum Type;
+        private bool AttachOnTrailer;
+        private string FurnitureTip;
+        
         // Internal stuff
         private ModInstance Owner;
         
@@ -52,57 +54,61 @@ namespace SimplePartLoader
             set { FurniturePrice = value; }
         }
         
-        public bool BehaveAsFurniture
+        public bool MoveTool
         {
-            get { return FurnitureBehaviour; }
-            set { FurnitureBehaviour = value; }
+            get { return UseMoveTool; }
+            set { UseMoveTool = value; }
         }
 
-        public bool HandPickup
+        public bool TrailerAttaching
         {
-            get { return UsingHandPickup; }
-            set { UsingHandPickup = value; }
+            get { return AttachOnTrailer; }
+            set { AttachOnTrailer = value; }
         }
-        
+        public FurnitureGenerator.FreezeTypeEnum FreezeType
+        {
+            get { return Type; }
+            set { Type = value; }
+        }
+
+        public string Tip
+        {
+            get { return FurnitureTip; }
+            set { FurnitureTip = value; }
+        }
         public Furniture(GameObject go, FurnitureGenerator fg)
         {
             ObjectPrefab = go;
 
-            FurnitureBehaviour = fg.EnableFurnitureBehaviour;
-            UsingHandPickup = fg.AllowHandPicking;
+            FreezeType = fg.FreezeType;
+            MoveTool = fg.RequiresMoveTool;
+            TrailerAttaching = fg.FreezeOnTrailer;
+
             FurniturePrice = fg.Price;
             Name = fg.DisplayName;
             PrefabName = fg.PrefabName;
 
             ObjectPrefab.AddComponent<ModUtilsFurniture>().PrefabName = PrefabName;
-            ObjectPrefab.AddComponent<Rigidbody>();
+            ObjectPrefab.AddComponent<Rigidbody>().isKinematic = true;
             ObjectPrefab.layer = LayerMask.NameToLayer("Items");
 
             GameObject.Destroy(ObjectPrefab.GetComponent<FurnitureGenerator>());
 
-            MooveItem mv = ObjectPrefab.AddComponent<MooveItem>();
-            mv.IsFurniture = FurnitureBehaviour;
-            mv.price = (int) FurniturePrice;
-            if(!mv.IsFurniture && UsingHandPickup)
-            {
-                Debug.LogWarning("[ModUtils/Furniture]: Using hand pickup without furniture behaviour is not allowed");
-                UsingHandPickup = false;
-            }
-
-            if(UsingHandPickup)
-                ObjectPrefab.name = "MODUTILS_FURNITURE_H_" + PrefabName;
+            if(MoveTool)
+                ObjectPrefab.name = "MODUTILS_FURNITURE_F" + PrefabName;
             else
-                ObjectPrefab.name = "MODUTILS_FURNITURE_" + PrefabName;
-            
+                ObjectPrefab.name = "MODUTILS_FURNITURE_C" + PrefabName;
+
         }
 
-        public SaleFurniture CreateSaleItem(Vector3 position, Vector3 rotation)
+        public SaleFurniture CreateSaleItem(Vector3 position, Vector3 rotation, SpawnSpot spot = null)
         {
             SaleFurniture sf = new SaleFurniture();
             sf.Furniture = this;
             sf.Pos = position;
             sf.Rot = rotation;
-
+            sf.Spawn = spot;
+            
             FurnitureManager.SaleItems.Add(sf);
 
             return sf;

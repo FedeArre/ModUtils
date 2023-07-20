@@ -121,6 +121,9 @@
   <data name="autoupdater_ui_canvas" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\autoupdater_ui_canvas;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
+  <data name="Computer" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Computer.dll;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
   <data name="extra_buildings_models" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\extra_buildings_models;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
