@@ -688,7 +688,8 @@ namespace SimplePartLoader
                     DestroyConsideringSetting(part, markedTransparent.gameObject);
                 }
 
-                Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
+                    Debug.Log($"[ModUtils/SPL/Debug]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
                 
                 // Destroy some stuff
                 DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());

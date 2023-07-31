@@ -213,7 +213,7 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.Log("Could not kill game, slowly exiting!");
+                Debug.Log("Could not kill game, slowly exiting! - " + ex.Message);
                 Environment.Exit(0);
             }
         }

@@ -27,7 +27,7 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.3.0"; // AssemblyInfo
+        public override string Version => "v1.3.1";
         
         bool TESTING_VERSION_REMEMBER = false;
         string TESTING_VERSION_NUMBER = "1.3-rc2";
@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public string Description => "Allows you to create awesome stuff!";
 
         // Autoupdater
-        public const string API_URL = "https://modding.fedes.uy/api";
+        public const string API_URL = "https://localhost:44335/api";
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
@@ -63,9 +63,6 @@ namespace SimplePartLoader
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
-
-            // Loading Computer scripts
-            var assembly = System.Reflection.Assembly.Load(Properties.Resources.Computer);
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -114,9 +111,12 @@ namespace SimplePartLoader
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
 
+            // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
             ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
-
+            ComputerUI.SetupComputer(AutoupdaterBundle.LoadAsset<GameObject>("AppLauncher"), AutoupdaterBundle.LoadAsset<GameObject>("AppLauncherIcon"));
+            
+            // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
             UI_Error_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -154,12 +154,8 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
-            Debug.Log("[ModUtilsMPTEST]: OnLoad event called -> Generating all dependant calls");
-
             ModUtils.OnLoadCalled();
             PartManager.OnLoadCalled();
-            FurnitureManager.SetupFurniture();
-            ComputerUI.LoadComputerTable();
 
             PlayerTransform = ModUtils.GetPlayer().transform;
 
@@ -194,6 +190,9 @@ namespace SimplePartLoader
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
+            ComputerUI.LoadComputerTable();
+            FurnitureManager.SetupFurniture();
+
             GameObject shop = GameObject.Instantiate(ModShopPrefab, new Vector3(722.5838f, 38.12f, -189.3593f), Quaternion.Euler(new Vector3(0, 90f, 0)));
             shop.transform.localScale = new Vector3(0.87f, 0.87f, 0.87f);
             shop.name = "EXTRA_BUILDINGS_MODSHOP";
@@ -204,34 +203,13 @@ namespace SimplePartLoader
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
         }
 
-        /*public override void Continue()
+        public override void Continue()
         {
-            Debug.Log("[ModUtilsMPTEST]: Continue event called -> Generating all dependant calls");
-
-            // Custom saving
-            // Custom data saving is not enabled for survival mode!
-            if (ModUtils.GetPlayerTools().MapMagic)
-                return;
-
-            GameObject dummyObject = new GameObject("SPL_Dummy");
-            dummyObject.AddComponent<SavingHandlerMono>().Load();
-        }*/
-
-        /*public override void OnSaveFinish()
-        {
-            Debug.Log("[ModUtilsMPTEST]: OnSaveFinish event called -> Generating all dependant calls");
-
-            // Custom data saving is not enabled for survival mode!
-            if (ModUtils.GetPlayerTools().MapMagic)
-                return;
-        
-            CustomSaverHandler.Save();
-        }*/
+            ComputerUI.Continue();
+        }
 
         public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
         {
-            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemSave event called -> Generating all dependant calls");
-
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
@@ -239,13 +217,13 @@ namespace SimplePartLoader
             if (!isBarn)
             {
                 FurnitureManager.SaveFurniture(saver);
+                ComputerUI.Save();
+                DataHandler.OnSave(saver);
             }
         }
 
         public override void OnSaveSystemLoad(SaveSystem saver, bool isBarn)
         {
-            Debug.Log("[ModUtilsMPTEST]: OnSaveSystemLoad event called -> Generating all dependant calls");
-
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
@@ -256,6 +234,7 @@ namespace SimplePartLoader
 
             if (!isBarn) {
                 FurnitureManager.LoadFurniture(saver);
+                DataHandler.OnLoad(saver);
             }
         }
 
@@ -279,17 +258,17 @@ namespace SimplePartLoader
                     }
                 }
             }
+        }
 
-            if (SharedRaycasts.EnableSharedRaycasting)
-                SharedRaycasts.Update();
-
-            // TESTING ONLY!!
-            if(Input.GetKeyDown(KeyCode.M))
+        public override void LateUpdate()
+        {
+            if (ComputerUI.PlayerAtComputer && Input.GetKeyDown(KeyCode.Escape))
             {
-                ComputerUI.Open();
+                ComputerUI.Close();
+                ModUtils.PlayerTools.ESC();
             }
         }
-         
+
         public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
         {
             TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);

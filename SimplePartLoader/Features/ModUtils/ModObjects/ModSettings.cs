@@ -13,6 +13,7 @@ namespace SimplePartLoader
         private bool Immediate = false;
         private bool Cloning = true;
         private bool CullShader = false;
+        private bool DebugEnabled = false;
         private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
         private string[] FitsToEngine;
@@ -62,7 +63,7 @@ namespace SimplePartLoader
             get { return CullShader; }
             set { CullShader = value; }
         }
-        
+
         internal ModSettings(ModInstance _modInstance)
         {
             modInstance = _modInstance;

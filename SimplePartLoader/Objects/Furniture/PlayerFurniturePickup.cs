@@ -1,4 +1,5 @@
 ﻿using Assets.SimpleLocalization;
+using SimplePartLoader.Features;
 using SimplePartLoader.Objects.Furniture.Saving;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,17 @@ namespace SimplePartLoader.Objects.Furniture
 {
     internal class PlayerFurniturePickup : MonoBehaviour
     {
+        internal static PlayerFurniturePickup Instance;
+
         Transform PlayerHand;
         Transform CurrentlyHoldingFurniture = null;
 
-        string LookText;
-        string PriceToShow;
-        string TipToShow;
-        string EngineText;
+        public string LookText;
+        public string PriceToShow;
+        public string TipToShow;
+        public string EngineText;
 
-        bool ShowText;
+        public bool ShowText;
 
         UnityEngine.UI.Text PriceText;
         TMPro.TMP_Text LookingText;
@@ -39,6 +42,8 @@ namespace SimplePartLoader.Objects.Furniture
             PriceText = ModUtils.GetPlayerTools().PriceText;
             TipsText = ModUtils.GetPlayerTools().TipsText;
             FitEngineText = ModUtils.GetPlayerTools().LookingFitEngineText;
+
+            Instance = this;
         }
 
         void Update()
@@ -50,6 +55,11 @@ namespace SimplePartLoader.Objects.Furniture
             {
                 if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, Items))
                 {
+                    if(rcHit.collider.name == "ModUtilsComputer")
+                    {
+                        ComputerUI.RaycastHandler(rcHit);
+                    }
+
                     if (rcHit.collider.transform.name.StartsWith("MODUTILS_FURNITURE_")) // If looking at ModUtils furniture
                     {
                         if (Input.GetMouseButtonDown(0))
