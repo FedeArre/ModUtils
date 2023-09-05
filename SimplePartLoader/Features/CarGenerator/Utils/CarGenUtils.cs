@@ -43,13 +43,17 @@ namespace SimplePartLoader.CarGen
             return null;
         }
 
-        internal static void RecursiveCarBuild(Car car)
+        internal static void RecursiveCarBuild(Car car, int iterationCount)
         {
             bool callAgain = false;
+            if(iterationCount > 30)
+            {
+                Debug.LogError("[ModUtils/CarGen/Warning]: Recursive car on " + car.carGeneratorData.CarName + " build reached 30 iterations, aborting.");
+            }
 
             foreach (transparents t in car.carPrefab.GetComponentsInChildren<transparents>())
             {
-                if (!IsTransparentEmpty(t))
+                if (!IsTransparentEmpty(t) || t.name == "Hook") // Hook causes recursive loop, we can evade it
                     continue;
 
                 bool isParentCustom = t.transform.parent.GetComponent<SPL_Part>();
@@ -74,7 +78,7 @@ namespace SimplePartLoader.CarGen
 
             if (callAgain)
             {
-                RecursiveCarBuild(car);
+                RecursiveCarBuild(car, iterationCount+1);
             }
         }
         

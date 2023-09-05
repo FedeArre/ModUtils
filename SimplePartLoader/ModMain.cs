@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public string Description => "Allows you to create awesome stuff!";
 
         // Autoupdater
-        public const string API_URL = "https://localhost:44335/api";
+        public const string API_URL = "https://modding.fedes.uy/api";
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;

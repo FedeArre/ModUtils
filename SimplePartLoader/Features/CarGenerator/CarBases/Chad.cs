@@ -568,7 +568,7 @@ namespace SimplePartLoader.CarGen
             Brakes vehBrakes = new Brakes();
             vehBrakes.HandbrakeWorkingOrder = true;
             vehBrakes.StartedToBrake = true;
-            vehBrakes.maxTorque = 2750;
+            vehBrakes.maxTorque = 1f;
             vehBrakes.brakeOffThrottleStrength = 0.1f;
             vehBrakes.MainProp = mainCarProps;
             vehBrakes.brakeWhileAsleep = false;

@@ -107,7 +107,7 @@ namespace SimplePartLoader.Features
 
         internal static void Continue()
         {
-            if(DataHandler.GetData("ModUtils_ComputerPos_X") != null)
+            if (DataHandler.GetData("ModUtils_ComputerPos_X") != null)
             {
                 float pX = (float) Convert.ChangeType(DataHandler.GetData("ModUtils_ComputerPos_X"), typeof(float));
                 float pY = (float) Convert.ChangeType(DataHandler.GetData("ModUtils_ComputerPos_Y"), typeof(float));

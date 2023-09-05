@@ -98,7 +98,7 @@ namespace SimplePartLoader.CarGen
         internal static void BuildCar(Car car)
         {
             // Build our car
-            CarGenUtils.RecursiveCarBuild(car);
+            CarGenUtils.RecursiveCarBuild(car, 0);
 
             if (car.carGeneratorData.TransparentReferenceUpdate)
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab);
