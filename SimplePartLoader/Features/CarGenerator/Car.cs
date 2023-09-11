@@ -22,7 +22,8 @@ namespace SimplePartLoader.CarGen
 
         internal ModInstance loadedBy;
 
-        public bool EnableDebug = false;
+        public bool IgnoreLogErrors { get; set; }
+        public bool EnableDebug { get; set; }
         
         internal Car(GameObject car, GameObject empty, GameObject transparents)
         {

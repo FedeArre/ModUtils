@@ -29,8 +29,8 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.3.1";
         
-        bool TESTING_VERSION_REMEMBER = false;
-        string TESTING_VERSION_NUMBER = "1.3-rc2";
+        bool TESTING_VERSION_REMEMBER = true;
+        string TESTING_VERSION_NUMBER = "charger development build - 5";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using static Unity.Burst.Intrinsics.X86.Avx;
 
 namespace SimplePartLoader
 {
@@ -253,12 +254,12 @@ namespace SimplePartLoader
                     if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter)
                         continue;
 
-                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, p.UseBetterCopy);
-                    
                     DevLog(p, $"Now copying component to base object ({comp})");
+
+                    p.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, p.UseBetterCopy);
                 }
             }
-            
+
             if (!doNotCopyChilds)
                 AttachPrefabChilds(p.Prefab, carPart, p.UseBetterCopy); // Call the recursive function that copies all the child hierarchy.
 
@@ -345,12 +346,13 @@ namespace SimplePartLoader
         /// <param name="preciseCloning">Precise cloning enabled</param>
         internal static void AttachPrefabChilds(GameObject partToAttach, GameObject original, bool preciseCloning)
         {
+            DevLog("Entering AttachPrefabChilds method");
             DevLog("Attaching childs to " + partToAttach.name);
 
             // Now we also do the same for the childs of the object.
             for (int i = 0; i < original.transform.childCount; i++)
             {
-                DevLog("Attaching " + original.transform.GetChild(i).name);
+                DevLog($"Attaching  {original.transform.GetChild(i).name} {original.transform.GetChild(i).GetType()}");
                 GameObject childObject = new GameObject();
                 childObject.transform.SetParent(partToAttach.transform);
 
@@ -369,18 +371,17 @@ namespace SimplePartLoader
 
                     if (!childObject.GetComponent(comp.GetType()))
                     {
-                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, preciseCloning);
-
                         DevLog("Copying component " + comp.GetType());
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, preciseCloning);
                     }
                     else
                     {
-                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), preciseCloning);
-
                         DevLog("Cloning component" + comp.GetType());
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), preciseCloning);
                     }
                 }
 
+                DevLog("OK");
                 if (original.transform.GetChild(i).childCount != 0)
                     AttachPrefabChilds(childObject, original.transform.GetChild(i).gameObject, preciseCloning);
             }

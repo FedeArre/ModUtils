@@ -1,4 +1,5 @@
 ﻿using PaintIn3D;
+using SimplePartLoader.CarGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,6 +93,8 @@ namespace SimplePartLoader.Utils
                 childObject.layer = original.transform.GetChild(i).gameObject.layer;
                 childObject.tag = original.transform.GetChild(i).tag;
 
+                childObject.SetActive(original.activeSelf); // EXPERIMENTAL!
+
                 childObject.transform.localPosition = original.transform.GetChild(i).localPosition;
                 childObject.transform.localRotation = original.transform.GetChild(i).localRotation;
                 childObject.transform.localScale = original.transform.GetChild(i).localScale;
@@ -124,7 +127,7 @@ namespace SimplePartLoader.Utils
         /// Updates all the DEPENDANTS and ATTACHABLES on the given GameObject
         /// </summary>
         /// <param name="p">The GameObject that will be updated</param>
-        public static void UpdateTransparentsReferences(GameObject p)
+        public static void UpdateTransparentsReferences(GameObject p, bool ignoreErrors = false)
         {
             bool referenceUpdated = false;
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
@@ -162,7 +165,7 @@ namespace SimplePartLoader.Utils
                                 break;
                             }
                         }
-                        if (!referenceUpdated)
+                        if (!referenceUpdated && !ignoreErrors)
                         {
                             if(dp.dependant == null)
                                 Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object (null) not found in " + p.name + ", on part " + t.name);
@@ -218,6 +221,12 @@ namespace SimplePartLoader.Utils
                     t.ATTACHABLES = newAttachables;
                 }
             }
+        }
+
+        // Compatibility method
+        public static void UpdateTransparentsReferences(GameObject p)
+        {
+            UpdateTransparentsReferences(p, false);
         }
 
         /// <summary>

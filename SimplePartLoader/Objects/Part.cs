@@ -155,6 +155,35 @@ namespace SimplePartLoader
             }
         }
 
+        public void MakeOpenable(OpeningType type)
+        {
+            if (Prefab.GetComponent<Pickup>())
+                DestroyConsiderSetting(Prefab.GetComponent<Pickup>());
+
+            if (!Prefab.GetComponent<PickupDoor>())
+            {
+                RemoveAttachmentsFromPart();
+
+                Prefab.AddComponent<PickupDoor>();
+                Prefab.AddComponent<OpenDoor>();
+
+                Prefab.layer = LayerMask.NameToLayer("OpenableParts");
+                Prefab.tag = "Untagged";
+
+                UpdatePartinfoBasedOnType(type);
+                GenerateHingePivot(type);
+            }
+        }
+
+        public void UpdateHingePivotPosition(Vector3 newLocalPosition)
+        {
+            Transform t = Prefab.transform.Find("HingePivot");
+            if(t)
+            {
+                t.localPosition = newLocalPosition;
+            }
+        }
+
         public Transform[] GetTransforms()
         {
             return Prefab.GetComponentsInChildren<Transform>();
@@ -252,6 +281,59 @@ namespace SimplePartLoader
                 GameObject.Destroy(c);
             }
         }
+
+        private void UpdatePartinfoBasedOnType(OpeningType type)
+        {
+            PartInfo.HoodHalf = false;
+            PartInfo.Hood = false;
+            PartInfo.Rdoor = false;
+            PartInfo.Ldoor = false;
+            PartInfo.Trunk = false;
+
+            switch (type)
+            {
+                case OpeningType.TRUNK:
+                    PartInfo.Trunk = true;
+                    break;
+
+                case OpeningType.DOOR_LEFT:
+                    PartInfo.Ldoor = true;
+                    break;
+
+                case OpeningType.DOOR_RIGHT:
+                    PartInfo.Rdoor = true;
+                    break;
+
+                case OpeningType.HOOD:
+                    PartInfo.Hood = true;
+                    break;
+
+                case OpeningType.HOOD_HALF:
+                    PartInfo.HoodHalf = true;
+                    break;
+            }
+        }
+
+        private void GenerateHingePivot(OpeningType type)
+        {
+            Transform t = Prefab.transform.Find("HingePivot");
+            if (t)
+            {
+                SPL.DevLog(this, "Found hinge pivot automatically, using it as reference");
+            }
+            else
+            {
+                GameObject hingePivot = new GameObject("HingePivot");
+                t = hingePivot.transform;
+                t.SetParent(Prefab.transform);
+
+                t.localPosition = Vector3.zero;
+            }
+
+            t.gameObject.layer = LayerMask.NameToLayer("OpenableParts");
+
+            PartInfo.HingePivot = t.gameObject;
+        }
     }
 
     
@@ -267,5 +349,14 @@ namespace SimplePartLoader
         NONE = 0,
         FORCE_BACKSIDE,
         FORCE_DOUBLESIDED
+    }
+
+    public enum OpeningType
+    {
+        TRUNK = 0,
+        DOOR_LEFT,
+        DOOR_RIGHT,
+        HOOD,
+        HOOD_HALF
     }
 }

@@ -48,12 +48,13 @@ namespace SimplePartLoader.CarGen
             bool callAgain = false;
             if(iterationCount > 30)
             {
-                Debug.LogError("[ModUtils/CarGen/Warning]: Recursive car on " + car.carGeneratorData.CarName + " build reached 30 iterations, aborting.");
+                Debug.LogError("[ModUtils/CarGen/Warning]: Recursive build on " + car.carGeneratorData.CarName + " car reached 30 iterations, aborting.");
+                return;
             }
 
             foreach (transparents t in car.carPrefab.GetComponentsInChildren<transparents>())
             {
-                if (!IsTransparentEmpty(t) || t.name == "Hook") // Hook causes recursive loop, we can evade it
+                if (!IsTransparentEmpty(t) || t.name == "Hook" || !t.GetComponent<MeshFilter>()) // Hook causes recursive loop, we can evade it - Mesh Filter check for some old stuff that isnt anymore around like ignition coil, is disabled just by that.
                     continue;
 
                 bool isParentCustom = t.transform.parent.GetComponent<SPL_Part>();
@@ -162,8 +163,6 @@ namespace SimplePartLoader.CarGen
                         CarProperties carProps = part.GetComponent<CarProperties>();
                         if (carProps.PrefabName != exceptions.ExceptionList[name])
                         {
-                            Debug.Log($"EXCEPTION HIT: {carProps.PrefabName} - {exceptions.ExceptionList[name]}");
-
                             foundPart = null;
                             continue;
                         }
