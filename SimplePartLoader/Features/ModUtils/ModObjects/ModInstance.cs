@@ -22,7 +22,7 @@ namespace SimplePartLoader
         internal bool RequiresSteamCheck = false;
         internal bool Checked = false;
         
-        internal bool CheckedAndAllowed = false;
+        internal bool CheckedAndAllowed = true;
 
         internal bool Thumbnails = false;
         
@@ -203,6 +203,7 @@ namespace SimplePartLoader
 
         public void EnableEarlyAccessCheck()
         {
+            CheckedAndAllowed = false;
             RequiresSteamCheck = true;
         }
 

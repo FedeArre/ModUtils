@@ -30,7 +30,7 @@ namespace SimplePartLoader
         public override string Version => "v1.3.1";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "charger development build - 5";
+        string TESTING_VERSION_NUMBER = "charger development build - 6";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -59,6 +59,11 @@ namespace SimplePartLoader
 
         public ModMain()
         {
+            var watch = new System.Diagnostics.Stopwatch();
+            long totalTime = 0;
+
+            watch.Start();
+
             Debug.Log("ModUtils is loading - Version: " + Version);
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
@@ -127,6 +132,9 @@ namespace SimplePartLoader
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
+
+            watch.Stop();
+            Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
         }
 
         public override void OnMenuLoad()
@@ -154,8 +162,27 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
+            var watch = new System.Diagnostics.Stopwatch();
+            long totalTime = 0;
+
+            watch.Start();
+
+            Debug.Log($"[ModUtils/Timing]: OnLoad method was called!");
+
+            // ModUtils library time
             ModUtils.OnLoadCalled();
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: ModUtils library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            // PartManager library time
+            watch.Restart();
             PartManager.OnLoadCalled();
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
 
             PlayerTransform = ModUtils.GetPlayer().transform;
 
@@ -190,7 +217,20 @@ namespace SimplePartLoader
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
+
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: Save dissasembly & various library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+            watch.Restart();
+
+            // Computer UI stuff
             ComputerUI.LoadComputerTable();
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: In-game computer succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+            watch.Restart();
+
+            // Furniture stuff
             FurnitureManager.SetupFurniture();
 
             GameObject shop = GameObject.Instantiate(ModShopPrefab, new Vector3(722.5838f, 38.12f, -189.3593f), Quaternion.Euler(new Vector3(0, 90f, 0)));
@@ -201,6 +241,12 @@ namespace SimplePartLoader
             shopSupportCube.transform.localPosition = new Vector3(657.1829f, 51.2f, -46.6193f);
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
+
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: Furniture manager & ModShop succesfully loaded - Took {watch.ElapsedMilliseconds} ms");
+            Debug.Log($"[ModUtils/Timing]: ModUtils loading took ${totalTime} ms");
+
         }
 
         public override void Continue()

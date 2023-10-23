@@ -162,7 +162,7 @@ namespace SimplePartLoader
 
             if (!Prefab.GetComponent<PickupDoor>())
             {
-                RemoveAttachmentsFromPart();
+                RemoveAttachmentsFromPartIgnoringNuts();
 
                 Prefab.AddComponent<PickupDoor>();
                 Prefab.AddComponent<OpenDoor>();
@@ -252,7 +252,24 @@ namespace SimplePartLoader
             if(Prefab.GetComponent<PickupWindow>())
                 DestroyConsiderSetting(Prefab.GetComponent<PickupWindow>());
         }
-        
+
+        private void RemoveAttachmentsFromPartIgnoringNuts()
+        {
+            foreach (WeldCut wc in Prefab.GetComponentsInChildren<WeldCut>())
+            {
+                DestroyConsiderSetting(wc.gameObject);
+            }
+
+            if (Prefab.GetComponent<RemoveWindow>())
+                DestroyConsiderSetting(Prefab.GetComponent<RemoveWindow>());
+
+            if (Prefab.GetComponent<PickupHand>())
+                DestroyConsiderSetting(Prefab.GetComponent<PickupHand>());
+
+            if (Prefab.GetComponent<PickupWindow>())
+                DestroyConsiderSetting(Prefab.GetComponent<PickupWindow>());
+        }
+
         private void DestroyConsiderSetting(Component c)
         {
             if (modInstance != null)

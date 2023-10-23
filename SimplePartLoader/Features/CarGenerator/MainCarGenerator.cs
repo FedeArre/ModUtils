@@ -22,8 +22,14 @@ namespace SimplePartLoader.CarGen
 
         internal static void StartCarGen()
         {
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
             foreach (Car car in RegisteredCars)
             {
+                if(!car.loadedBy.CheckAllow)
+                    return;
+
                 ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
                 
                 // First, clone our base to our empty.
@@ -81,6 +87,9 @@ namespace SimplePartLoader.CarGen
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
             }
+
+            watch.Stop();
+            Debug.Log($"[ModUtils/Timing/CarGenerator]: Car loading ({RegisteredCars.Count} cars) took {watch.ElapsedMilliseconds}");
         }
 
         internal static void AddCars()
