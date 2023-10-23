@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimplePartLoader</RootNamespace>
     <AssemblyName>_SimplePartLoader</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -36,14 +36,15 @@
   <ItemGroup>
     <Reference Include="!!ModUI, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\Mods\!!ModUI.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\Mods\!!ModUI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mirror">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Mirror.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -52,19 +53,19 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="PaintIn3D">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\PaintIn3D.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\PaintIn3D.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Rewired_Core">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Core.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Rewired_Windows">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Windows.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Rewired_Windows.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RuntimePreviewGenerator.Runtime">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\RuntimePreviewGenerator.Runtime.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\RuntimePreviewGenerator.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -77,371 +78,375 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Unity.Addressables">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Addressables.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Addressables.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Animation.Rigging">
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Animation.Rigging.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst.Cecil">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Mdb">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Mdb.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Mdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Pdb">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Pdb.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Pdb.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Rocks">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Rocks.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Cecil.Rocks.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Burst.Unsafe">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Unsafe.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Burst.Unsafe.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Collections">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Collections.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Collections.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InputSystem">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.InputSystem.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.InputSystem.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.InternalAPIEngineBridge.013">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.InternalAPIEngineBridge.013.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.InternalAPIEngineBridge.013.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Jobs">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Jobs.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Jobs.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Localization">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Localization.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Localization.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Mathematics">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Mathematics.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Mathematics.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Postprocessing.Runtime">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder.Csg">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Csg.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Csg.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder.KdTree">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.KdTree.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.KdTree.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder.Poly2Tri">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Poly2Tri.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Poly2Tri.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ProBuilder.Stl">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Stl.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ProBuilder.Stl.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Recorder">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Recorder.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Recorder.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Recorder.Base">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Recorder.Base.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Recorder.Base.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ResourceManager">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ResourceManager.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ResourceManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.ScriptableBuildPipeline">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ScriptableBuildPipeline.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.ScriptableBuildPipeline.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.Timeline">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Timeline.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Unity.Timeline.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AccessibilityModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AccessibilityModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AccessibilityModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AIModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AndroidJNIModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AndroidJNIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AnimationModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AnimationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ARModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ARModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ARModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AssetBundleModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.AudioModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ClothModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClothModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ClusterInputModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClusterInputModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClusterInputModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ClusterRendererModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClusterRendererModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ClusterRendererModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CrashReportingModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.CrashReportingModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.CrashReportingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.DirectorModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.DirectorModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.DSPGraphModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.DSPGraphModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.DSPGraphModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.GameCenterModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GameCenterModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GameCenterModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.GIModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GIModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.GridModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GridModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.GridModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.HotReloadModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.HotReloadModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.HotReloadModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.InputLegacyModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.InputModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.InputModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.InputModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.JSONSerializeModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.JSONSerializeModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.LocalizationModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.LocalizationModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.LocalizationModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ParticleSystemModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ParticleSystemModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PerformanceReportingModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.PerformanceReportingModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.PerformanceReportingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.Physics2DModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.Physics2DModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ProfilerModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ProfilerModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ProfilerModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.ScreenCaptureModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.ScreenCaptureModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.SharedInternalsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SharedInternalsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.SpriteMaskModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SpriteMaskModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SpriteMaskModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.SpriteShapeModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SpriteShapeModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SpriteShapeModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.StreamingModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.StreamingModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.StreamingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.SubstanceModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SubstanceModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SubstanceModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.SubsystemsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SubsystemsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.SubsystemsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TerrainModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TerrainModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TerrainPhysicsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TerrainPhysicsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextCoreModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TextCoreModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TextCoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TilemapModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TilemapModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TilemapModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TLSModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TLSModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.TLSModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIElementsNativeModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIElementsNativeModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIElementsNativeModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UmbraModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UmbraModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UmbraModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UNETModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UNETModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UNETModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityAnalyticsModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityAnalyticsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityConnectModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityConnectModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityConnectModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityCurlModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityCurlModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityCurlModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityTestProtocolModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityTestProtocolModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityTestProtocolModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestAudioModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestTextureModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UnityWebRequestWWWModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VehiclesModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VehiclesModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VFXModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VFXModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VFXModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VideoModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VideoModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VirtualTexturingModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VirtualTexturingModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VirtualTexturingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.VRModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VRModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.VRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.WindModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.WindModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.WindModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.XRModule">
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.XRModule.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\UnityEngine.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -456,8 +461,20 @@
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
+    <Compile Include="Features\Computer\AppLauncher\AppLauncherHandling.cs" />
+    <Compile Include="Features\Computer\ComputerApp.cs" />
+    <Compile Include="Features\Computer\AssetScripts\ActionMenuController.cs" />
+    <Compile Include="Features\Computer\ComputerIdentifier.cs" />
+    <Compile Include="Features\Computer\ComputerLogic.cs" />
+    <Compile Include="Features\Computer\AssetScripts\CustomCursorStandaloneInputModule.cs" />
+    <Compile Include="Features\Computer\AssetScripts\D90Button.cs" />
+    <Compile Include="Features\Computer\AssetScripts\DesktopIcon.cs" />
+    <Compile Include="Features\Computer\AssetScripts\DigitalClock.cs" />
+    <Compile Include="Features\Computer\AssetScripts\DraggableTopbar.cs" />
+    <Compile Include="Features\Computer\AssetScripts\PauseMenu.cs" />
+    <Compile Include="Features\Computer\AssetScripts\WindowController.cs" />
     <Compile Include="Features\Computer\ComputerUI.cs" />
-    <Compile Include="Features\SharedRaycasts.cs" />
+    <Compile Include="Features\DataHandler.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
@@ -525,9 +542,6 @@
     <None Include="Resources\autoupdater_ui_canvas" />
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Computer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

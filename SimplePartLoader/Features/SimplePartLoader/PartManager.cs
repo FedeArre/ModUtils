@@ -129,6 +129,30 @@ namespace SimplePartLoader
                     {
                         part.Prefab.AddComponent<SPL_Part>();
                     }
+
+                    // v1.4 - Experimental wrong triger setup detection
+                    if(part.CarProps.triger)
+                    {
+                        MeshCollider mc = part.Prefab.GetComponent<MeshCollider>();
+                        if(mc == null)
+                        {
+                            Debug.LogError($"[ModUtils/SPL/Error]: {part.CarProps.PrefabName} does not have a MeshCollider!");
+                            continue;
+                        }
+
+                        if(!mc.isTrigger)
+                        {
+                            Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.CarProps.PrefabName} has CarProperties.triger set to true but MeshCollider isTrigger set to false!");
+                        }
+
+                        foreach(Collider c in part.Prefab.GetComponentsInChildren<Collider>())
+                        {
+                            if(!c.isTrigger && c.gameObject.layer == LayerMask.NameToLayer("Default"))
+                            {
+                                Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.Prefab.name} child named {c.gameObject.name} has wrong layer for triger setup!");
+                            }
+                        }
+                    }
                 }
             }
             SPL.DevLog("Injecting into catalog & localization stuff");
@@ -551,7 +575,7 @@ namespace SimplePartLoader
                             }
                             else
                             {
-                                Debug.Log($"[ModUtils/PaintingSystem/Error]: {part.Prefab} prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}. This is only a warning, but you should fix it.");
+                                Debug.Log($"[ModUtils/PaintingSystem/Warning]: {part.Prefab} prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}. This is only a warning, but you should fix it.");
                                 part.Renderer.materials = dummyMats;
                             }
                             break;
@@ -562,7 +586,7 @@ namespace SimplePartLoader
                             break;
                     }
 
-                    if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable)
+                    if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable && (part.CarProps.Paintable || part.CarProps.DMGdeformMesh || part.CarProps.DMGdisplacepart))
                         Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Mesh from {data.PrefabName} is not readable. This will cause the part to not be loaded properly. Please make the mesh readable.");
                 }
 
@@ -688,7 +712,8 @@ namespace SimplePartLoader
                     DestroyConsideringSetting(part, markedTransparent.gameObject);
                 }
 
-                Debug.Log($"[ModUtils/SPL]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
+                if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
+                    Debug.Log($"[ModUtils/SPL/Debug]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
                 
                 // Destroy some stuff
                 DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());

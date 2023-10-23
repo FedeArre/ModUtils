@@ -20,6 +20,9 @@ namespace SimplePartLoader.Utils
             GameObject carPart = null;
             foreach (GameObject part in PartManager.gameParts)
             {
+                if (part == null)
+                    Debug.LogError("[ModUtils/Error]: PartManager part list got a null on it, restart game!");
+
                 if (part.name == partName)
                 {
                     carPart = part;

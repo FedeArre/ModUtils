@@ -31,7 +31,9 @@ namespace SimplePartLoader.CarGen
             // Bone target fix
             foreach (MyBoneSCR scr in objective.GetComponentsInChildren<MyBoneSCR>())
             {
-                Debug.Log($"Bone found at {scr.name} ({Utils.Functions.GetTransformPath(scr.transform)})");
+                if(car.EnableDebug)
+                    Debug.Log($"[ModUtils/CarGen/Bones]: Bone found at {scr.name} ({Utils.Functions.GetTransformPath(scr.transform)})");
+                
                 if (scr.transform.childCount != 0)
                 {
                     if(scr.LocalStrtetchTarget != null)
@@ -568,7 +570,7 @@ namespace SimplePartLoader.CarGen
             Brakes vehBrakes = new Brakes();
             vehBrakes.HandbrakeWorkingOrder = true;
             vehBrakes.StartedToBrake = true;
-            vehBrakes.maxTorque = 2750;
+            vehBrakes.maxTorque = 1f;
             vehBrakes.brakeOffThrottleStrength = 0.1f;
             vehBrakes.MainProp = mainCarProps;
             vehBrakes.brakeWhileAsleep = false;

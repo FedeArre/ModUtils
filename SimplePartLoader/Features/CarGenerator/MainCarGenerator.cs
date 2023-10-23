@@ -22,8 +22,14 @@ namespace SimplePartLoader.CarGen
 
         internal static void StartCarGen()
         {
+            var watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
             foreach (Car car in RegisteredCars)
             {
+                if(!car.loadedBy.CheckAllow)
+                    return;
+
                 ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
                 
                 // First, clone our base to our empty.
@@ -81,6 +87,9 @@ namespace SimplePartLoader.CarGen
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
             }
+
+            watch.Stop();
+            Debug.Log($"[ModUtils/Timing/CarGenerator]: Car loading ({RegisteredCars.Count} cars) took {watch.ElapsedMilliseconds}");
         }
 
         internal static void AddCars()
@@ -98,10 +107,10 @@ namespace SimplePartLoader.CarGen
         internal static void BuildCar(Car car)
         {
             // Build our car
-            CarGenUtils.RecursiveCarBuild(car);
+            CarGenUtils.RecursiveCarBuild(car, 0);
 
             if (car.carGeneratorData.TransparentReferenceUpdate)
-                CarBuilding.UpdateTransparentsReferences(car.carPrefab);
+                CarBuilding.UpdateTransparentsReferences(car.carPrefab, car.IgnoreLogErrors);
 
             if (car.carGeneratorData.BoneTargetTransformFix)
             {
@@ -182,8 +191,10 @@ namespace SimplePartLoader.CarGen
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
                         continue;
                     }
+
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().ImportantBolts += 1f;
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().fixedImportantBolts += 1f;
+                    
                     if (car.EnableDebug && !boltNut.otherobject)
                     {
                         Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
@@ -204,8 +215,12 @@ namespace SimplePartLoader.CarGen
                 {
                     weldCut.ReStart();
                     weldCut.welded = true;
-                    Debug.Log(weldCut.gameObject.name);
-                    Debug.Log(weldCut.transform.parent.name);
+
+                    if(car.EnableDebug)
+                    {
+                        Debug.Log($"[ModUtils/CarGen/AttachDebug]: Weld object ${weldCut.gameObject?.name}, parent is {weldCut.transform.parent.name}");
+                    }
+
                     weldCut.gameObject.transform.parent.GetComponent<Partinfo>().fixedwelds += 1f;
                     weldCut.gameObject.transform.parent.GetComponent<Partinfo>().attachedwelds += 1f;
 

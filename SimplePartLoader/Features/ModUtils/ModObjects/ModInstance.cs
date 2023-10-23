@@ -8,6 +8,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static NWH.VehiclePhysics2.Demo.DemoSettings;
 
 namespace SimplePartLoader
 {
@@ -21,7 +22,7 @@ namespace SimplePartLoader
         internal bool RequiresSteamCheck = false;
         internal bool Checked = false;
         
-        internal bool CheckedAndAllowed = false;
+        internal bool CheckedAndAllowed = true;
 
         internal bool Thumbnails = false;
         
@@ -56,7 +57,7 @@ namespace SimplePartLoader
         {
             get { return CheckedAndAllowed; }
         }
-        
+
         internal ModInstance(Mod mod)
         {
             thisMod = mod;
@@ -64,7 +65,7 @@ namespace SimplePartLoader
             loadedFurniture = new List<Furniture>();
             settings = new ModSettings(this);
 
-            Debug.Log($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
+            DebugIfEnabled($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
         }
 
         public Part Load(AssetBundle bundle, string prefabName)
@@ -129,7 +130,7 @@ namespace SimplePartLoader
                     part.PartInfo.FitsToEngine = part.Mod.Settings.AutomaticFitsToEngine;
                 }
                 
-                Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
+                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
             
@@ -144,7 +145,7 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY_PREFABGEN;
-                Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (dummy part with Prefab generator) {prefabName} from {thisMod.Name}");
+                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part with Prefab generator) {prefabName} from {thisMod.Name}");
             }
             else
             {
@@ -155,7 +156,7 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY;
-                Debug.Log($"[ModUtils/SPL]: Succesfully loaded part (dummy part) {prefabName} from {thisMod.Name}");
+                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part) {prefabName} from {thisMod.Name}");
             }
 
             return p;
@@ -195,13 +196,14 @@ namespace SimplePartLoader
 
             loadedFurniture.Add(furn);
             FurnitureManager.Furnitures.Add(furn.PrefabName, furn);
-            Debug.Log($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
+            DebugIfEnabled($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
             
             return furn;
         }
 
         public void EnableEarlyAccessCheck()
         {
+            CheckedAndAllowed = false;
             RequiresSteamCheck = true;
         }
 
@@ -317,6 +319,13 @@ namespace SimplePartLoader
 
             MainCarGenerator.RegisteredCars.Add(car);
             return car;
+        }
+        public void DebugIfEnabled(string text)
+        {
+            if (settings.EnableDeveloperLog)
+            {
+                Debug.Log(text);
+            }
         }
     }
 }
