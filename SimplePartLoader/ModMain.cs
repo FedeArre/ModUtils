@@ -30,7 +30,7 @@ namespace SimplePartLoader
         public override string Version => "v1.3.1";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "charger development build - 6";
+        string TESTING_VERSION_NUMBER = "charger development build - 7";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -45,9 +45,6 @@ namespace SimplePartLoader
         // ModUtils
         Transform PlayerTransform;
         bool PlayerOnCar;
-        
-        // Mod delete
-        string[] modsToDelete = { "Extra Buildings.dll", "Autoupdater.dll" };
         
         // Mod shop
         AssetBundle Bundle;
@@ -71,15 +68,7 @@ namespace SimplePartLoader
 
             // Mod delete
             string ModsFolderPath = Application.dataPath + "/../Mods/";
-            foreach(string s in modsToDelete)
-            {
-                if (File.Exists(ModsFolderPath + s))
-                {
-                    File.Delete(ModsFolderPath + s);
-                    Debug.Log($"[ModUtils/Legacy]: Mod {s} has been replaced by ModUtils");
-                }
-            }
-
+            
             if (Directory.Exists(ModsFolderPath + "Autoupdater/"))
             {
                 Directory.Delete(ModsFolderPath + "Autoupdater/", true);
