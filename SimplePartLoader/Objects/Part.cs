@@ -331,6 +331,12 @@ namespace SimplePartLoader
             }
         }
 
+        public void RemovePaintCounters()
+        {
+            foreach (P3dChangeCounter counter in Prefab.GetComponentsInChildren<P3dChangeCounter>())
+                GameObject.Destroy(counter);
+        }
+
         private void GenerateHingePivot(OpeningType type)
         {
             Transform t = Prefab.transform.Find("HingePivot");
