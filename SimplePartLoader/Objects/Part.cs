@@ -337,6 +337,17 @@ namespace SimplePartLoader
                 GameObject.Destroy(counter);
         }
 
+        public void SetStandardShader()
+        {
+            Material[] objectMats = Renderer.materials;
+            Shader standardShader = Shader.Find("Standard");
+
+            foreach (Material m in objectMats)
+                m.shader = standardShader;
+
+            Renderer.materials = objectMats;
+        }
+
         private void GenerateHingePivot(OpeningType type)
         {
             Transform t = Prefab.transform.Find("HingePivot");
