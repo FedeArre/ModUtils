@@ -250,6 +250,13 @@ namespace SimplePartLoader.CarGen
             smokeComponent.particleSystems.Add(smokeComponent.GetComponent<ParticleSystem>());
             smokeComponent2.particleSystems.Add(smokeComponent2.GetComponent<ParticleSystem>());
 
+            // Fixing RVP.SUSP
+            Transform WheelControllerFR = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFR");
+            Transform WheelControllerFL = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFL");
+
+            WheelControllerFL.GetComponent<RVP.SUSP>().tr = WheelControllerFL;
+            WheelControllerFR.GetComponent<RVP.SUSP>().tr = WheelControllerFR;
+
             // Bone fix
             foreach (MyBoneSCR scr in objective.GetComponentsInChildren<MyBoneSCR>())
             {
@@ -265,7 +272,7 @@ namespace SimplePartLoader.CarGen
                 {
                     scr.LocalStrtetchTarget = scr.transform.parent.Find("DummyPivHbrak");
                 }
-                else if (scr.transform.name == "RearAxle07")
+                else if (scr.name == "RearAxle07")
                 {
                     Transform NonRot1 = null, NonRot2 = null;
 
@@ -282,7 +289,6 @@ namespace SimplePartLoader.CarGen
                         if (NonRot1 && NonRot2)
                             break;
                     }
-
                     scr.targetTransform = NonRot2;
                     scr.targetTransformB = NonRot1;
                 }

@@ -1,9 +1,12 @@
 ﻿using PaintIn3D;
+using SimplePartLoader.Features.CarGenerator;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -64,6 +67,14 @@ namespace SimplePartLoader.CarGen
                 mcp.CarPrice = car.carGeneratorData.CarPrice;
                 mcp.PREFAB = car.emptyCarPrefab;
 
+                // Removing InsideItems object
+                GameObject.DestroyImmediate(car.emptyCarPrefab.transform.Find("InsideItems").gameObject);
+                GameObject.DestroyImmediate(car.carPrefab.transform.Find("InsideItems").gameObject);
+
+                // Custom steering breaking fix
+                car.emptyCarPrefab.AddComponent<SteeringFix>();
+                car.carPrefab.AddComponent<SteeringFix>();
+
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
                 baseData.SetupTemplate(car.carPrefab, car);
@@ -86,6 +97,81 @@ namespace SimplePartLoader.CarGen
                 
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
+                /*
+                Debug.Log("[ModUtils/CarGenDebug]: Root component count: " + car.carPrefab.GetComponents<MonoBehaviour>().Length);
+                Debug.Log("[ModUtils/CarGenDebug]: Childrens component count: " + car.carPrefab.GetComponentsInChildren<MonoBehaviour>().Length);
+                foreach(MonoBehaviour c in car.carPrefab.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if(c != null)
+                    { 
+                        Type type = c.GetType();
+                        Debug.Log(type);
+
+                        if (type == null) continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        Debug.Log(fields);
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field == null) continue;
+
+                            if (field.FieldType == typeof(Transform))
+                            {
+                                Debug.Log(field.Name);
+                                Transform transformValue = (Transform)field.GetValue(c);
+                                if (transformValue && transformValue.root)
+                                {
+                                    Debug.Log($"TransformFind: {transformValue.root.name} ({transformValue.name}) @ {c}");
+                                }
+
+                            }
+                            else if (field.FieldType == typeof(GameObject))
+                            {
+                                GameObject goValue = (GameObject)field.GetValue(c);
+                                if (goValue && goValue.transform && goValue.transform.root)
+                                {
+                                    Debug.Log($"GameObjectFind: {goValue.transform.root.name} ({goValue.transform.name}) @ {c}");
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (MonoBehaviour c in car.carPrefab.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if (c != null)
+                    {
+                        Type type = c.GetType();
+                        Debug.Log(type);
+
+                        if (type == null) continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        Debug.Log(fields);
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field == null) continue;
+
+                            if (field.FieldType == typeof(Transform))
+                            {
+                                Debug.Log(field.Name);
+                                Transform transformValue = (Transform)field.GetValue(c);
+                                if (transformValue && transformValue.root)
+                                {
+                                    Debug.Log($"TransformFind: {transformValue.root.name} ({transformValue.name}) @ {c}");
+                                }
+
+                            }
+                            else if (field.FieldType == typeof(GameObject))
+                            {
+                                GameObject goValue = (GameObject)field.GetValue(c);
+                                if (goValue && goValue.transform && goValue.transform.root)
+                                {
+                                    Debug.Log($"GameObjectFind: {goValue.transform.root.name} ({goValue.transform.name}) @ {c}");
+                                }
+                            }
+                        }
+                    }
+                }*/
             }
 
             watch.Stop();
