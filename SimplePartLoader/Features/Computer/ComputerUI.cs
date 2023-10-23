@@ -132,6 +132,7 @@ namespace SimplePartLoader.Features
                 DataHandler.RemoveData("ModUtils_ComputerRot_X");
                 DataHandler.RemoveData("ModUtils_ComputerRot_Y");
                 DataHandler.RemoveData("ModUtils_ComputerRot_Z");
+                return;
             }
 
             Vector3 pos = ModUtils.UnshiftCoords(NewTable.transform.position);
