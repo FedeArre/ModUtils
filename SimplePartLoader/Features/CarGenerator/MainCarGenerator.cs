@@ -25,9 +25,10 @@ namespace SimplePartLoader.CarGen
 
         internal static void StartCarGen()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
-
+#endif
             foreach (Car car in RegisteredCars)
             {
                 if(!car.loadedBy.CheckAllow)
@@ -173,9 +174,10 @@ namespace SimplePartLoader.CarGen
                     }
                 }*/
             }
-
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/CarGenerator]: Car loading ({RegisteredCars.Count} cars) took {watch.ElapsedMilliseconds}");
+#endif
         }
 
         internal static void AddCars()

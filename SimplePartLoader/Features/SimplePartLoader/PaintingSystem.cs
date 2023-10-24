@@ -91,6 +91,14 @@ namespace SimplePartLoader
                 
                 P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
 
+                // Check for original mesh
+                OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+                Mesh meshToUse = null;
+                if (orMesh)
+                {
+                    meshToUse = orMesh.Mesh;
+                }
+
                 // Setting up the components
 
                 // Material cloner
@@ -101,7 +109,8 @@ namespace SimplePartLoader
 
                 counter_colorMap.PaintableTexture = paintableTexture_colorMap;
                 counter_colorMap.Threshold = 0.1f;
-                counter_colorMap.enabled = false;          
+                counter_colorMap.enabled = false;
+                counter_colorMap.MaskMesh = meshToUse;
 
                 CheckHighResolutionPaint(part, paintableTexture_colorMap);
                 
@@ -143,6 +152,14 @@ namespace SimplePartLoader
                 return;
             }
 
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if (orMesh)
+            {
+                meshToUse = orMesh.Mesh;
+            }
+
             // Now we add all the painting components
             P3dMaterialCloner materialCloner_l2 = Prefab.AddComponent<P3dMaterialCloner>();
 
@@ -176,11 +193,13 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-            
+            counter_rust.MaskMesh = meshToUse;
+
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-            
+            counter_colorMap.MaskMesh = meshToUse;
+
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
             
             // Final details
@@ -223,6 +242,14 @@ namespace SimplePartLoader
                 return;
             }
 
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if (orMesh)
+            {
+                meshToUse = orMesh.Mesh;
+            }
+
             // Setting up the components
 
             // Material cloner
@@ -240,7 +267,8 @@ namespace SimplePartLoader
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
-            
+            counter_dirt.MaskMesh = meshToUse;
+
             // Final details
             part.CarProps.Washable = true;
         }
