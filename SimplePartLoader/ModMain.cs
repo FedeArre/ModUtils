@@ -1,6 +1,6 @@
 ﻿// The following preprocessor declaration disables the timing feature from ModUtils.
 // This module can create unrequired overhead on final builds
-#define MODUTILS_TIMING_ENABLED
+//#define MODUTILS_TIMING_ENABLED
 
 using Autoupdater.Objects;
 using ModUI;
@@ -60,11 +60,10 @@ namespace SimplePartLoader
 
         public ModMain()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
-            long totalTime = 0;
-
             watch.Start();
-
+#endif
             Debug.Log("ModUtils is loading - Version: " + Version);
             Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
@@ -126,8 +125,10 @@ namespace SimplePartLoader
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
 
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
+#endif
         }
 
         public override void OnMenuLoad()
@@ -155,28 +156,32 @@ namespace SimplePartLoader
 
         public override void OnLoad()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             long totalTime = 0;
 
             watch.Start();
 
             Debug.Log($"[ModUtils/Timing]: OnLoad method was called!");
-
+#endif
             // ModUtils library time
             ModUtils.OnLoadCalled();
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: ModUtils library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
 
             // PartManager library time
             watch.Restart();
+#endif
             PartManager.OnLoadCalled();
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
 
             watch.Restart();
-
+#endif
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -210,19 +215,20 @@ namespace SimplePartLoader
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
-
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: Save dissasembly & various library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
             watch.Restart();
-
+#endif
             // Computer UI stuff
             ComputerUI.LoadComputerTable();
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: In-game computer succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
             watch.Restart();
-
+#endif
             // Furniture stuff
             FurnitureManager.SetupFurniture();
 
@@ -234,11 +240,12 @@ namespace SimplePartLoader
             shopSupportCube.transform.localPosition = new Vector3(657.1829f, 51.2f, -46.6193f);
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
-
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: Furniture manager & ModShop succesfully loaded - Took {watch.ElapsedMilliseconds} ms");
             Debug.Log($"[ModUtils/Timing]: ModUtils loading took ${totalTime} ms");
+#endif
 
         }
 

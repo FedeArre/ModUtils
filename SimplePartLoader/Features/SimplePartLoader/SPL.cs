@@ -416,9 +416,10 @@ namespace SimplePartLoader
         /// </summary>
         internal static void InvokeLoadFinishedEvent()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch1 = new System.Diagnostics.Stopwatch();
             watch1.Start();
-
+#endif
             if (LoadFinish != null)
             {
                 DevLog("Load finish has been called - Developer logging is enabled (Please disable before releasing your mod!)");
@@ -426,13 +427,16 @@ namespace SimplePartLoader
                 {
                     try
                     {
+#if MODUTILS_TIMING_ENABLED
                         var watch2 = new System.Diagnostics.Stopwatch();
                         watch2.Start();
-
+#endif
                         handler.DynamicInvoke();
 
+#if MODUTILS_TIMING_ENABLED
                         watch2.Stop();
                         Debug.Log($"[ModUtils/Timing/FirstLoad]: {handler.Method.ReflectedType.Assembly.FullName} FirstLoad took {watch2.ElapsedMilliseconds}ms");
+#endif
                     }
                     catch (Exception ex)
                     {
@@ -442,9 +446,10 @@ namespace SimplePartLoader
                     }
                 }
             }
+#if MODUTILS_TIMING_ENABLED
             watch1.Stop();
             Debug.Log($"[ModUtils/Timing/FirstLoad]: FirstLoad total took {watch1.ElapsedMilliseconds}ms");
-
+#endif
         }
 
         /// <summary>
