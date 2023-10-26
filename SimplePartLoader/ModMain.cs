@@ -34,7 +34,7 @@ namespace SimplePartLoader
         public override string Version => "v1.3.1";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "charger development build - 7";
+        string TESTING_VERSION_NUMBER = "charger development build - 8";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -42,6 +42,7 @@ namespace SimplePartLoader
 
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
+
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
@@ -57,6 +58,7 @@ namespace SimplePartLoader
 
         // Mod settings
         internal static ModUI.Settings.ModSettings.Toggle TelemetryToggle;
+        public static ModUI.Settings.ModSettings.Toggle EnableEarlyAccess;
 
         public ModMain()
         {
@@ -69,7 +71,7 @@ namespace SimplePartLoader
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
-            // Mod delete
+            // Deleting unused stuff
             string ModsFolderPath = Application.dataPath + "/../Mods/";
             
             if (Directory.Exists(ModsFolderPath + "Autoupdater/"))
@@ -317,6 +319,9 @@ namespace SimplePartLoader
 
         public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
         {
+            EnableEarlyAccess = modSettings.AddToggle("Enable Early Access (You need to restart the game for mods to load when enabled)", "EnableEA_ModUtils", false);
+            modSettings.AddSpace();
+            modSettings.AddSpace();
             TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);
             modSettings.AddLabel("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
             modSettings.AddSpace();

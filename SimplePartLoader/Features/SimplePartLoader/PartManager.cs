@@ -2,6 +2,7 @@
 using KCC;
 using RVP;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Objects;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
@@ -355,7 +356,7 @@ namespace SimplePartLoader
                 if(t.Owner.CarProps)
                     Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
 
-                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
+                transparentObject.AddComponent<ReworkedTransparentEdit>().transparentData = t;
             }
             
             return transparentObject;

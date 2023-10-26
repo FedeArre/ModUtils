@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -46,6 +47,102 @@ namespace SimplePartLoader
             Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
+            if(ModMain.EnableEarlyAccess.Value)
+            {
+                // Load keys
+                Dictionary<string, string> foundKeys = new Dictionary<string, string>();
+                string ModsFolderPath = Application.dataPath + "/../Mods/";
+                string[] files = Directory.GetFiles(ModsFolderPath);
+
+                for (int i = 0; i < files.Length; i++)
+                {
+                    try
+                    {
+                        string stuff = File.ReadAllText(files[i]);
+                        if (stuff.StartsWith("MDU783-"))
+                        {
+                            foundKeys.Add(files[i], stuff.Substring(7));
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Log("[ModUtils/EACheck]: Something is going wrong internally on mod data reading: " + ex.Message);
+                    }
+                }
+
+                // If we have keys, we now start loading the mods
+                foreach (var item in foundKeys)
+                {
+                    try
+                    {
+                        var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/eachecknew");
+
+                        httpWebRequest.ContentType = "application/json";
+                        httpWebRequest.Accept = "application/json";
+                        httpWebRequest.Method = "POST";
+
+                        EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
+                        eamo.Key = item.Value;
+                        eamo.SteamId = steamID + "";
+
+                        using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                        {
+                            streamWriter.Write(JsonConvert.SerializeObject(eamo));
+                        }
+
+                        using (HttpWebResponse response = (HttpWebResponse)httpWebRequest.GetResponse())
+                        {
+                            if (response.StatusCode == HttpStatusCode.OK)
+                            {
+                                using (MemoryStream memoryStream = new MemoryStream())
+                                using (Stream responseStream = response.GetResponseStream())
+                                {
+                                    int bufferSize = 4096;
+                                    byte[] buffer = new byte[bufferSize];
+                                    int bytesRead;
+                                    while ((bytesRead = responseStream.Read(buffer, 0, bufferSize)) > 0)
+                                    {
+                                        memoryStream.Write(buffer, 0, bytesRead);
+                                        if (bytesRead < bufferSize)
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    // Load the assembly from the memory stream
+                                    byte[] assemblyBytes = memoryStream.ToArray();
+                                    Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+                                    Type typeFromHandle = typeof(Mod);
+                                    for (int i = 0; i < types.Length; i++)
+                                    {
+                                        if (typeFromHandle.IsAssignableFrom(types[i]))
+                                        {
+                                            Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                            ModLoader.mods.Add(m);
+                                            m.OnMenuLoad();
+                                        }
+                                    }
+                                }
+
+                                Debug.Log($"[ModUtils/EACheck]: Succesfully loaded " + Path.GetFileName(item.Key));
+                            }
+                            else
+                            {
+                                ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
+                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Could not load " + Path.GetFileName(item.Key));
+                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Status code: " +  response.StatusCode);
+                            }
+                        }
+                    }
+                    catch(Exception ex)
+                    {
+                        ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
+                        Debug.LogError("[ModUtils/EACheck/Error]: An error occured checking a file. " + ex.Message);
+                        Debug.LogError("[ModUtils/EACheck/Error]: " + ex.StackTrace);
+                    }
+                }
+            }
+
             foreach (ModInstance mi in ModUtils.ModInstances)
             {
                 if (mi.RequiresSteamCheck)
@@ -53,7 +150,7 @@ namespace SimplePartLoader
                     mi.Check(steamID);
                 }
             }
-
+            
             // Autoupdating stuff goes here too now!
             JSON_ModList jsonList = new JSON_ModList(Steamworks.SteamApps.GetAppBuildId());
             foreach (Mod mod in ModLoader.mods)
@@ -86,6 +183,23 @@ namespace SimplePartLoader
 
                     AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
 
+                    // First check for unsupported mods.
+
+                    List<JSON_Mod_API_Result> unsupportedMods = new List<JSON_Mod_API_Result>();
+                    if (AutoupdaterResult.Count > 0)
+                    {
+                        Debug.Log("api result");
+                        foreach (var item in AutoupdaterResult)
+                        {
+                            Debug.Log(item);
+                            Debug.Log(item.file_name);
+                            Debug.Log(item.unsupported);
+                            if (item.unsupported) unsupportedMods.Add(item);
+                        }
+
+                        foreach(var item in unsupportedMods) AutoupdaterResult.Remove(item);
+                    }
+
                     if (AutoupdaterResult.Count > 0)
                     {
                         // Updates available.
@@ -116,6 +230,14 @@ namespace SimplePartLoader
                         AutoupdaterResult.ForEach(x => names += $"{x.mod_name}, ");
                         names = names.Substring(0, names.Length - 2);
                         UI.transform.Find("Panel/TextMods").GetComponent<Text>().text = names;
+                    }
+
+                    if(unsupportedMods.Count > 0)
+                    {
+                        foreach(var item in unsupportedMods)
+                        {
+                            ErrorMessageHandler.GetInstance().UnsupportedModList.Add(item.mod_name);
+                        }
                     }
                 }
             }

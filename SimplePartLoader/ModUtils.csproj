@@ -481,6 +481,7 @@
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
     <Compile Include="Objects\EditorComponents\CarGenerator.cs" />
     <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />
     <Compile Include="Objects\EditorComponents\ChildMove.cs" />
@@ -516,6 +517,7 @@
     <Compile Include="Objects\EditorComponents\MarkAsFlatnut.cs" />
     <Compile Include="Objects\EditorComponents\MarkAsHexnut.cs" />
     <Compile Include="Objects\Part.cs" />
+    <Compile Include="Objects\ReworkedTransparentEdit.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="Features\SimplePartLoader\PartManager.cs" />

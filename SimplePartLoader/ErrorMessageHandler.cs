@@ -22,11 +22,12 @@ namespace SimplePartLoader
         }
 
         public List<string> DisabledModList = new List<string>();
+        public List<string> UnsupportedModList = new List<string>();
         public bool ThumbnaiLGeneratorEnabled;
 
         void OnGUI()
         {
-            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled)
+            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0)
                 return;
 
             int nextLineHeight = 40;
@@ -51,6 +52,19 @@ namespace SimplePartLoader
                 nextLineHeight += 15;
                 GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Thumbnail generator enabled!");
                 nextLineHeight += 15;
+            }
+
+            if(UnsupportedModList.Count != 0)
+            {
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mods are marked as");
+                nextLineHeight += 15;
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "unsupported / obsolete by the mod author: ");
+                nextLineHeight += 15;
+                foreach (string mod in UnsupportedModList)
+                {
+                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
+                    nextLineHeight += 15;
+                }
             }
         }
     }
