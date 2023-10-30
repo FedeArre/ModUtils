@@ -15,8 +15,12 @@ namespace SimplePartLoader
     public class ModInstance
     {
         private Mod thisMod;
+
         private List<Part> loadedParts;
         private List<Furniture> loadedFurniture;
+        private List<Car> loadedCars;
+        private List<Buildable> loadedBuildables;
+
         private ModSettings settings;
 
         internal bool RequiresSteamCheck = false;
@@ -37,7 +41,17 @@ namespace SimplePartLoader
             get { return loadedFurniture; }
             internal set { loadedFurniture = value; }
         }
-        
+        public List<Car> Cars
+        {
+            get { return loadedCars; }
+            internal set { loadedCars = value; }
+        }
+        public List<Buildable> Buildables
+        {
+            get { return loadedBuildables; }
+            internal set { loadedBuildables = value; }
+        }
+
         public Mod Mod
         {
             get { return thisMod; }
@@ -61,8 +75,12 @@ namespace SimplePartLoader
         internal ModInstance(Mod mod)
         {
             thisMod = mod;
+
             loadedParts = new List<Part>();
             loadedFurniture = new List<Furniture>();
+            loadedCars = new List<Car>();
+            loadedBuildables = new List<Buildable>();
+
             settings = new ModSettings(this);
 
             DebugIfEnabled($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
@@ -283,8 +301,14 @@ namespace SimplePartLoader
                     FurnitureManager.Furnitures.Remove(f);
                 }
 
+                foreach(Buildable b in Buildables)
+                {
+                    BuildableManager.Buildables[b.PrefabName] = null;
+                }
+
                 Parts.Clear();
                 Furnitures.Clear();
+                Buildables.Clear();
             }
         }
 
@@ -317,9 +341,49 @@ namespace SimplePartLoader
             Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
             car.loadedBy = this;
 
+            Cars.Add(car);
+
             MainCarGenerator.RegisteredCars.Add(car);
             return car;
         }
+
+        public Buildable LoadBuildable(AssetBundle bundle, string prefabName)
+        {
+            // Safety checks
+            if (!bundle)
+                Debug.LogError("[ModUtils/Buildables/Error]: Tried to create a buildable without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                Debug.LogError("[ModUtils/Buildables/Error]: Tried to create a buildable without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+
+            if (!prefab)
+                Debug.LogError($"[ModUtils/Buildables/Error]: Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+
+            BuildableGenerator buildGen = prefab.GetComponent<BuildableGenerator>();
+            if (!buildGen)
+                Debug.LogError($"[ModUtils/Buildables/Error]: {prefabName} does not have Buildable Generator component!");
+
+            if (BuildableManager.Buildables.Contains(buildGen.PrefabName))
+                Debug.LogError($"[ModUtils/Buildables/Error]: {buildGen.PrefabName} (from {prefabName}) prefab name is already registered in ModUtils!");
+
+            if (Saver.modParts.Contains(buildGen.PrefabName))
+                Debug.LogError($"[ModUtils/Buildables/Error]: {buildGen.PrefabName} (from {prefabName}) prefab name is already registered in game saver!");
+
+            Buildable b = new Buildable(buildGen.PrefabName, prefab, (BuildableType) buildGen.Type);
+            b.loadedBy = this;
+
+            prefab.AddComponent<SaveItem>().PrefabName = buildGen.PrefabName;
+            prefab.tag = "Building";
+
+            BuildableManager.Buildables.Add(buildGen.PrefabName, b);
+            Saver.modParts.Add(buildGen.PrefabName, prefab);
+
+            Buildables.Add(b);
+            return b;
+        }
+
         public void DebugIfEnabled(string text)
         {
             if (settings.EnableDeveloperLog)

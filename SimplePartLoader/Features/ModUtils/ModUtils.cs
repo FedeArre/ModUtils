@@ -41,7 +41,8 @@ namespace SimplePartLoader
             CursorCanvas = GameObject.Find("CursorCanvas");
             PlayerTools = Player.GetComponent<tools>();
             RewiredPlayer = ReInput.players.GetPlayer(0);
-            
+
+            Debug.Log("THIS IS MODUTILS! " + PlayerTools.buildparent);
             GameObject PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();

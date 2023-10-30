@@ -184,6 +184,14 @@ namespace SimplePartLoader
 
             watch.Restart();
 #endif
+            BuildableManager.OnGameLoad();
+#if MODUTILS_TIMING_ENABLED
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: Building (BuildingManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+#endif
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
