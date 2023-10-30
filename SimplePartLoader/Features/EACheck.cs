@@ -47,29 +47,35 @@ namespace SimplePartLoader
             Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
-            if(ModMain.EnableEarlyAccess.Value)
-            {
-                // Load keys
-                Dictionary<string, string> foundKeys = new Dictionary<string, string>();
-                string ModsFolderPath = Application.dataPath + "/../Mods/";
-                string[] files = Directory.GetFiles(ModsFolderPath);
+            // Load keys
+            Dictionary<string, string> foundKeys = new Dictionary<string, string>();
+            string ModsFolderPath = Application.dataPath + "/../Mods/";
+            string[] files = Directory.GetFiles(ModsFolderPath);
 
-                for (int i = 0; i < files.Length; i++)
+            for (int i = 0; i < files.Length; i++)
+            {
+                try
                 {
-                    try
+                    string stuff = File.ReadAllText(files[i]);
+                    if (stuff.StartsWith("MDU783-"))
                     {
-                        string stuff = File.ReadAllText(files[i]);
-                        if (stuff.StartsWith("MDU783-"))
-                        {
-                            foundKeys.Add(files[i], stuff.Substring(7));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.Log("[ModUtils/EACheck]: Something is going wrong internally on mod data reading: " + ex.Message);
+                        foundKeys.Add(files[i], stuff.Substring(7));
                     }
                 }
+                catch (Exception ex)
+                {
+                    Debug.Log("[ModUtils/EACheck]: Something is going wrong internally on mod data reading: " + ex.Message);
+                }
+            }
 
+            if(!ModMain.EnableEarlyAccess.Value && foundKeys.Count != 0)
+            {
+                ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
+            }
+
+            if (ModMain.EnableEarlyAccess.Value)
+            {
+                
                 // If we have keys, we now start loading the mods
                 foreach (var item in foundKeys)
                 {

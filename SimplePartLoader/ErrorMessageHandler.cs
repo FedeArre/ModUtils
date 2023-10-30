@@ -24,10 +24,11 @@ namespace SimplePartLoader
         public List<string> DisabledModList = new List<string>();
         public List<string> UnsupportedModList = new List<string>();
         public bool ThumbnaiLGeneratorEnabled;
+        public bool EarlyAccessMod;
 
         void OnGUI()
         {
-            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0)
+            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod)
                 return;
 
             int nextLineHeight = 40;
@@ -54,7 +55,17 @@ namespace SimplePartLoader
                 nextLineHeight += 15;
             }
 
-            if(UnsupportedModList.Count != 0)
+            if (EarlyAccessMod)
+            {
+                nextLineHeight += 15;
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Early Access (EA) mod detected but loading");
+                nextLineHeight += 15;
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "EA mods are not enabled. Enable them on settings");
+                nextLineHeight += 15;
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "and restart the game");
+            }
+
+            if (UnsupportedModList.Count != 0)
             {
                 GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mods are marked as");
                 nextLineHeight += 15;

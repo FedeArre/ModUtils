@@ -21,6 +21,7 @@ namespace SimplePartLoader.CarGen
         internal static void BaseSetup()
         {
             AvailableBases[CarBase.Chad] = new Chad();
+            AvailableBases[CarBase.LAD] = new LAD();
         }
 
         internal static void StartCarGen()
@@ -41,10 +42,34 @@ namespace SimplePartLoader.CarGen
                 CarBuilding.CopyCarToPrefab(baseData.GetCar(), car.carPrefab);
 
                 // Then, destroy all transparents requested by user
-                foreach (string transparent in car.carGeneratorData.TransparentsToDelete)
+                if(car.carGeneratorData.RemoveOriginalTransparents)
                 {
-                    CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent);
-                    CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent);
+                    List<string> transparentsToDelete = new List<string>();
+
+                    if (car.carGeneratorData.DontRemoveFuelLine)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("FuelLine")) car.carGeneratorData.TransparentExceptions.Add("FuelLine");
+                    }
+
+                    if (car.carGeneratorData.DontRemoveBatteryWires)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("WiresMain06")) car.carGeneratorData.TransparentExceptions.Add("WiresMain06s");
+                    }
+
+                    foreach (transparents tr in car.emptyCarPrefab.GetComponentsInChildren<transparents>())
+                    {
+                        if (tr.transform.parent != car.emptyCarPrefab.transform) continue; // Transparent is not root, ignore
+
+                        if (car.carGeneratorData.TransparentExceptions.Contains(tr.name)) continue; // Transparent is ignored by user
+
+                        transparentsToDelete.Add(tr.name);
+                    }
+
+                    foreach (string transparent in transparentsToDelete)
+                    {
+                        CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent);
+                        CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent);
+                    }
                 }
 
                 // Add custom transparents to our car
