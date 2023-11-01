@@ -130,8 +130,10 @@ namespace SimplePartLoader.Utils
         public static void UpdateTransparentsReferences(GameObject p, bool ignoreErrors = false)
         {
             bool referenceUpdated = false;
+            Debug.Log("now at ... " + p);
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
             {
+                Debug.Log("tr " + t);
                 if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
                 {
                     transparents.dependantObjects[] newDependants = new transparents.dependantObjects[t.DEPENDANTS.Length];
@@ -146,7 +148,14 @@ namespace SimplePartLoader.Utils
                             continue;
                         }
 
-                        int savePosition = dp.dependant.GetComponent<transparents>().SavePosition;
+                        transparents tr = dp.dependant.GetComponent<transparents>();
+                        if(!tr)
+                        {
+                            Debug.LogError($"[ModUtils/CarGen/Error]: Dependant {dp.dependant} of object {t} does not have transparents component. Something is not setup properly on Unity side");
+                            continue;
+                        }
+
+                        int savePosition = tr.SavePosition;
                         foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
                             if(t2 == null)

@@ -135,6 +135,9 @@ namespace SimplePartLoader
                 loadedParts.Add(part);
                 
                 part.PartType = PartTypes.FULL_PART;
+
+                if (Saver.modParts.ContainsKey(part.CarProps.PrefabName))
+                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {part.CarProps.PrefabName} on Saver.modParts. Part loading is {prefabName}");
                 
                 Saver.modParts.Add(part.CarProps.PrefabName, prefab);
 
@@ -157,6 +160,10 @@ namespace SimplePartLoader
             if (prefabGen)
             {
                 p.Name = prefabGen.PrefabName;
+
+                if (Saver.modParts.ContainsKey(p.Name))
+                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+                
                 Saver.modParts.Add(p.Name, prefab);
 
                 PartManager.prefabGenParts.Add(p);
@@ -167,7 +174,11 @@ namespace SimplePartLoader
             }
             else
             {
-                p.Name = prefabName;
+                p.Name = prefabName; 
+                
+                if (Saver.modParts.ContainsKey(p.Name))
+                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+
                 Saver.modParts.Add(prefabName, prefab);
                 
                 PartManager.dummyParts.Add(p);
