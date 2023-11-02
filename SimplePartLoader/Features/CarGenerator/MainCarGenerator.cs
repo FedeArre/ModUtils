@@ -53,7 +53,7 @@ namespace SimplePartLoader.CarGen
 
                     if (car.carGeneratorData.DontRemoveBatteryWires)
                     {
-                        if (!car.carGeneratorData.TransparentExceptions.Contains("WiresMain06")) car.carGeneratorData.TransparentExceptions.Add("WiresMain06s");
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("WiresMain06")) car.carGeneratorData.TransparentExceptions.Add("WiresMain06");
                     }
 
                     foreach (transparents tr in car.emptyCarPrefab.GetComponentsInChildren<transparents>())
