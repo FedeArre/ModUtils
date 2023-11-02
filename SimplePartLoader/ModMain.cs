@@ -34,7 +34,7 @@ namespace SimplePartLoader
         public override string Version => "v1.3.1";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "charger development build - 8b";
+        string TESTING_VERSION_NUMBER = "charger development build - 8c";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -176,7 +176,17 @@ namespace SimplePartLoader
             // PartManager library time
             watch.Restart();
 #endif
-            PartManager.OnLoadCalled();
+            try
+            {
+                PartManager.OnLoadCalled();
+            }
+            catch(Exception ex)
+            {
+                Debug.LogError("[ModUtils/Error/Critical]: PartManager had an unexpected major issue - Parts will not continue to be loaded.");
+                Debug.LogError("[ModUtils/Error/Critical]: Reported source & data: " + ex.Source);
+                Debug.LogError(ex.Message + " - " + ex.StackTrace);
+            }
+
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
@@ -256,7 +266,6 @@ namespace SimplePartLoader
             Debug.Log($"[ModUtils/Timing]: Furniture manager & ModShop succesfully loaded - Took {watch.ElapsedMilliseconds} ms");
             Debug.Log($"[ModUtils/Timing]: ModUtils loading took ${totalTime} ms");
 #endif
-
         }
 
         public override void Continue()
