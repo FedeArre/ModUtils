@@ -325,6 +325,11 @@ namespace SimplePartLoader
             }
         }
 
+        public override void OnNewMapLoad()
+        {
+            BuildableManager.OnNewMapEnabled();
+        }
+
         public override void LateUpdate()
         {
             if (ComputerUI.PlayerAtComputer && Input.GetKeyDown(KeyCode.Escape))

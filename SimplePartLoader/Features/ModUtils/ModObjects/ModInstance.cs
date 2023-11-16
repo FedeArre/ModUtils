@@ -8,7 +8,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static NWH.VehiclePhysics2.Demo.DemoSettings;
 
 namespace SimplePartLoader
 {
@@ -20,6 +19,7 @@ namespace SimplePartLoader
         private List<Furniture> loadedFurniture;
         private List<Car> loadedCars;
         private List<Buildable> loadedBuildables;
+        private List<BuildableMaterial> loadedBuildableMats;
 
         private ModSettings settings;
 
@@ -52,6 +52,12 @@ namespace SimplePartLoader
             internal set { loadedBuildables = value; }
         }
 
+        public List<BuildableMaterial> BuildableMaterials
+        {
+            get { return loadedBuildableMats; }
+            internal set { loadedBuildableMats = value; }
+        }
+        
         public Mod Mod
         {
             get { return thisMod; }
@@ -393,6 +399,39 @@ namespace SimplePartLoader
 
             Buildables.Add(b);
             return b;
+        }
+
+        public BuildableMaterial LoadBuildableMaterial(AssetBundle bundle, string prefabName, string materialName)
+        {
+            // Safety checks
+            if (!bundle)
+                Debug.LogError("[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                Debug.LogError("[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material prefab but it was not found in the AssetBundle {prefabName}");
+
+
+            Material mat = bundle.LoadAsset<Material>(materialName);
+            if (!mat)
+                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material but it was not found in the AssetBundle {materialName}");
+
+            if (BuildableManager.BuildableMaterials.Contains(materialName))
+                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: {materialName} (from {prefabName}) material name is already registered in ModUtils!");
+
+            if (Saver.modParts.Contains(materialName))
+                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: {materialName} (from {prefabName}) material name is already registered in game saver!");
+
+            BuildableMaterial bm = new BuildableMaterial(materialName, mat, this);
+
+            BuildableManager.BuildableMaterials.Add(materialName, bm);
+            Saver.modParts.Add(materialName, bm);
+
+            BuildableMaterials.Add(bm);
+            return bm;
         }
 
         public void DebugIfEnabled(string text)

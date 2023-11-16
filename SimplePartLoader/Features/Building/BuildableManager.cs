@@ -11,6 +11,7 @@ namespace SimplePartLoader
     internal class BuildableManager
     {
         internal static Hashtable Buildables { get; } = new Hashtable();
+        internal static Hashtable BuildableMaterials { get; } = new Hashtable();
         internal static BuildingParent BuildComponent = null;
 
         internal static void OnGameLoad()
@@ -47,6 +48,12 @@ namespace SimplePartLoader
 
             for (int i = CategorizedBuildablesIndexes[(int)BuildableType.ROOF]; i < BuildComponent.RoofParts.Length; i++)
                 BuildComponent.RoofParts[i] = CategorizedBuildables[(int)BuildableType.ROOF].Dequeue().Prefab;
+        }
+
+        internal static void OnNewMapEnabled()
+        {
+            GameObject referenceSaleItem = GameObject.Find("Unloadables/HardwareStore/SHOPITEMS/FinishingMaterial");
+
         }
     }
 }
