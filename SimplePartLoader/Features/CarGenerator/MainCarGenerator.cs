@@ -438,6 +438,11 @@ namespace SimplePartLoader.CarGen
                     {
                         Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
                     }
+                    MeshRenderer mr = carProps.GetComponent<MeshRenderer>();
+                    if (carProps.Washable && mr && mr.materials.Length < 2)
+                    {
+                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
+                    }
                 }
 
                 foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())
