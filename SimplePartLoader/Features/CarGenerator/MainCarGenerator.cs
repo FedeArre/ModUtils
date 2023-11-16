@@ -24,6 +24,7 @@ namespace SimplePartLoader.CarGen
         {
             AvailableBases[CarBase.Chad] = new Chad();
             AvailableBases[CarBase.LAD] = new LAD();
+            AvailableBases[CarBase.Wolf] = new Wolf();
         }
 
         internal static void StartCarGen()
@@ -56,6 +57,11 @@ namespace SimplePartLoader.CarGen
                     if (car.carGeneratorData.DontRemoveBatteryWires)
                     {
                         if (!car.carGeneratorData.TransparentExceptions.Contains("WiresMain06")) car.carGeneratorData.TransparentExceptions.Add("WiresMain06");
+                    }
+
+                    if (car.carGeneratorData.DontRemoveBrakeLine)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("MainBrakeLine")) car.carGeneratorData.TransparentExceptions.Add("MainBrakeLine");
                     }
 
                     foreach (transparents tr in car.emptyCarPrefab.GetComponentsInChildren<transparents>())

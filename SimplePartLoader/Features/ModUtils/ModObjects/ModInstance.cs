@@ -86,6 +86,7 @@ namespace SimplePartLoader
             loadedFurniture = new List<Furniture>();
             loadedCars = new List<Car>();
             loadedBuildables = new List<Buildable>();
+            loadedBuildableMats = new List<BuildableMaterial>();
 
             settings = new ModSettings(this);
 
@@ -401,7 +402,7 @@ namespace SimplePartLoader
             return b;
         }
 
-        public BuildableMaterial LoadBuildableMaterial(AssetBundle bundle, string prefabName, string materialName)
+        public BuildableMaterial LoadBuildableMaterial(AssetBundle bundle, string prefabName, string materialName, Vector3 shopPosition, Vector3 shopRotation)
         {
             // Safety checks
             if (!bundle)
@@ -414,7 +415,6 @@ namespace SimplePartLoader
             if (!prefab)
                 Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material prefab but it was not found in the AssetBundle {prefabName}");
 
-
             Material mat = bundle.LoadAsset<Material>(materialName);
             if (!mat)
                 Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material but it was not found in the AssetBundle {materialName}");
@@ -425,10 +425,13 @@ namespace SimplePartLoader
             if (Saver.modParts.Contains(materialName))
                 Debug.LogError($"[ModUtils/Buildables/Mats/Error]: {materialName} (from {prefabName}) material name is already registered in game saver!");
 
-            BuildableMaterial bm = new BuildableMaterial(materialName, mat, this);
+            if (shopPosition == null || shopRotation == null)
+                Debug.LogWarning($"[ModUtils/Buildables/Mats/Warning]: {materialName} (from {prefabName}) material does not have shop position or shop rotation!");
+
+            BuildableMaterial bm = new BuildableMaterial(materialName, mat, this, shopPosition, shopRotation, prefab);
 
             BuildableManager.BuildableMaterials.Add(materialName, bm);
-            Saver.modParts.Add(materialName, bm);
+            Saver.modParts.Add(materialName, mat);
 
             BuildableMaterials.Add(bm);
             return bm;

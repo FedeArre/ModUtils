@@ -47,11 +47,13 @@ public class CarGenerator : MonoBehaviour
     public bool RemoveOriginalTransparents = false;
     public bool DontRemoveBatteryWires = true;
     public bool DontRemoveFuelLine = true;
+    public bool DontRemoveBrakeLine = true;
     public List<string> TransparentExceptions = new List<string>();
 }
 
 public enum CarBase
 {
     Chad,
-    LAD
+    LAD,
+    Wolf
 }

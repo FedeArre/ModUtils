@@ -456,11 +456,13 @@
     <Compile Include="Features\Building\Buildable.cs" />
     <Compile Include="Features\Building\BuildableManager.cs" />
     <Compile Include="Features\Building\BuildableMaterial.cs" />
+    <Compile Include="Features\Building\DelayedBuildableLoader.cs" />
     <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
     <Compile Include="Features\CarGenerator\Car.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
     <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
     <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\SteeringFix.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />

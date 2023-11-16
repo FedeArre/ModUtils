@@ -62,7 +62,7 @@ namespace SimplePartLoader.CarGen
                         }
                         else
                         {
-                            Debug.LogWarning($"[ModUtils/CarGen/BoneFix/Chad]: Could not find bone for {scr.LocalStrtetchTarget.name} ({scr.LocalStrtetchTarget.parent.name})");
+                            Debug.LogWarning($"[ModUtils/CarGen/BoneFix/Wolf]: Could not find bone for {scr.LocalStrtetchTarget.name} ({scr.LocalStrtetchTarget.parent.name})");
                         }
                     }
 
