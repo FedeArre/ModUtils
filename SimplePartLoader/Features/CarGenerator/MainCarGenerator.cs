@@ -1,4 +1,6 @@
-﻿using PaintIn3D;
+﻿//#define MODUTILS_DEVELOPER_CAR_CREATOR
+
+using PaintIn3D;
 using SimplePartLoader.Features.CarGenerator;
 using SimplePartLoader.Utils;
 using System;
@@ -123,7 +125,7 @@ namespace SimplePartLoader.CarGen
                 
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
-                /*
+#if MODUTILS_DEVELOPER_CAR_CREATOR
                 Debug.Log("[ModUtils/CarGenDebug]: Root component count: " + car.carPrefab.GetComponents<MonoBehaviour>().Length);
                 Debug.Log("[ModUtils/CarGenDebug]: Childrens component count: " + car.carPrefab.GetComponentsInChildren<MonoBehaviour>().Length);
                 foreach(MonoBehaviour c in car.carPrefab.GetComponentsInChildren<MonoBehaviour>())
@@ -197,7 +199,8 @@ namespace SimplePartLoader.CarGen
                             }
                         }
                     }
-                }*/
+                }
+#endif
             }
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
@@ -305,13 +308,30 @@ namespace SimplePartLoader.CarGen
                         continue;
                     }
 
+                    //Debug.Log($"Now at boltnut {boltNut} ({boltNut.transform.parent.name}) {boltNut.otherobjectName} {boltNut.otherobject}");
+
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().ImportantBolts += 1f;
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().fixedImportantBolts += 1f;
                     
-                    if (car.EnableDebug && !boltNut.otherobject)
+                    if (!boltNut.otherobject)
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
-                        continue;
+                        if(string.IsNullOrEmpty(boltNut.otherobjectNameL) || string.IsNullOrEmpty(boltNut.otherobjectNameR))
+                        {
+                            boltNut.otherobjectNameL = boltNut.otherobjectName;
+                            boltNut.otherobjectNameR = boltNut.otherobjectName;
+                            boltNut.ReStart();
+
+                            if(!boltNut.otherobject)
+                            {
+                                Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                            continue;
+                        }
                     }
                     
                     if (!boltNut.otherobject.GetComponent<Partinfo>())
