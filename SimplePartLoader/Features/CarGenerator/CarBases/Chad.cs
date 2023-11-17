@@ -368,6 +368,7 @@ namespace SimplePartLoader.CarGen
             newClutch.fwdAcceleration = 0.0195f;
             newClutch.slipTorque = 5000;
             newClutch.variableEngagementRPMRange = 1400;
+
             newClutch.inertia = 0.04f;
             newClutch.name = "Clutch";
             newClutch.startSignal = false;

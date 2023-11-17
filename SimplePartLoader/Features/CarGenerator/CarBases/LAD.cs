@@ -25,13 +25,13 @@ namespace SimplePartLoader.CarGen
             exceptions.ExceptionList["FlareRL06"] = "none";
             exceptions.ExceptionList["FlareRL06"] = "none";
             exceptions.ExceptionList["HeadlightCase06"] = "none";
-            exceptions.ExceptionList["HeadlightCase06"] = "none";
             exceptions.ExceptionList["TaxiSign"] = "none";
             exceptions.ExceptionList["SpoilerRR06"] = "none";
             exceptions.ExceptionList["SpoilerR06"] = "none";
             exceptions.ExceptionList["Louvre06"] = "none";
             exceptions.ExceptionList["SpeedoDigital"] = "none";
             exceptions.ExceptionList["SpoilerF06"] = "none";
+            exceptions.ExceptionList["TrailerHook06"] = "none";
         }
 
         public void PostBuild(GameObject objective, Car car)

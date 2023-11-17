@@ -184,7 +184,8 @@ namespace SimplePartLoader
             {
                 Debug.LogError("[ModUtils/Error/Critical]: PartManager had an unexpected major issue - Parts will not continue to be loaded.");
                 Debug.LogError("[ModUtils/Error/Critical]: Reported source & data: " + ex.Source);
-                Debug.LogError(ex.Message + " - " + ex.StackTrace);
+                Debug.LogError(ex.Message);
+                Debug.LogError(ex.StackTrace.ToString());
             }
 
 #if MODUTILS_TIMING_ENABLED
