@@ -313,5 +313,11 @@ namespace SimplePartLoader.Utils
                     cp.DMGdisplacepart = false;
             }
         }
+
+        public static void AddValueToArray(ref string[] array, string newValue)
+        {
+            Array.Resize(ref array, array.Length + 1);
+            array[array.Length - 1] = newValue;
+        }
     }
 }

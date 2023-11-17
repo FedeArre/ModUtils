@@ -112,8 +112,18 @@ namespace SimplePartLoader.CarGen
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
                 baseData.SetupTemplate(car.carPrefab, car);
-                car.OnSetupCarTemplate?.Invoke(car.emptyCarPrefab);
-                car.OnSetupCarTemplate?.Invoke(car.carPrefab);
+
+                try
+                {
+                    car.OnSetupCarTemplate?.Invoke(car.emptyCarPrefab);
+                    car.OnSetupCarTemplate?.Invoke(car.carPrefab);
+                }
+                catch(Exception ex)
+                {
+                    Debug.LogError($"[ModUtils/CarGen/Error]: There was an issue while setting up the template of {car.carGeneratorData.CarName}");
+                    Debug.LogError(ex.Message);
+                    Debug.LogError(ex.StackTrace);
+                }
 
                 if (!car.carGeneratorData.DisableModUtilsTemplateSetup)
                     baseData.ForceTemplateExceptions(car.exceptionsObject);
@@ -259,7 +269,17 @@ namespace SimplePartLoader.CarGen
             }
 
             baseData.PostBuild(car.carPrefab, car);
-            car.OnPostBuild?.Invoke(car.carPrefab);
+
+            try
+            {
+                car.OnPostBuild?.Invoke(car.carPrefab);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[ModUtils/CarGen/Error]: There was an issue while setting up the post-build of {car.carGeneratorData.CarName}");
+                Debug.LogError(ex.Message);
+                Debug.LogError(ex.StackTrace);
+            }
 
             // Attach fix
             if(car.carGeneratorData.EnableAttachFix)
