@@ -130,10 +130,9 @@ namespace SimplePartLoader.Utils
         public static void UpdateTransparentsReferences(GameObject p, bool ignoreErrors = false)
         {
             bool referenceUpdated = false;
-            Debug.Log("now at ... " + p);
+
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
             {
-                Debug.Log("tr " + t);
                 if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
                 {
                     transparents.dependantObjects[] newDependants = new transparents.dependantObjects[t.DEPENDANTS.Length];

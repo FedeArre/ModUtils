@@ -22,6 +22,11 @@ namespace SimplePartLoader.CarGen
 
         internal ModInstance loadedBy;
 
+        public GameObject BuiltCarPrefab
+        {
+            get { return carPrefab; }
+        }
+
         public bool IgnoreLogErrors { get; set; }
         public bool EnableDebug { get; set; }
         

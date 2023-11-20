@@ -194,12 +194,8 @@ namespace SimplePartLoader
                     List<JSON_Mod_API_Result> unsupportedMods = new List<JSON_Mod_API_Result>();
                     if (AutoupdaterResult.Count > 0)
                     {
-                        Debug.Log("api result");
                         foreach (var item in AutoupdaterResult)
                         {
-                            Debug.Log(item);
-                            Debug.Log(item.file_name);
-                            Debug.Log(item.unsupported);
                             if (item.unsupported) unsupportedMods.Add(item);
                         }
 
@@ -299,7 +295,6 @@ namespace SimplePartLoader
                 try
                 {
                     client.DownloadFileAsync(new Uri(dd.current_download_link), DownloadFolder + $"\\{dd.file_name}");
-                    Debug.Log($"Now downloading: " + dd.mod_name);
                 }
                 catch (Exception ex)
                 {

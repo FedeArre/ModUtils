@@ -189,7 +189,7 @@ namespace SimplePartLoader
         internal static void SeatFix(GameObject prefab, bool printData)
         {
             if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Seat]: COMPATIBILITY! - Seat fix tried to be applied to {prefab} (Fix is not needed anymore)");
+                Debug.Log($"[ModUtils/CommonFix/Seat]: Compatibility - Seat fix tried to be applied to {prefab} (Fix is not needed anymore)");
         }
         
         internal static void Windows(GameObject prefab, bool printData)

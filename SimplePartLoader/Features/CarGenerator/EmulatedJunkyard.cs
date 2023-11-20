@@ -381,7 +381,7 @@ namespace SimplePartLoader.CarGen
                 if (float.IsNaN(mcp.CarPriceStart))
                 {
                     mcp.CarPriceStart = 250;
-                    Debug.Log($"[ModUtils/EmulatedJunkyard]: NaN value detected, game fallbacks to 20 in this case...");
+                    Debug.Log($"[ModUtils/EmulatedJunkyard]: NaN value detected, game fallbacks to 250 in this case...");
                 }
 
                 Debug.Log("[ModUtils/EmulatedJunkyard]: The spawn of the car was succesful on this case. Remember to try various times since spawns are random!");

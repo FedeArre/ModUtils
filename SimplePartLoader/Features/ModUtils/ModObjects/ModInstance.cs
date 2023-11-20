@@ -252,7 +252,6 @@ namespace SimplePartLoader
         
         internal async void Check(ulong SteamID)
         {
-            Debug.Log($"Checking for {SteamID} at mod {Mod.Name}");
             if (!RequiresSteamCheck)
                 return;
 
