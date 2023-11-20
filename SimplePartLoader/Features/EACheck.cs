@@ -8,7 +8,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -81,68 +83,46 @@ namespace SimplePartLoader
                 {
                     try
                     {
-                        var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/eachecknew");
-
-                        httpWebRequest.ContentType = "application/json";
-                        httpWebRequest.Accept = "application/json";
-                        httpWebRequest.Method = "POST";
-
-                        EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
-                        eamo.Key = item.Value;
-                        eamo.SteamId = steamID + "";
-
-                        using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                        using(HttpClient client = new HttpClient())
                         {
-                            streamWriter.Write(JsonConvert.SerializeObject(eamo));
-                        }
+                            EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
+                            eamo.Key = item.Value;
+                            eamo.SteamId = steamID + "";
 
-                        using (HttpWebResponse response = (HttpWebResponse)httpWebRequest.GetResponse())
-                        {
-                            if (response.StatusCode == HttpStatusCode.OK)
+                            HttpContent content = new StringContent(JsonConvert.SerializeObject(eamo), System.Text.Encoding.UTF8, "application/json");
+                            HttpResponseMessage response = client.PostAsync(ModMain.API_URL + "/eachecknew", content).Result;
+
+                            if(response.IsSuccessStatusCode)
                             {
-                                using (MemoryStream memoryStream = new MemoryStream())
-                                using (Stream responseStream = response.GetResponseStream())
+                                byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
+                                Debug.Log(assemblyBytes.Length);
+                                Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+                                Type typeFromHandle = typeof(Mod);
+                                for (int i = 0; i < types.Length; i++)
                                 {
-                                    int bufferSize = 4096;
-                                    byte[] buffer = new byte[bufferSize];
-                                    int bytesRead;
-                                    while ((bytesRead = responseStream.Read(buffer, 0, bufferSize)) > 0)
+                                    if (typeFromHandle.IsAssignableFrom(types[i]))
                                     {
-                                        memoryStream.Write(buffer, 0, bytesRead);
-                                        if (bytesRead < bufferSize)
-                                        {
-                                            break;
-                                        }
-                                    }
-
-                                    // Load the assembly from the memory stream
-                                    byte[] assemblyBytes = memoryStream.ToArray();
-                                    Type[] types = Assembly.Load(assemblyBytes).GetTypes();
-                                    Type typeFromHandle = typeof(Mod);
-                                    for (int i = 0; i < types.Length; i++)
-                                    {
-                                        if (typeFromHandle.IsAssignableFrom(types[i]))
-                                        {
-                                            Mod m = (Mod)Activator.CreateInstance(types[i]);
-                                            ModLoader.mods.Add(m);
-                                            m.OnMenuLoad();
-                                        }
+                                        Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                        ModLoader.mods.Add(m);
+                                        m.OnMenuLoad();
                                     }
                                 }
-
+                            
                                 Debug.Log($"[ModUtils/EACheck]: Succesfully loaded " + Path.GetFileName(item.Key));
                             }
                             else
                             {
                                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
                                 Debug.LogWarning($"[ModUtils/EACheck/Error]: Could not load " + Path.GetFileName(item.Key));
-                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Status code: " +  response.StatusCode);
+                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Status code: " + response.StatusCode);
                             }
                         }
                     }
-                    catch(Exception ex)
+                    catch(Exception ex) 
                     {
                         ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
+                        Debug.Log(ex);
+                        Debug.Log(ex.ToString());
                         Debug.LogError("[ModUtils/EACheck/Error]: An error occured checking a file. " + ex.Message);
                         Debug.LogError("[ModUtils/EACheck/Error]: " + ex.StackTrace);
                     }
