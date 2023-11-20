@@ -1,5 +1,6 @@
 ﻿using PaintIn3D;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,26 +9,23 @@ using UnityEngine;
 
 namespace SimplePartLoader.CarGen
 {
-    public class EmulatedJunkyard
+    public class EmulatorComponent : MonoBehaviour
     {
-        public static void SpawnCar(GameObject car)
+        public GameObject car;
+        void Start()
         {
-            Debug.Log($"[ModUtils/EmulatedJunkyard]: Emulated junkyard - Spawning {car.name}");
-
-            // Ignore CS0618 warning (This is game code copy)
-#pragma warning disable CS0618
-            UnityEngine.Random.seed = DateTime.Now.Millisecond + UnityEngine.Random.Range(0, 999999);
-#pragma warning restore CS0618
-
-            GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(car, new Vector3(UnityEngine.Random.Range(0.1f, 10f), UnityEngine.Random.Range(-99f, -70f), UnityEngine.Random.Range(0.1f, 10f)), Quaternion.Euler((float)UnityEngine.Random.Range(0, 360), (float)UnityEngine.Random.Range(0, 360), (float)UnityEngine.Random.Range(0, 360)));
-            EmulateCreatingJunkyard(gameObject);
+            StartCoroutine(Emulate());
         }
 
-        internal static void EmulateCreatingJunkyard(GameObject car)
+        IEnumerator Emulate()
         {
+            yield return 0;
+            yield return 0;
+            yield return 0;
+
             Debug.Log("[ModUtils/EmulatedJunkyard]: Object instanciate done, setting mileage & color & start options.");
-            
-            if(!car.GetComponent<Rigidbody>())
+
+            if (!car.GetComponent<Rigidbody>())
                 Debug.Log($"[ModUtils/EmulatedJunkyard]: CAR DOES NOT HAVE RIGIDBODY - THIS IS CRITICAL!");
 
             MainCarProperties mcp = car.GetComponent<MainCarProperties>();
@@ -157,7 +155,7 @@ namespace SimplePartLoader.CarGen
                     if (carProperties.Condition >= 0.6f && carProperties.JunkSpawnChance == 2)
                     {
                         Debug.Log($"[ModUtils/EmulatedJunkyard]: JunkSpawnChance is 2 and Condition is >= 0.6, trying to delete part");
-                        
+
                         if (carProperties.gameObject.GetComponent<Pickup>() && !carProperties.Tire)
                         {
                             carProperties.gameObject.GetComponent<Pickup>().BRAKE2();
@@ -171,7 +169,7 @@ namespace SimplePartLoader.CarGen
                     if (carProperties.Condition >= 0.8f && carProperties.JunkSpawnChance == 3)
                     {
                         Debug.Log($"[ModUtils/EmulatedJunkyard]: JunkSpawnChance is 3 and Condition is >= 0.8, trying to delete part");
-                        
+
                         if (carProperties.gameObject.GetComponent<Pickup>() && !carProperties.Tire)
                         {
                             carProperties.gameObject.GetComponent<Pickup>().BRAKE2();
@@ -204,188 +202,190 @@ namespace SimplePartLoader.CarGen
                         carProperties.Condition = 1f;
                     }
                 }
-
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: Second part of per-part setup is finished. Trying to reset wheel controllers");
-                mcp.ResetWheelControllers();
-
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: WCs were reset, now trying to determinate starting price - stage1");
-                int allparts = 0;
-                int existingparts = 0;
-                mcp.CarPriceStart = 0f;
-
-                foreach (transparents transparents in mcp.GetComponentsInChildren<transparents>())
-                {
-                    if (!transparents.NotImportantPart)
-                    {
-                        allparts++;
-                    }
-                    if (!transparents.NotImportantPart && transparents.HaveAttached)
-                    {
-                        existingparts++;
-                    }
-                }
-
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage2 of start price, allparts: {allparts} | existingparts {existingparts}");
-                P3dChangeCounter[] targetLis = mcp.GetComponentsInChildren<P3dChangeCounter>();
-                foreach (P3dChangeCounter p3dChangeCounter in targetLis)
-                {
-                    Debug.Log($"[ModUtils/EmulatedJunkyard]: Enabling counter {p3dChangeCounter.name}, threshold is {p3dChangeCounter.Threshold} (0.1 is paint)");
-
-                    p3dChangeCounter.enabled = true;
-                    if (p3dChangeCounter.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter.Threshold == 0.1f)
-                    {
-                        p3dChangeCounter.changeDirty = true;
-                        p3dChangeCounter.Color = mcp.Color;
-                    }
-                }
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage3, calculating floats (paint ratios)");
-                float CleanRatio = 0.1f;
-                float NoRustRatio = 0.1f;
-                float PaintRatio = 0.1f;
-                float CleanRatioParts = 0f;
-                float NoRustRatioParts = 0f;
-                float PaintRatioParts = 0f;
-                float PaintGoodParts = 0f;
-                float RustGoodParts = 0f;
-                foreach (P3dChangeCounter p3dChangeCounter2 in targetLis)
-                {
-                    float num = 1f - p3dChangeCounter2.Ratio;
-                    Debug.Log($"[ModUtils/EmulatedJunkyard]: Ratio is {num}, paintable {p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable}, washable {p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Washable}, threshold is {p3dChangeCounter2.Threshold}");
-                    if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Washable && p3dChangeCounter2.Threshold == 0.7f)
-                    {
-                        if ((double)num > 0.6)
-                        {
-                            CleanRatio += 1f;
-                        }
-                        CleanRatioParts += 1f;
-                        p3dChangeCounter2.gameObject.GetComponent<CarProperties>().CleanRatio = num;
-                    }
-                    if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter2.Threshold == 0.5f)
-                    {
-                        NoRustRatio += num;
-                        NoRustRatioParts += 1f;
-                        p3dChangeCounter2.gameObject.GetComponent<CarProperties>().NoRustRatio = num;
-                        if (num > 0.95f)
-                        {
-                            RustGoodParts += 1f;
-                        }
-                    }
-                    if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter2.Threshold == 0.1f)
-                    {
-                        PaintRatio += num;
-                        PaintRatioParts += 1f;
-                        p3dChangeCounter2.gameObject.GetComponent<CarProperties>().PaintRatio = num;
-                        if (num > 0.9f)
-                        {
-                            PaintGoodParts += 1f;
-                        }
-                    }
-                    p3dChangeCounter2.enabled = false;
-                }
-                float DamagedBodyPanels = 0f;
-                float AllBodyPanels = 0f;
-                float AverageCondition = 0f;
-
-                if (CleanRatioParts > 0f)
-                {
-                    CleanRatio /= CleanRatioParts;
-                }
-                else
-                {
-                    CleanRatio = 0.9f;
-                }
-                if (NoRustRatioParts > 0f)
-                {
-                    NoRustRatio = RustGoodParts / NoRustRatioParts;
-                }
-                else
-                {
-                    NoRustRatio = 0.9f;
-                }
-                if (PaintRatioParts > 0f)
-                {
-                    PaintRatio = PaintGoodParts / PaintRatioParts;
-                }
-                else
-                {
-                    PaintRatio = 0.9f;
-                }
-
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage 4, ratios were calculated. Starting per part calculation");
-                foreach (CarProperties carProps in mcp.GetComponentsInChildren<CarProperties>())
-                {
-                    Debug.Log($"[ModUtils/EmulatedJunkyard]: Now at part {carProps.name} (SinglePart: {carProps.SinglePart})");
-                    if (carProps.SinglePart)
-                    {
-                        float conditCount = 0f;
-                        if (carProps.MeshRepairable && (mcp.Owner == "Client" || carProps.Owner != "Client"))
-                        {
-                            if (carProps.MeshDamaged)
-                            {
-                                DamagedBodyPanels += 1f;
-                            }
-                            AllBodyPanels += 1f;
-                            if (carProps.Ruined || carProps.NoRustRatio < 0.9f)
-                            {
-                                conditCount += 0f;
-                            }
-                            else if (carProps.MeshDamaged || carProps.NoRustRatio < 0.95f)
-                            {
-                                conditCount += 0.1f;
-                            }
-                            else
-                            {
-                                conditCount += 1f;
-                            }
-                        }
-                        if (!carProps.MeshRepairable && (mcp.Owner == "Client" || carProps.Owner != "Client"))
-                        {
-                            if (carProps.Condition < 0.4f && carProps.Condition >= 0.1f && (carProps.WornMesh || carProps.WornMaterial))
-                            {
-                                conditCount += 0.1f;
-                            }
-                            else if (carProps.Condition <= 0.1f && (carProps.RuinedMesh || carProps.RuinedMaterial || carProps.WornMesh || carProps.WornMaterial))
-                            {
-                                conditCount += 0f;
-                            }
-                            else if (carProps.PartIsOld)
-                            {
-                                conditCount += 0f;
-                            }
-                            else
-                            {
-                                conditCount += 1f;
-                            }
-                        }
-                        carProps.ConditionDebug = conditCount;
-                        AverageCondition += conditCount;
-                    }
-                }
-                if (existingparts >= allparts)
-                {
-                    AverageCondition /= (float)existingparts;
-                }
-                else
-                {
-                    AverageCondition /= mcp.PartsCount;
-                }
-                mcp.CarPriceStart = mcp.CarPrice * AverageCondition * (NoRustRatio * NoRustRatio);
-                mcp.CarPriceStart = mcp.CarPriceStart / 2f + mcp.CarPriceStart / 2f * PaintRatio;
-                mcp.CarPriceStart = mcp.CarPriceStart / 50f * 49f + mcp.CarPriceStart / 50f * CleanRatio;
-                if (AllBodyPanels > 1f)
-                {
-                    mcp.CarPriceStart = mcp.CarPriceStart / 3f + mcp.CarPriceStart / 3f * 2f * ((AllBodyPanels - DamagedBodyPanels) / AllBodyPanels);
-                }
-
-                Debug.Log($"[ModUtils/EmulatedJunkyard]: Value calculated was {mcp.CarPriceStart}");
-                if (float.IsNaN(mcp.CarPriceStart))
-                {
-                    mcp.CarPriceStart = 250;
-                    Debug.Log($"[ModUtils/EmulatedJunkyard]: NaN value detected, game fallbacks to 250 in this case...");
-                }
-
-                Debug.Log("[ModUtils/EmulatedJunkyard]: The spawn of the car was succesful on this case. Remember to try various times since spawns are random!");
             }
+
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: Second part of per-part setup is finished. Trying to reset wheel controllers");
+            mcp.ResetWheelControllers();
+
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: WCs were reset, now trying to determinate starting price - stage1");
+            int allparts = 0;
+            int existingparts = 0;
+            mcp.CarPriceStart = 0f;
+
+            foreach (transparents transparents in mcp.GetComponentsInChildren<transparents>())
+            {
+                if (!transparents.NotImportantPart)
+                {
+                    allparts++;
+                }
+                if (!transparents.NotImportantPart && transparents.HaveAttached)
+                {
+                    existingparts++;
+                }
+            }
+
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage2 of start price, allparts: {allparts} | existingparts {existingparts}");
+            P3dChangeCounter[] targetLis = mcp.GetComponentsInChildren<P3dChangeCounter>();
+            foreach (P3dChangeCounter p3dChangeCounter in targetLis)
+            {
+                Debug.Log($"[ModUtils/EmulatedJunkyard]: Enabling counter {p3dChangeCounter.name}, threshold is {p3dChangeCounter.Threshold} (0.1 is paint)");
+
+                p3dChangeCounter.enabled = true;
+                if (p3dChangeCounter.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter.Threshold == 0.1f)
+                {
+                    p3dChangeCounter.changeDirty = true;
+                    p3dChangeCounter.Color = mcp.Color;
+                }
+            }
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage3, calculating floats (paint ratios)");
+            float CleanRatio = 0.1f;
+            float NoRustRatio = 0.1f;
+            float PaintRatio = 0.1f;
+            float CleanRatioParts = 0f;
+            float NoRustRatioParts = 0f;
+            float PaintRatioParts = 0f;
+            float PaintGoodParts = 0f;
+            float RustGoodParts = 0f;
+            foreach (P3dChangeCounter p3dChangeCounter2 in targetLis)
+            {
+                float num = 1f - p3dChangeCounter2.Ratio;
+                Debug.Log($"[ModUtils/EmulatedJunkyard]: Ratio is {num}, paintable {p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable}, washable {p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Washable}, threshold is {p3dChangeCounter2.Threshold}");
+                if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Washable && p3dChangeCounter2.Threshold == 0.7f)
+                {
+                    if ((double)num > 0.6)
+                    {
+                        CleanRatio += 1f;
+                    }
+                    CleanRatioParts += 1f;
+                    p3dChangeCounter2.gameObject.GetComponent<CarProperties>().CleanRatio = num;
+                }
+                if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter2.Threshold == 0.5f)
+                {
+                    NoRustRatio += num;
+                    NoRustRatioParts += 1f;
+                    p3dChangeCounter2.gameObject.GetComponent<CarProperties>().NoRustRatio = num;
+                    if (num > 0.95f)
+                    {
+                        RustGoodParts += 1f;
+                    }
+                }
+                if (p3dChangeCounter2.gameObject.GetComponent<CarProperties>().Paintable && p3dChangeCounter2.Threshold == 0.1f)
+                {
+                    PaintRatio += num;
+                    PaintRatioParts += 1f;
+                    p3dChangeCounter2.gameObject.GetComponent<CarProperties>().PaintRatio = num;
+                    if (num > 0.9f)
+                    {
+                        PaintGoodParts += 1f;
+                    }
+                }
+                p3dChangeCounter2.enabled = false;
+            }
+            float DamagedBodyPanels = 0f;
+            float AllBodyPanels = 0f;
+            float AverageCondition = 0f;
+
+            if (CleanRatioParts > 0f)
+            {
+                CleanRatio /= CleanRatioParts;
+            }
+            else
+            {
+                CleanRatio = 0.9f;
+            }
+            if (NoRustRatioParts > 0f)
+            {
+                NoRustRatio = RustGoodParts / NoRustRatioParts;
+            }
+            else
+            {
+                NoRustRatio = 0.9f;
+            }
+            if (PaintRatioParts > 0f)
+            {
+                PaintRatio = PaintGoodParts / PaintRatioParts;
+            }
+            else
+            {
+                PaintRatio = 0.9f;
+            }
+
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: Stage 4, ratios were calculated. Starting per part calculation");
+            foreach (CarProperties carProps in mcp.GetComponentsInChildren<CarProperties>())
+            {
+                Debug.Log($"[ModUtils/EmulatedJunkyard]: Now at part {carProps.name} (SinglePart: {carProps.SinglePart})");
+                if (carProps.SinglePart)
+                {
+                    float conditCount = 0f;
+                    if (carProps.MeshRepairable && (mcp.Owner == "Client" || carProps.Owner != "Client"))
+                    {
+                        if (carProps.MeshDamaged)
+                        {
+                            DamagedBodyPanels += 1f;
+                        }
+                        AllBodyPanels += 1f;
+                        if (carProps.Ruined || carProps.NoRustRatio < 0.9f)
+                        {
+                            conditCount += 0f;
+                        }
+                        else if (carProps.MeshDamaged || carProps.NoRustRatio < 0.95f)
+                        {
+                            conditCount += 0.1f;
+                        }
+                        else
+                        {
+                            conditCount += 1f;
+                        }
+                    }
+                    if (!carProps.MeshRepairable && (mcp.Owner == "Client" || carProps.Owner != "Client"))
+                    {
+                        if (carProps.Condition < 0.4f && carProps.Condition >= 0.1f && (carProps.WornMesh || carProps.WornMaterial))
+                        {
+                            conditCount += 0.1f;
+                        }
+                        else if (carProps.Condition <= 0.1f && (carProps.RuinedMesh || carProps.RuinedMaterial || carProps.WornMesh || carProps.WornMaterial))
+                        {
+                            conditCount += 0f;
+                        }
+                        else if (carProps.PartIsOld)
+                        {
+                            conditCount += 0f;
+                        }
+                        else
+                        {
+                            conditCount += 1f;
+                        }
+                    }
+                    carProps.ConditionDebug = conditCount;
+                    AverageCondition += conditCount;
+                }
+            }
+            if (existingparts >= allparts)
+            {
+                AverageCondition /= (float)existingparts;
+            }
+            else
+            {
+                AverageCondition /= mcp.PartsCount;
+            }
+            mcp.CarPriceStart = mcp.CarPrice * AverageCondition * (NoRustRatio * NoRustRatio);
+            mcp.CarPriceStart = mcp.CarPriceStart / 2f + mcp.CarPriceStart / 2f * PaintRatio;
+            mcp.CarPriceStart = mcp.CarPriceStart / 50f * 49f + mcp.CarPriceStart / 50f * CleanRatio;
+            if (AllBodyPanels > 1f)
+            {
+                mcp.CarPriceStart = mcp.CarPriceStart / 3f + mcp.CarPriceStart / 3f * 2f * ((AllBodyPanels - DamagedBodyPanels) / AllBodyPanels);
+            }
+
+            Debug.Log($"[ModUtils/EmulatedJunkyard]: Value calculated was {mcp.CarPriceStart}");
+            if (float.IsNaN(mcp.CarPriceStart))
+            {
+                mcp.CarPriceStart = 250;
+                Debug.Log($"[ModUtils/EmulatedJunkyard]: NaN value detected, game fallbacks to 250 in this case...");
+            }
+
+            Debug.Log("[ModUtils/EmulatedJunkyard]: The spawn of the car was succesful on this case. Remember to try various times since spawns are random!");
+            ModUtils.PlayCashSound();
+            GameObject.Destroy(this.gameObject);
         }
     }
 }

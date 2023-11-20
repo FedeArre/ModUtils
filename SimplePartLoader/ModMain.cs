@@ -31,9 +31,9 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.3.1";
+        public override string Version => "v1.4.0";
         
-        bool TESTING_VERSION_REMEMBER = true;
+        bool TESTING_VERSION_REMEMBER = false;
         string TESTING_VERSION_NUMBER = "v1.4-rc1";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
