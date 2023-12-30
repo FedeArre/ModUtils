@@ -27,13 +27,17 @@ namespace SimplePartLoader
 
         GameObject UI;
 
-        string DownloadFolder = Application.dataPath + "/../Mods/ModUtilsUpdating";
+        string DownloadFolder = "";
 
         List<JSON_Mod_API_Result> AutoupdaterResult;
         Queue<JSON_Mod_API_Result> Data;
 
         JSON_Mod_API_Result CurrentDownloadingMod;
         Text progressText;
+        void Start()
+        {
+            DownloadFolder = Application.dataPath + "/../Mods/ModUtilsUpdating";
+        }
 
         void Update()
         {
@@ -41,13 +45,10 @@ namespace SimplePartLoader
                 return;
 
             frameCount++;
-            if (!SteamManager.Initialized)
-                return;
-
-            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            ulong steamID = 76561198947956828;
             Debug.Log("[ModUtils/EACheck]: Identified user: " + steamID);
-            Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
-            KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
+            //Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
+            //KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
             // Load keys
             Dictionary<string, string> foundKeys = new Dictionary<string, string>();
@@ -75,7 +76,7 @@ namespace SimplePartLoader
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
             }
 
-            if (ModMain.EnableEarlyAccess.Value)
+            if (true)
             {
                 
                 // If we have keys, we now start loading the mods
@@ -138,7 +139,7 @@ namespace SimplePartLoader
             }
             
             // Autoupdating stuff goes here too now!
-            JSON_ModList jsonList = new JSON_ModList(Steamworks.SteamApps.GetAppBuildId());
+            JSON_ModList jsonList = new JSON_ModList(0);
             foreach (Mod mod in ModLoader.mods)
             {
                 JSON_Mod jsonMod = new JSON_Mod();
