@@ -33,8 +33,8 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.4.0";
         
-        bool TESTING_VERSION_REMEMBER = false;
-        string TESTING_VERSION_NUMBER = "v1.4-rc1";
+        bool TESTING_VERSION_REMEMBER = true;
+        string TESTING_VERSION_NUMBER = "v1.4.1-dev";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 

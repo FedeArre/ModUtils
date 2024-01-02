@@ -8,6 +8,8 @@ using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -130,30 +132,6 @@ namespace SimplePartLoader
                     {
                         part.Prefab.AddComponent<SPL_Part>();
                     }
-
-                    // v1.4 - Experimental wrong triger setup detection
-                    if(part.CarProps.triger)
-                    {
-                        MeshCollider mc = part.Prefab.GetComponent<MeshCollider>();
-                        if(mc == null)
-                        {
-                            Debug.LogError($"[ModUtils/SPL/Error]: {part.CarProps.PrefabName} does not have a MeshCollider!");
-                            continue;
-                        }
-
-                        if(!mc.isTrigger)
-                        {
-                            Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.CarProps.PrefabName} has CarProperties.triger set to true but MeshCollider isTrigger set to false!");
-                        }
-
-                        foreach(Collider c in part.Prefab.GetComponentsInChildren<Collider>())
-                        {
-                            if(!c.isTrigger && c.gameObject.layer == LayerMask.NameToLayer("Default"))
-                            {
-                                Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.Prefab.name} child named {c.gameObject.name} has wrong layer for triger setup!");
-                            }
-                        }
-                    }
                 }
             }
             SPL.DevLog("Injecting into catalog & localization stuff");
@@ -233,7 +211,7 @@ namespace SimplePartLoader
 
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
 
-            // We know load our transparents. We have to load them for the junkyard parts, car prefabs.
+            // We now load our transparents. We have to load them for the junkyard parts, car prefabs.
             foreach(TransparentData t in transparentData)
             {
                 // We check the car part list for every possible part that has the transparent. This is slow but required for dummy part transparent attaching and will not impact FPS (Only loading time).
@@ -305,6 +283,16 @@ namespace SimplePartLoader
                     TMPro.TMP_Dropdown.OptionData newItem = new TMPro.TMP_Dropdown.OptionData();
                     newItem.text = s;
                     catalog.EngineDropdown.options.Add(newItem);
+                }
+            }
+
+            foreach(ModInstance mi in ModUtils.RegisteredMods)
+            {
+                if(mi.GenerateReport)
+                {
+                    ModStatusReport msr = new ModStatusReport(mi);
+                    Debug.Log("GREAT REPORT");
+                    Debug.Log(msr.GenerateReport(true));
                 }
             }
 
@@ -461,11 +449,6 @@ namespace SimplePartLoader
                 // Now we remove all specific childs / move them.
                 foreach(ChildDestroy cd in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                 {
-                    if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
-                    {
-                        Debug.Log($"[ModUtils/SPL/PrefabGen/DevLog]: Part {part.Prefab.name} - Trying to destroy {cd.name} (SW: {cd.StartsWith} | EW: {cd.EndsWith})");
-                    }
-
                     foreach(Transform t in part.GetTransforms())
                     {
                         if (cd.StartsWith)
@@ -713,9 +696,7 @@ namespace SimplePartLoader
                     DestroyConsideringSetting(part, markedTransparent.gameObject);
                 }
 
-                if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
-                    Debug.Log($"[ModUtils/SPL/Debug]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
-                
+                part.PrefabGenLoaded = true;
                 // Destroy some stuff
                 DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());
                 

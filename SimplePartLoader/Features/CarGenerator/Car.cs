@@ -29,7 +29,16 @@ namespace SimplePartLoader.CarGen
 
         public bool IgnoreLogErrors { get; set; }
         public bool EnableDebug { get; set; }
-        
+
+        internal bool IssueExternalReport = false;
+        internal string ReportedIssue = string.Empty;
+
+        internal void ReportIssue(string issue)
+        {
+            IssueExternalReport = true;
+            ReportedIssue += issue + "\n";
+        }
+
         internal Car(GameObject car, GameObject empty, GameObject transparents)
         {
             carPrefab = car;

@@ -30,6 +30,8 @@ namespace SimplePartLoader.Utils
                 if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
                     continue;
 
+                if(comp == null) continue;
+
                 DevLog($"Now copying component to base object ({comp})");
                 prefab.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
@@ -65,6 +67,8 @@ namespace SimplePartLoader.Utils
             {
                 if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
                     continue;
+
+                if (comp == null) continue;
 
                 DevLog($"Now copying component to added part ({comp})");
                 addedPart.AddComponent(comp.GetType()).GetCopyOf(comp, true);

@@ -316,7 +316,8 @@ namespace SimplePartLoader.CarGen
                     
                     if (!flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
+                        car.ReportIssue($"Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
+                        continue;
                     }
 
                     flatNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
@@ -330,7 +331,7 @@ namespace SimplePartLoader.CarGen
 
                     if (!boltNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
+                        car.ReportIssue($"Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
                         continue;
                     }
 
@@ -349,20 +350,20 @@ namespace SimplePartLoader.CarGen
 
                             if(!boltNut.otherobject)
                             {
-                                Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                                car.ReportIssue($"Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
                                 continue;
                             }
                         }
                         else
                         {
-                            Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                            car.ReportIssue($"Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
                             continue;
                         }
                     }
                     
                     if (!boltNut.otherobject.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
+                        car.ReportIssue($"Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
                         continue;
                     }
                     
@@ -385,13 +386,13 @@ namespace SimplePartLoader.CarGen
 
                     if (!weldCut.otherobject)
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
+                        car.ReportIssue($"Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
                         continue;
                     }
                     
                     if (!weldCut.otherobject.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
+                        car.ReportIssue($"Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
                         continue;
                     }
                     
@@ -456,12 +457,12 @@ namespace SimplePartLoader.CarGen
                 {
                     if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
                     {
-                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                        car.ReportIssue("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
                     }
                     MeshRenderer mr = carProps.GetComponent<MeshRenderer>();
                     if (carProps.Washable && mr && mr.materials.Length < 2)
                     {
-                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
+                        car.ReportIssue("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
                     }
                 }
 

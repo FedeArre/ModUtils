@@ -22,9 +22,14 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
+        internal bool PrefabGenLoaded = false;
+
         public bool UseBetterCopy;
         public ShaderSettings ForceShaderStatus = ShaderSettings.NONE;
-        
+
+        internal bool IssueExternalReport = false;
+        internal string ReportedIssue = string.Empty;
+
         private PartTypes Type;
         private ModInstance modInstance;
 
@@ -175,6 +180,12 @@ namespace SimplePartLoader
             }
         }
 
+        internal void ReportIssue(string issue)
+        {
+            IssueExternalReport = true;
+            ReportedIssue += issue + "\n";
+        }
+
         public void UpdateHingePivotPosition(Vector3 newLocalPosition)
         {
             Transform t = Prefab.transform.Find("HingePivot");
@@ -189,7 +200,7 @@ namespace SimplePartLoader
             return Prefab.GetComponentsInChildren<Transform>();
         }
         
-        [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on SimplePartLoader 1.5. Use PaintingSystem.Types instead!")]
+        [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on Modutils 1.5. Use PaintingSystem.Types instead!")]
         public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
         {
             PaintingSystem.Types newType = (PaintingSystem.Types)type;
@@ -367,6 +378,16 @@ namespace SimplePartLoader
             t.gameObject.layer = LayerMask.NameToLayer("OpenableParts");
 
             PartInfo.HingePivot = t.gameObject;
+        }
+
+        public string GetTypeName()
+        {
+            switch(Type)
+            {
+                case PartTypes.FULL_PART: return "Full part";
+                case PartTypes.DUMMY_PREFABGEN: return "Prefab generator";
+                default: return "Dummy";
+            }
         }
     }
 

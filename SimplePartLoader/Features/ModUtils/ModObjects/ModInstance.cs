@@ -29,6 +29,7 @@ namespace SimplePartLoader
         internal bool CheckedAndAllowed = true;
 
         internal bool Thumbnails = false;
+        internal bool GenerateReport = false;
         
         public List<Part> Parts
         {
@@ -89,8 +90,6 @@ namespace SimplePartLoader
             loadedBuildableMats = new List<BuildableMaterial>();
 
             settings = new ModSettings(this);
-
-            DebugIfEnabled($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
         }
 
         public Part Load(AssetBundle bundle, string prefabName)
@@ -158,7 +157,6 @@ namespace SimplePartLoader
                     part.PartInfo.FitsToEngine = part.Mod.Settings.AutomaticFitsToEngine;
                 }
                 
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
             
@@ -177,7 +175,6 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY_PREFABGEN;
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part with Prefab generator) {prefabName} from {thisMod.Name}");
             }
             else
             {
@@ -192,7 +189,6 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY;
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part) {prefabName} from {thisMod.Name}");
             }
 
             return p;
@@ -232,7 +228,6 @@ namespace SimplePartLoader
 
             loadedFurniture.Add(furn);
             FurnitureManager.Furnitures.Add(furn.PrefabName, furn);
-            DebugIfEnabled($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
             
             return furn;
         }
@@ -241,6 +236,11 @@ namespace SimplePartLoader
         {
             CheckedAndAllowed = false;
             RequiresSteamCheck = true;
+        }
+
+        public void GenerateModReport()
+        {
+            GenerateReport = true;
         }
 
         public void GenerateThumbnails()
@@ -434,14 +434,6 @@ namespace SimplePartLoader
 
             BuildableMaterials.Add(bm);
             return bm;
-        }
-
-        public void DebugIfEnabled(string text)
-        {
-            if (settings.EnableDeveloperLog)
-            {
-                Debug.Log(text);
-            }
         }
     }
 }

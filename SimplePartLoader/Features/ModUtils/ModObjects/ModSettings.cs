@@ -13,7 +13,6 @@ namespace SimplePartLoader
         private bool Immediate = false;
         private bool Cloning = true;
         private bool CullShader = false;
-        private bool DebugEnabled = false;
         private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
         private string[] FitsToEngine;
@@ -22,7 +21,8 @@ namespace SimplePartLoader
         {
             get { return modInstance; }
         }
-        
+
+        [Obsolete("This feature has been removed - Please use Mod Status Report!")]
         public bool EnableDeveloperLog
         {
             get { return DeveloperLog; }

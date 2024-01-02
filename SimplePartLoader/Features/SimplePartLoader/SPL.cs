@@ -20,6 +20,7 @@ namespace SimplePartLoader
         public delegate void DataLoadedDelegate();
         public static event DataLoadedDelegate DataLoaded;
 
+        [Obsolete("This feature has been removed and will be fully removed on ModUtils v1.5")]
         public static bool DEVELOPER_LOG = false;
         public static bool ENABLE_SAVE_DISSASAMBLE = false;
         public static bool PREFAB_NAME_COLLISION_CHECK = false;
@@ -484,7 +485,7 @@ namespace SimplePartLoader
         internal static void DevLog(string str)
         {
             if (DEVELOPER_LOG)
-                Debug.Log("[ModUtils/Dev/SPL]: " + str);
+                Debug.Log("[ModUtils/DevMode]: " + str);
         }
 
         internal static void DevLog(Part p, string str)
@@ -493,7 +494,7 @@ namespace SimplePartLoader
             {
                 if(p.Mod.Settings.EnableDeveloperLog)
                 {
-                    Debug.Log($"[ModUtils/Dev/SPL]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
+                    Debug.Log($"[ModUtils/DevMode]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
                 }
             }
         }
