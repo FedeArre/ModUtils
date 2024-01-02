@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SimplePartLoader.CarGen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -44,6 +45,14 @@ namespace SimplePartLoader
             if(Mod.Cars.Count != 0)
             {
                 reportText += $"\n\nPer car report: ";
+                foreach (Car c in Mod.Cars)
+                {
+                    string text = GenerateCarReport(c, showOnlyWrong);
+                    if (text != "")
+                        reportText += "\n" + text;
+                }
+                if (showOnlyWrong && !PartFailed)
+                    reportText += "\n All car tests are OK";
             }
 
             return reportText ;
@@ -163,6 +172,15 @@ namespace SimplePartLoader
                     resultText += $"\nExtra information about this test: " + extraInfoReferences;
                 }
             }
+
+            return resultText;
+        }
+
+        public string GenerateCarReport(Car c, bool showOnlyWrong)
+        {
+            if (!c.IssueExternalReport) return $"------------------------------------------------------------------------------\n- {c.carGeneratorData.CarName} - No issues reported!";
+
+            string resultText = $"------------------------------------------------------------------------------\n- {c.carGeneratorData.CarName} - Reported issues:\n" + c.ReportedIssue;
 
             return resultText;
         }

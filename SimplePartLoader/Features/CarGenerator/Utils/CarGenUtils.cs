@@ -11,12 +11,12 @@ namespace SimplePartLoader.CarGen
 {
     public class CarGenUtils
     {
-        public static void DeleteRootTransparent(GameObject go, string transparentToDel)
+        public static void DeleteRootTransparent(GameObject go, string transparentToDel, Car c)
         {
             Transform t = go.transform.Find(transparentToDel);
             if (!t)
             {
-                Debug.LogError("[ModUtils/CarGenUtils/Error]: Invalid transparent delete - " + transparentToDel);
+                c.ReportIssue("Invalid transparent delete - " + transparentToDel);
             }
             else
             {

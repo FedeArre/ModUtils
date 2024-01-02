@@ -433,7 +433,7 @@ namespace SimplePartLoader
 
                 if(!data.EnableMeshChange && part.GetComponent<MeshFilter>())
                 {
-                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
+                    part.ReportIssue($"Wrong setup in Prefab Generator - Has a MeshFilter component but EnableMeshChange is set to false.");
                     continue;
                 }
                 
@@ -571,7 +571,7 @@ namespace SimplePartLoader
                     }
 
                     if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable && (part.CarProps.Paintable || part.CarProps.DMGdeformMesh || part.CarProps.DMGdisplacepart))
-                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Mesh from {data.PrefabName} is not readable. This will cause the part to not be loaded properly. Please make the mesh readable.");
+                        part.ReportIssue($"Mesh is not readable and part is paintable or deformable.");
                 }
 
                 // To enable chroming on our part
@@ -583,7 +583,7 @@ namespace SimplePartLoader
                 if (data.CatalogImage)
                 {
                     if (data.CatalogImage.width < 500 || data.CatalogImage.height < 500)
-                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Thumbnail of {data.PrefabName} is too small! Size has to be at least 500x500!");
+                        part.ReportIssue($"Thumbnail is too small! Size has to be at least 500x500!");
 
                     part.PartInfo.Thumbnail = data.CatalogImage;
                 }

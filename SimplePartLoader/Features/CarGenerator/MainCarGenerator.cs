@@ -75,8 +75,8 @@ namespace SimplePartLoader.CarGen
 
                     foreach (string transparent in transparentsToDelete)
                     {
-                        CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent);
-                        CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent);
+                        CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent, car);
+                        CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent, car);
                     }
                 }
 
@@ -242,7 +242,7 @@ namespace SimplePartLoader.CarGen
             CarGenUtils.RecursiveCarBuild(car, 0);
 
             if (car.carGeneratorData.TransparentReferenceUpdate)
-                CarBuilding.UpdateTransparentsReferences(car.carPrefab, car.IgnoreLogErrors);
+                CarBuilding.UpdateTransparentsReferences(car.carPrefab, car);
 
             if (car.carGeneratorData.BoneTargetTransformFix)
             {
