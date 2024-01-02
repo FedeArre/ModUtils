@@ -650,5 +650,32 @@ namespace SimplePartLoader
 
             p.Renderer.materials = matsOfPart;
         }
+
+        public static void SetupPart(Part p, PaintingSystem.Types type, bool dontUseBlack = false)
+        {
+            switch (type)
+            {
+                case Types.FullPaintingSupport:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaint:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyDirt:
+                    SetMaterialsForObject(p, -1, -1, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaintAndDirt:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaintAndRust:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    p.EnablePartPainting(type);
+                    break;
+            }
+        }
     }
 }
