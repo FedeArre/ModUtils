@@ -25,6 +25,8 @@ namespace SimplePartLoader
         internal bool PrefabGenLoaded = false;
 
         public bool UseBetterCopy;
+        public bool BoltDisplacement = true;
+
         public ShaderSettings ForceShaderStatus = ShaderSettings.NONE;
 
         internal bool IssueExternalReport = false;

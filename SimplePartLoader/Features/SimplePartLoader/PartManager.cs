@@ -374,7 +374,7 @@ namespace SimplePartLoader
                         HexNut hx = t.GetComponent<HexNut>();
                         CarProperties cp = hx.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         hx.gameObject.AddComponent<DISABLER>();
 
@@ -391,7 +391,7 @@ namespace SimplePartLoader
                         BoltNut bn = t.GetComponent<BoltNut>();
                         CarProperties cp = bn.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         bn.gameObject.AddComponent<DISABLER>();
 
@@ -408,7 +408,7 @@ namespace SimplePartLoader
                         FlatNut fn = t.GetComponent<FlatNut>();
                         CarProperties cp = fn.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         fn.gameObject.AddComponent<DISABLER>();
 
@@ -425,7 +425,7 @@ namespace SimplePartLoader
                         WeldCut wc = t.GetComponent<WeldCut>();
                         CarProperties cp = wc.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         wc.gameObject.AddComponent<DISABLER>();
 
