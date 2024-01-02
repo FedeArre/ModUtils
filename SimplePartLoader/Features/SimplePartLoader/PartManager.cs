@@ -451,6 +451,8 @@ namespace SimplePartLoader
                 {
                     foreach(Transform t in part.GetTransforms())
                     {
+                        if (t == part.Prefab.transform) continue;
+
                         if (cd.StartsWith)
                         {
                             if (t.name.StartsWith(cd.ChildName))
