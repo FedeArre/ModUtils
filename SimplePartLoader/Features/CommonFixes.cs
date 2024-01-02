@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -71,6 +72,10 @@ namespace SimplePartLoader
 
                     case FixType.Cluster:
                         Cluster(prefab, printData);
+                        break;
+
+                    case FixType.MyBoneSCR:
+                        Bones(prefab);
                         break;
                 }
             }
@@ -243,6 +248,29 @@ namespace SimplePartLoader
             else if (printData)
                 Debug.Log("[ModUtils/CommonFix/Cluster]: Right not found at prefab " + prefab);
         }
+
+        internal static void Bones(GameObject prefab)
+        {
+            foreach (MyBoneSCR scr in prefab.GetComponentsInChildren<MyBoneSCR>())
+            {
+                if (scr.transform.childCount != 0 && scr.transform.GetChild(0).name.Contains("Pivot"))
+                {
+                    scr.LocalStrtetchTarget = scr.transform.GetChild(0);
+                    scr.targetTransform = null;
+                }
+            }
+
+            foreach (MyBoneSCR scr in prefab.GetComponentsInChildren<MyBoneSCR>())
+            {
+                if (scr.thisTransform != null)
+                {
+                    if (!scr.thisTransform.root != prefab.transform)
+                    {
+                        scr.thisTransform = scr.transform;
+                    }
+                }
+            }
+        }
     }
 
     public enum FixType
@@ -256,6 +284,7 @@ namespace SimplePartLoader
         Oilpan,
         DriverPassangerSeat,
         Windows,
-        Cluster
+        Cluster,
+        MyBoneSCR
     }
 }
