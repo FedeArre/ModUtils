@@ -154,7 +154,7 @@ namespace SimplePartLoader
                 }
             }
 
-            if (!issuesFound && showOnlyWrong) return "";
+            if (!issuesFound && !p.IssueExternalReport && showOnlyWrong) return "";
 
             // Generate report text
             string prefabGenOkString = " ";
@@ -171,6 +171,11 @@ namespace SimplePartLoader
                 {
                     resultText += $"\nExtra information about this test: " + extraInfoReferences;
                 }
+            }
+
+            if(p.IssueExternalReport)
+            {
+                resultText += $"\n  - Reported issues in part from other ModUtils modules: \n" + p.ReportedIssue;
             }
 
             return resultText;

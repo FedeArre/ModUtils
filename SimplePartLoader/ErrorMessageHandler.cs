@@ -25,10 +25,11 @@ namespace SimplePartLoader
         public List<string> UnsupportedModList = new List<string>();
         public bool ThumbnaiLGeneratorEnabled;
         public bool EarlyAccessMod;
+        public bool ReportMod;
 
         void OnGUI()
         {
-            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod)
+            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod && !ReportMod)
                 return;
 
             int nextLineHeight = 40;
@@ -52,6 +53,13 @@ namespace SimplePartLoader
             {
                 nextLineHeight += 15;
                 GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Thumbnail generator enabled!");
+                nextLineHeight += 15;
+            }
+
+            if (ReportMod)
+            {
+                nextLineHeight += 15;
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Mod report feature is enabled!");
                 nextLineHeight += 15;
             }
 

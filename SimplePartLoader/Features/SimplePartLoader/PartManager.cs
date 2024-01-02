@@ -7,6 +7,7 @@ using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ConstrainedExecution;
@@ -291,8 +292,15 @@ namespace SimplePartLoader
                 if(mi.GenerateReport)
                 {
                     ModStatusReport msr = new ModStatusReport(mi);
-                    Debug.Log("GREAT REPORT");
-                    Debug.Log(msr.GenerateReport(true));
+                    try
+                    {
+                        string report = msr.GenerateReport(mi.onlyWrongStuff);
+                        File.WriteAllText("./Mods/__ModReport.txt", report);
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.LogError("[ModUtils/SPL/Development/Error]: An issue occured trying to save mod report: " + ex.Message);
+                    }
                 }
             }
 
