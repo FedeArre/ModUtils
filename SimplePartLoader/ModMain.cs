@@ -261,6 +261,21 @@ namespace SimplePartLoader
             shopSupportCube.transform.localPosition = new Vector3(657.1829f, 51.2f, -46.6193f);
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
+
+            // Load modshop into map
+            try
+            {
+                GameObject scene = GameObject.Find("SceneManager");
+                Transform centerMap = scene.transform.Find("MapCanvas/GameObject/MAP/CenterOfMap");
+                Transform shopRef = centerMap.Find("Shop");
+                GameObject modShopObj = GameObject.Instantiate(shopRef.gameObject);
+                modShopObj.transform.SetParent(centerMap);
+                modShopObj.transform.Find("GameObject").GetComponent<Text>().text = "Mod shop";
+                modShopObj.transform.localPosition = new Vector3(217f, -27f, 0f);
+            }
+            catch { }
+
+
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
