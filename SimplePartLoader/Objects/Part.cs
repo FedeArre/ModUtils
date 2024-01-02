@@ -100,6 +100,12 @@ namespace SimplePartLoader
 
         public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
+            if(attachesTo == PartInfo.RenamedPrefab)
+            {
+                ReportIssue($"Tried to generate part with same name as renamed prefab ({attachesTo})");
+                return null;
+            }
+
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
             MeshFilter mf = Prefab.GetComponent<MeshFilter>();
             if (mf)

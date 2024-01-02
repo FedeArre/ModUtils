@@ -64,6 +64,12 @@ namespace SimplePartLoader.CarGen
                 }
 
                 GameObject part = PartLookup(t.name, isParentCustom, car.exceptionsObject, t.Type);
+                
+                if(t.name == t.transform.parent.name)
+                {
+                    car.ReportIssue($"Car generation prevented infinite loop for {t.name}");
+                    continue;
+                }
 
                 if (!part)
                 {
