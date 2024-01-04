@@ -43,6 +43,10 @@ public class CarGenerator : MonoBehaviour
     public bool EnableAWD = false;
     public bool Disable_NWH_Rebuild = false;
 
+    [Header("Spawn settings")]
+    public bool SpawnOnJobs = false;
+    public bool SpawnRuined = false;
+
     [Header("Transparent remover")]
     public bool RemoveOriginalTransparents = false;
     public bool DontRemoveBatteryWires = true;

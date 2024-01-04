@@ -10,6 +10,10 @@ public class BuildableGenerator : MonoBehaviour
     [Header("Basic settings")]
     public string PrefabName = "";
     public BuildType Type = BuildType.Roof;
+
+    [Header("Door settings")]
+    public Transform OpenPosition = null;
+    public Transform ClosedPosition = null;
 }
 
 public enum BuildType

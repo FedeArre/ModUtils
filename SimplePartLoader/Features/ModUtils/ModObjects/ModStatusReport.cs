@@ -154,22 +154,33 @@ namespace SimplePartLoader
                 }
             }
 
-            if (!issuesFound && !p.IssueExternalReport && showOnlyWrong) return "";
-
             // Generate report text
             string prefabGenOkString = " ";
             if(p.PartType == PartTypes.DUMMY_PREFABGEN)
             {
                 prefabGenOkString = p.PrefabGenLoaded ? " (OK) " : " (NOT OK) ";
             }
-            string resultText = $"------------------------------------------------------------------------------\n- {p.CarProps.PrefabName} - {p.GetTypeName()}{prefabGenOkString}- Tests:";
+
+            string resultText = $"------------------------------------------------------------------------------\n- {p.CarProps.PrefabName} - {p.GetTypeName()}{prefabGenOkString}- Possible issues:";
 
             for(int i = 0; i < partsChecks.Length; i++)
             {
-                resultText += $"\n  - {GetPartReportName(i)} - Result: " + (partsChecks[i] ? "FAILED" : "Ok");
-                if(i == 5 && partsChecks[i]) // Handle special referencing showing
+                if(showOnlyWrong)
                 {
-                    resultText += $"\nExtra information about this test: " + extraInfoReferences;
+                    if (!partsChecks[i]) continue;
+                    resultText += $"\n  - {GetPartReportName(i)}";
+                    if (i == 5 && partsChecks[i]) // Handle special referencing showing
+                    {
+                        resultText += $"\nExtra information: \n" + extraInfoReferences;
+                    }
+                }
+                else
+                {
+                    resultText += $"\n  - {GetPartReportName(i)} - Result: " + (partsChecks[i] ? "FAILED" : "Ok");
+                    if (i == 5 && partsChecks[i]) // Handle special referencing showing
+                    {
+                        resultText += $"\nExtra information about this test: \n" + extraInfoReferences;
+                    }
                 }
             }
 
@@ -177,6 +188,8 @@ namespace SimplePartLoader
             {
                 resultText += $"\n  - Reported issues in part from other ModUtils modules: \n" + p.ReportedIssue;
             }
+
+            if (!issuesFound && !p.IssueExternalReport && showOnlyWrong) return "";
 
             return resultText;
         }
