@@ -48,7 +48,7 @@ namespace SimplePartLoader.CarGen
             bool callAgain = false;
             if(iterationCount > 30)
             {
-                Debug.LogError("[ModUtils/CarGen/Warning]: Recursive build on " + car.carGeneratorData.CarName + " car reached 30 iterations, aborting.");
+                CustomLogger.AddLine("CarGenerator", $"Recursive build on " + car.carGeneratorData.CarName + " car reached 30 iterations, aborting.");
                 return;
             }
 

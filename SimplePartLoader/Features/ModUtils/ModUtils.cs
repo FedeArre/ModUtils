@@ -84,7 +84,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -97,7 +97,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -110,7 +110,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -123,7 +123,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
+                CustomLogger.AddLine("Utils", $"Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
             }
         }
 
@@ -135,7 +135,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetKeyPlayer but Rewired has not started yet, make sure to GetKeyPlayer this after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetKeyPlayer but Rewired has not started yet, make sure to GetKeyPlayer this after OnLoad!");
                 return null;
             }
         }
@@ -200,7 +200,7 @@ namespace SimplePartLoader
             {
                 if(mod.ID == mi.Mod.ID)
                 {
-                    Debug.LogError($"[ModUtils/ModRegister/Error]: Tried to register mod {mod.ID} but it is already registered!");
+                    CustomLogger.AddLine("ModRegister", $"Tried to register mod {mod.ID} but it is already registered!");
                     return null;
                 }
             }

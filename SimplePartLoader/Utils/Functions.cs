@@ -21,7 +21,7 @@ namespace SimplePartLoader.Utils
             foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
-                    Debug.LogError("[ModUtils/Error]: PartManager part list got a null on it, restart game!");
+                    CustomLogger.AddLine("Parts", "PartManager gameParts got a null on it - Restart game");
 
                 if (part.name == partName)
                 {

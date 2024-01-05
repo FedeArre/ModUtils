@@ -72,7 +72,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.Log("[ModUtils/KeepAlive/Error]: Error occured while trying to send heartbeat, error: " + ex.ToString());
+                CustomLogger.AddLine("KeepAlive", ex);
             }
         }
         public static KeepAlive GetInstance()
@@ -84,7 +84,7 @@ namespace SimplePartLoader
 
         public void Ready()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Enabled!"); 
+            CustomLogger.AddLine("KeepAlive", $"Enabled");
         }
     }
 }

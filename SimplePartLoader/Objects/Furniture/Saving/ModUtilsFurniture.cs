@@ -23,7 +23,7 @@ namespace SimplePartLoader.Objects.Furniture.Saving
             furnitureRef = (SimplePartLoader.Furniture) FurnitureManager.Furnitures[PrefabName];
             if(furnitureRef == null)
             {
-                Debug.Log("[ModUtils/Furniture/Error]: Could not find reference for furniture with prefab name " + PrefabName);
+                CustomLogger.AddLine("Furnitures", $"Could not find reference for furniture with prefab name " + PrefabName);
             }
         }
 

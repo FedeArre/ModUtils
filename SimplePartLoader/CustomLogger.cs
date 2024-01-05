@@ -24,6 +24,19 @@ namespace SimplePartLoader
                 lines.RemoveAt(0);
         }
 
+        public static void AddLine(string origin, Exception ex, bool dontShowInLog = false)
+        {
+            string message = $"[{DateTime.Now.ToString("HH:mm:ss")} - {origin}] An issue occured, the following information is available about the issue:\n{ex.Message}\n{ex.StackTrace}";
+
+            Debug.LogError(message);
+
+            if (!dontShowInLog)
+                lines.Add(message);
+
+            if (lines.Count > 15)
+                lines.RemoveAt(0);
+        }
+
         public static List<string> GetLines()
         {
             return lines;

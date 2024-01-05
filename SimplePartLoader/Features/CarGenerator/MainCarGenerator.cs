@@ -120,9 +120,7 @@ namespace SimplePartLoader.CarGen
                 }
                 catch(Exception ex)
                 {
-                    Debug.LogError($"[ModUtils/CarGen/Error]: There was an issue while setting up the template of {car.carGeneratorData.CarName}");
-                    Debug.LogError(ex.Message);
-                    Debug.LogError(ex.StackTrace);
+                    CustomLogger.AddLine("CarGenerator", ex);
                 }
 
                 if (!car.carGeneratorData.DisableModUtilsTemplateSetup)
@@ -134,7 +132,7 @@ namespace SimplePartLoader.CarGen
                 // Saving setup
                 if (Saver.modParts.ContainsKey(car.carGeneratorData.CarName))
                 {
-                    Debug.LogError("[ModUtils/CarGen/Error]: Name collision detected! " + car.carGeneratorData.CarName);
+                    CustomLogger.AddLine("CarGenerator", $"Name collision detected! " + car.carGeneratorData.CarName);
                 }
 
                 Saver.modParts.Add(car.carGeneratorData.CarName, car.emptyCarPrefab);
@@ -279,9 +277,7 @@ namespace SimplePartLoader.CarGen
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[ModUtils/CarGen/Error]: There was an issue while setting up the post-build of {car.carGeneratorData.CarName}");
-                Debug.LogError(ex.Message);
-                Debug.LogError(ex.StackTrace);
+                CustomLogger.AddLine("CarGenerator", ex);
             }
 
             // Attach fix

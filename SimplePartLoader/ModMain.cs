@@ -66,8 +66,8 @@ namespace SimplePartLoader
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 #endif
-            Debug.Log("ModUtils is loading - Version: " + Version);
-            Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
+            CustomLogger.AddLine("Main", "ModUtils is loading - Version: " + Version);
+            CustomLogger.AddLine("Main", "Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
@@ -139,10 +139,10 @@ namespace SimplePartLoader
             if (!MenuFirstLoad)
             {
                 MenuFirstLoad = true;
-                Debug.Log("[ModUtils/Main]: Printing mod list.");
-                foreach(Mod m in ModLoader.mods)
+                CustomLogger.AddLine("Main", "Printing mod list");
+                foreach (Mod m in ModLoader.mods)
                 {
-                    Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
+                    CustomLogger.AddLine("Main", $"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
 
                 // Enable heartbeat
@@ -183,10 +183,7 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/Error/Critical]: PartManager had an unexpected major issue - Parts will not continue to be loaded.");
-                Debug.LogError("[ModUtils/Error/Critical]: Reported source & data: " + ex.Source);
-                Debug.LogError(ex.Message);
-                Debug.LogError(ex.StackTrace.ToString());
+                CustomLogger.AddLine("Parts", ex);
             }
 
 #if MODUTILS_TIMING_ENABLED
@@ -211,7 +208,7 @@ namespace SimplePartLoader
 
             if(SPL.ENABLE_SAVE_DISSASAMBLE)
             {
-                Debug.Log("[ModUtils/Dev]: Save dissasembling has been enabled!");
+                CustomLogger.AddLine("Dev", "Save dissasembling has been enabled! - Information in Player.log");
                 SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
                 if (File.Exists(Application.persistentDataPath + "/save1/save.dat"))
                 {

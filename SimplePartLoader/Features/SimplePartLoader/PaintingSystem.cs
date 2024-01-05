@@ -38,7 +38,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -78,7 +78,7 @@ namespace SimplePartLoader
 
                 if (l2Material_index == -1)
                 {
-                    Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                    CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                     return;
                 }
 
@@ -126,7 +126,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -148,7 +148,7 @@ namespace SimplePartLoader
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -216,7 +216,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -238,7 +238,7 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
@@ -279,7 +279,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -309,13 +309,13 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if(l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -397,7 +397,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -427,13 +427,13 @@ namespace SimplePartLoader
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -514,7 +514,7 @@ namespace SimplePartLoader
 
             if (!DirtMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
             }
             return DirtMaterial;
         }
@@ -537,7 +537,7 @@ namespace SimplePartLoader
 
             if (!PaintRustMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetPaintRustMaterial was not able to retrive a paint-rust material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetPaintRustMaterial was not able to retrive a paint-rust material. Make sure you are using it on FirstLoad event.");
             }
             return PaintRustMaterial;
         }
@@ -565,7 +565,7 @@ namespace SimplePartLoader
 
             if (!BaseMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
             }
             
             return useBackfaceShader ? CullBaseMaterial : BaseMaterial;
@@ -590,7 +590,7 @@ namespace SimplePartLoader
             
             if (!ChromeMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetChromeMaterial was not able to retrive the chrome material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetChromeMaterial was not able to retrive the chrome material. Make sure you are using it on FirstLoad event.");
             }
             return ChromeMaterial;
         }
@@ -610,7 +610,7 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= bodymatIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 bool shader = false;
@@ -632,7 +632,7 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= paintRustIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 matsOfPart[paintRustIndex] = GetPaintRustMaterial();
@@ -642,7 +642,7 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= dirtIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 matsOfPart[dirtIndex] = GetDirtMaterial();

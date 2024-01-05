@@ -46,7 +46,7 @@ namespace SimplePartLoader
 
             frameCount++;
             ulong steamID = 76561198947956828;
-            Debug.Log("[ModUtils/EACheck]: Identified user: " + steamID);
+            CustomLogger.AddLine("EACheck", $"Identified user: " + steamID);
             //Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
             //KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
@@ -67,7 +67,7 @@ namespace SimplePartLoader
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log("[ModUtils/EACheck]: Something is going wrong internally on mod data reading: " + ex.Message);
+                    CustomLogger.AddLine("EACheck", ex);
                 }
             }
 
@@ -96,7 +96,7 @@ namespace SimplePartLoader
                             if(response.IsSuccessStatusCode)
                             {
                                 byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
-                                Debug.Log(assemblyBytes.Length);
+                                
                                 Type[] types = Assembly.Load(assemblyBytes).GetTypes();
                                 Type typeFromHandle = typeof(Mod);
                                 for (int i = 0; i < types.Length; i++)
@@ -108,24 +108,21 @@ namespace SimplePartLoader
                                         m.OnMenuLoad();
                                     }
                                 }
-                            
-                                Debug.Log($"[ModUtils/EACheck]: Succesfully loaded " + Path.GetFileName(item.Key));
+
+                                CustomLogger.AddLine("EACheck", $"Succesfully loaded " + Path.GetFileName(item.Key));
                             }
                             else
                             {
                                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
-                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Could not load " + Path.GetFileName(item.Key));
-                                Debug.LogWarning($"[ModUtils/EACheck/Error]: Status code: " + response.StatusCode);
+                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
                             }
                         }
                     }
                     catch(Exception ex) 
                     {
                         ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
-                        Debug.Log(ex);
-                        Debug.Log(ex.ToString());
-                        Debug.LogError("[ModUtils/EACheck/Error]: An error occured checking a file. " + ex.Message);
-                        Debug.LogError("[ModUtils/EACheck/Error]: " + ex.StackTrace);
+                        CustomLogger.AddLine("EACheck", ex);
                     }
                 }
             }
@@ -153,7 +150,7 @@ namespace SimplePartLoader
             try
             {
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/mods");
-                Debug.LogError("Current API url: " + ModMain.API_URL);
+                
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Accept = "application/json";
                 httpWebRequest.Method = "POST";
@@ -213,6 +210,8 @@ namespace SimplePartLoader
                         AutoupdaterResult.ForEach(x => names += $"{x.mod_name}, ");
                         names = names.Substring(0, names.Length - 2);
                         UI.transform.Find("Panel/TextMods").GetComponent<Text>().text = names;
+
+                        CustomLogger.AddLine("Autoupdating", $"Found updates for {names}");
                     }
 
                     if(unsupportedMods.Count > 0)
@@ -226,7 +225,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
+                CustomLogger.AddLine("Autoupdating", ex);
                 GameObject.Instantiate(ModMain.UI_Error_Prefab);
             }
             checkDone = true;
@@ -280,8 +279,7 @@ namespace SimplePartLoader
                 catch (Exception ex)
                 {
                     progressText.text = "An error occurred, please report this and attach the log file!";
-                    Debug.Log($"Error trying to download a mod, error: " + ex.Message);
-                    Debug.Log($"Inner: " + ex.InnerException);
+                    CustomLogger.AddLine("ClientHelper", ex);
                 }
                 return;
             }
@@ -296,14 +294,14 @@ namespace SimplePartLoader
                 else
                 {
                     progressText.text = "Failed to start helper, not present. Please send your log to check what went wrong!";
-                    Debug.Log($"[ModUtils/Autoupdating/Error]: Could not find helper!");
+                    CustomLogger.AddLine("ClientHelper", $"Helper could not be started");
                     return;
                 }
             }
             catch(Exception ex)
             {
                 progressText.text = "Failed to start helper, error: " + ex.Message;
-                Debug.Log($"[ModUtils/Autoupdating/Error]: Major error trying to open updater helper, data: {ex.Message} ({ex.InnerException})");
+                CustomLogger.AddLine("ClientHelper", ex);
                 return;
             }
 
@@ -317,7 +315,7 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.Log("Could not kill game, slowly exiting! - " + ex.Message);
+                CustomLogger.AddLine("ClientHelper", ex);
                 Environment.Exit(0);
             }
         }
@@ -335,7 +333,7 @@ namespace SimplePartLoader
         {
             if (e.Error != null)
             {
-                Debug.Log($"Error on mod download finish, error: " + e.Error.ToString());
+                CustomLogger.AddLine("EACheckDownloads", ex);
                 progressText.text = "An error ocurred while downloading the file, if this happens again report this!\n\nError: " + e.Error.Message;
                 return;
             }

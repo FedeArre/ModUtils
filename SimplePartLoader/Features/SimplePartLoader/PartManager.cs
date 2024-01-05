@@ -77,7 +77,7 @@ namespace SimplePartLoader
 
             if(!GameObject.Find("ModLoader").GetComponent<EACheck>())
             {
-                Debug.Log("[ModUtils/Safety]: EACheck could not be found. This is a safety check. Please report this to the developer of the mod that is causing this.");
+                CustomLogger.AddLine("Main", "EA check component was not present");
                 return;
             }
 
@@ -96,8 +96,7 @@ namespace SimplePartLoader
                 }
                 catch(Exception ex)
                 {
-                    Debug.LogError("[ModUtils/SPL/Error]: Something went wrong during first load event! FirstLoad execution has been stopped. Error: ");
-                    Debug.LogError(ex.ToString());
+                    CustomLogger.AddLine("Parts", ex);
                     return;
                 }
 
@@ -114,7 +113,7 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
+                        CustomLogger.AddLine("Parts", $"The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
                         modLoadedParts.Remove(part);
                         continue;
                     }
@@ -123,7 +122,7 @@ namespace SimplePartLoader
                     {
                         if(part.Mod.RequiresSteamCheck && !part.Mod.Checked)
                         {
-                            Debug.Log($"[ModUtils/SPL/Safety]: Removing {part.Prefab.name}");
+                            CustomLogger.AddLine("PartsEA", $"Removing {part.Prefab.name}");
                             GameObject.Destroy(part.Prefab);
                             modLoadedParts.Remove(part);
                         }
@@ -161,7 +160,6 @@ namespace SimplePartLoader
             {
                 if(!p.Prefab)
                 {
-                    Debug.LogError("[ModUtils/SPL/Error]: Null part safety on modLoadedParts, name: " + p.Name);
                     continue;
                 }
                 GameObject.DontDestroyOnLoad(p.Prefab);
@@ -328,12 +326,12 @@ namespace SimplePartLoader
 
             if (t.TestingEnabled)
             {
-                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled");
+                CustomLogger.AddLine("TransparentEditor", $"{t.Name} ({t.Owner.Name}) has the transparent editor enabled");
                 if(t.Owner.Mod != null)
-                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part added by mod {t.Owner.Mod.Name}");
+                    CustomLogger.AddLine("TransparentEditor", $"Part added by mod {t.Owner.Mod.Name}");
                 
                 if(t.Owner.CarProps)
-                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
+                    CustomLogger.AddLine("TransparentEditor", $"Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
 
                 transparentObject.AddComponent<ReworkedTransparentEdit>().transparentData = t;
             }
@@ -433,7 +431,7 @@ namespace SimplePartLoader
 
                 if (!part.CarProps)
                 {
-                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Prefab generator was unable to create {part.Name}");
+                    CustomLogger.AddLine("Parts", $"Prefab generator was unable to create {part.Name}");
                     continue;
                 }
 
@@ -553,7 +551,7 @@ namespace SimplePartLoader
                             }
                             else
                             {
-                                Debug.Log($"[ModUtils/PaintingSystem/Warning]: {part.Prefab} prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}. This is only a warning, but you should fix it.");
+                                part.ReportIssue($"Prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}");
                                 part.Renderer.materials = dummyMats;
                             }
                             break;

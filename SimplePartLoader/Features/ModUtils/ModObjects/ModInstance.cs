@@ -142,7 +142,7 @@ namespace SimplePartLoader
                 part.PartType = PartTypes.FULL_PART;
 
                 if (Saver.modParts.ContainsKey(part.CarProps.PrefabName))
-                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {part.CarProps.PrefabName} on Saver.modParts. Part loading is {prefabName}");
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {part.CarProps.PrefabName} on Saver.modParts. Part loading is {prefabName}");
                 
                 Saver.modParts.Add(part.CarProps.PrefabName, prefab);
 
@@ -166,7 +166,7 @@ namespace SimplePartLoader
                 p.Name = prefabGen.PrefabName;
 
                 if (Saver.modParts.ContainsKey(p.Name))
-                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
                 
                 Saver.modParts.Add(p.Name, prefab);
 
@@ -180,7 +180,7 @@ namespace SimplePartLoader
                 p.Name = prefabName; 
                 
                 if (Saver.modParts.ContainsKey(p.Name))
-                    Debug.LogError($"[ModUtils/SPL/Error]: Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
 
                 Saver.modParts.Add(prefabName, prefab);
                 
@@ -197,27 +197,27 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a furniture without valid AssetBundle");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a furniture without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a part without prefab name");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create an already existing prefab ({prefabName})");
+                CustomLogger.AddLine("Furnitures", $"Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             FurnitureGenerator furnitureGen = prefab.GetComponent<FurnitureGenerator>();
             if (!furnitureGen)
-                Debug.Log($"[ModUtils/Furniture/Error]: {prefabName} has no Furniture Generator component");
+                CustomLogger.AddLine("Furnitures", $"{prefabName} has no Furniture Generator component");
             
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 
             if(FurnitureManager.Furnitures.ContainsKey(furnitureGen.PrefabName))
             {
-                Debug.Log($"[ModUtils/Furniture/Error]: {furnitureGen.PrefabName} prefab name is already on use!");
+                CustomLogger.AddLine("Furnitures", $"{furnitureGen.PrefabName} prefab name is already on use!");
                 return null;
             }
             
@@ -271,13 +271,12 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/EACheck/Error]: An exception occured");
-                Debug.LogError(ex);
+                CustomLogger.AddLine("EACheck", ex);
             }
 
             if(!allowed)
             {
-                Debug.Log("[ModUtils/EACheck]: User is not allowed to use this mod - " + Mod.Name);
+                CustomLogger.AddLine("EACheck", $"User is not allowed to use mod " + Mod.Name);
                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Mod.Name);
                 
                 foreach (Part p in Parts)
@@ -327,27 +326,27 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without valid AssetBundle");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a car without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
-                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without car / empty / transparents name");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a car without car / empty / transparents name");
 
             GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
             GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
             GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
             
             if (!carPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
             
             if (!emptyCarPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
             
             if (!transparentsPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
 
             CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
             if(!carGen)
-                Debug.LogError($"[ModUtils/CarGen/Error]: {carObject} has no Car Generator component");
+                CustomLogger.AddLine("CarGenerator", $"{carObject} has no Car Generator component");
 
             Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
             car.loadedBy = this;
@@ -362,25 +361,25 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.LogError("[ModUtils/Buildables/Error]: Tried to create a buildable without valid AssetBundle");
+                CustomLogger.AddLine("Buildables", $"Tried to create a buildable without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                Debug.LogError("[ModUtils/Buildables/Error]: Tried to create a buildable without valid prefab name");
+                CustomLogger.AddLine("Buildables", $"Tried to create a buildable without valid prefab name");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
 
             if (!prefab)
-                Debug.LogError($"[ModUtils/Buildables/Error]: Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                CustomLogger.AddLine("Buildables", $"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             BuildableGenerator buildGen = prefab.GetComponent<BuildableGenerator>();
             if (!buildGen)
-                Debug.LogError($"[ModUtils/Buildables/Error]: {prefabName} does not have Buildable Generator component!");
+                CustomLogger.AddLine("Buildables", $"{prefabName} does not have Buildable Generator component!");
 
             if (BuildableManager.Buildables.Contains(buildGen.PrefabName))
-                Debug.LogError($"[ModUtils/Buildables/Error]: {buildGen.PrefabName} (from {prefabName}) prefab name is already registered in ModUtils!");
+                CustomLogger.AddLine("Buildables", $"{buildGen.PrefabName} (from {prefabName}) prefab name is already registered in ModUtils!");
 
             if (Saver.modParts.Contains(buildGen.PrefabName))
-                Debug.LogError($"[ModUtils/Buildables/Error]: {buildGen.PrefabName} (from {prefabName}) prefab name is already registered in game saver!");
+                CustomLogger.AddLine("Buildables", $"{buildGen.PrefabName} (from {prefabName}) prefab name is already registered in game saver!");
 
             Buildable b = new Buildable(buildGen.PrefabName, prefab, (BuildableType) buildGen.Type);
             b.loadedBy = this;
@@ -399,27 +398,27 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.LogError("[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material without valid AssetBundle");
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                Debug.LogError("[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material without valid prefab name");
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material without valid prefab name");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material prefab but it was not found in the AssetBundle {prefabName}");
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material prefab but it was not found in the AssetBundle {prefabName}");
 
             Material mat = bundle.LoadAsset<Material>(materialName);
             if (!mat)
-                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: Tried to create a buildable material but it was not found in the AssetBundle {materialName}");
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material but it was not found in the AssetBundle {materialName}");
 
             if (BuildableManager.BuildableMaterials.Contains(materialName))
-                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: {materialName} (from {prefabName}) material name is already registered in ModUtils!");
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material name is already registered in ModUtils!");
 
             if (Saver.modParts.Contains(materialName))
-                Debug.LogError($"[ModUtils/Buildables/Mats/Error]: {materialName} (from {prefabName}) material name is already registered in game saver!");
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material name is already registered in game saver!");
 
             if (shopPosition == null || shopRotation == null)
-                Debug.LogWarning($"[ModUtils/Buildables/Mats/Warning]: {materialName} (from {prefabName}) material does not have shop position or shop rotation!");
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material does not have shop position or shop rotation!");
 
             BuildableMaterial bm = new BuildableMaterial(materialName, mat, this, shopPosition, shopRotation, prefab);
 

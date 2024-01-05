@@ -240,7 +240,7 @@ namespace SimplePartLoader
                     break;
 
                 default:
-                    Debug.LogError("[ModUtils/SPL/Error]: An invalid type has been sent to Part.EnablePainting, part: " +Prefab.name);
+                    CustomLogger.AddLine("Parts", $"An invalid type has been sent to Part.EnablePainting, part: " + Prefab.name);
                     break;
             }
         }
