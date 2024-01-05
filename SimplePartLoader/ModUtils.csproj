@@ -451,6 +451,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomLogger.cs" />
     <Compile Include="Features\Autoupdating\Autoupdating.cs" />
     <Compile Include="Features\Autoupdating\DownloadData.cs" />
     <Compile Include="Features\Building\Buildable.cs" />
@@ -470,6 +471,7 @@
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
+    <Compile Include="Features\DevUI\ComponentDevUI.cs" />
     <Compile Include="Features\Computer\AppLauncher\AppLauncherHandling.cs" />
     <Compile Include="Features\Computer\ComputerApp.cs" />
     <Compile Include="Features\Computer\AssetScripts\ActionMenuController.cs" />
@@ -484,7 +486,8 @@
     <Compile Include="Features\Computer\AssetScripts\WindowController.cs" />
     <Compile Include="Features\Computer\ComputerUI.cs" />
     <Compile Include="Features\DataHandler.cs" />
-    <Compile Include="Features\ModUtils\ModObjects\ModStatusReport.cs" />
+    <Compile Include="Features\DevUI\DevUI.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />

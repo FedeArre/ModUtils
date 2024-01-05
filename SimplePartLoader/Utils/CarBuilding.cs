@@ -240,6 +240,31 @@ namespace SimplePartLoader.Utils
             }
         }
 
+        public static void UpdateVisualObjects(Car c)
+        {
+            foreach(CarProperties cp in c.carPrefab.GetComponentsInChildren<CarProperties>())
+            {
+                if(cp.VisualObject)
+                {
+                    bool updated = false;
+                    foreach(Transform t in cp.transform)
+                    {
+                        if(t.name == cp.VisualObject.name)
+                        {
+                            cp.VisualObject = t.gameObject;
+                            updated = true;
+                            break;
+                        }
+                    }
+
+                    if(!updated && cp.GetComponent<MeshRenderer>())
+                    {
+                        cp.VisualObject = cp.gameObject;
+                    }
+                }
+            }
+        }
+
         // Compatibility method
         public static void UpdateTransparentsReferences(GameObject p)
         {

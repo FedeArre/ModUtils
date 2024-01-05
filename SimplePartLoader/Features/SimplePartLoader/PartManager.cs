@@ -287,23 +287,6 @@ namespace SimplePartLoader
                 }
             }
 
-            foreach(ModInstance mi in ModUtils.RegisteredMods)
-            {
-                if(mi.GenerateReport)
-                {
-                    ModStatusReport msr = new ModStatusReport(mi);
-                    try
-                    {
-                        string report = msr.GenerateReport(mi.onlyWrongStuff);
-                        File.WriteAllText("./Mods/__ModReport.txt", report);
-                    }
-                    catch(Exception ex)
-                    {
-                        Debug.LogError("[ModUtils/SPL/Development/Error]: An issue occured trying to save mod report: " + ex.Message);
-                    }
-                }
-            }
-
             MainCarGenerator.AddCars();
             SPL.InvokeLoadFinishedEvent();
         }

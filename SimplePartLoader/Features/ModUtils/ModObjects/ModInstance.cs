@@ -30,9 +30,6 @@ namespace SimplePartLoader
 
         internal bool Thumbnails = false;
 
-        internal bool GenerateReport = false;
-        internal bool onlyWrongStuff = false;
-        
         public List<Part> Parts
         {
             get { return loadedParts; }
@@ -238,13 +235,6 @@ namespace SimplePartLoader
         {
             CheckedAndAllowed = false;
             RequiresSteamCheck = true;
-        }
-
-        public void GenerateModReport(bool onlyWrong = true)
-        {
-            ErrorMessageHandler.GetInstance().ReportMod = true;
-            GenerateReport = true;
-            onlyWrongStuff = onlyWrong;
         }
 
         public void GenerateThumbnails()

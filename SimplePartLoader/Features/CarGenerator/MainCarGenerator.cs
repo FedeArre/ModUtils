@@ -242,7 +242,10 @@ namespace SimplePartLoader.CarGen
             CarGenUtils.RecursiveCarBuild(car, 0);
 
             if (car.carGeneratorData.TransparentReferenceUpdate)
+            {
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab, car);
+                CarBuilding.UpdateVisualObjects(car);
+            }
 
             if (car.carGeneratorData.BoneTargetTransformFix)
             {

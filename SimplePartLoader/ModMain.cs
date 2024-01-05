@@ -43,7 +43,7 @@ namespace SimplePartLoader
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -109,6 +109,7 @@ namespace SimplePartLoader
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
+            UI_Developer = AutoupdaterBundle.LoadAsset<GameObject>("DevCanvas");
 
             // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
