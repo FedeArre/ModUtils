@@ -549,6 +549,7 @@ namespace SimplePartLoader
 
                 part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
                 part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
+                part.PartInfo.HingePivot = null; // Force reset of it (if required)
 
                 // Mesh stuff
                 if (data.EnableMeshChange)
