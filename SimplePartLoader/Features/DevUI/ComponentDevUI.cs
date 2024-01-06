@@ -12,6 +12,7 @@ namespace SimplePartLoader.Features
     internal class ComponentDevUI : MonoBehaviour
     {
         Text m_frameComponent;
+        Text m_consoleComponent;
 
         Dropdown m_carDropdown;
         Dropdown m_modsDropdown;
@@ -25,6 +26,7 @@ namespace SimplePartLoader.Features
             FPS_AIO = ModUtils.GetPlayer().GetComponent<FirstPersonAIO>();
             
             m_frameComponent = transform.Find("Panel/Frames").GetComponent<Text>();
+            m_consoleComponent = transform.Find("Panel/Console").GetComponent<Text>();
             m_carDropdown = transform.Find("Panel/Emulator/Dropdown").GetComponent<Dropdown>();
             m_modsDropdown = transform.Find("Panel/Reports/Dropdown").GetComponent<Dropdown>();
             m_modReportOnlyWrongToggle = transform.Find("Panel/Reports/Toggle").GetComponent<Toggle>();
@@ -69,6 +71,8 @@ namespace SimplePartLoader.Features
                 else
                     FPS_AIO.ControllerPause();
             }
+
+            m_consoleComponent.text = GetConsoleText();
         }
 
         public void GenerateModReport() 
@@ -88,6 +92,18 @@ namespace SimplePartLoader.Features
             GameObject carToSpawn = Cars[m_carDropdown.value];
 
             EmulatedJunkyard.SpawnCar(carToSpawn);
+        }
+
+        public string GetConsoleText()
+        {
+            string lines = "";
+
+            foreach(string line in CustomLogger.GetLines())
+            {
+                lines += line + "\n";
+            }
+
+            return lines;
         }
     }
 }

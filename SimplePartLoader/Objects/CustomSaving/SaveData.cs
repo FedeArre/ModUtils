@@ -17,7 +17,7 @@ namespace SimplePartLoader
             CarProperties carProps = this.GetComponent<CarProperties>();
             if(!carProps)
             {
-                Debug.Log("[SPL]: Invalid save data attachment! Object: " + this);
+                CustomLogger.AddLine("SaveDataComponent", $"Invalid save data attachment! Object: " + this);
                 GameObject.Destroy(this);
                 return;
             }

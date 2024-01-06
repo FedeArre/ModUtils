@@ -148,10 +148,10 @@ namespace SimplePartLoader
 
             if(SPL.DEVELOPER_LOG)
             {
-                Debug.Log("[ModUtils/SPL]: Parts catalog has been modified. New size: " + jpl.Parts.Length);
+                CustomLogger.AddLine("Parts", "Parts catalog has been modified. New size: " + jpl.Parts.Length);
                 foreach (Part p in modLoadedParts)
                 {
-                    Debug.Log($"[ModUtils/SPL]: Added part: {p.Name} (GameObject name: {p.Prefab}");
+                    CustomLogger.AddLine("Parts", $"Added part: {p.Name} (GameObject name: {p.Prefab}", true);
                 }
             }
             
@@ -189,7 +189,7 @@ namespace SimplePartLoader
 
             if(SPL.PREFAB_NAME_COLLISION_CHECK)
             {
-                Debug.Log("[ModUtils/SPL/PrefabNameCollisionCheck]: Checking for prefab name collisions...");
+                CustomLogger.AddLine("PrefabNameCollisionCheck", "Checking for prefab name collisions...");
                 List<string> prefabNames = new List<string>();
                 foreach (GameObject go in gameParts)
                 {
@@ -199,7 +199,7 @@ namespace SimplePartLoader
                     
                     if (prefabNames.Contains(cp.PrefabName))
                     {
-                        Debug.LogError($"[ModUtils/SPL/PrefabNameCollisionCheck]: Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
+                        CustomLogger.AddLine("PrefabNameCollisionCheck", $"Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
                     }
                     else
                     {

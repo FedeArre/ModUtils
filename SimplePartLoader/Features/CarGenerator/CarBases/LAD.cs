@@ -60,10 +60,6 @@ namespace SimplePartLoader.CarGen
                         {
                             scr.LocalStrtetchTarget = newBone;
                         }
-                        else
-                        {
-                            Debug.LogWarning($"[ModUtils/CarGen/BoneFix/Wolf]: Could not find bone for {scr.LocalStrtetchTarget.name} ({scr.LocalStrtetchTarget.parent.name})");
-                        }
                     }
 
                     scr.targetTransform = null;
@@ -73,7 +69,6 @@ namespace SimplePartLoader.CarGen
             // ModUtils LAD template
             if (car.carGeneratorData.DisableModUtilsTemplateSetup)
                 return;
-
 
             // All fluid fixes
             Transform engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlock");

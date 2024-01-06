@@ -12,7 +12,7 @@ namespace SimplePartLoader.CarGen
     {
         public static void SpawnCar(GameObject car)
         {
-            Debug.Log($"[ModUtils/EmulatedJunkyard]: Emulated junkyard - Spawning {car.name}");
+            CustomLogger.AddLine("EmulatedJunkyard", $"Emulated junkyard - Spawning {car.name}");
 
             // Ignore CS0618 warning (This is game code copy)
 #pragma warning disable CS0618

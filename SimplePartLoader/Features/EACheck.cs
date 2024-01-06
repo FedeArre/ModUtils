@@ -333,7 +333,7 @@ namespace SimplePartLoader
         {
             if (e.Error != null)
             {
-                CustomLogger.AddLine("EACheckDownloads", ex);
+                CustomLogger.AddLine("EACheckDownloads", e.Error);
                 progressText.text = "An error ocurred while downloading the file, if this happens again report this!\n\nError: " + e.Error.Message;
                 return;
             }

@@ -1,4 +1,5 @@
 ﻿using float_oat.Desktop90;
+using Newtonsoft.Json;
 using SimplePartLoader.Features.Computer.AppLauncher;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,6 @@ namespace SimplePartLoader.Features
                 ComputerIdentifier ci = t.GetComponent<ComputerIdentifier>();
                 if(ci && t.gameObject.activeSelf)
                 {
-                    Debug.Log("Saving icon data for " + ci.Name);
                     DataHandler.AddData($"ModUtils_Computer_{ci.Name}_IconX", t.localPosition.x);
                     DataHandler.AddData($"ModUtils_Computer_{ci.Name}_IconY", t.localPosition.y);
                 }
@@ -83,13 +83,13 @@ namespace SimplePartLoader.Features
             ComputerApp existingAppCheck = RegisteredApps.Where(x => x.AppNameIdentifier == appName).FirstOrDefault();
             if (existingAppCheck != null)
             {
-                Debug.LogError($"[ModUtils/Computer/Error]: Tried to register app but name is already on use! App-name: {appName}");
+                CustomLogger.AddLine("Computer", $"Tried to register app but name is already on use! App-name: {appName}");
                 return null;
             }
 
             if (windowPrefab == null || iconPrefab == null || String.IsNullOrEmpty(appName))
             {
-                Debug.LogError($"[ModUtils/Computer/Error]: Required data to create app was not given!");
+                CustomLogger.AddLine("Computer", $"Required data to create app was not given!");
                 return null;
             }
 

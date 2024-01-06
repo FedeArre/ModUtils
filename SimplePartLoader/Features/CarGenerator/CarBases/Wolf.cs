@@ -56,10 +56,6 @@ namespace SimplePartLoader.CarGen
                         {
                             scr.LocalStrtetchTarget = newBone;
                         }
-                        else
-                        {
-                            Debug.LogWarning($"[ModUtils/CarGen/BoneFix/Wolf]: Could not find bone for {scr.LocalStrtetchTarget.name} ({scr.LocalStrtetchTarget.parent.name})");
-                        }
                     }
 
                     scr.targetTransform = null;

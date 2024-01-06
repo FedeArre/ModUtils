@@ -9,7 +9,7 @@ namespace SimplePartLoader
 {
     internal class CustomLogger
     {
-        private static List<string> lines;
+        private static List<string> lines = new List<string>();
 
         public static void AddLine(string origin, string line, bool dontShowInLog = false)
         {
