@@ -57,6 +57,8 @@ namespace SimplePartLoader.Features
                 m_modsDropdown.options.Add(newOption);
             }
 
+            m_carDropdown.RefreshShownValue();
+            m_modsDropdown.RefreshShownValue();
         }
 
         void Update()
