@@ -156,6 +156,17 @@ namespace SimplePartLoader
                     part.PartInfo.FitsToEngine = part.Mod.Settings.AutomaticFitsToEngine;
                 }
                 
+                PartProperties pp = part.GetComponent<PartProperties>();
+                if(pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        part.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
+
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
             
@@ -174,6 +185,17 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY_PREFABGEN;
+
+                PartProperties pp = p.GetComponent<PartProperties>();
+                if (pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        p.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
             }
             else
             {
@@ -188,6 +210,17 @@ namespace SimplePartLoader
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY;
+
+                PartProperties pp = p.GetComponent<PartProperties>();
+                if (pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        p.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
             }
 
             return p;

@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using SimplePartLoader;
+using System.Collections.Generic;
 
 namespace SimplePartLoader
 {
@@ -13,7 +14,7 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
         public Renderer Renderer;
-        
+
         internal GameObject OriginalGameobject;
 
         internal string Name;
@@ -36,7 +37,8 @@ namespace SimplePartLoader
         private ModInstance modInstance;
 
         public bool RotateThumbnail;
-        
+        internal List<string> Properties = new List<string> ();
+
         public ModInstance Mod
         {
             get { return modInstance; }
@@ -396,6 +398,11 @@ namespace SimplePartLoader
                 case PartTypes.DUMMY_PREFABGEN: return "Prefab generator";
                 default: return "Dummy";
             }
+        }
+
+        public bool HasProperty(string property)
+        {
+            return Properties.Contains(property);
         }
     }
 

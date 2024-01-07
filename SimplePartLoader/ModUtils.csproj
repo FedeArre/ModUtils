@@ -495,6 +495,7 @@
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
+    <Compile Include="Objects\EditorComponents\MaterialSetup.cs" />
     <Compile Include="Objects\EditorComponents\BuildableGenerator.cs" />
     <Compile Include="Objects\EditorComponents\CarGenerator.cs" />
     <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />
@@ -503,6 +504,7 @@
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
     <Compile Include="Objects\EditorComponents\OriginalMesh.cs" />
     <Compile Include="Objects\EditorComponents\FurnitureCollider.cs" />
+    <Compile Include="Objects\EditorComponents\PartProperties.cs" />
     <Compile Include="Objects\Furniture\CustomFurnitureSaleItem.cs" />
     <Compile Include="Objects\Furniture\Furniture.cs" />
     <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
