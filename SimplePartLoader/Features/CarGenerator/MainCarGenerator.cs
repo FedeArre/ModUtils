@@ -264,6 +264,7 @@ namespace SimplePartLoader.CarGen
             {
                 foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
+                    partinfo.HingePivot = null;
                     if (!String.IsNullOrEmpty(partinfo.RenamedPrefab))
                         partinfo.gameObject.name = partinfo.RenamedPrefab;
                 }

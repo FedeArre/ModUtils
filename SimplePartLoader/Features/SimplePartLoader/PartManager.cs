@@ -218,6 +218,22 @@ namespace SimplePartLoader
                 { 
                     if(t.AttachesTo == part.name)
                     {
+                        bool preventTransparentCreation = false;
+
+                        foreach(transparents transparent in part.GetComponentsInChildren<transparents>())
+                        {
+                            if(transparent.name == t.Name && transparent.SavePosition == t.SavePosition)
+                            {
+                                preventTransparentCreation = true;
+                            }
+                        }
+
+                        if(preventTransparentCreation)
+                        {
+                            CustomLogger.AddLine("Transparents", $"Prevented transparent {t.Name} creation due to existing transparent with same save position ({t.SavePosition})");
+                            break;
+                        }
+
                         SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name})");
 
                         GameObject transparentObject = GetTransparentReadyObject(t);
