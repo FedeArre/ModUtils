@@ -132,6 +132,21 @@ namespace SimplePartLoader
                     {
                         part.Prefab.AddComponent<SPL_Part>();
                     }
+
+                    MaterialSetup ms = part.Prefab.GetComponent<MaterialSetup>();
+                    if (ms)
+                    {
+                        if (ms.SetPartToBlackMaterial)
+                            part.Renderer.material = PaintingSystem.GetBodymatMaterial(part.Mod.Settings.UseBackfaceShader);
+
+                        if (ms.EnableChromeStationSupport)
+                            part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
+
+                        if (ms.SupportType != PaintTypes.DontAdd)
+                            PaintingSystem.SetupPart(part, (PaintingSystem.Types) ms.SupportType);
+
+                        GameObject.Destroy(ms);
+                    }
                 }
             }
             SPL.DevLog("Injecting into catalog & localization stuff");
