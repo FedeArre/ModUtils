@@ -18,6 +18,7 @@ namespace SimplePartLoader.CarGen
     internal class MainCarGenerator
     {
         internal static List<Car> RegisteredCars = new List<Car>();
+        internal static List<Car> RuinedCars = new List<Car>();
         internal static Hashtable AvailableBases = new Hashtable();
         
         internal static void BaseSetup()
@@ -139,6 +140,10 @@ namespace SimplePartLoader.CarGen
                 
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
+
+                if (car.carGeneratorData.SpawnRuined)
+                    RuinedCars.Add(car);
+
 #if MODUTILS_DEVELOPER_CAR_CREATOR
                 Debug.Log("[ModUtils/CarGenDebug]: Root component count: " + car.carPrefab.GetComponents<MonoBehaviour>().Length);
                 Debug.Log("[ModUtils/CarGenDebug]: Childrens component count: " + car.carPrefab.GetComponentsInChildren<MonoBehaviour>().Length);
@@ -224,13 +229,19 @@ namespace SimplePartLoader.CarGen
 
         internal static void AddCars()
         {
-            GameObject CarsParent = GameObject.Find("CarsParent");
-            CarList CarsComp = CarsParent.GetComponent<CarList>();
+            GameObject carsParent = GameObject.Find("CarsParent");
+            CarList carsComp = carsParent.GetComponent<CarList>();
             
             foreach (Car car in RegisteredCars)
             {
-                Array.Resize(ref CarsComp.Cars, CarsComp.Cars.Length + 1);
-                CarsComp.Cars[CarsComp.Cars.Length - 1] = car.carPrefab;
+                Array.Resize(ref carsComp.Cars, carsComp.Cars.Length + 1);
+                carsComp.Cars[carsComp.Cars.Length - 1] = car.carPrefab;
+
+                if(car.carGeneratorData.SpawnOnJobs)
+                {
+                    Array.Resize(ref carsComp.JobCars, carsComp.JobCars.Length + 1);
+                    carsComp.JobCars[carsComp.JobCars.Length - 1] = car.carPrefab;
+                }
             }
         }
 
@@ -376,7 +387,7 @@ namespace SimplePartLoader.CarGen
                     weldCut.ReStart();
                     weldCut.welded = true;
 
-                    if(car.EnableDebug)
+                    if(CustomLogger.DebugEnabled)
                     {
                         Debug.Log($"[ModUtils/CarGen/AttachDebug]: Weld object ${weldCut.gameObject?.name}, parent is {weldCut.transform.parent.name}");
                     }
@@ -419,8 +430,8 @@ namespace SimplePartLoader.CarGen
 
             if (car.carGeneratorData.FixLights)
             {
-                CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
-                CommonFixes.Windows(car.carPrefab, car.EnableDebug);
+                CommonFixes.CarLightsFix(car.carPrefab, false);
+                CommonFixes.Windows(car.carPrefab, false);
             }
 
             if (car.carGeneratorData.EnableAutomaticPainting)
@@ -451,7 +462,7 @@ namespace SimplePartLoader.CarGen
             }
 
             // Since painting generally crashes the creation, this will help developers
-            if (car.EnableDebug)
+            if (CustomLogger.DebugEnabled)
             {
                 foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
                 {

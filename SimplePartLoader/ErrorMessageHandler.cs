@@ -25,11 +25,12 @@ namespace SimplePartLoader
         public List<string> UnsupportedModList = new List<string>();
         public bool ThumbnaiLGeneratorEnabled;
         public bool EarlyAccessMod;
-        public bool ReportMod;
+        public List<string> DebugEnabled = new List<string>();
+        public List<string> Dissasembler = new List<string>();
 
         void OnGUI()
         {
-            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod && !ReportMod)
+            if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod && DebugEnabled.Count == 0 && Dissasembler.Count == 0)
                 return;
 
             int nextLineHeight = 40;
@@ -56,11 +57,28 @@ namespace SimplePartLoader
                 nextLineHeight += 15;
             }
 
-            if (ReportMod)
+            if (DebugEnabled.Count != 0)
             {
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mod(s) enabled debug options: ");
                 nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Mod report feature is enabled!");
+
+                foreach (string mod in DebugEnabled)
+                {
+                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
+                    nextLineHeight += 15;
+                }
+            }
+
+            if (Dissasembler.Count != 0)
+            {
+                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mod(s) enabled save dissasembler: ");
                 nextLineHeight += 15;
+
+                foreach (string mod in Dissasembler)
+                {
+                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
+                    nextLineHeight += 15;
+                }
             }
 
             if (EarlyAccessMod)

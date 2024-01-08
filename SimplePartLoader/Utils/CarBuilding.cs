@@ -11,9 +11,7 @@ namespace SimplePartLoader.Utils
 {
     public class CarBuilding
     {
-        /// <summary>
-        /// Enables the debug mode for car building functions
-        /// </summary>
+        [Obsolete("The following property will be removed in ModUtils v1.5 - Use ModInstance.EnableDebug instead")]
         public static bool ENABLE_CARBUILDING_DEBUG = false;
 
         /// <summary>
@@ -240,14 +238,19 @@ namespace SimplePartLoader.Utils
 
         public static void UpdateVisualObjects(Car c)
         {
-            foreach(CarProperties cp in c.carPrefab.GetComponentsInChildren<CarProperties>())
+            UpdateVisualObjects(c.carPrefab);
+        }
+
+        public static void UpdateVisualObjects(GameObject go)
+        {
+            foreach (CarProperties cp in go.GetComponentsInChildren<CarProperties>())
             {
-                if(cp.VisualObject)
+                if (cp.VisualObject)
                 {
                     bool updated = false;
-                    foreach(Transform t in cp.transform)
+                    foreach (Transform t in cp.transform)
                     {
-                        if(t.name == cp.VisualObject.name)
+                        if (t.name == cp.VisualObject.name)
                         {
                             cp.VisualObject = t.gameObject;
                             updated = true;
@@ -255,7 +258,7 @@ namespace SimplePartLoader.Utils
                         }
                     }
 
-                    if(!updated && cp.GetComponent<MeshRenderer>())
+                    if (!updated && cp.GetComponent<MeshRenderer>())
                     {
                         cp.VisualObject = cp.gameObject;
                     }
@@ -275,8 +278,8 @@ namespace SimplePartLoader.Utils
         /// <param name="str">The message to show on log</param>
         internal static void DevLog(string str)
         {
-            if (ENABLE_CARBUILDING_DEBUG)
-                Debug.Log("[ModUtils/CarBuilding]: " + str);
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("CarDebug", str);
         }
     }
 }

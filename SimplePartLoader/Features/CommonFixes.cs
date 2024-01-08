@@ -19,7 +19,7 @@ namespace SimplePartLoader
                 return;
             }
 
-            FixPart(p.Prefab, type, p.Mod.Settings.EnableDeveloperLog);
+            FixPart(p.Prefab, type);
         }
 
         public static void FixPart(GameObject prefab, FixType type, bool printData = true)

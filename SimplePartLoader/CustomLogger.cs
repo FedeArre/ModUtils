@@ -11,6 +11,9 @@ namespace SimplePartLoader
     {
         private static List<string> lines = new List<string>();
 
+        public static bool DebugEnabled = false;
+        public static bool SaveDissasamble = false;
+
         public static void AddLine(string origin, string line, bool dontShowInLog = false)
         {
             string message = $"[{DateTime.Now.ToString("HH:mm:ss")} - {origin}] {line}";

@@ -390,6 +390,18 @@ namespace SimplePartLoader
             return car;
         }
 
+        public void EnableDebug(bool saveDissasembler = false)
+        {
+            ErrorMessageHandler.GetInstance().DebugEnabled.Add(Mod.ID);
+            CustomLogger.DebugEnabled = true;
+
+            if (saveDissasembler)
+            {
+                ErrorMessageHandler.GetInstance().Dissasembler.Add(Mod.ID);
+                CustomLogger.SaveDissasamble = true;
+            }
+        }
+
         public Buildable LoadBuildable(AssetBundle bundle, string prefabName)
         {
             // Safety checks

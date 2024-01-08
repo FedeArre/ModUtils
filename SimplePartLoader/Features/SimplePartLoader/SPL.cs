@@ -213,13 +213,13 @@ namespace SimplePartLoader
         {
             if (p == null) // Safety check
             {
-                Debug.LogError("[ModUtils/SPL/Error]: Tried to do full copy into empty part");
+                CustomLogger.AddLine("Parts", "Tried to do full copy into empty part");
                 return;
             }
             
             if(p.Prefab.GetComponents<Component>() == null)
             {
-                Debug.Log("[ModUtils/SPL/Error]: The part that was going to be copied had a null component. Part: " + p.Name);
+                CustomLogger.AddLine("Parts", "The part that was going to be copied had a null component. Part: " + p.Name);
                 return;
             }
 
@@ -240,7 +240,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                Debug.LogError($"[ModUtils/SPL/Error] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
+                CustomLogger.AddLine("Parts", "Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 
@@ -472,18 +472,15 @@ namespace SimplePartLoader
         /// <param name="str">The string to be printed on log</param>
         internal static void DevLog(string str)
         {
-            if (DEVELOPER_LOG)
-                Debug.Log("[ModUtils/DevMode]: " + str);
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("Debug", str);
         }
 
         internal static void DevLog(Part p, string str)
         {
-            if(p.Mod != null)
+            if (CustomLogger.DebugEnabled)
             {
-                if(p.Mod.Settings.EnableDeveloperLog)
-                {
-                    Debug.Log($"[ModUtils/DevMode]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
-                }
+                CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, mod: {p.Mod.Name})");
             }
         }
 
@@ -494,8 +491,8 @@ namespace SimplePartLoader
         /// <exception cref="Exception">Generic exception to stop execution</exception>
         internal static void SplError(string str)
         {
-            Debug.LogError("[ModUtils/SPL/Error]: " + str);
-            throw new Exception("ModUtils exception");
+            CustomLogger.AddLine("SplError", str);
+            throw new Exception("ModUtils major exception - Read above");
         }
         
         // Compatibility for older versions

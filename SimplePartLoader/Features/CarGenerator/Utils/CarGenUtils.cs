@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static EVP.VehicleAudio;
+using static PaintIn3D.P3dCoordCopier;
 
 namespace SimplePartLoader.CarGen
 {
@@ -73,9 +75,9 @@ namespace SimplePartLoader.CarGen
 
                 if (!part)
                 {
-                    if (car.EnableDebug)
-                        Debug.LogWarning("[ModUtils/CarGen/PartLookup/Warning]: Part lookup could not find part for " + t.name);
-                    
+                    if (CustomLogger.DebugEnabled)
+                        CustomLogger.AddLine("CarDebug", "Part lookup could not find part for " + t.name);
+
                     continue;
                 }
 

@@ -22,6 +22,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine.ProBuilder;
 using SimplePartLoader.Features;
+using SimplePartLoader.Features.CarGenerator;
 
 namespace SimplePartLoader
 {
@@ -150,11 +151,6 @@ namespace SimplePartLoader
                 
                 return;
             }
-
-            if(SPL.DEVELOPER_LOG)
-            {
-                GameObject.Instantiate(UI_DeveloperLogEnabled_Prefab);
-            }
         }
 
         public override void OnLoad()
@@ -206,7 +202,7 @@ namespace SimplePartLoader
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
                 CustomSaverHandler.NewGame();
 
-            if(SPL.ENABLE_SAVE_DISSASAMBLE)
+            if(CustomLogger.SaveDissasamble)
             {
                 CustomLogger.AddLine("Dev", "Save dissasembling has been enabled! - Information in Player.log");
                 SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
@@ -273,7 +269,7 @@ namespace SimplePartLoader
             }
             catch { }
 
-
+            new GameObject("tempRuinedOverwrite").AddComponent<RuinedOverwrite>();
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;

@@ -17,13 +17,15 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
+    <Optimize>true</Optimize>
     <OutputPath>C:\Program Files %28x86%29\Steam\steamapps\common\My Garage\Mods\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>x64</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -467,6 +469,7 @@
     <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatedJunkyard.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatorComponent.cs" />
+    <Compile Include="Features\CarGenerator\RuinedOverwrite.cs" />
     <Compile Include="Features\CarGenerator\SteeringFix.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />

@@ -161,7 +161,7 @@ namespace SimplePartLoader
 
             Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
-            if(SPL.DEVELOPER_LOG)
+            if(CustomLogger.DebugEnabled)
             {
                 CustomLogger.AddLine("Parts", "Parts catalog has been modified. New size: " + jpl.Parts.Length);
                 foreach (Part p in modLoadedParts)

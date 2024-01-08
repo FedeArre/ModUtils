@@ -27,7 +27,9 @@ namespace SimplePartLoader.CarGen
             get { return carPrefab; }
         }
 
+        [Obsolete("The following property will be removed on ModUtils v1.5")]
         public bool IgnoreLogErrors { get; set; }
+        [Obsolete("The following property will be removed on ModUtils v1.5")]
         public bool EnableDebug { get; set; }
 
         internal bool IssueExternalReport = false;
