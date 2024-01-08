@@ -432,6 +432,14 @@ namespace SimplePartLoader
             prefab.AddComponent<SaveItem>().PrefabName = buildGen.PrefabName;
             prefab.tag = "Building";
 
+            if (b.Type == BuildableType.DOOR && buildGen.OpenPosition && buildGen.ClosedPosition)
+            {
+                OpenGarage garage = prefab.AddComponent<OpenGarage>();
+                garage.OpenOnOThisClick = true;
+                garage.GateClosed = buildGen.ClosedPosition.gameObject;
+                garage.GateOpen = buildGen.OpenPosition.gameObject;
+            }
+
             BuildableManager.Buildables.Add(buildGen.PrefabName, b);
             Saver.modParts.Add(buildGen.PrefabName, prefab);
 
