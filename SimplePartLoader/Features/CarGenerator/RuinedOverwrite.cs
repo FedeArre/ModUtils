@@ -13,8 +13,7 @@ namespace SimplePartLoader.Features.CarGenerator
     {
         void Start()
         {
-            StartCoroutine(OverwriteExistingRuined());
-            /*int value = UnityEngine.Random.Range(1, 4);
+            int value = UnityEngine.Random.Range(1, 4);
             if (value != 2 || MainCarGenerator.RuinedCars.Count == 0)
             {
                 GameObject.Destroy(gameObject);
@@ -22,7 +21,7 @@ namespace SimplePartLoader.Features.CarGenerator
             else
             {
                 StartCoroutine(OverwriteExistingRuined());
-            }*/
+            }
         }
 
         IEnumerator OverwriteExistingRuined()
