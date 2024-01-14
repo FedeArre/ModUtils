@@ -46,6 +46,7 @@ public class CarGenerator : MonoBehaviour
     [Header("Spawn settings")]
     public bool SpawnOnJobs = false;
     public bool SpawnRuined = false;
+    public bool SpawnOnBarn = false;
 
     [Header("Transparent remover")]
     public bool RemoveOriginalTransparents = false;

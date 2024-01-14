@@ -61,8 +61,6 @@ namespace SimplePartLoader.CarGen
                             scr.LocalStrtetchTarget = newBone;
                         }
                     }
-
-                    scr.targetTransform = null;
                 }
             }
 
@@ -295,7 +293,6 @@ namespace SimplePartLoader.CarGen
                 if (scr.transform.childCount != 0 && scr.transform.GetChild(0).name.Contains("Pivot"))
                 {
                     scr.LocalStrtetchTarget = scr.transform.GetChild(0);
-                    scr.targetTransform = null;
                 }
                 else if (scr.transform.name == "HandbbrakeCable")
                 {

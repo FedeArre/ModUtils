@@ -242,6 +242,12 @@ namespace SimplePartLoader.CarGen
                     Array.Resize(ref carsComp.JobCars, carsComp.JobCars.Length + 1);
                     carsComp.JobCars[carsComp.JobCars.Length - 1] = car.carPrefab;
                 }
+
+                if (car.carGeneratorData.SpawnOnBarn)
+                {
+                    Array.Resize(ref carsComp.BarnCars, carsComp.BarnCars.Length + 1);
+                    carsComp.BarnCars[carsComp.JobCars.Length - 1] = car.carPrefab;
+                }
             }
         }
 
@@ -264,6 +270,8 @@ namespace SimplePartLoader.CarGen
                     {
                         scr.thisTransform = scr.transform;
                     }
+
+                    //scr.enabled = true;
                 }
             }
 
@@ -468,12 +476,12 @@ namespace SimplePartLoader.CarGen
                 {
                     if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
                     {
-                        car.ReportIssue("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                        car.ReportIssue("CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
                     }
                     MeshRenderer mr = carProps.GetComponent<MeshRenderer>();
                     if (carProps.Washable && mr && mr.materials.Length < 2)
                     {
-                        car.ReportIssue("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
+                        car.ReportIssue("CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
                     }
                 }
 
@@ -484,6 +492,39 @@ namespace SimplePartLoader.CarGen
 
                     if (pi.fixedImportantBolts != 0)
                         Debug.Log($"[ModUtils/CarGen/PostBuild/Debug]: {pi} ({pi.name}) has {pi.fixedImportantBolts} BoltNuts");
+                }
+
+                foreach (transparents tr in car.carPrefab.GetComponentsInChildren<transparents>())
+                {
+                    if(tr.DEPENDANTS.Length > 0)
+                    {
+                        for(int i = 0; i < tr.DEPENDANTS.Length; i++)
+                        {
+                            if (tr.DEPENDANTS[i] == null || tr.DEPENDANTS[i].dependant == null)
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has a dependant which is null");
+                            else if (!tr.DEPENDANTS[i].dependant.GetComponent<transparents>())
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has a dependant which is not a transparent");
+                        }
+                    }
+
+                    if (tr.ATTACHABLES.Length > 0)
+                    {
+                        for (int i = 0; i < tr.ATTACHABLES.Length; i++)
+                        {
+                            if (tr.ATTACHABLES[i] == null || tr.ATTACHABLES[i].Attachable == null)
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has an attachable which is null");
+                            else if (!tr.ATTACHABLES[i].Attachable.GetComponent<transparents>())
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has an attachable which is not a transparent");
+                        }
+                    }
+                }
+
+                foreach(MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
+                {
+                    if(scr.doubleSided && !scr.targetTransform)
+                    {
+                        car.ReportIssue($"{scr.name} ({Functions.GetTransformPath(scr.transform)}) is set as double sided but no target transform is set");
+                    }
                 }
             }
         }

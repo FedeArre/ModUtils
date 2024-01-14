@@ -78,6 +78,7 @@ namespace SimplePartLoader
                 yield return new WaitForEndOfFrame();
 
                 // Check stuff now
+
                 string referenceIssues = "";
                 foreach (MonoBehaviour c in car.GetComponentsInChildren<MonoBehaviour>())
                 {
@@ -115,6 +116,14 @@ namespace SimplePartLoader
                             }
                         }
                     }
+                }
+                
+                foreach (MyBoneSCR scr in car.GetComponentsInChildren<MyBoneSCR>())
+                {
+                    if (scr.stretchToTarget && string.IsNullOrEmpty(scr.StrechToName))
+                        referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName null\n");
+                    else if(scr.stretchToTarget && !scr.thisTransform)
+                        referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName set to {scr.StrechToName} but could not be found\n");
                 }
 
                 if (!carObj.IssueExternalReport && string.IsNullOrEmpty(referenceIssues)) 
