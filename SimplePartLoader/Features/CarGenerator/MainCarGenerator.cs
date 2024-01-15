@@ -102,9 +102,20 @@ namespace SimplePartLoader.CarGen
                 mcp.CarPrice = car.carGeneratorData.CarPrice;
                 mcp.PREFAB = car.emptyCarPrefab;
 
-                // Removing InsideItems object
-                GameObject.DestroyImmediate(car.emptyCarPrefab.transform.Find("InsideItems").gameObject);
-                GameObject.DestroyImmediate(car.carPrefab.transform.Find("InsideItems").gameObject);
+                // Fix InsideItems object
+                Transform emptyInsideItems = car.emptyCarPrefab.transform.Find("InsideItems");
+                Transform builtInsideItems = car.carPrefab.transform.Find("InsideItems");
+
+                InsideItems emptyInsideItemsComp = emptyInsideItems.GetComponent<InsideItems>();
+                InsideItems builtInsideItemsComp = builtInsideItems.GetComponent<InsideItems>();
+                InsideCollider emptyInsideItemsColl = emptyInsideItems.GetChild(0).GetComponent<InsideCollider>();
+                InsideCollider builtInsideItemsColl = builtInsideItems.GetChild(0).GetComponent<InsideCollider>();
+
+                emptyInsideItemsComp.InsideCollider = emptyInsideItemsColl.gameObject;
+                emptyInsideItemsColl.insideitems = emptyInsideItemsComp;
+
+                builtInsideItemsComp.InsideCollider = builtInsideItemsColl.gameObject;
+                builtInsideItemsColl.insideitems = builtInsideItemsComp;
 
                 // Custom steering breaking fix
                 car.emptyCarPrefab.AddComponent<SteeringFix>();
