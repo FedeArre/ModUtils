@@ -22,6 +22,9 @@ namespace SimplePartLoader.CarGen
 
         internal ModInstance loadedBy;
 
+        public List<string> FitToCarExceptions { get; set; }
+        public string AutomaticFitToCar { get; set; }
+
         public GameObject BuiltCarPrefab
         {
             get { return carPrefab; }
@@ -50,6 +53,7 @@ namespace SimplePartLoader.CarGen
             carGeneratorData = car.GetComponent<CarGenerator>();
 
             exceptionsObject = new BuildingExceptions();
+            FitToCarExceptions = new List<string>();
         }
         
         public void SetCarTemplateFunction(Action<GameObject> function)

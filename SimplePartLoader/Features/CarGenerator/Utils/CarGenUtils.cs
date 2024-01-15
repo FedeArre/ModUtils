@@ -88,6 +88,16 @@ namespace SimplePartLoader.CarGen
                     continue;
                 }
 
+                if(!string.IsNullOrEmpty(car.AutomaticFitToCar))
+                {
+                    Partinfo pi = part.GetComponent<Partinfo>();
+                    if(!car.FitToCarExceptions.Contains(pi.RenamedPrefab))
+                    {
+                        Array.Resize(ref pi.FitsToCar, pi.FitsToCar.Length + 1);
+                        pi.FitsToCar[pi.FitsToCar.Length - 1] = car.AutomaticFitToCar;
+                    }
+                }
+
                 CarBuilding.CopyPartIntoTransform(part, t.transform);
                 callAgain = true;
             }
