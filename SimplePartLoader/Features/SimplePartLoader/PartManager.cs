@@ -130,7 +130,7 @@ namespace SimplePartLoader
 
                     if (!part.Prefab.GetComponent<SPL_Part>())
                     {
-                        part.Prefab.AddComponent<SPL_Part>();
+                        part.Prefab.AddComponent<SPL_Part>().Mod = part.Mod;
                     }
 
                     MaterialSetup ms = part.Prefab.GetComponent<MaterialSetup>();

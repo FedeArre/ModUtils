@@ -128,7 +128,6 @@ namespace SimplePartLoader
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
-
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
@@ -270,6 +269,9 @@ namespace SimplePartLoader
             catch { }
 
             new GameObject("tempRuinedOverwrite").AddComponent<RuinedOverwrite>();
+
+            CatalogMassUpdate.ApplyChanges();
+
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;

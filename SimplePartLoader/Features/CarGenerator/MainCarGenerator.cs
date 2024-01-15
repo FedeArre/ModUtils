@@ -270,8 +270,6 @@ namespace SimplePartLoader.CarGen
                     {
                         scr.thisTransform = scr.transform;
                     }
-
-                    //scr.enabled = true;
                 }
             }
 

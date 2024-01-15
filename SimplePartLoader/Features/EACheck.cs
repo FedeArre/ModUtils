@@ -45,10 +45,14 @@ namespace SimplePartLoader
                 return;
 
             frameCount++;
-            ulong steamID = 76561198947956828;
+
+            if (!SteamManager.Initialized)
+                return;
+
+            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID;
             CustomLogger.AddLine("EACheck", $"Identified user: " + steamID);
-            //Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
-            //KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
+            CustomLogger.AddLine("EACheck", $"App build id: " + Steamworks.SteamApps.GetAppBuildId());
+            KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
             // Load keys
             Dictionary<string, string> foundKeys = new Dictionary<string, string>();
@@ -86,6 +90,8 @@ namespace SimplePartLoader
                     {
                         using(HttpClient client = new HttpClient())
                         {
+                            client.Timeout = TimeSpan.FromMinutes(30);
+
                             EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
                             eamo.Key = item.Value;
                             eamo.SteamId = steamID + "";
@@ -118,6 +124,16 @@ namespace SimplePartLoader
                                 CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
                             }
                         }
+                    }
+                    catch(AggregateException ae)
+                    {
+                        CustomLogger.AddLine("EACheck", "Agregate exception occured");
+                        ae.Handle((x) =>
+                        {
+                            CustomLogger.AddLine("EACheck", x);
+                            CustomLogger.AddLine("EACheck", item.Value);
+                            return true;
+                        });
                     }
                     catch(Exception ex) 
                     {

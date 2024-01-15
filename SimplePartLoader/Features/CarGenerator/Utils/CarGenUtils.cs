@@ -81,6 +81,13 @@ namespace SimplePartLoader.CarGen
                     continue;
                 }
 
+                SPL_Part splPart = part.GetComponent<SPL_Part>();
+                if (splPart && splPart.Mod != car.loadedBy)
+                {
+                    car.ReportIssue($"Car generation prevented part fitting for {t.name} because part was from other mod");
+                    continue;
+                }
+
                 CarBuilding.CopyPartIntoTransform(part, t.transform);
                 callAgain = true;
             }
