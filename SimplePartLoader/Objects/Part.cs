@@ -37,7 +37,7 @@ namespace SimplePartLoader
         private ModInstance modInstance;
 
         public bool RotateThumbnail;
-        internal List<string> Properties = new List<string> ();
+        public List<string> Properties = new List<string>();
 
         public ModInstance Mod
         {
