@@ -65,6 +65,8 @@ namespace SimplePartLoader.CarGen
             counter_colorMap.enabled = false;
 
             CheckHighResolutionPaint(Prefab, res);
+
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         public static void EnablePaintAndRust(GameObject Prefab, PaintingSystem.PartPaintResolution res)
@@ -139,6 +141,7 @@ namespace SimplePartLoader.CarGen
             counter_colorMap.enabled = false;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
 
@@ -304,6 +307,7 @@ namespace SimplePartLoader.CarGen
             counter_dirt.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         public static void EnablePaintAndDirt(GameObject Prefab, PaintingSystem.PartPaintResolution res)
@@ -381,6 +385,7 @@ namespace SimplePartLoader.CarGen
             paintableTexture_dirt.Group = 5;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         internal static void CheckHighResolutionPaint(GameObject Prefab, PaintingSystem.PartPaintResolution res)

@@ -55,6 +55,7 @@ namespace SimplePartLoader
 
                 CheckHighResolutionPaint(part, paintableTexture);
 
+                TryApplyL2Overwrite(part);
                 part.CarProps.Paintable = true;
                 part.Paintable = true;
             }
@@ -113,7 +114,8 @@ namespace SimplePartLoader
                 counter_colorMap.MaskMesh = meshToUse;
 
                 CheckHighResolutionPaint(part, paintableTexture_colorMap);
-                
+
+                TryApplyL2Overwrite(part);
                 // Final details
                 part.Paintable = true;
                 part.CarProps.Paintable = true;
@@ -201,7 +203,8 @@ namespace SimplePartLoader
             counter_colorMap.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
-            
+
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -382,7 +385,8 @@ namespace SimplePartLoader
             counter_dirt.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
-            
+
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -466,6 +470,7 @@ namespace SimplePartLoader
             
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
 
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -676,6 +681,49 @@ namespace SimplePartLoader
                     p.EnablePartPainting(type);
                     break;
             }
+        }
+
+        internal static void TryApplyL2Overwrite(Part p)
+        {
+            TryApplyL2Overwrite(p.Prefab);
+        }
+
+        internal static void TryApplyL2Overwrite(GameObject go)
+        {
+            L2PaintOverwrite comp = go.GetComponent<L2PaintOverwrite>();
+            if (!comp)
+                return;
+
+            Material matToChange = go.GetComponent<Renderer>().material;
+            if (!matToChange || matToChange.shader.name != "Thunderbyte/RustDirt2Layers")
+                return;
+
+            if(comp._texcoord)
+                matToChange.SetTexture("_texcoord", comp._texcoord);
+
+            if (comp._GrungeMap)
+                matToChange.SetTexture("_GrungeMap", comp._GrungeMap);
+
+            if (comp._L1ColorMap)
+                matToChange.SetTexture("_L1ColorMap", comp._L1ColorMap);
+
+            if (comp._L1EmissionMap)
+                matToChange.SetTexture("_L1EmissionMap", comp._L1EmissionMap);
+
+            if (comp._L1MetallicRustDustSmoothness)
+                matToChange.SetTexture("_L1MetallicRustDustSmoothness", comp._L1MetallicRustDustSmoothness);
+
+            if (comp._L1Normal)
+                matToChange.SetTexture("_L1Normal", comp._L1Normal);
+
+            if (comp._L2EmissionMap)
+                matToChange.SetTexture("_L2EmissionMap", comp._L2EmissionMap);
+
+            if (comp._L2MetallicRustDustSmoothness)
+                matToChange.SetTexture("_L2MetallicRustDustSmoothness", comp._L2MetallicRustDustSmoothness);
+
+            if (comp._L2Normal)
+                matToChange.SetTexture("_L2Normal", comp._L2Normal);
         }
     }
 }
