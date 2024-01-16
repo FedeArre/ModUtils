@@ -11,6 +11,7 @@ namespace SimplePartLoader
     public class ModUtils
     {
         public static GameObject Player { get; internal set; }
+        public static GameObject PlayerHand { get; internal set; }
         public static GameObject CursorCanvas { get; internal set; }
         public static tools PlayerTools { get; internal set; }
         public static AudioManager AudioList { get; internal set; }
@@ -42,7 +43,7 @@ namespace SimplePartLoader
             PlayerTools = Player.GetComponent<tools>();
             RewiredPlayer = ReInput.players.GetPlayer(0);
 
-            GameObject PlayerHand = GameObject.Find("hand");
+            PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();
 
