@@ -86,6 +86,7 @@ namespace SimplePartLoader
                 // If we have keys, we now start loading the mods
                 foreach (var item in foundKeys)
                 {
+                    CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
                     try
                     {
                         using(HttpClient client = new HttpClient())
@@ -99,16 +100,25 @@ namespace SimplePartLoader
                             HttpContent content = new StringContent(JsonConvert.SerializeObject(eamo), System.Text.Encoding.UTF8, "application/json");
                             HttpResponseMessage response = client.PostAsync(ModMain.API_URL + "/eachecknew", content).Result;
 
-                            if(response.IsSuccessStatusCode)
+                            CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode}");
+
+                            if (response.IsSuccessStatusCode)
                             {
                                 byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
-                                
+                                CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
+                                if(assemblyBytes.Length == 0 )
+                                {
+                                    ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
+                                    continue;
+                                }
+
                                 Type[] types = Assembly.Load(assemblyBytes).GetTypes();
                                 Type typeFromHandle = typeof(Mod);
                                 for (int i = 0; i < types.Length; i++)
                                 {
                                     if (typeFromHandle.IsAssignableFrom(types[i]))
                                     {
+                                        CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
                                         Mod m = (Mod)Activator.CreateInstance(types[i]);
                                         ModLoader.mods.Add(m);
                                         m.OnMenuLoad();
