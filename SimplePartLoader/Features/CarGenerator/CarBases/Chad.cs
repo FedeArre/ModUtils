@@ -53,8 +53,6 @@ namespace SimplePartLoader.CarGen
                             scr.LocalStrtetchTarget = newBone;
                         }
                     }
-                        
-                    scr.targetTransform = null;
                 }
             }
 

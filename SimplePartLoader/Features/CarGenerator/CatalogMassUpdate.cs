@@ -11,10 +11,22 @@ namespace SimplePartLoader.CarGen
     {
         internal static Dictionary<string, List<string>> CarChangesToDo = new Dictionary<string, List<string>>();
         internal static Dictionary<string, List<string>> EngineChangesToDo = new Dictionary<string, List<string>>();
+        public static string[] AllCarsList = null;
 
         internal static void ApplyChanges()
         {
-            foreach(GameObject go in PartManager.gameParts)
+            // Search for SparkPlug, pretty high on list for our luck.
+            foreach (GameObject part in PartManager.gameParts)
+            {
+                if (part.name == "SparkPlug")
+                {
+                    AllCarsList = part.GetComponent<Partinfo>().FitsToCar;
+                    break;
+                }
+            }
+
+            // Now do the actual magic!
+            foreach (GameObject go in PartManager.gameParts)
             {
                 if (CarChangesToDo.ContainsKey(go.name))
                 {
@@ -53,7 +65,7 @@ namespace SimplePartLoader.CarGen
             foreach(GameObject go in PartManager.gameParts)
             {
                 Partinfo pi = go.GetComponent<Partinfo>();
-                if(pi)
+                if(pi && !ArrayContainsString(pi.FitsToCar, nameToAdd))
                 {
                     if(condition(pi) == true)
                     {
@@ -75,7 +87,7 @@ namespace SimplePartLoader.CarGen
             foreach (GameObject go in PartManager.gameParts)
             {
                 Partinfo pi = go.GetComponent<Partinfo>();
-                if (pi)
+                if (pi && !ArrayContainsString(pi.FitsToCar, nameToAdd))
                 {
                     if (condition(pi) == true)
                     {
@@ -91,6 +103,16 @@ namespace SimplePartLoader.CarGen
                     }
                 }
             }
+        }
+
+        public static bool ArrayContainsString(string[] array, string toSearch)
+        {
+            foreach(string str in array)
+            {
+                if(str == toSearch)
+                    return true;
+            }
+            return false;
         }
     }
 }

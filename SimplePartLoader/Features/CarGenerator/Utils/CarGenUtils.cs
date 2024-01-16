@@ -84,14 +84,27 @@ namespace SimplePartLoader.CarGen
                 SPL_Part splPart = part.GetComponent<SPL_Part>();
                 if (splPart && splPart.Mod != car.loadedBy)
                 {
-                    car.ReportIssue($"Car generation prevented part fitting for {t.name} because part was from other mod");
-                    continue;
+                    if(!car.OtherModBuildingExceptions.Contains(splPart.Mod.Mod.ID))
+                    {
+                        car.ReportIssue($"Car generation prevented part fitting for {t.name} because part was from other mod ({splPart.Mod.Mod.ID})");
+                        continue;
+                    }
                 }
 
                 if(!string.IsNullOrEmpty(car.AutomaticFitToCar))
                 {
                     Partinfo pi = part.GetComponent<Partinfo>();
-                    if(!car.FitToCarExceptions.Contains(pi.RenamedPrefab))
+                    bool flag = false;
+                    foreach(string s in pi.FitsToCar)
+                    {
+                        if(s == car.AutomaticFitToCar)
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if(!flag && !car.FitToCarExceptions.Contains(pi.RenamedPrefab))
                     {
                         Array.Resize(ref pi.FitsToCar, pi.FitsToCar.Length + 1);
                         pi.FitsToCar[pi.FitsToCar.Length - 1] = car.AutomaticFitToCar;
