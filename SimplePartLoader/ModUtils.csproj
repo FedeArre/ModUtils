@@ -42,6 +42,9 @@
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\Mods\!!ModUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="0Harmony, Version=2.3.1.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.3.1.1\lib\net452\0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
@@ -476,6 +479,7 @@
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
+    <Compile Include="Features\CustomMeshes\CustomMeshHandler.cs" />
     <Compile Include="Features\DevUI\ComponentDevUI.cs" />
     <Compile Include="Features\Computer\AppLauncher\AppLauncherHandling.cs" />
     <Compile Include="Features\Computer\ComputerApp.cs" />
@@ -493,12 +497,17 @@
     <Compile Include="Features\DataHandler.cs" />
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
+    <Compile Include="Features\TrigerColliderBug.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Hooks\CustomEngineHook.cs" />
+    <Compile Include="Hooks\FixTryHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
+    <Compile Include="Objects\EditorComponents\CustomEngine.cs" />
+    <Compile Include="Objects\EditorComponents\CustomMeshes.cs" />
     <Compile Include="Objects\EditorComponents\L2PaintOverwrite.cs" />
     <Compile Include="Objects\EditorComponents\MaterialSetup.cs" />
     <Compile Include="Objects\EditorComponents\BuildableGenerator.cs" />
@@ -563,6 +572,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\autoupdater_ui_canvas" />
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />

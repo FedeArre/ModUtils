@@ -1,4 +1,5 @@
 ﻿using NWH.VehiclePhysics2;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,6 +36,8 @@ namespace SimplePartLoader.Features.CarGenerator
             yield return 0;
             yield return 0;
             yield return 0;
+            yield return 0;
+            yield return 0;
 
             foreach (var i in vc.powertrain.wheelGroups)
             {
@@ -42,16 +45,26 @@ namespace SimplePartLoader.Features.CarGenerator
             }
 
             // MainCarProperties.PreventChildCollisions (but using Collider instead of MeshCollider)
-            Collider[] componentsInChildren = base.GetComponentsInChildren<Collider>();
-            Collider[] array = componentsInChildren;
+            Collider[] array = base.GetComponentsInChildren<Collider>();
             for (int i = 0; i < array.Length; i++)
             {
+                array[i].material = vc.physicsMaterial;
                 for (int j = i + 1; j < array.Length; j++)
                 {
                     if (!(array[i] == array[j]))
                     {
-                        Physics.IgnoreCollision(array[i], array[j]);
+                        //Debug.Log($"Ignoring collision between {Functions.GetTransformPath(array[i].transform)} && {Functions.GetTransformPath(array[j].transform)}");
+                        Physics.IgnoreCollision(array[i], array[j], true);
                     }
+                }
+            }
+
+            // DEBUG: REMOVE: TODO:
+            foreach(Transform t in base.GetComponentsInChildren<Transform>())
+            {
+                if(t.gameObject.layer == LayerMask.NameToLayer("Default"))
+                {
+                    Debug.Log($"UI LAYER AT {t.name} at path {Functions.GetTransformPath(t)}");
                 }
             }
 

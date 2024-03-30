@@ -49,7 +49,7 @@ namespace SimplePartLoader
             if (!SteamManager.Initialized)
                 return;
 
-            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID; // User SteamID
             CustomLogger.AddLine("EACheck", $"Identified user: " + steamID);
             CustomLogger.AddLine("EACheck", $"App build id: " + Steamworks.SteamApps.GetAppBuildId());
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
@@ -66,6 +66,7 @@ namespace SimplePartLoader
                     string stuff = File.ReadAllText(files[i]);
                     if (stuff.StartsWith("MDU783-"))
                     {
+                        CustomLogger.AddLine("EACheck", $"Adding {Path.GetFileName(files[i])} as loadable mod");
                         foundKeys.Add(files[i], stuff.Substring(7));
                     }
                 }
@@ -79,17 +80,15 @@ namespace SimplePartLoader
             {
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
             }
-
-            if (true)
+            else if (foundKeys.Count != 0)
             {
-                
                 // If we have keys, we now start loading the mods
                 foreach (var item in foundKeys)
                 {
                     CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
                     try
                     {
-                        using(HttpClient client = new HttpClient())
+                        using (HttpClient client = new HttpClient())
                         {
                             client.Timeout = TimeSpan.FromMinutes(30);
 
@@ -102,11 +101,11 @@ namespace SimplePartLoader
 
                             CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode}");
 
-                            if (response.IsSuccessStatusCode)
+                            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound)
                             {
                                 byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
                                 CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
-                                if(assemblyBytes.Length == 0 )
+                                if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound)
                                 {
                                     ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
                                     continue;
@@ -122,6 +121,7 @@ namespace SimplePartLoader
                                         Mod m = (Mod)Activator.CreateInstance(types[i]);
                                         ModLoader.mods.Add(m);
                                         m.OnMenuLoad();
+                                        break;
                                     }
                                 }
 
@@ -135,7 +135,7 @@ namespace SimplePartLoader
                             }
                         }
                     }
-                    catch(AggregateException ae)
+                    catch (AggregateException ae)
                     {
                         CustomLogger.AddLine("EACheck", "Agregate exception occured");
                         ae.Handle((x) =>
@@ -145,7 +145,7 @@ namespace SimplePartLoader
                             return true;
                         });
                     }
-                    catch(Exception ex) 
+                    catch (Exception ex)
                     {
                         ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
                         CustomLogger.AddLine("EACheck", ex);
@@ -172,6 +172,9 @@ namespace SimplePartLoader
 
                 jsonList.mods.Add(jsonMod);
             }
+
+            if (ModMain.EnableEarlyAccess.Value)
+                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
 
             try
             {

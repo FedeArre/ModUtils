@@ -412,41 +412,48 @@ namespace SimplePartLoader.CarGen
             WheelRR = objective.transform.Find("RearSusp/WheelControllerRR").GetComponent<WheelController>();
             WheelRL = objective.transform.Find("RearSusp/WheelControllerRL").GetComponent<WheelController>();
 
+            WheelFR.maxDriveSlip = 0;
+            WheelFL.maxDriveSlip = 0;
+            WheelRR.maxDriveSlip = 0;
+            WheelRL.maxDriveSlip = 0;
+
             mainCarProps.FRwhellcontroller = WheelFR.gameObject;
             mainCarProps.FLwhellcontroller = WheelFL.gameObject;
             mainCarProps.RRwhellcontroller = WheelRR.gameObject;
             mainCarProps.RLwhellcontroller = WheelRL.gameObject;
 
-            WheelFR.parent = objective;
             WheelFL.parent = objective;
-            WheelRR.parent = objective;
+            WheelFR.parent = objective;
             WheelRL.parent = objective;
+            WheelRR.parent = objective;
 
             // Now we fix the list in VehicleController
-            NWH_WheelFR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
-            NWH_WheelFR.wheelController = WheelFR;
-            NWH_WheelFR.wheelGroupSelector.index = 0;
-            NWH_WheelFR.name = "WheelWheelControllerFR";
-
             NWH_WheelFL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
             NWH_WheelFL.wheelController = WheelFL;
             NWH_WheelFL.wheelGroupSelector.index = 0;
             NWH_WheelFL.name = "WheelWheelControllerFL";
 
-            NWH_WheelRR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
-            NWH_WheelRR.wheelController = WheelRR;
-            NWH_WheelRR.wheelGroupSelector.index = 1;
-            NWH_WheelRR.name = "WheelWheelControllerRR";
+            NWH_WheelFR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
+            NWH_WheelFR.wheelController = WheelFR;
+            NWH_WheelFR.wheelGroupSelector.index = 0;
+            NWH_WheelFR.name = "WheelWheelControllerFR";
+
 
             NWH_WheelRL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
             NWH_WheelRL.wheelController = WheelRL;
             NWH_WheelRL.wheelGroupSelector.index = 1;
             NWH_WheelRL.name = "WheelWheelControllerRL";
 
-            WheelControllers.Add(NWH_WheelRR);
-            WheelControllers.Add(NWH_WheelRL);
-            WheelControllers.Add(NWH_WheelFR);
+            NWH_WheelRR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
+            NWH_WheelRR.wheelController = WheelRR;
+            NWH_WheelRR.wheelGroupSelector.index = 1;
+            NWH_WheelRR.name = "WheelWheelControllerRR";
+
+            
             WheelControllers.Add(NWH_WheelFL);
+            WheelControllers.Add(NWH_WheelFR);
+            WheelControllers.Add(NWH_WheelRL);
+            WheelControllers.Add(NWH_WheelRR);
 
             FrontGroup.name = "Front";
             FrontGroup.ackermanPercent = 0.14f;
@@ -454,7 +461,7 @@ namespace SimplePartLoader.CarGen
             FrontGroup.camberAtBottom = 1;
             FrontGroup.camberAtTop = -5;
             FrontGroup.steerCoefficient = 1;
-            FrontGroup.trackWidth = 1.4559f;
+            FrontGroup.trackWidth = 1.5f;
 
             RearGroup.name = "Rear";
             RearGroup.ackermanPercent = 0;
@@ -588,9 +595,6 @@ namespace SimplePartLoader.CarGen
             vehBrakes.brakeWhileIdle = false;
 
             vehController.brakes = vehBrakes;
-            
-            FrontGroup.antiRollBarForce = 0.6f;
-            RearGroup.antiRollBarForce = 1f;
         }
     }
 }

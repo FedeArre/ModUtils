@@ -12,12 +12,14 @@ namespace Autoupdater.Objects
         public List<JSON_Mod> mods { get; }
         public string GameVersion { get; set; }
         public int BuildId { get; set; }
+        public ulong SteamId { get; set; }
 
         public JSON_ModList(int buildId)
         {
             mods = new List<JSON_Mod>();
             GameVersion = Application.version;
             BuildId = buildId;
+            SteamId = 0; // No need.
         }
     }
 }

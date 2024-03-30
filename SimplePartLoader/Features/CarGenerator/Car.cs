@@ -56,6 +56,7 @@ namespace SimplePartLoader.CarGen
 
             exceptionsObject = new BuildingExceptions();
             FitToCarExceptions = new List<string>();
+            OtherModBuildingExceptions = new List<string>();
         }
         
         public void SetCarTemplateFunction(Action<GameObject> function)

@@ -480,7 +480,10 @@ namespace SimplePartLoader
         {
             if (CustomLogger.DebugEnabled)
             {
-                CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, mod: {p.Mod.Name})");
+                if(p.Mod != null)
+                    CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, mod: {p.Mod.Name})");
+                else
+                    CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, origin mod unknown)");
             }
         }
 

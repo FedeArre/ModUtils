@@ -68,6 +68,11 @@ namespace SimplePartLoader.Utils
 
                 DevLog($"Now copying component to added part ({comp})");
                 addedPart.AddComponent(comp.GetType()).GetCopyOf(comp, true);
+                /*if(comp is Partinfo)
+                {
+                    Partinfo pi = (Partinfo)comp;
+                    addedPart.name = pi.RenamedPrefab != null ? pi.RenamedPrefab : addedPart.name;
+                }*/
             }
             
             AttachPrefabChilds(addedPart, partToAdd);

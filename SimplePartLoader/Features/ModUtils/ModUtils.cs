@@ -1,4 +1,5 @@
-﻿using Rewired;
+﻿using EnviroSamples;
+using Rewired;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace SimplePartLoader
     {
         public static GameObject Player { get; internal set; }
         public static GameObject PlayerHand { get; internal set; }
+        public static FirstPersonAIO PlayerAIO { get; internal set; }
         public static GameObject CursorCanvas { get; internal set; }
         public static tools PlayerTools { get; internal set; }
         public static AudioManager AudioList { get; internal set; }
@@ -42,6 +44,7 @@ namespace SimplePartLoader
             CursorCanvas = GameObject.Find("CursorCanvas");
             PlayerTools = Player.GetComponent<tools>();
             RewiredPlayer = ReInput.players.GetPlayer(0);
+            PlayerAIO = Player.GetComponent<FirstPersonAIO>();
 
             PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();

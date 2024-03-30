@@ -65,7 +65,7 @@ namespace SimplePartLoader.CarGen
                     isParentCustom = true;
                 }
 
-                GameObject part = PartLookup(t.name, isParentCustom, car.exceptionsObject, t.Type);
+                GameObject part = PartLookup(t.name, isParentCustom, car, t.Type);
                 
                 if(t.name == t.transform.parent.name)
                 {
@@ -82,7 +82,7 @@ namespace SimplePartLoader.CarGen
                 }
 
                 SPL_Part splPart = part.GetComponent<SPL_Part>();
-                if (splPart && splPart.Mod != car.loadedBy)
+                if (splPart && splPart.Mod != null && splPart.Mod.Mod != null && splPart.Mod != car.loadedBy)
                 {
                     if(!car.OtherModBuildingExceptions.Contains(splPart.Mod.Mod.ID))
                     {
@@ -135,16 +135,94 @@ namespace SimplePartLoader.CarGen
             return true;
         }
 
-        internal static GameObject PartLookup(string name, bool parentIsCustom, BuildingExceptions exceptions, int type)
+        internal static GameObject PartLookup(string name, bool parentIsCustom, Car car, int type)
         {
             GameObject foundPart = null;
+
+            BuildingExceptions exceptions = car.exceptionsObject;
 
             // Hardcoded exceptions
             if (name == "Spacer")
                 return null;
-            
+
+            // Even faster lookup, priorize mod-loaded stuff first!
+            foreach (Part partObj in car.loadedBy.Parts)
+            {
+                GameObject part = partObj.Prefab;
+
+                if (part == null)
+                    continue;
+
+                if (part.name == name)
+                {
+                    foundPart = part;
+
+                    if (exceptions.ExceptionList.ContainsKey(name))
+                    {
+                        CarProperties carProps = part.GetComponent<CarProperties>();
+                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        {
+                            foundPart = null;
+                            continue;
+                        }
+                    }
+
+                    if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart.GetComponent<CarProperties>().Type != type && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart)
+                        break;
+
+                }
+            }
+
+            if (foundPart)
+                return foundPart;
+
+            // Slow lookup by Partinfo RenamedPrefab. Only happens if part was not found yet (looking on mod parts only)
+            foreach (Part partObj in car.loadedBy.Parts)
+            {
+                GameObject part = partObj.Prefab;
+                if (part == null)
+                    continue;
+
+                Partinfo pi = part.GetComponent<Partinfo>();
+                if (pi.RenamedPrefab == name)
+                {
+                    foundPart = part;
+
+                    if (exceptions.ExceptionList.ContainsKey(name))
+                    {
+                        CarProperties carProps = part.GetComponent<CarProperties>();
+                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        {
+                            foundPart = null;
+                            continue;
+                        }
+                    }
+
+                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart)
+                        break;
+                }
+            }
+
             // Fast lookup, only by GameObject name (Works for almost all parts)
-            foreach(GameObject part in PartManager.gameParts)
+            foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
                     continue;

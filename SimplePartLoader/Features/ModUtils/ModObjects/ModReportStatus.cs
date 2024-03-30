@@ -98,7 +98,7 @@ namespace SimplePartLoader
                                 Transform transformValue = (Transform)field.GetValue(c);
                                 if (transformValue && transformValue.root && transformValue.root.name != carObj.carGeneratorData.CarName)
                                 {
-                                    if (transformValue.root == sceneMananger || transformValue.root == player) continue;
+                                    if (transformValue.root == sceneMananger.root || transformValue.root == player.root) continue;
 
                                     referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {transformValue.name} (parent {transformValue.parent})\n";
                                 }
@@ -109,7 +109,7 @@ namespace SimplePartLoader
                                
                                 if (goValue && goValue.transform && goValue.transform.root && goValue.transform.root.name != carObj.carGeneratorData.CarName)
                                 {
-                                    if (goValue.transform.root == sceneMananger || goValue.transform.root == player || (c.GetType().Name == "CarProperties" && field.Name == "PREFAB")) continue;
+                                    if (goValue.transform.root == sceneMananger.root || goValue.transform.root == player.root || (c.GetType().Name == "CarProperties" && field.Name == "PREFAB")) continue;
 
                                     referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {goValue.transform.name} (parent {goValue.transform.parent})\n";
                                 }
@@ -125,6 +125,23 @@ namespace SimplePartLoader
                     else if(scr.stretchToTarget && !scr.thisTransform)
                         referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName set to {scr.StrechToName} but could not be found\n");
                 }
+
+                m_reportText += $"\n---------TRIGGER PARTS FOUND----------------------\n";
+
+                foreach (CarProperties cp in car.GetComponentsInChildren<CarProperties>())
+                {
+                    if(cp.triger)
+                    {
+                        m_reportText += $"Part {cp.PrefabName} has trigger collider set on, checking colliders & status:\n";
+                        foreach(Collider c in cp.gameObject.GetComponentsInChildren<Collider>())
+                        {
+                            m_reportText += $"{Functions.GetTransformPath(c.transform)} - SCALE: {c.transform.localScale}\n";
+                        }
+                        m_reportText += $"\n";
+                    }
+
+                }
+
 
                 if (!carObj.IssueExternalReport && string.IsNullOrEmpty(referenceIssues)) 
                     m_reportText += $"\n------------------------------------------------------------------------------\n- {carObj.carGeneratorData.CarName} - No issues reported!\n";

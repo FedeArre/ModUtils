@@ -481,5 +481,30 @@ namespace SimplePartLoader
             BuildableMaterials.Add(bm);
             return bm;
         }
+
+        public void LoadCustomMeshObject(AssetBundle bundle, string prefabName)
+        {
+            // Safety checks
+            if (!bundle)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load custom meshes object without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object prefab but it was not found in the AssetBundle {prefabName}");
+
+            CustomMeshes cm = prefab.GetComponent<CustomMeshes>();
+            if (!cm)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object but component was not found in the GameObject {prefabName}");
+
+            if(CustomMeshHandler.IsEngineNameUsed(cm))
+            {
+                CustomLogger.AddLine("CustomMeshes", $"Repeated engine name found, name {cm.EngineName}");
+            }
+
+            CustomMeshHandler.Meshes.Add(cm);
+        }
     }
 }

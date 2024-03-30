@@ -169,8 +169,7 @@ namespace SimplePartLoader
                     CustomLogger.AddLine("Parts", $"Added part: {p.Name} (GameObject name: {p.Prefab}", true);
                 }
             }
-            
-            
+
             foreach (Part p in modLoadedParts)
             {
                 if(!p.Prefab)
@@ -200,9 +199,14 @@ namespace SimplePartLoader
                             dictionary.Value.Add(p.CarProps.PartName, (string)p.languages["English"]); // Fallback to english if no locale was set.
                     }
                 }
+
+                if(p.CarProps.triger)
+                {
+                    p.Prefab.AddComponent<TrigerColliderBug>();
+                }
             }
 
-            if(SPL.PREFAB_NAME_COLLISION_CHECK)
+            if (SPL.PREFAB_NAME_COLLISION_CHECK)
             {
                 CustomLogger.AddLine("PrefabNameCollisionCheck", "Checking for prefab name collisions...");
                 List<string> prefabNames = new List<string>();
@@ -373,9 +377,11 @@ namespace SimplePartLoader
         internal static void LoadPrefabGeneratorParts()
         {
             foreach (Part part in prefabGenParts)
-            {
+            {;
                 // We first get the data from our part
                 PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
+
+                CustomLogger.AddLine("Debug", "Prefab generator trying to generate " + data.PrefabName);
 
                 // We convert all our HexNut / FlatNut / BoltNut / WeldCut to be supported by the game.
                 // This is to allow developers to use either the "Mark as [..]" components or work directly with the components

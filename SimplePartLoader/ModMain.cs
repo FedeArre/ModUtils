@@ -23,6 +23,9 @@ using System.Threading.Tasks;
 using UnityEngine.ProBuilder;
 using SimplePartLoader.Features;
 using SimplePartLoader.Features.CarGenerator;
+using System.Reflection;
+using System.Runtime.ConstrainedExecution;
+using HarmonyLib;
 
 namespace SimplePartLoader
 {
@@ -35,7 +38,7 @@ namespace SimplePartLoader
         public override string Version => "v1.4.0";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "v1.4.1-rc3";
+        string TESTING_VERSION_NUMBER = "v1.5-dev1";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -44,7 +47,7 @@ namespace SimplePartLoader
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -71,6 +74,9 @@ namespace SimplePartLoader
             CustomLogger.AddLine("Main", "Developed by Federico Arredondo - www.github.com/FedeArre");
             if(TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
+
+            var harmony = new Harmony("com.modutils");
+            harmony.PatchAll();
 
             // Deleting unused stuff
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -111,6 +117,7 @@ namespace SimplePartLoader
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
             UI_Developer = AutoupdaterBundle.LoadAsset<GameObject>("DevCanvas");
+            UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
 
             // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
@@ -317,6 +324,37 @@ namespace SimplePartLoader
 
         public override void Update()
         {
+            if(Input.GetKeyDown(KeyCode.M))
+            {
+                RaycastHit rcHit;
+                if(Physics.Raycast(Camera.main.transform.position,   Camera.main.transform.forward, out rcHit, 3.0f))
+                {
+                    if(rcHit.transform.tag == "Vehicle" || rcHit.transform.root.tag == "Vehicle")
+                    {
+                        Transform car = rcHit.transform;
+                        if (car.tag != "Vehicle")
+                            car = car.root;
+                        ModUtils.PlayCashSound();
+
+                        Debug.Log("REPORT OF CAR " + car.name);
+                        foreach (MonoBehaviour c in car.GetComponentsInChildren<MonoBehaviour>())
+                        {
+                            if (c != null)
+                            {
+                                Type type = c.GetType();
+                                if (type == null || type == typeof(CarProperties) || type == typeof(MainCarProperties)) continue;
+                                FieldInfo[] fields = type.GetFields();
+                                foreach (FieldInfo field in fields)
+                                {
+                                    if (field == null) continue;
+
+                                    Debug.Log($"{type.Name} - {field.Name} - {field.GetValue(c)} - {c}");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             if (PlayerTransform)
             {
                 if(PlayerTransform.parent == null && PlayerOnCar)
