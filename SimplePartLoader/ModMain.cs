@@ -29,7 +29,7 @@ using HarmonyLib;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod, IModDescription, IModSettings
+    public class ModMain : Mod
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "ModUtils";
@@ -41,8 +41,6 @@ namespace SimplePartLoader
         string TESTING_VERSION_NUMBER = "v1.5-dev1";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
-
-        public string Description => "Allows you to create awesome stuff!";
 
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
@@ -59,10 +57,6 @@ namespace SimplePartLoader
         AssetBundle Bundle;
         GameObject ModShopPrefab;
         Material FloorMat;
-
-        // Mod settings
-        internal static ModUI.Settings.ModSettings.Toggle TelemetryToggle;
-        public static ModUI.Settings.ModSettings.Toggle EnableEarlyAccess;
 
         public ModMain()
         {
@@ -389,7 +383,7 @@ namespace SimplePartLoader
             }
         }
 
-        public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
+        /*public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
         {
             EnableEarlyAccess = modSettings.AddToggle("Enable Early Access (You need to restart the game for mods to load when enabled)", "EnableEA_ModUtils", false);
             modSettings.AddSpace();
@@ -401,6 +395,6 @@ namespace SimplePartLoader
             modSettings.AddSpace();
         }
 
-        public void ModSettingsLoaded() { }
+        public void ModSettingsLoaded() { }*/
     }
 }
