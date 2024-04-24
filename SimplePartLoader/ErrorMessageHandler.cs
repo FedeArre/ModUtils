@@ -22,6 +22,7 @@ namespace SimplePartLoader
         }
 
         public List<string> DisabledModList = new List<string>();
+        public List<string> DisallowedModList = new List<string>();
         public List<string> UnsupportedModList = new List<string>();
         public bool ThumbnaiLGeneratorEnabled;
         public bool EarlyAccessMod;

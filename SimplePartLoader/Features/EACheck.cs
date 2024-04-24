@@ -129,7 +129,14 @@ namespace SimplePartLoader
                             }
                             else
                             {
-                                ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
+                                if(response.StatusCode == HttpStatusCode.NotFound) // invalid key, update mod
+                                {
+                                    ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
+                                }
+                                else
+                                {
+                                    ErrorMessageHandler.GetInstance().DisallowedModList.Add(Path.GetFileName(item.Key));
+                                }
                                 CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
                                 CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
                             }
