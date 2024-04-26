@@ -76,7 +76,8 @@ namespace SimplePartLoader
                 }
             }
 
-            if(!ModMain.EnableEarlyAccess.Value && foundKeys.Count != 0)
+            // TODO UNCOMMENT
+            if (/*!ModMain.EnableEarlyAccess.Value && */foundKeys.Count != 0)
             {
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
             }
@@ -180,8 +181,9 @@ namespace SimplePartLoader
                 jsonList.mods.Add(jsonMod);
             }
 
-            if (ModMain.EnableEarlyAccess.Value)
-                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            // TODO UNCOMMENT
+            //if (ModMain.EnableEarlyAccess.Value)
+                //jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
 
             try
             {

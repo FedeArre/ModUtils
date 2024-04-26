@@ -27,6 +27,10 @@ namespace SimplePartLoader
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
         internal static List<ModInstance> RegisteredMods = new List<ModInstance>();
+
+        // Delayed function executer
+        internal static ExternalFunctionExecuter DelayFuncExecute;
+
         public static List<ModInstance> ModInstances
         {
             get { return RegisteredMods; }
@@ -60,6 +64,7 @@ namespace SimplePartLoader
 
             GameObject dummy = new GameObject("SPL_Dummy");
             dummy.AddComponent<SPL_CarTracking>().AddToAll();
+            DelayFuncExecute = dummy.AddComponent<ExternalFunctionExecuter>();
         }
 
         internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
@@ -224,6 +229,11 @@ namespace SimplePartLoader
         {
             if (!PartManager.CarCategoriesToAdd.Contains(name))
                 PartManager.CarCategoriesToAdd.Add(name);
+        }
+
+        public static void ExecuteNextFrame(Action functionToCall)
+        {
+            DelayFuncExecute.AddFunction(functionToCall);
         }
     }
 }

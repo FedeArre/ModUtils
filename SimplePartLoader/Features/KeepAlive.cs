@@ -58,16 +58,16 @@ namespace SimplePartLoader
 
                 jsonList.mods.Add(jsonMod);
             }
-
-            if (ModMain.EnableEarlyAccess.Value)
-                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            // TODO UNCOMMENT
+            //if (ModMain.EnableEarlyAccess.Value)
+                //jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
 
             serializedJson = JsonConvert.SerializeObject(jsonList);
         }
         private async void SendCurrentStatus()
-        {
-            if(!ModMain.TelemetryToggle.Value) // If telemetry is not enabled, :(
-                return;
+        {// TODO UNCOMMENT
+         //if(!ModMain.TelemetryToggle.Value) // If telemetry is not enabled, :(
+         //return;
 
             try
             {

@@ -26,6 +26,7 @@ using SimplePartLoader.Features.CarGenerator;
 using System.Reflection;
 using System.Runtime.ConstrainedExecution;
 using HarmonyLib;
+using SimplePartLoader.Features.UI;
 
 namespace SimplePartLoader
 {
@@ -38,14 +39,14 @@ namespace SimplePartLoader
         public override string Version => "v1.4.0";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "v1.5-dev1";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.0-dev2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -66,7 +67,7 @@ namespace SimplePartLoader
 #endif
             CustomLogger.AddLine("Main", "ModUtils is loading - Version: " + Version);
             CustomLogger.AddLine("Main", "Developed by Federico Arredondo - www.github.com/FedeArre");
-            if(TESTING_VERSION_REMEMBER)
+            if (TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
             var harmony = new Harmony("com.modutils");
@@ -74,7 +75,7 @@ namespace SimplePartLoader
 
             // Deleting unused stuff
             string ModsFolderPath = Application.dataPath + "/../Mods/";
-            
+
             if (Directory.Exists(ModsFolderPath + "Autoupdater/"))
             {
                 Directory.Delete(ModsFolderPath + "Autoupdater/", true);
@@ -112,12 +113,13 @@ namespace SimplePartLoader
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
             UI_Developer = AutoupdaterBundle.LoadAsset<GameObject>("DevCanvas");
             UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
+            UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
 
             // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
             ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
             ComputerUI.SetupComputer(AutoupdaterBundle.LoadAsset<GameObject>("AppLauncher"), AutoupdaterBundle.LoadAsset<GameObject>("AppLauncherIcon"));
-            
+
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -129,6 +131,15 @@ namespace SimplePartLoader
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
+
+            // UI update
+            ModInstance mi = ModUtils.RegisterMod(this);
+            mi.AddTextInputToUI("Text input with default value:", "value");
+            mi.AddLabelToUI("Testing!");
+            mi.AddLabelToUI("Testing a bit more, how is this?");
+            mi.AddTextInputToUI("Text input test:");
+            mi.AddLabelToUI("Testing even more, this is very long now. Great!? ModUtils v1.5.0 dev2 UI tests :)\nTrying jump line.");
+
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
@@ -146,6 +157,10 @@ namespace SimplePartLoader
                     CustomLogger.AddLine("Main", $"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
 
+                UI_Mods = GameObject.Instantiate(UI_Mods_Prefab);
+                GameObject.DontDestroyOnLoad(UI_Mods);
+
+                ModUtilsUI.PrepareUI();
                 // Enable heartbeat
                 KeepAlive.GetInstance().Ready();
                 

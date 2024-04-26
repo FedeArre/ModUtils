@@ -30,6 +30,8 @@ namespace SimplePartLoader
 
         internal bool Thumbnails = false;
 
+        internal List<ISetting> ModSettings = new List<ISetting>();
+
         public List<Part> Parts
         {
             get { return loadedParts; }
@@ -505,6 +507,31 @@ namespace SimplePartLoader
             }
 
             CustomMeshHandler.Meshes.Add(cm);
+        }
+
+
+        // Mod settings update
+        public Label AddLabelToUI(string text)
+        {
+            Label label = new Label(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
+
+        public TextInput AddTextInputToUI(string text, string defaultValue = "", Action<string> onValueChange = null)
+        {
+            TextInput textInput = new TextInput(text, defaultValue, onValueChange);
+            ModSettings.Add(textInput);
+
+            return textInput;
+        }
+
+        public ModDropdown AddDropdownToUI(string text, string[] options, int defaultOption = 0, Action<int> onValueChange = null)
+        {
+            ModDropdown dropdown = new ModDropdown(text, options, defaultOption, onValueChange);
+            ModSettings.Add(dropdown);
+            return dropdown;
         }
     }
 }

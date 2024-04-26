@@ -496,8 +496,15 @@
     <Compile Include="Features\Computer\ComputerUI.cs" />
     <Compile Include="Features\DataHandler.cs" />
     <Compile Include="Features\DevUI\DevUI.cs" />
+    <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
     <Compile Include="Features\TrigerColliderBug.cs" />
+    <Compile Include="Features\UI\ModUtilsUI.cs" />
+    <Compile Include="Features\UI\Settings\Dropdown.cs" />
+    <Compile Include="Features\UI\Settings\ISetting.cs" />
+    <Compile Include="Features\UI\Settings\Label.cs" />
+    <Compile Include="Features\UI\Settings\Spacer.cs" />
+    <Compile Include="Features\UI\Settings\TextInput.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
@@ -577,6 +584,7 @@
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
