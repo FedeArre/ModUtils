@@ -3,9 +3,6 @@
 //#define MODUTILS_TIMING_ENABLED
 
 using Autoupdater.Objects;
-using ModUI;
-using ModUI.Settings;
-using static ModUI.Settings.ModSettings;
 using Newtonsoft.Json;
 using SimplePartLoader;
 using SimplePartLoader.CarGen;
@@ -134,12 +131,20 @@ namespace SimplePartLoader
 
             // UI update
             ModInstance mi = ModUtils.RegisterMod(this);
-            mi.AddTextInputToUI("Text input with default value:", "value");
+            mi.AddCheckboxToUI("ModUtils_EnableEA", "Enable Early Access (requires game restart)", false);
+            mi.AddCheckboxToUI("ModUtils_Telemetry", "Enable telemetry (Shares your current mod list for player counts, no data stored)", true);
+            mi.AddSpacerToUI();
+            mi.AddSpacerToUI();
+            mi.AddLabelToUI("Following stuff is testing for v1.5-dev2 - Ignore! :)");
+            mi.AddTextInputToUI("textInputId2", "Text input with default value:", "value");
             mi.AddLabelToUI("Testing!");
             mi.AddLabelToUI("Testing a bit more, how is this?");
-            mi.AddTextInputToUI("Text input test:");
+            mi.AddTextInputToUI("textInputTest", "Text input test:");
             mi.AddLabelToUI("Testing even more, this is very long now. Great!? ModUtils v1.5.0 dev2 UI tests :)\nTrying jump line.");
-
+            mi.AddDropdownToUI("coolDropdown", "Dropdown test", new string[] { "test 1", "test2", "test55" });
+            mi.AddSliderToUI("sliderTest", 0, 10, 2);
+            mi.AddButtonToUI("test butotn");
+            mi.AddCheckboxToUI("checkboxTest", "hola mi vida no desconfies de la musica", true);
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
@@ -163,7 +168,8 @@ namespace SimplePartLoader
                 ModUtilsUI.PrepareUI();
                 // Enable heartbeat
                 KeepAlive.GetInstance().Ready();
-                
+
+                SettingSaver.LoadSettings();
                 return;
             }
         }

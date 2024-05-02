@@ -12,9 +12,11 @@ namespace SimplePartLoader
         public string[] Options;
         public int selectedOption;
         public Action<int> OnValueChange = null;
+        public string SettingSaveId;
 
-        public ModDropdown(string text, string[] options, int selectedOption = 0, Action<int> onValueChange = null)
+        public ModDropdown(string saveId, string text, string[] options, int selectedOption = 0, Action<int> onValueChange = null)
         {
+            SettingSaveId = saveId;
             this.Text = text;
             this.Options = options;
             this.selectedOption = selectedOption;

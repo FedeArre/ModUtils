@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Rewired;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,19 @@ using System.Threading.Tasks;
 
 namespace SimplePartLoader
 {
-    public class TextInput : ISetting
+    public class Checkbox : ISetting
     {
         public string Text;
-        public string CurrentValue;
-        public Action<string> OnValueChange = null;
+        public bool Checked;
+        public Action<bool> OnValueChange;
+
         public string SettingSaveId;
 
-        public TextInput(string saveId, string text, string currentValue, Action<string> onValueChange)
+        public Checkbox(string saveId, string text, bool @checked, Action<bool> onValueChange = null)
         {
             SettingSaveId = saveId;
             Text = text;
-            CurrentValue = currentValue;
+            Checked = @checked;
             OnValueChange = onValueChange;
         }
     }

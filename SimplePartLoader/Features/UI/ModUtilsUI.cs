@@ -28,8 +28,11 @@ namespace SimplePartLoader.Features.UI
         static GameObject textInputSettingPrefab;
         static GameObject dropdownSettingPrefab;
         static GameObject spacerSettingPrefab;
+        static GameObject sliderSettingPrefab;
+        static GameObject buttonSettingPrefab;
+        static GameObject checkboxSettingPrefab;
 
-        static GameObject eventSystemSpecial;
+       // static GameObject eventSystemSpecial;
 
         static ModInstance currentModInstance = null;
 
@@ -48,14 +51,18 @@ namespace SimplePartLoader.Features.UI
             labelSettingPrefab = panel.Find("SettingLabelPrefab").gameObject;
             textInputSettingPrefab = panel.Find("SettingTextInputPrefab").gameObject;
             dropdownSettingPrefab = panel.Find("SettingDropdownPrefab").gameObject;
+            sliderSettingPrefab = panel.Find("SettingSliderPrefab").gameObject;
+            buttonSettingPrefab = panel.Find("SettingButtonPrefab").gameObject;
+            checkboxSettingPrefab = panel.Find("SettingCheckboxPrefab").gameObject;
             spacerSettingPrefab = panel.Find("SettingSpacer").gameObject;
 
             panel.Find("Footer").GetComponent<TMP_Text>().text = $"ModUtils {ModMain.TESTING_VERSION_NUMBER} - Developed by Federico Arredondo";
             panel.gameObject.SetActive(false);
+            ModMain.UI_Mods.GetComponent<Canvas>().sortingOrder = 500;
 
-            eventSystemSpecial = new GameObject("ModUtilsUI_EventSystem_<3");
+            /*eventSystemSpecial = new GameObject("ModUtilsUI_EventSystem_<3");
             eventSystemSpecial.AddComponent<EventSystem>();
-            GameObject.DontDestroyOnLoad(eventSystemSpecial);
+            GameObject.DontDestroyOnLoad(eventSystemSpecial);*/
 
             // Make button work
             ModMain.UI_Mods.transform.Find("OpenMods").GetComponent<Button>().onClick.AddListener(ModsButtonClick);
@@ -94,7 +101,7 @@ namespace SimplePartLoader.Features.UI
             if (currentModInstance != null) CloseButtonClick();
 
             panel.gameObject.SetActive(!panel.gameObject.activeSelf);
-            eventSystemSpecial.SetActive(!eventSystemSpecial.activeSelf);
+            //eventSystemSpecial.SetActive(!eventSystemSpecial.activeSelf);
         }
 
         /// <summary>
@@ -115,11 +122,13 @@ namespace SimplePartLoader.Features.UI
                 exitButtonText.text = "X";
                 titleText.text = "List of loaded mods";
                 currentModInstance = null;
+
+                SettingSaver.SaveSettings();
             }
             else
             {
                 panel.gameObject.SetActive(false);
-                eventSystemSpecial.SetActive(false);
+                //eventSystemSpecial.SetActive(false);
             }
         }
 
@@ -157,6 +166,7 @@ namespace SimplePartLoader.Features.UI
                     TMP_InputField field = tr.Find("InputField").GetComponent<TMP_InputField>();
                     field.text = l.CurrentValue;
 
+                    field.onValueChanged.AddListener(delegate { l.CurrentValue = field.text; });
                     if (l.OnValueChange != null) field.onValueChanged.AddListener(delegate { l.OnValueChange.Invoke(field.text);  });
                 }
                 else if(setting is ModDropdown)
@@ -164,18 +174,21 @@ namespace SimplePartLoader.Features.UI
                     ModDropdown d = (ModDropdown)setting;
                     if (d.Options == null || d.Options.Length == 0) continue;
 
-                    Transform tr = GameObject.Instantiate(textInputSettingPrefab).transform;
+                    Transform tr = GameObject.Instantiate(dropdownSettingPrefab).transform;
                     tr.SetParent(modSettingsAttach);
                     tr.localScale = Vector3.one;
                     tr.gameObject.SetActive(true);
 
                     tr.Find("Text").GetComponent<TMP_Text>().text = d.Text;
                     TMP_Dropdown dropdown = tr.Find("Dropdown").GetComponent<TMP_Dropdown>();
+                    
                     dropdown.ClearOptions();
                     dropdown.AddOptions(d.Options.ToList());
 
                     dropdown.value = d.selectedOption;
-                    dropdown.onValueChanged.AddListener(delegate { d.OnValueChange.Invoke(dropdown.value); });
+                    dropdown.onValueChanged.AddListener(delegate { d.selectedOption = dropdown.value;  });
+
+                    if(d.OnValueChange != null) dropdown.onValueChanged.AddListener(delegate { d.OnValueChange.Invoke(dropdown.value); });
                 }
                 else if(setting is Spacer)
                 {
@@ -184,7 +197,63 @@ namespace SimplePartLoader.Features.UI
                     tr.localScale = Vector3.one;
                     tr.gameObject.SetActive(true);
                 }
+                else if(setting is ModSlider)
+                {
+                    ModSlider sl = (ModSlider)setting;
+                    Transform tr = GameObject.Instantiate(sliderSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    TMP_Text textValue = tr.transform.Find("Text").GetComponent<TMP_Text>();
+                    textValue.text = "Value: " + sl.Value;
+                    tr.transform.Find("MaxValue").GetComponent<TMP_Text>().text = ""+sl.MaxValue;
+                    tr.transform.Find("MinValue").GetComponent<TMP_Text>().text = ""+sl.MinValue;
+
+                    Slider slider = tr.transform.Find("Slider").GetComponent<Slider>();
+                    slider.minValue = sl.MinValue;
+                    slider.maxValue = sl.MaxValue;
+                    slider.value = sl.Value;
+                    slider.wholeNumbers = sl.WholeNumbers;
+
+                    slider.onValueChanged.AddListener(delegate { sl.Value = slider.value; });
+                    slider.onValueChanged.AddListener(delegate { UpdateSlider(textValue, slider.value);  });
+                    if (sl.OnValueChanged != null) slider.onValueChanged.AddListener(delegate { sl.OnValueChanged.Invoke(slider.value); });
+                }
+                else if(setting is ModButton)
+                {
+                    ModButton modButton = (ModButton)setting;
+                    Transform tr = GameObject.Instantiate(buttonSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    tr.Find("Button/Text (TMP)").GetComponent<TMP_Text>().text = modButton.Text;
+
+                    if(modButton.OnButtonPress != null) tr.Find("Button").GetComponent<Button>().onClick.AddListener(delegate { modButton.OnButtonPress.Invoke(); });
+                }
+                else if(setting is Checkbox)
+                {
+                    Checkbox checkbox = (Checkbox)setting;
+                    Transform tr = GameObject.Instantiate(checkboxSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    Toggle toggle = tr.Find("Toggle").GetComponent<Toggle>();
+                    toggle.isOn = checkbox.Checked;
+
+                    toggle.onValueChanged.AddListener(delegate { checkbox.Checked = toggle.isOn; });
+                    if (checkbox.OnValueChange != null) toggle.onValueChanged.AddListener(delegate { checkbox.OnValueChange.Invoke(toggle.isOn); });
+
+                    tr.Find("Toggle/Text (TMP)").GetComponent<TMP_Text>().text = checkbox.Text;
+                }
             }
+        }
+
+        internal static void UpdateSlider(TMP_Text t, float value)
+        {
+            t.text = $"Value: {value}";
         }
 
         internal static ModInstance FindModInstance(Mod mod)

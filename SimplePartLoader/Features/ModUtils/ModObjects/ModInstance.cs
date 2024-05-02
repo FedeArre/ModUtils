@@ -518,20 +518,67 @@ namespace SimplePartLoader
 
             return label;
         }
-
-        public TextInput AddTextInputToUI(string text, string defaultValue = "", Action<string> onValueChange = null)
+        public void AddSpacerToUI()
         {
-            TextInput textInput = new TextInput(text, defaultValue, onValueChange);
+            Spacer s = new Spacer();
+            ModSettings.Add(s);
+        }
+
+        public TextInput AddTextInputToUI(string saveId, string text, string defaultValue = "", Action<string> onValueChange = null)
+        {
+            TextInput textInput = new TextInput(saveId, text, defaultValue, onValueChange);
             ModSettings.Add(textInput);
 
             return textInput;
         }
 
-        public ModDropdown AddDropdownToUI(string text, string[] options, int defaultOption = 0, Action<int> onValueChange = null)
+        public ModDropdown AddDropdownToUI(string saveId, string text, string[] options, int defaultOption = 0, Action<int> onValueChange = null)
         {
-            ModDropdown dropdown = new ModDropdown(text, options, defaultOption, onValueChange);
+            ModDropdown dropdown = new ModDropdown(saveId, text, options, defaultOption, onValueChange);
             ModSettings.Add(dropdown);
             return dropdown;
+        }
+
+        public ModSlider AddSliderToUI(string saveId, float minValue, float maxValue, float value, bool wholeNumbers = true, Action<float> onValueChange = null)
+        {
+            if(minValue > maxValue || value < minValue || value > maxValue)
+            {
+                CustomLogger.AddLine("ModUtilsUI", $"Wrong setup of slider in {Mod.ID} - discarding setting!");
+                return null;
+            }
+
+            ModSlider s = new ModSlider(saveId, minValue, maxValue, value, wholeNumbers, onValueChange);
+            ModSettings.Add(s);
+            return s;
+        }
+
+        public ModButton AddButtonToUI(string text, Action onButtonClick = null)
+        {
+            ModButton mb = new ModButton(text, onButtonClick);
+            ModSettings.Add(mb);
+            return mb;
+        }
+
+        public Checkbox AddCheckboxToUI(string saveId, string text, bool value, Action<bool> onValueChange = null) 
+        {
+            Checkbox ch = new Checkbox(saveId, text, value, onValueChange);
+            ModSettings.Add(ch);
+            return ch;
+        }
+
+        internal List<ISetting> GetSaveablesSettings()
+        {
+            List<ISetting> settings = new List<ISetting>();
+
+            foreach(ISetting setting in ModSettings)
+            {
+                if(setting is Checkbox || setting is ModSlider || setting is ModDropdown || setting is TextInput)
+                {
+                    settings.Add(setting);
+                }
+            }
+
+            return settings.Count == 0 ? null : settings;
         }
     }
 }
