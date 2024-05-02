@@ -58,7 +58,7 @@ namespace SimplePartLoader.Features.UI
 
             panel.Find("Footer").GetComponent<TMP_Text>().text = $"ModUtils {ModMain.TESTING_VERSION_NUMBER} - Developed by Federico Arredondo";
             panel.gameObject.SetActive(false);
-            ModMain.UI_Mods.GetComponent<Canvas>().sortingOrder = 500;
+            ModMain.UI_Mods.GetComponent<Canvas>().sortingOrder = 501;
 
             /*eventSystemSpecial = new GameObject("ModUtilsUI_EventSystem_<3");
             eventSystemSpecial.AddComponent<EventSystem>();

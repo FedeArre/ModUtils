@@ -21,7 +21,7 @@ namespace SimplePartLoader
         private KeepAlive()
         {
             // UNSAFE! This has to be removed after ModUtils backend update!
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            //ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
             // Keep the json to post on memory
             JSON_ModList jsonList = new JSON_ModList(-1);
@@ -58,16 +58,16 @@ namespace SimplePartLoader
 
                 jsonList.mods.Add(jsonMod);
             }
-            // TODO UNCOMMENT
-            //if (ModMain.EnableEarlyAccess.Value)
-                //jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+
+            if (ModMain.EA_Enabled.Checked)
+                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
 
             serializedJson = JsonConvert.SerializeObject(jsonList);
         }
         private async void SendCurrentStatus()
-        {// TODO UNCOMMENT
-         //if(!ModMain.TelemetryToggle.Value) // If telemetry is not enabled, :(
-         //return;
+        {
+            if(!ModMain.Telemetry.Checked)
+                return;
 
             try
             {

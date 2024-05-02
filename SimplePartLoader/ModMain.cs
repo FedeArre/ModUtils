@@ -56,6 +56,8 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
+        internal static Checkbox EA_Enabled, Telemetry;
+
         public ModMain()
         {
 #if MODUTILS_TIMING_ENABLED
@@ -126,13 +128,12 @@ namespace SimplePartLoader
             PaintingSystem.CullBaseMaterial = AutoupdaterBundle.LoadAsset<Material>("testMat");
             AutoupdaterBundle.Unload(false);
 
-            ModUtils.SetupSteamworks();
-            MainCarGenerator.BaseSetup();
-
             // UI update
             ModInstance mi = ModUtils.RegisterMod(this);
-            mi.AddCheckboxToUI("ModUtils_EnableEA", "Enable Early Access (requires game restart)", false);
-            mi.AddCheckboxToUI("ModUtils_Telemetry", "Enable telemetry (Shares your current mod list for player counts, no data stored)", true);
+            mi.SetSettingsLoadedFunction(LoadSettings);
+            EA_Enabled = mi.AddCheckboxToUI("ModUtils_EnableEA", "Enable Early Access (requires game restart)", false);
+            mi.AddLabelToUI("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
+            Telemetry = mi.AddCheckboxToUI("ModUtils_Telemetry", "Telemetry enabled", true);
             mi.AddSpacerToUI();
             mi.AddSpacerToUI();
             mi.AddLabelToUI("Following stuff is testing for v1.5-dev2 - Ignore! :)");
@@ -145,6 +146,10 @@ namespace SimplePartLoader
             mi.AddSliderToUI("sliderTest", 0, 10, 2);
             mi.AddButtonToUI("test butotn");
             mi.AddCheckboxToUI("checkboxTest", "hola mi vida no desconfies de la musica", true);
+
+            ModUtils.SetupSteamworks();
+            MainCarGenerator.BaseSetup();
+
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
@@ -166,9 +171,6 @@ namespace SimplePartLoader
                 GameObject.DontDestroyOnLoad(UI_Mods);
 
                 ModUtilsUI.PrepareUI();
-                // Enable heartbeat
-                KeepAlive.GetInstance().Ready();
-
                 SettingSaver.LoadSettings();
                 return;
             }
@@ -404,18 +406,10 @@ namespace SimplePartLoader
             }
         }
 
-        /*public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
+        public  void LoadSettings()
         {
-            EnableEarlyAccess = modSettings.AddToggle("Enable Early Access (You need to restart the game for mods to load when enabled)", "EnableEA_ModUtils", false);
-            modSettings.AddSpace();
-            modSettings.AddSpace();
-            TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);
-            modSettings.AddLabel("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
-            modSettings.AddSpace();
-            modSettings.AddSpace();
-            modSettings.AddSpace();
+            // Enable heartbeat
+            KeepAlive.GetInstance().Ready();
         }
-
-        public void ModSettingsLoaded() { }*/
     }
 }

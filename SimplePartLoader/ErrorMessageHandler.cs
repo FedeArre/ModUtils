@@ -32,8 +32,6 @@ namespace SimplePartLoader
 
         void OnGUI()
         {
-            // TODO
-            return;
             if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod && DebugEnabled.Count == 0 && Dissasembler.Count == 0 && UpdateRequired.Count == 0)
                 return;
 

@@ -35,91 +35,112 @@ namespace SimplePartLoader.Features.UI
                 return;
             }
 
-            foreach(ModInstance mod in ModUtils.RegisteredMods)
+            try
             {
-                ModWrapper modWrapper = GetModOnWrapper(mod.Mod.ID);
-                if (modWrapper == null || modWrapper.Settings.Count == 0) continue;
-                Dictionary<string, string> dicSettings = new Dictionary<string, string>();
-
-                foreach(SettingWrapper sw in modWrapper.Settings)
+                foreach (ModInstance mod in ModUtils.RegisteredMods)
                 {
-                    try
-                    { 
-                        dicSettings.Add(sw.Id, sw.Value.ToString());
-                    }
-                    catch(Exception ex)
+                    ModWrapper modWrapper = GetModOnWrapper(mod.Mod.ID);
+                    if (modWrapper == null || modWrapper.Settings.Count == 0) continue;
+                    Dictionary<string, string> dicSettings = new Dictionary<string, string>();
+
+                    foreach (SettingWrapper sw in modWrapper.Settings)
                     {
-                        CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load CAST - {sw.Id}");
-                        CustomLogger.AddLine("SettingSaver", ex);
+                        try
+                        {
+                            dicSettings.Add(sw.Id, sw.Value.ToString());
+                        }
+                        catch (Exception ex)
+                        {
+                            CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load CAST - {sw.Id}");
+                            CustomLogger.AddLine("SettingSaver", ex);
+                        }
+                    }
+
+                    foreach (ISetting setting in mod.ModSettings)
+                    {
+                        if (setting is TextInput)
+                        {
+                            var temp = (TextInput)setting;
+                            if (dicSettings.ContainsKey(temp.SettingSaveId))
+                            {
+                                try
+                                {
+                                    temp.CurrentValue = dicSettings[temp.SettingSaveId];
+                                }
+                                catch (Exception ex)
+                                {
+                                    CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
+                                    CustomLogger.AddLine("SettingSaver", ex);
+                                }
+                            }
+                        }
+                        else if (setting is ModDropdown)
+                        {
+                            var temp = (ModDropdown)setting;
+                            if (dicSettings.ContainsKey(temp.SettingSaveId))
+                            {
+                                try
+                                {
+                                    temp.selectedOption = int.Parse(dicSettings[temp.SettingSaveId]);
+                                }
+                                catch (Exception ex)
+                                {
+                                    CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
+                                    CustomLogger.AddLine("SettingSaver", ex);
+                                }
+                            }
+                        }
+                        else if (setting is ModSlider)
+                        {
+                            var temp = (ModSlider)setting;
+                            if (dicSettings.ContainsKey(temp.SettingSaveId))
+                            {
+                                try
+                                {
+                                    temp.Value = float.Parse(dicSettings[temp.SettingSaveId]);
+                                }
+                                catch (Exception ex)
+                                {
+                                    CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
+                                    CustomLogger.AddLine("SettingSaver", ex);
+                                }
+                            }
+                        }
+                        else if (setting is Checkbox)
+                        {
+                            var temp = (Checkbox)setting;
+                            if (dicSettings.ContainsKey(temp.SettingSaveId))
+                            {
+                                try
+                                {
+                                    temp.Checked = bool.Parse(dicSettings[temp.SettingSaveId]);
+                                }
+                                catch (Exception ex)
+                                {
+                                    CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
+                                    CustomLogger.AddLine("SettingSaver", ex);
+                                }
+                            }
+                        }
                     }
                 }
+            }
 
-                foreach(ISetting setting in mod.ModSettings)
+            catch (Exception ex)
+            {
+                CustomLogger.AddLine("SettingSaver", $"MAJOR ISSUE on ModSettings load - Not properly handled!");
+                CustomLogger.AddLine("SettingSaver", ex);
+            }
+
+            // Settings are now loaded
+            foreach (ModInstance mi in ModUtils.RegisteredMods)
+            {
+                if (mi.ModSettings.Count == 0) continue;
+                if (mi.SettingsLoaded) continue;
+                if (mi.OnSettingsLoad != null)
                 {
-                    if(setting is TextInput)
-                    {
-                        var temp = (TextInput)setting;
-                        if(dicSettings.ContainsKey(temp.SettingSaveId))
-                        {
-                            try
-                            {
-                                temp.CurrentValue = dicSettings[temp.SettingSaveId];
-                            }
-                            catch(Exception ex)
-                            {
-                                CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
-                                CustomLogger.AddLine("SettingSaver", ex);
-                            }
-                        }
-                    }
-                    else if (setting is ModDropdown)
-                    {
-                        var temp = (ModDropdown)setting;
-                        if (dicSettings.ContainsKey(temp.SettingSaveId))
-                        {
-                            try
-                            {
-                                temp.selectedOption = int.Parse(dicSettings[temp.SettingSaveId]);
-                            }
-                            catch (Exception ex)
-                            {
-                                CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
-                                CustomLogger.AddLine("SettingSaver", ex);
-                            }
-                        }
-                    }
-                    else if (setting is ModSlider)
-                    {
-                        var temp = (ModSlider)setting;
-                        if (dicSettings.ContainsKey(temp.SettingSaveId))
-                        {
-                            try
-                            {
-                                temp.Value = float.Parse(dicSettings[temp.SettingSaveId]);
-                            }
-                            catch (Exception ex)
-                            {
-                                CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
-                                CustomLogger.AddLine("SettingSaver", ex);
-                            }
-                        }
-                    }
-                    else if (setting is Checkbox)
-                    {
-                        var temp = (Checkbox)setting;
-                        if (dicSettings.ContainsKey(temp.SettingSaveId))
-                        {
-                            try
-                            {
-                                temp.Checked = bool.Parse(dicSettings[temp.SettingSaveId]);
-                            }
-                            catch (Exception ex)
-                            {
-                                CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
-                                CustomLogger.AddLine("SettingSaver", ex);
-                            }
-                        }
-                    }
+                    mi.SettingsLoaded = true;
+                    mi.OnSettingsLoad.Invoke();
                 }
             }
         }

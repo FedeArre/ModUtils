@@ -1,6 +1,7 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
 using SimplePartLoader.Features.Autoupdating;
+using SimplePartLoader.Features.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -52,6 +53,7 @@ namespace SimplePartLoader
             ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID; // User SteamID
             CustomLogger.AddLine("EACheck", $"Identified user: " + steamID);
             CustomLogger.AddLine("EACheck", $"App build id: " + Steamworks.SteamApps.GetAppBuildId());
+
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
             // Load keys
@@ -76,8 +78,7 @@ namespace SimplePartLoader
                 }
             }
 
-            // TODO UNCOMMENT
-            if (/*!ModMain.EnableEarlyAccess.Value && */foundKeys.Count != 0)
+            if (!ModMain.EA_Enabled.Checked && foundKeys.Count != 0)
             {
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
             }
@@ -168,7 +169,9 @@ namespace SimplePartLoader
                     mi.Check(steamID);
                 }
             }
-            
+
+            SettingSaver.LoadSettings(); // Reload settings in case an EA mod is using settings. Great edge case.
+
             // Autoupdating stuff goes here too now!
             JSON_ModList jsonList = new JSON_ModList(0);
             foreach (Mod mod in ModLoader.mods)
@@ -181,9 +184,8 @@ namespace SimplePartLoader
                 jsonList.mods.Add(jsonMod);
             }
 
-            // TODO UNCOMMENT
-            //if (ModMain.EnableEarlyAccess.Value)
-                //jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+            if (ModMain.EA_Enabled.Checked)
+                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
 
             try
             {

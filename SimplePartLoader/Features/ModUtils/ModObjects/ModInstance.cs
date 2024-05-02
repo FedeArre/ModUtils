@@ -32,6 +32,9 @@ namespace SimplePartLoader
 
         internal List<ISetting> ModSettings = new List<ISetting>();
 
+        internal Action OnSettingsLoad;
+        internal bool SettingsLoaded;
+
         public List<Part> Parts
         {
             get { return loadedParts; }
@@ -564,6 +567,11 @@ namespace SimplePartLoader
             Checkbox ch = new Checkbox(saveId, text, value, onValueChange);
             ModSettings.Add(ch);
             return ch;
+        }
+
+        public void SetSettingsLoadedFunction(Action func)
+        {
+            OnSettingsLoad = func;
         }
 
         internal List<ISetting> GetSaveablesSettings()
