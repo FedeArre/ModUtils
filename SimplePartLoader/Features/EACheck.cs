@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Policy;
 using System.Text;
@@ -84,12 +85,15 @@ namespace SimplePartLoader
             }
             else if (foundKeys.Count != 0)
             {
+                Stopwatch watch = new Stopwatch();
                 // If we have keys, we now start loading the mods
                 foreach (var item in foundKeys)
                 {
                     CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
+                    watch.Start();
                     try
                     {
+                        ServicePointManager.DefaultConnectionLimit = 15;
                         using (HttpClient client = new HttpClient())
                         {
                             client.Timeout = TimeSpan.FromMinutes(30);
@@ -99,10 +103,13 @@ namespace SimplePartLoader
                             eamo.SteamId = steamID + "";
 
                             HttpContent content = new StringContent(JsonConvert.SerializeObject(eamo), System.Text.Encoding.UTF8, "application/json");
+                            client.DefaultRequestHeaders.Range = new RangeHeaderValue(0, 300);
                             HttpResponseMessage response = client.PostAsync(ModMain.API_URL + "/eachecknew", content).Result;
+                            watch.Stop();
 
-                            CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode}");
+                            CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode} and took {watch.ElapsedMilliseconds}ms");
 
+                            watch.Start();
                             if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound)
                             {
                                 byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
@@ -127,7 +134,7 @@ namespace SimplePartLoader
                                     }
                                 }
 
-                                CustomLogger.AddLine("EACheck", $"Succesfully loaded " + Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.");
                             }
                             else
                             {
@@ -158,6 +165,10 @@ namespace SimplePartLoader
                     {
                         ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
                         CustomLogger.AddLine("EACheck", ex);
+                    }
+                    finally
+                    {
+                        watch.Restart();
                     }
                 }
             }

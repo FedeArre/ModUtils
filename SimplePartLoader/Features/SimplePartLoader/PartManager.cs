@@ -199,11 +199,6 @@ namespace SimplePartLoader
                             dictionary.Value.Add(p.CarProps.PartName, (string)p.languages["English"]); // Fallback to english if no locale was set.
                     }
                 }
-
-                if(p.CarProps.triger)
-                {
-                    p.Prefab.AddComponent<TrigerColliderBug>();
-                }
             }
 
             if (SPL.PREFAB_NAME_COLLISION_CHECK)

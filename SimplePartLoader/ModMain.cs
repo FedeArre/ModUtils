@@ -43,7 +43,7 @@ namespace SimplePartLoader
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -58,12 +58,16 @@ namespace SimplePartLoader
 
         internal static Checkbox EA_Enabled, Telemetry;
 
+        Stopwatch watch;
         public ModMain()
         {
 #if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 #endif
+            watch = new System.Diagnostics.Stopwatch();
+            watch.Start();
+
             CustomLogger.AddLine("Main", "ModUtils is loading - Version: " + Version);
             CustomLogger.AddLine("Main", "Developed by Federico Arredondo - www.github.com/FedeArre");
             if (TESTING_VERSION_REMEMBER)
@@ -113,6 +117,7 @@ namespace SimplePartLoader
             UI_Developer = AutoupdaterBundle.LoadAsset<GameObject>("DevCanvas");
             UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
             UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
+            UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
 
             // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
@@ -160,6 +165,9 @@ namespace SimplePartLoader
         {
             if (!MenuFirstLoad)
             {
+                watch.Stop();
+                CustomLogger.AddLine("Timing", $"Mods took {watch.ElapsedMilliseconds} ms to load.");
+
                 MenuFirstLoad = true;
                 CustomLogger.AddLine("Main", "Printing mod list");
                 foreach (Mod m in ModLoader.mods)
@@ -174,6 +182,9 @@ namespace SimplePartLoader
                 SettingSaver.LoadSettings();
                 return;
             }
+
+            UI_Mods.SetActive(true);
+            UI_Mods.transform.Find("OpenMods").localScale = Vector3.one;
         }
 
         public override void OnLoad()
@@ -248,7 +259,10 @@ namespace SimplePartLoader
                     Debug.Log("[ModUtils/Dev]: Loaded " + save.table.Count + " entries.");
                 }
             }
-            
+
+            UI_Mods.transform.Find("OpenMods").localScale = Vector3.one / 2;
+            UI_Mods.SetActive(false);
+
             // Mod shop load
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
@@ -341,37 +355,6 @@ namespace SimplePartLoader
 
         public override void Update()
         {
-            if(Input.GetKeyDown(KeyCode.M))
-            {
-                RaycastHit rcHit;
-                if(Physics.Raycast(Camera.main.transform.position,   Camera.main.transform.forward, out rcHit, 3.0f))
-                {
-                    if(rcHit.transform.tag == "Vehicle" || rcHit.transform.root.tag == "Vehicle")
-                    {
-                        Transform car = rcHit.transform;
-                        if (car.tag != "Vehicle")
-                            car = car.root;
-                        ModUtils.PlayCashSound();
-
-                        Debug.Log("REPORT OF CAR " + car.name);
-                        foreach (MonoBehaviour c in car.GetComponentsInChildren<MonoBehaviour>())
-                        {
-                            if (c != null)
-                            {
-                                Type type = c.GetType();
-                                if (type == null || type == typeof(CarProperties) || type == typeof(MainCarProperties)) continue;
-                                FieldInfo[] fields = type.GetFields();
-                                foreach (FieldInfo field in fields)
-                                {
-                                    if (field == null) continue;
-
-                                    Debug.Log($"{type.Name} - {field.Name} - {field.GetValue(c)} - {c}");
-                                }
-                            }
-                        }
-                    }
-                }
-            }
             if (PlayerTransform)
             {
                 if(PlayerTransform.parent == null && PlayerOnCar)
@@ -388,6 +371,16 @@ namespace SimplePartLoader
                         PlayerOnCar = true;
                         ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
                     }
+                }
+
+                if(ModUtils.PlayerTools.EscMenu.activeSelf && !UI_Mods.activeSelf)
+                {
+                    UI_Mods.SetActive(true);
+                }
+
+                else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf)
+                {
+                    UI_Mods.SetActive(false);
                 }
             }
         }

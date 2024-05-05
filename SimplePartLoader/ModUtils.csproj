@@ -493,7 +493,6 @@
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
-    <Compile Include="Features\TrigerColliderBug.cs" />
     <Compile Include="Features\UI\ModUtilsUI.cs" />
     <Compile Include="Features\UI\Saving\SettingSaver.cs" />
     <Compile Include="Features\UI\Saving\UISettingsWrapper.cs" />
@@ -505,6 +504,7 @@
     <Compile Include="Features\UI\Settings\Slider.cs" />
     <Compile Include="Features\UI\Settings\Spacer.cs" />
     <Compile Include="Features\UI\Settings\TextInput.cs" />
+    <Compile Include="Features\UniLog.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />

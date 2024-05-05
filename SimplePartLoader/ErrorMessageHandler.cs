@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SimplePartLoader
 {
@@ -29,103 +31,97 @@ namespace SimplePartLoader
         public List<string> DebugEnabled = new List<string>();
         public List<string> Dissasembler = new List<string>();
         public List<string> UpdateRequired = new List<string>();
+        GameObject ui;
 
-        void OnGUI()
+        void Start()
         {
             if (DisabledModList.Count == 0 && !ThumbnaiLGeneratorEnabled && UnsupportedModList.Count == 0 && !EarlyAccessMod && DebugEnabled.Count == 0 && Dissasembler.Count == 0 && UpdateRequired.Count == 0)
                 return;
 
-            int nextLineHeight = 20;
-            int totalSpaceCountReq = DisabledModList.Count + UnsupportedModList.Count + DebugEnabled.Count + Dissasembler.Count + UpdateRequired.Count;
+            ui = GameObject.Instantiate(ModMain.UI_Info_Prefab);
 
-            GUI.Box(new Rect(Screen.width - 350, 400, 300, 120 + (totalSpaceCountReq*15)), "ModUtils warnings");
-            
+            int totalSpaceCountReq = DisabledModList.Count + UnsupportedModList.Count + DebugEnabled.Count + Dissasembler.Count + UpdateRequired.Count;
+            totalSpaceCountReq *= 15;
+            ui.transform.Find("Panel").GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalSpaceCountReq);
+            string textToAdd = "ModUtils warnings";
+
             if (DisabledModList.Count != 0)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "EA check could not authentify some mods");
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mods were disabled:");
-                nextLineHeight += 15;
+                textToAdd += "\nEA check could not authentify some mods";
+                textToAdd += "\nThe following mods were disabled:";
                 
                 foreach (string mod in DisabledModList)
                 {
-                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
-                    nextLineHeight += 15;
+                    textToAdd += "\n- " + mod;
                 }
             }
 
             if (UpdateRequired.Count != 0)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Following EA mod(s) are not updated");
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Updating them is required to make them work");
-                nextLineHeight += 15;
+                textToAdd += "\nFollowing EA mod(s) are not updated";
+                textToAdd += "\nUpdating them is required to make them work";
 
                 foreach (string mod in UpdateRequired)
                 {
-                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
-                    nextLineHeight += 15;
+                    textToAdd += "\n- " + mod;
                 }
             }
 
             if (ThumbnaiLGeneratorEnabled)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Thumbnail generator enabled!");
-                nextLineHeight += 15;
+                textToAdd += "\nThumbnail generator enabled!";
             }
 
             if (DebugEnabled.Count != 0)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mod(s) enabled debug options: ");
-                nextLineHeight += 15;
+                textToAdd += "\nThe following mod(s) enabled debug options: ";
 
                 foreach (string mod in DebugEnabled)
                 {
-                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
-                    nextLineHeight += 15;
+                    textToAdd += "\n - " + mod;
                 }
             }
 
             if (Dissasembler.Count != 0)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mod(s) enabled save dissasembler: ");
-                nextLineHeight += 15;
+                textToAdd += "\nThe following mod(s) enabled save dissasembler: ";
 
                 foreach (string mod in Dissasembler)
                 {
-                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
-                    nextLineHeight += 15;
+                    textToAdd += "\n - " + mod;
                 }
             }
 
             if (EarlyAccessMod)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "Early Access (EA) mod detected but loading");
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "EA mods are not enabled. Enable them on settings");
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "and restart the game");
+                textToAdd += "\nEarly Access (EA) mod detected but loading";
+                textToAdd += "\nEA mods are not enabled. Enable them on settings";
+                textToAdd += "\nand restart the game";
             }
 
             if (UnsupportedModList.Count != 0)
             {
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "The following mods are marked as");
-                nextLineHeight += 15;
-                GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "unsupported / obsolete by the mod author: ");
-                nextLineHeight += 15;
+                textToAdd += "\nThe following mods are marked as";
+                textToAdd += "\nunsupported / obsolete by the mod author: ";
                 foreach (string mod in UnsupportedModList)
                 {
-                    GUI.Label(new Rect(Screen.width - 345, 400 + nextLineHeight, 280, 20), "- " + mod);
-                    nextLineHeight += 15;
+                    textToAdd += "\n - " + mod;
                 }
             }
+
+            ui.transform.Find("Panel/Text (TMP)").GetComponent<TMP_Text>().text = textToAdd;
+
+            Button[] bt = Resources.FindObjectsOfTypeAll(typeof(Button)) as Button[];
+            foreach(Button b in bt)
+            {
+                b.onClick.AddListener(remove);
+            }
+        }
+
+        public void remove()
+        {
+            if (!ui) return;
+            GameObject.Destroy(ui);
         }
     }
 }
