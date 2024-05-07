@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 namespace SimplePartLoader.Features.UI
@@ -31,16 +32,22 @@ namespace SimplePartLoader.Features.UI
         static GameObject sliderSettingPrefab;
         static GameObject buttonSettingPrefab;
         static GameObject checkboxSettingPrefab;
+        static GameObject keybindSettingPrefab;
 
        // static GameObject eventSystemSpecial;
 
         static ModInstance currentModInstance = null;
 
+        static KeybindDetector keybindDetector = null;
+        static Keybind currentlyEditingKeybind = null;
+        static TMP_Text currentlyEditingKeybindText = null;
+        static bool editingMultiplier = false;
+
+        static List<string> RegisteredMods = new List<string>();
+
         internal static void PrepareUI()
         {
             panel = ModMain.UI_Mods.transform.Find("Panel");
-            GameObject modCard = panel.Find("ModCardPrefab").gameObject;
-            Transform viewportContent = panel.Find("Rect/Scroll View/Viewport/Content");
 
             allModPanel = panel.Find("Rect");
             modSettingsPanel = panel.Find("ModSettings");
@@ -55,6 +62,7 @@ namespace SimplePartLoader.Features.UI
             buttonSettingPrefab = panel.Find("SettingButtonPrefab").gameObject;
             checkboxSettingPrefab = panel.Find("SettingCheckboxPrefab").gameObject;
             spacerSettingPrefab = panel.Find("SettingSpacer").gameObject;
+            keybindSettingPrefab = panel.Find("SettingsKeybindPrefab").gameObject;
 
             panel.Find("Footer").GetComponent<TMP_Text>().text = $"ModUtils {ModMain.TESTING_VERSION_NUMBER} - Developed by Federico Arredondo";
             panel.gameObject.SetActive(false);
@@ -68,9 +76,27 @@ namespace SimplePartLoader.Features.UI
             ModMain.UI_Mods.transform.Find("OpenMods").GetComponent<Button>().onClick.AddListener(ModsButtonClick);
             panel.Find("Button").GetComponent<Button>().onClick.AddListener(CloseButtonClick);
 
+            keybindDetector = ModMain.UI_Mods.AddComponent<KeybindDetector>();
+
             // Preload all mods now.
+            ModCardLoad();
+        }
+
+        internal static void ModCardLoad()
+        {
+            GameObject modCard = panel.Find("ModCardPrefab").gameObject;
+            Transform viewportContent = panel.Find("Rect/Scroll View/Viewport/Content");
+
             foreach (Mod m in ModLoader.mods)
             {
+                ModInstance mi = FindModInstance(m);
+
+                if (mi != null && mi.CardLoaded) continue;
+                if (mi != null) mi.CardLoaded = true;
+                if (RegisteredMods.Contains(m.ID)) continue;
+
+                RegisteredMods.Add(m.ID);
+
                 Transform card = GameObject.Instantiate(modCard).transform;
                 card.gameObject.SetActive(true);
                 card.SetParent(viewportContent);
@@ -78,7 +104,7 @@ namespace SimplePartLoader.Features.UI
                 card.Find("Title").GetComponent<TMP_Text>().text = m.Name;
                 card.Find("ModId").GetComponent<TMP_Text>().text = "ID: " + m.ID;
 
-                if(m.Icon != null)
+                if (m.Icon != null)
                 {
                     Texture2D icon = new Texture2D(2, 2);
                     icon.LoadImage(m.Icon);
@@ -86,12 +112,11 @@ namespace SimplePartLoader.Features.UI
                     card.Find("Image").GetComponent<Image>().sprite = spr;
                 }
 
-                ModInstance mi = FindModInstance(m);
-                if(mi != null && mi.ModSettings.Count != 0)
+                if (mi != null && mi.ModSettings.Count != 0)
                 {
                     Button b = card.Find("Button").GetComponent<Button>();
                     b.interactable = true;
-                    b.onClick.AddListener(delegate { OpenUISettings(mi);  });
+                    b.onClick.AddListener(delegate { OpenUISettings(mi); });
                 }
             }
         }
@@ -111,11 +136,15 @@ namespace SimplePartLoader.Features.UI
         {
             if (currentModInstance != null) // Mod settings page open. Close and go back to the all mods page
             {
+                // Keybind case
+                if (currentlyEditingKeybind != null) SetKeybind(currentlyEditingKeybind, null);
+
                 // Settings cleanup
                 for (int i = 0; i < modSettingsAttach.childCount; i++)
                 {
                     GameObject.Destroy(modSettingsAttach.GetChild(i).gameObject);
                 }
+
 
                 allModPanel.gameObject.SetActive(true);
                 modSettingsPanel.gameObject.SetActive(false);
@@ -248,6 +277,24 @@ namespace SimplePartLoader.Features.UI
 
                     tr.Find("Toggle/Text (TMP)").GetComponent<TMP_Text>().text = checkbox.Text;
                 }
+                else if(setting is Keybind)
+                {
+                    Transform tr = GameObject.Instantiate(keybindSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    Keybind keybind = (Keybind)setting;
+
+                    TMP_Text multiplierBttText = tr.Find("Button/Text (TMP)").GetComponent<TMP_Text>();
+                    TMP_Text keyBttText = tr.Find("Button (1)/Text (TMP)").GetComponent<TMP_Text>();
+
+                    tr.Find("Button").GetComponent<Button>().onClick.AddListener(delegate { StartKeybindEdition(keybind, true, multiplierBttText); } );
+                    tr.Find("Button (1)").GetComponent<Button>().onClick.AddListener(delegate { StartKeybindEdition(keybind, false, keyBttText); } );
+
+                    keyBttText.text = keybind.Key.ToString();
+                    multiplierBttText.text = keybind.Multiplier.ToString();
+                }
             }
         }
 
@@ -266,6 +313,64 @@ namespace SimplePartLoader.Features.UI
                 }
             }
             return null;
+        }
+
+        internal static void StartKeybindEdition(Keybind k, bool multiplier, TMP_Text text)
+        {
+            if(currentlyEditingKeybind != null)
+            {
+                SetKeybind(k, null);
+            }
+
+            currentlyEditingKeybind = k;
+            currentlyEditingKeybindText = text;
+            editingMultiplier = multiplier;
+
+            text.text = "...";
+
+            keybindDetector.CurrentlyEditing = true;
+        }
+
+        internal static void SetKeybind(Keybind keybind, KeyCode? key)
+        {
+            if (currentlyEditingKeybind == null) return;
+            if (key == null || key == KeyCode.Escape)
+            {
+                if(editingMultiplier)
+                    keybind.Multiplier = KeyCode.None;
+
+                currentlyEditingKeybindText.text = editingMultiplier ? keybind.Multiplier.ToString() : keybind.Key.ToString();
+            }
+            else
+            {
+                if (editingMultiplier && keybind.Key != key)
+                    keybind.Multiplier = (KeyCode)key;
+                else if(keybind.Multiplier != key)
+                    keybind.Key = (KeyCode)key;
+
+                currentlyEditingKeybindText.text = editingMultiplier ? keybind.Multiplier.ToString() : keybind.Key.ToString();
+            }
+
+            currentlyEditingKeybind = null;
+            currentlyEditingKeybindText = null;
+
+            keybindDetector.CurrentlyEditing = false;
+        }
+
+        internal static void KeyPressDetected(KeyCode key)
+        {
+            if(currentlyEditingKeybind != null)
+            {
+                SetKeybind(currentlyEditingKeybind, key);
+            }
+        }
+
+        internal static void EscKeybindPress()
+        {
+            if (currentlyEditingKeybind != null)
+            {
+                SetKeybind(currentlyEditingKeybind, null);
+            }
         }
     }
 }

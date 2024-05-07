@@ -182,8 +182,11 @@ namespace SimplePartLoader
             }
 
             SettingSaver.LoadSettings(); // Reload settings in case an EA mod is using settings. Great edge case.
+            ModUtilsUI.ModCardLoad();
 
             // Autoupdating stuff goes here too now!
+            KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId()); // Update list so EA mods show telemetry
+
             JSON_ModList jsonList = new JSON_ModList(0);
             foreach (Mod mod in ModLoader.mods)
             {

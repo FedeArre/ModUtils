@@ -11,17 +11,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
-using System.Net.Http;
-using System.Threading.Tasks;
-using UnityEngine.ProBuilder;
 using SimplePartLoader.Features;
 using SimplePartLoader.Features.CarGenerator;
-using System.Reflection;
-using System.Runtime.ConstrainedExecution;
 using HarmonyLib;
 using SimplePartLoader.Features.UI;
 
@@ -36,7 +30,7 @@ namespace SimplePartLoader
         public override string Version => "v1.4.0";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.0-dev2";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.0-dev3";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -151,6 +145,8 @@ namespace SimplePartLoader
             mi.AddSliderToUI("sliderTest", 0, 10, 2);
             mi.AddButtonToUI("test butotn");
             mi.AddCheckboxToUI("checkboxTest", "hola mi vida no desconfies de la musica", true);
+            mi.AddLabelToUI("Setup keybind for do nothing: ");
+            mi.AddKeybindToUI("testKeybind", KeyCode.W);
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
@@ -180,6 +176,12 @@ namespace SimplePartLoader
 
                 ModUtilsUI.PrepareUI();
                 SettingSaver.LoadSettings();
+
+                GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
+                if(modUiRemove)
+                {
+                    modUiRemove.SetActive(false);
+                }
                 return;
             }
 

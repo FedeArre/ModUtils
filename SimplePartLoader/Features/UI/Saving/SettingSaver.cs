@@ -122,6 +122,29 @@ namespace SimplePartLoader.Features.UI
                                 }
                             }
                         }
+                        else if (setting is Keybind)
+                        {
+                            var temp = (Keybind)setting;
+                            if (dicSettings.ContainsKey(temp.SettingSaveId))
+                            {
+                                try
+                                {
+                                    string s = dicSettings[temp.SettingSaveId];
+                                    string[] split = s.Split('|');
+
+                                    if(split != null && split.Length == 2)
+                                    {
+                                        temp.Key = (KeyCode)int.Parse(split[0]);
+                                        temp.Multiplier = (KeyCode)int.Parse(split[1]);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    CustomLogger.AddLine("SettingSaver", $"Issue on ModSettings load - {temp.SettingSaveId}");
+                                    CustomLogger.AddLine("SettingSaver", ex);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -189,6 +212,11 @@ namespace SimplePartLoader.Features.UI
                     {
                         var temp = (TextInput)setting;
                         modWrapper.Settings.Add(new SettingWrapper(temp.SettingSaveId, temp.CurrentValue));
+                    }
+                    else if(setting is Keybind)
+                    {
+                        var temp = (Keybind)setting;
+                        modWrapper.Settings.Add(new SettingWrapper(temp.SettingSaveId, $"{((int)temp.Key)}|{(int)temp.Multiplier}"));
                     }
                 }
 

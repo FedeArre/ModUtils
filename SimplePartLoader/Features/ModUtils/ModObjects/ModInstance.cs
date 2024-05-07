@@ -34,6 +34,7 @@ namespace SimplePartLoader
 
         internal Action OnSettingsLoad;
         internal bool SettingsLoaded;
+        internal bool CardLoaded;
 
         public List<Part> Parts
         {
@@ -316,7 +317,7 @@ namespace SimplePartLoader
             {
                 CustomLogger.AddLine("EACheck", $"User is not allowed to use mod " + Mod.Name);
                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Mod.Name);
-                
+
                 foreach (Part p in Parts)
                 {
                     if (PartManager.modLoadedParts.Contains(p))
@@ -568,6 +569,12 @@ namespace SimplePartLoader
             ModSettings.Add(ch);
             return ch;
         }
+        public Keybind AddKeybindToUI(string saveId, KeyCode key, KeyCode multiplier = KeyCode.None)
+        {
+            Keybind kb = new Keybind(saveId, key, multiplier);
+            ModSettings.Add(kb);
+            return kb;
+        }
 
         public void SetSettingsLoadedFunction(Action func)
         {
@@ -580,7 +587,7 @@ namespace SimplePartLoader
 
             foreach(ISetting setting in ModSettings)
             {
-                if(setting is Checkbox || setting is ModSlider || setting is ModDropdown || setting is TextInput)
+                if(setting is Checkbox || setting is ModSlider || setting is ModDropdown || setting is TextInput || setting is Keybind)
                 {
                     settings.Add(setting);
                 }
