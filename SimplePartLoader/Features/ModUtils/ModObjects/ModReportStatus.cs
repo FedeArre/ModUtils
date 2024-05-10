@@ -1,4 +1,5 @@
-﻿using SimplePartLoader.CarGen;
+﻿using Rewired;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections;
@@ -9,6 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using static UnityEngine.InputSystem.LowLevel.InputStateHistory;
 
 namespace SimplePartLoader
@@ -47,17 +49,30 @@ namespace SimplePartLoader
             {
                 StartCoroutine(LoadCars());
             }
+            else if(ModUtils.GetPlayerCurrentCar())
+            {
+                StartCoroutine(LoadCar(ModUtils.GetPlayerCurrentCar().gameObject));
+            }
             else
             {
                 WriteToFile();
             }
         }
 
+        IEnumerator LoadCar(GameObject car)
+        {
+            yield return 0;
+
+            string referenceIssues = GenerateReport(car);
+
+            if (!string.IsNullOrEmpty(referenceIssues))
+                m_reportText += $"Reported references issues:\n{referenceIssues}";
+
+            WriteToFile();
+        }
+
         IEnumerator LoadCars()
         {
-            Transform sceneMananger = GameObject.Find("SceneManager").transform;
-            Transform player = GameObject.Find("Player").transform;
-
             foreach(Car carObj in m_mod.Cars)
             {
                 GameObject car = GameObject.Instantiate(carObj.carPrefab);
@@ -68,7 +83,7 @@ namespace SimplePartLoader
 
                 car.name = carObj.carGeneratorData.CarName;
 
-                // Wait 7 frames
+                // Wait 11 frames (7+4 because i like the number. Joke, 7 caused car to not be fully loaded yet)
                 yield return new WaitForEndOfFrame();
                 yield return new WaitForEndOfFrame();
                 yield return new WaitForEndOfFrame();
@@ -76,74 +91,14 @@ namespace SimplePartLoader
                 yield return new WaitForEndOfFrame();
                 yield return new WaitForEndOfFrame();
                 yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
+                yield return new WaitForEndOfFrame();
 
-                // Check stuff now
+                string referenceIssues = GenerateReport(car);
 
-                string referenceIssues = "";
-                foreach (MonoBehaviour c in car.GetComponentsInChildren<MonoBehaviour>())
-                {
-                    if (c != null)
-                    {
-                        Type type = c.GetType();
-
-                        if (type == null) continue;
-
-                        FieldInfo[] fields = type.GetFields();
-                        foreach (FieldInfo field in fields)
-                        {
-                            if (field == null) continue;
-
-                            if (field.FieldType == typeof(Transform))
-                            {
-                                Transform transformValue = (Transform)field.GetValue(c);
-                                if (transformValue && transformValue.root && transformValue.root.name != carObj.carGeneratorData.CarName)
-                                {
-                                    if (transformValue.root == sceneMananger.root || transformValue.root == player.root) continue;
-
-                                    referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {transformValue.name} (parent {transformValue.parent})\n";
-                                }
-                            }
-                            else if (field.FieldType == typeof(GameObject))
-                            {
-                                GameObject goValue = (GameObject)field.GetValue(c);
-                               
-                                if (goValue && goValue.transform && goValue.transform.root && goValue.transform.root.name != carObj.carGeneratorData.CarName)
-                                {
-                                    if (goValue.transform.root == sceneMananger.root || goValue.transform.root == player.root || (c.GetType().Name == "CarProperties" && field.Name == "PREFAB")) continue;
-
-                                    referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {goValue.transform.name} (parent {goValue.transform.parent})\n";
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                foreach (MyBoneSCR scr in car.GetComponentsInChildren<MyBoneSCR>())
-                {
-                    if (scr.stretchToTarget && string.IsNullOrEmpty(scr.StrechToName))
-                        referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName null\n");
-                    else if(scr.stretchToTarget && !scr.thisTransform)
-                        referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName set to {scr.StrechToName} but could not be found\n");
-                }
-
-                m_reportText += $"\n---------TRIGGER PARTS FOUND----------------------\n";
-
-                foreach (CarProperties cp in car.GetComponentsInChildren<CarProperties>())
-                {
-                    if(cp.triger)
-                    {
-                        m_reportText += $"Part {cp.PrefabName} has trigger collider set on, checking colliders & status:\n";
-                        foreach(Collider c in cp.gameObject.GetComponentsInChildren<Collider>())
-                        {
-                            m_reportText += $"{Functions.GetTransformPath(c.transform)} - SCALE: {c.transform.localScale}\n";
-                        }
-                        m_reportText += $"\n";
-                    }
-
-                }
-
-
-                if (!carObj.IssueExternalReport && string.IsNullOrEmpty(referenceIssues)) 
+                if (!carObj.IssueExternalReport && string.IsNullOrEmpty(referenceIssues))
                     m_reportText += $"\n------------------------------------------------------------------------------\n- {carObj.carGeneratorData.CarName} - No issues reported!\n";
                 else
                 {
@@ -153,7 +108,7 @@ namespace SimplePartLoader
                     else
                         m_reportText += $"\n";
 
-                    if(!string.IsNullOrEmpty(referenceIssues))
+                    if (!string.IsNullOrEmpty(referenceIssues))
                         m_reportText += $"Reported references issues:\n{referenceIssues}";
                 }
             }
@@ -161,6 +116,100 @@ namespace SimplePartLoader
             WriteToFile();
         }
 
+
+        string GenerateReport(GameObject car)
+        {
+            Transform sceneMananger = GameObject.Find("SceneManager").transform;
+            Transform player = GameObject.Find("Player").transform;
+
+            string referenceIssues = "";
+            foreach (MonoBehaviour c in car.GetComponentsInChildren<MonoBehaviour>())
+            {
+                if (c != null)
+                {
+                    Type type = c.GetType();
+
+                    if (type == null) continue;
+
+                    FieldInfo[] fields = type.GetFields();
+                    foreach (FieldInfo field in fields)
+                    {
+                        if (field == null) continue;
+
+                        if (field.FieldType == typeof(Transform))
+                        {
+                            Transform transformValue = (Transform)field.GetValue(c);
+                            if (transformValue && transformValue.root && transformValue.root.name != car.name)
+                            {
+                                if (transformValue.root == sceneMananger.root || transformValue.root == player.root) continue;
+
+                                referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {transformValue.name} (parent {transformValue.parent})\n";
+                            }
+                        }
+                        else if (field.FieldType == typeof(GameObject))
+                        {
+                            GameObject goValue = (GameObject)field.GetValue(c);
+
+                            if (goValue && goValue.transform && goValue.transform.root && goValue.transform.root.name != car.name)
+                            {
+                                if (goValue.transform.root == sceneMananger.root || goValue.transform.root == player.root || (c.GetType().Name == "CarProperties" && field.Name == "PREFAB") || (c.GetType().Name == "Partinfo" && field.Name.ToLower() == "player")) continue;
+
+                                referenceIssues += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {goValue.transform.name} (parent {goValue.transform.parent})\n";
+                            }
+                        }
+                    }
+                }
+            }
+
+            foreach (MyBoneSCR scr in car.GetComponentsInChildren<MyBoneSCR>())
+            {
+                if (scr.stretchToTarget && string.IsNullOrEmpty(scr.StrechToName))
+                    referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName null\n");
+                else if (scr.stretchToTarget && !scr.thisTransform)
+                    referenceIssues += ($"- {scr.name} bone (parent {scr.transform.parent.name}) has StrechToName set to {scr.StrechToName} but could not be found\n");
+            }
+
+            m_reportText += $"\n---------TRIGGER PARTS FOUND----------------------\n";
+
+            foreach (CarProperties cp in car.GetComponentsInChildren<CarProperties>())
+            {
+                if (cp.triger)
+                {
+                    m_reportText += $"Part {cp.PrefabName} has trigger collider set on, checking colliders & status:\n";
+                    foreach (Collider c in cp.gameObject.GetComponentsInChildren<Collider>())
+                    {
+                        m_reportText += $"{Functions.GetTransformPath(c.transform)} - SCALE: {c.transform.localScale}\n";
+                    }
+                    m_reportText += $"\n";
+                }
+            }
+
+            m_reportText += $"\n---------MISMATCHED TRIGERS PARTS FOUND----------------------\n";
+            bool found = false;
+            foreach (CarProperties cp in car.GetComponentsInChildren<CarProperties>())
+            {
+                found = false;
+                if (cp.SinglePart && !cp.triger)
+                {
+                    foreach (Collider c in cp.gameObject.GetComponentsInChildren<Collider>())
+                    {
+                        if (c.gameObject.layer == LayerMask.NameToLayer("Ignore Raycast") && c.transform.parent == cp.transform && !c.isTrigger)
+                        {
+                            m_reportText += "found " + c.gameObject.name;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        m_reportText += $"- {cp.PrefabName} - Child colliders found with no triger collider setup reported!\n";
+                    }
+                }
+            }
+            m_reportText += "\n";
+
+            return referenceIssues;
+        }
 
         public string GeneratePartReport(Part p, bool showOnlyWrong)
         {
