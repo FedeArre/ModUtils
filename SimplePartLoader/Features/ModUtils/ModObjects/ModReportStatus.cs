@@ -185,7 +185,7 @@ namespace SimplePartLoader
             }
 
             m_reportText += $"\n---------MISMATCHED TRIGERS PARTS FOUND----------------------\n";
-            bool found = false;
+            bool found = false, otherFound = false;
             foreach (CarProperties cp in car.GetComponentsInChildren<CarProperties>())
             {
                 found = false;
@@ -203,6 +203,22 @@ namespace SimplePartLoader
                     if (found)
                     {
                         m_reportText += $"- {cp.PrefabName} - Child colliders found with no triger collider setup reported!\n";
+                    }
+                }
+
+                if(cp.SinglePart && cp.triger)
+                {
+                    foreach (Collider c in cp.gameObject.GetComponentsInChildren<Collider>())
+                    {
+                        if (c.gameObject.layer == LayerMask.NameToLayer("Ignore Raycast") && c.transform.parent == cp.transform && !c.GetComponent<CarProperties>())
+                        {
+                            otherFound = true;
+                            break;
+                        }
+                    }
+                    if (found)
+                    {
+                        m_reportText += $"- {cp.PrefabName} - Child colliders found with but no CarProperties component found on one of them!\n";
                     }
                 }
             }

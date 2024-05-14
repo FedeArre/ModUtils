@@ -18,6 +18,11 @@ using SimplePartLoader.Features;
 using SimplePartLoader.Features.CarGenerator;
 using HarmonyLib;
 using SimplePartLoader.Features.UI;
+using static Unity.Burst.Intrinsics.X86.Avx;
+using System.Linq;
+using System.Reflection;
+using EVP;
+using SimplePartLoader.Utils;
 
 namespace SimplePartLoader
 {
@@ -67,7 +72,7 @@ namespace SimplePartLoader
             if (TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
-            var harmony = new Harmony("com.modutils");
+            var harmony = new Harmony("com.fedes.modutils");
             harmony.PatchAll();
 
             // Deleting unused stuff
@@ -383,6 +388,92 @@ namespace SimplePartLoader
                 else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf)
                 {
                     UI_Mods.SetActive(false);
+                }
+
+                if(Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    Debug.Log("Report of car");
+                    NWH.VehiclePhysics2.VehicleController veh = ModUtils.GetPlayerCurrentCar().GetComponent<NWH.VehiclePhysics2.VehicleController>();
+
+                    Type type = veh.GetType();
+
+                    IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
+                    IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
+
+                    foreach (var pinfo in pinfos)
+                    {
+                        if (pinfo.GetType() == typeof(object)) continue;
+                        Debug.Log($"P{pinfo.Name} - {pinfo.GetValue(veh)}");
+
+                        if (pinfo.GetValue(veh) == null || pinfo.GetValue(veh).GetType() == typeof(object)) continue;
+
+                        Type t = pinfo.GetValue(veh).GetType();
+                        bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                        if(!isPrimitiveType)
+                        {
+                            MyObjectSerialize(pinfo.GetValue(veh), 0);
+                        }
+                    }
+
+                    foreach (var finfo in finfos)
+                    {
+                        if (finfo.GetType() == typeof(object)) continue;
+                        Debug.Log($"F{finfo.Name} - {finfo.GetValue(veh)}");
+
+                        if (finfo.GetValue(veh) == null || finfo.GetValue(veh).GetType() == typeof(object)) continue;
+
+                        Type t = finfo.GetValue(veh).GetType();
+                        bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string) || t != typeof(IEnumerable));
+                        if (!isPrimitiveType)
+                        {
+                            MyObjectSerialize(finfo.GetValue(veh), 0);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void MyObjectSerialize(object obj, int iterations)
+        {
+            if (iterations > 15)
+            {
+                Debug.Log("end");
+                return;
+            }
+
+            Type type = obj.GetType();
+            if (type == null || type == typeof(object)) return;
+
+            Debug.Log($"-------- {type.Name} ");
+            IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
+            IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
+
+            foreach (var pinfo in pinfos)
+            {
+                if (pinfo.GetType() == typeof(object)) continue;
+                Debug.Log($"P{pinfo.Name} - {pinfo.GetValue(obj)}");
+
+                if (pinfo.GetValue(obj) == null || pinfo.GetValue(obj).GetType() == typeof(object)) continue;
+
+                Type t = pinfo.GetValue(obj).GetType();
+                bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                if (!isPrimitiveType)
+                {
+                    MyObjectSerialize(pinfo.GetValue(obj), iterations + 1);
+                }
+            }
+
+            foreach (var finfo in finfos)
+            {if (finfo.GetType() == typeof(object)) continue;
+                Debug.Log($"F{finfo.Name} - {finfo.GetValue(obj)}");
+
+                if (finfo.GetValue(obj) == null || finfo.GetValue(obj).GetType() == typeof(object)) continue;
+
+                Type t = finfo.GetValue(obj).GetType();
+                bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                if (!isPrimitiveType)
+                {
+                    MyObjectSerialize(finfo.GetValue(obj), iterations+1);
                 }
             }
         }
