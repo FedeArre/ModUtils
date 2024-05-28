@@ -193,6 +193,8 @@ namespace SimplePartLoader
                         continue;
                     }
 
+                    if (carProps.InBarn) continue; // Handled by barn data already, so it does not get duplicated. Found this was a thing on MaterialMaster development. Amazing
+
                     SavedData sd = new SavedData();
 
                     sd.PrefabName = data.PartName;
