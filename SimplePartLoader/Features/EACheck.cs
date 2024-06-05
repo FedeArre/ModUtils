@@ -82,6 +82,7 @@ namespace SimplePartLoader
             if (!ModMain.EA_Enabled.Checked && foundKeys.Count != 0)
             {
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
+                CustomLogger.AddLine("EACheck", $"Early Access Mods found but loading of them is not allowed!");
             }
             else if (foundKeys.Count != 0)
             {
