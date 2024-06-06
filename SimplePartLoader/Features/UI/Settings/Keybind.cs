@@ -25,6 +25,17 @@ namespace SimplePartLoader
         }
 
         /// <summary>
+        /// Check if the key were pressed this frame (Does not account for the multiplier being pressed this frame). Input.GetKey for the multiplier and Input.GetKeyDown for the key
+        /// </summary>
+        /// <returns>True if multiplier was pressed (and present) and the key was pressed THIS frame, otherwise false</returns>
+        public bool WasReleased()
+        {
+            if (Multiplier == KeyCode.None) return Input.GetKeyUp(Key);
+            else return Input.GetKey((KeyCode)Multiplier) && Input.GetKeyUp(Key);
+        }
+
+
+        /// <summary>
         /// Checks if both keys are present currently (or 1 if multiplier is not set). Works as Input.GetKey
         /// </summary>
         /// <returns>True if both keys are pressed, false otherwise</returns>
