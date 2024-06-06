@@ -38,14 +38,18 @@ internal class CustomEngineHook
         if(__instance.PrefabName == "FuelLine") // Fuel lines
         {
             bool flag = false;
-            foreach(var pair in cm.FuelLines)
+
+            if(cm.FuelLines != null)
             {
-                if(pair.CarName == carName)
+                foreach (var pair in cm.FuelLines)
                 {
-                    __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                    __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
-                    flag = true;
-                    break;
+                    if (pair.CarName == carName)
+                    {
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        flag = true;
+                        break;
+                    }
                 }
             }
 
@@ -58,15 +62,19 @@ internal class CustomEngineHook
         else if (__instance.PrefabName == "WiresMain06") // Battery Wires
         {
             bool flag = false;
-            foreach (var pair in cm.BatteryWires)
+            if (cm.BatteryWires != null)
             {
-                if (pair.CarName == carName)
+                foreach (var pair in cm.BatteryWires)
                 {
-                    __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                    __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
-                    flag = true;
-                    break;
+                    if (pair.CarName == carName)
+                    {
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        flag = true;
+                        break;
+                    }
                 }
+
             }
 
             if (!flag && cm.BatteryWireFallbackMesh)
@@ -78,14 +86,17 @@ internal class CustomEngineHook
         else if (__instance.PrefabName.Contains("LowerHose")) // Radiator lower hose
         {
             bool flag = false;
-            foreach (var pair in cm.RadiatorLowerHoses)
+            if (cm.RadiatorLowerHoses != null)
             {
-                if (pair.CarName == carName)
+                foreach (var pair in cm.RadiatorLowerHoses)
                 {
-                    __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                    __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
-                    flag = true;
-                    break;
+                    if (pair.CarName == carName)
+                    {
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        flag = true;
+                        break;
+                    }
                 }
             }
 
@@ -98,14 +109,18 @@ internal class CustomEngineHook
         else if (__instance.PrefabName.Contains("UpperHose")) // Radiator upper hose
         {
             bool flag = false;
-            foreach (var pair in cm.RadiatorUpperHoses)
+
+            if(cm.RadiatorUpperHoses != null)
             {
-                if (pair.CarName == carName)
+                foreach (var pair in cm.RadiatorUpperHoses)
                 {
-                    __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                    __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
-                    flag = true;
-                    break;
+                    if (pair.CarName == carName)
+                    {
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        flag = true;
+                        break;
+                    }
                 }
             }
 
