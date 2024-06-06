@@ -59,7 +59,9 @@ namespace SimplePartLoader
                 Debug.Log("UPDATING");
 
                 int totalSpaceCountReq = DisabledModList.Count + UnsupportedModList.Count + DebugEnabled.Count + Dissasembler.Count + UpdateRequired.Count;
-                ui.transform.Find("Panel").GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalSpaceCountReq * 50);
+                totalSpaceCountReq = totalSpaceCountReq + (EarlyAccessMod ? 20 : 0);
+
+                ui.transform.Find("Panel").GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalSpaceCountReq * 40);
                 string textToAdd = "ModUtils warnings";
 
                 if (DisabledModList.Count != 0)

@@ -111,45 +111,44 @@ namespace SimplePartLoader
                             CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode} and took {watch.ElapsedMilliseconds}ms");
 
                             watch.Start();
-                            if (response.IsSuccessStatusCode || response.StatusCode == HttpStatusCode.NotFound)
-                            {
-                                byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
-                                CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
-                                if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound)
-                                {
-                                    ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
-                                    continue;
-                                }
 
-                                Type[] types = Assembly.Load(assemblyBytes).GetTypes();
-                                Type typeFromHandle = typeof(Mod);
-                                for (int i = 0; i < types.Length; i++)
-                                {
-                                    if (typeFromHandle.IsAssignableFrom(types[i]))
-                                    {
-                                        CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
-                                        Mod m = (Mod)Activator.CreateInstance(types[i]);
-                                        ModLoader.mods.Add(m);
-                                        m.OnMenuLoad();
-                                        break;
-                                    }
-                                }
+                            byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
+                            CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
 
-                                CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.");
-                            }
-                            else
+                            if (response.StatusCode == HttpStatusCode.NoContent) // no permission
                             {
-                                if(response.StatusCode == HttpStatusCode.NotFound) // invalid key, update mod
-                                {
-                                    ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
-                                }
-                                else
-                                {
-                                    ErrorMessageHandler.GetInstance().DisallowedModList.Add(Path.GetFileName(item.Key));
-                                }
+                                ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
+
                                 CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
                                 CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
+
+                                continue;
                             }
+
+                            if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound) // invalid key
+                            {
+                                ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
+
+                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
+                                continue;
+                            }
+
+                            Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+                            Type typeFromHandle = typeof(Mod);
+                            for (int i = 0; i < types.Length; i++)
+                            {
+                                if (typeFromHandle.IsAssignableFrom(types[i]))
+                                {
+                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
+                                    Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                    ModLoader.mods.Add(m);
+                                    m.OnMenuLoad();
+                                    break;
+                                }
+                            }
+
+                            CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.\n\n");
                         }
                     }
                     catch (AggregateException ae)
