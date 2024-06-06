@@ -48,7 +48,7 @@ namespace SimplePartLoader.Objects.Furniture
 
         void Update()
         {
-            if (Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
+            if (ModMain.DevUIEnabled.Checked && Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
             {
                 DevUI.GetInstance().WasModPressed = true;
             }

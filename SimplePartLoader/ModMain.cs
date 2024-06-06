@@ -55,11 +55,23 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI;
 
-        // Developer stuff
+        // Developer stuff for UI
         internal static Checkbox DevUIEnabled;
-        internal static Keybind
+        internal static Keybind TogglePosRot;
+        internal static Keybind Multiplier;
+        internal static Keybind XMinus;
+        internal static Keybind X90;
+        internal static Keybind XPlus;
+        internal static Keybind YMinus;
+        internal static Keybind Y90;
+        internal static Keybind YPlus;
+        internal static Keybind ZMinus;
+        internal static Keybind Z90;
+        internal static Keybind ZPlus;
+        internal static Keybind PreviewCube;
+
         Stopwatch watch;
         public ModMain()
         {
@@ -139,14 +151,51 @@ namespace SimplePartLoader
             ModInstance mi = ModUtils.RegisterMod(this);
             mi.SetSettingsLoadedFunction(LoadSettings);
             EA_Enabled = mi.AddCheckboxToUI("ModUtils_EnableEA", "Enable Early Access (requires game restart)", false);
-            mi.AddLabelToUI("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
+            mi.AddLabelToUI("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored in any way.");
             Telemetry = mi.AddCheckboxToUI("ModUtils_Telemetry", "Telemetry enabled", true);
+            mi.AddLabelToUI("Permit ModUI to load. This will cause you to have 2 'Mods' buttons but will make some older mods that require BrennfuchS's ModUI to work");
+            DontDisableModUI = mi.AddCheckboxToUI("ModUtils_ModUIEnable", "Enable ModUI loading (Requires game restart)", false);
+
             mi.AddSpacerToUI();
             mi.AddSpacerToUI();
             mi.AddLabelToUI("The following stuff is intended for developers only");
             DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
             mi.AddSpacerToUI();
-            mi.AddLabelToUI("Keybinds for transparent editor:");
+
+            // Developer binds
+            mi.AddLabelToUI("---Keybinds for transparent editor---");
+            mi.AddLabelToUI("Switch between position and rotation:");
+            // General
+            TogglePosRot = mi.AddKeybindToUI("ModUtils_TransparentEditor_Toggle", KeyCode.Keypad0);
+            mi.AddLabelToUI("Multiplier:");
+            Multiplier = mi.AddKeybindToUI("ModUtils_TransparentEditor_Multp", KeyCode.LeftShift);
+
+            // X axis
+            mi.AddLabelToUI("X- :");
+            XMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_X-", KeyCode.Keypad1);
+            mi.AddLabelToUI("X90 :");
+            X90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_X90", KeyCode.Keypad2);
+            mi.AddLabelToUI("X+ :");
+            XPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_X+", KeyCode.Keypad3);
+
+            // Y axis
+            mi.AddLabelToUI("Y- :");
+            YMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y-", KeyCode.Keypad4);
+            mi.AddLabelToUI("Y90 :");
+            Y90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y90", KeyCode.Keypad5);
+            mi.AddLabelToUI("Y+ :");
+            YPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y+", KeyCode.Keypad6);
+
+            // Z axis
+            mi.AddLabelToUI("Z- :");
+            ZMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z-", KeyCode.Keypad7);
+            mi.AddLabelToUI("Z90 :");
+            Z90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z90", KeyCode.Keypad8);
+            mi.AddLabelToUI("Z+ :");
+            ZPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z+", KeyCode.Keypad9);
+
+            mi.AddLabelToUI("Preview cube toggle: ");
+            PreviewCube = mi.AddKeybindToUI("ModUtils_TransparentEditor_Cube", KeyCode.Z);
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
@@ -178,10 +227,11 @@ namespace SimplePartLoader
                 SettingSaver.LoadSettings();
 
                 GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
-                if(modUiRemove)
+                if(modUiRemove && !DontDisableModUI.Checked)
                 {
                     modUiRemove.SetActive(false);
                 }
+
                 return;
             }
 
@@ -428,7 +478,7 @@ namespace SimplePartLoader
                 }*/
             }
         }
-
+        /*
         public void MyObjectSerialize(object obj, int iterations)
         {
             if (iterations > 15)
@@ -473,7 +523,7 @@ namespace SimplePartLoader
                 }
             }
         }
-
+        */
         public override void OnNewMapLoad()
         {
             BuildableManager.OnNewMapEnabled();

@@ -37,80 +37,80 @@ namespace SimplePartLoader
             // Show data from our transparent object.
             dataShown  = $"{gameObject.name} data";
             dataShown += $"\nActual mode: {(editingRotation ? "Rotation" : "Position")}";
-            dataShown += $"\nMultiplier status: {(Input.GetKey(KeyCode.LeftShift) ? "Pressed" : "Not pressed")}";
+            dataShown += $"\nMultiplier status: {(ModMain.Multiplier.IsPressed() ? "Pressed" : "Not pressed")}";
             dataShown += $"\nLocal position: {gameObject.transform.localPosition.ToString("F3")}";
             dataShown += $"\nLocal rotation: {gameObject.transform.localEulerAngles.ToString("F3")}"; // F3 means 3 digit precision.
             dataShown += $"\nLocal scale: {gameObject.transform.localScale.ToString("F3")}";
 
-            if (Input.GetKeyDown(KeyCode.Keypad0)) // Multiplier
+            if (ModMain.TogglePosRot.WasPressed()) // Multiplier
             {
                 editingRotation = !editingRotation;
             } 
 
-            if (Input.GetKeyDown(KeyCode.Keypad1)) // X-
+            if (ModMain.XMinus.WasPressed()) // X-
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3( (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f), 0f, 0f);
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3( (ModMain.Multiplier.IsPressed() ? 1f : 0.1f), 0f, 0f);
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3( (Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f), 0f, 0f);
+                    gameObject.transform.localPosition = actualPos - new Vector3( (ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f), 0f, 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad2)) // X 90
+            else if (ModMain.X90.WasPressed()) // X 90
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3((Input.GetKey(KeyCode.LeftShift) ? 90f : -90f), 0f, 0f);
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3((ModMain.Multiplier.IsPressed() ? 90f : -90f), 0f, 0f);
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3((Input.GetKey(KeyCode.LeftShift) ? 90f : -90f), 0f, 0f);
+                    gameObject.transform.localPosition = actualPos - new Vector3((ModMain.Multiplier.IsPressed() ? 90f : -90f), 0f, 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad3)) // X+
+            else if (ModMain.XPlus.WasPressed()) // X+
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot + new Vector3((Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f), 0f, 0f);
+                    gameObject.transform.localEulerAngles = actualRot + new Vector3((ModMain.Multiplier.IsPressed() ? 1f : 0.1f), 0f, 0f);
                 else
-                    gameObject.transform.localPosition = actualPos + new Vector3((Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f), 0f, 0f);
+                    gameObject.transform.localPosition = actualPos + new Vector3((ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f), 0f, 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad4)) // Y-
+            else if (ModMain.YMinus.WasPressed()) // Y-
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f), 0f);
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 1f : 0.1f), 0f);
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f), 0f);
+                    gameObject.transform.localPosition = actualPos - new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f), 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad5)) // Y 90
+            else if (ModMain.Y90.WasPressed()) // Y 90
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 90f : -90f), 0f);
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 90f : -90f), 0f);
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 90f : -90f), 0f);
+                    gameObject.transform.localPosition = actualPos - new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 90f : -90f), 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad6)) // Y+
+            else if (ModMain.YPlus.WasPressed()) // Y+
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot + new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f), 0f);
+                    gameObject.transform.localEulerAngles = actualRot + new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 1f : 0.1f), 0f);
                 else
-                    gameObject.transform.localPosition = actualPos + new Vector3(0f, (Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f), 0f);
+                    gameObject.transform.localPosition = actualPos + new Vector3(0f, (ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f), 0f);
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad7)) // Z-
+            else if (ModMain.ZMinus.WasPressed()) // Z-
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f));
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 1f : 0.1f));
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f));
+                    gameObject.transform.localPosition = actualPos - new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f));
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad5)) // Z 90
+            else if (ModMain.Z90.WasPressed()) // Z 90
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 90f : -90f));
+                    gameObject.transform.localEulerAngles = actualRot - new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 90f : -90f));
                 else
-                    gameObject.transform.localPosition = actualPos - new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 90f : -90f));
+                    gameObject.transform.localPosition = actualPos - new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 90f : -90f));
             }
-            else if (Input.GetKeyDown(KeyCode.Keypad9)) // Z+
+            else if (ModMain.ZPlus.WasPressed()) // Z+
             {
                 if (editingRotation)
-                    gameObject.transform.localEulerAngles = actualRot + new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 1f : 0.1f));
+                    gameObject.transform.localEulerAngles = actualRot + new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 1f : 0.1f));
                 else
-                    gameObject.transform.localPosition = actualPos + new Vector3(0f, 0f, (Input.GetKey(KeyCode.LeftShift) ? 0.05f : 0.005f));
+                    gameObject.transform.localPosition = actualPos + new Vector3(0f, 0f, (ModMain.Multiplier.IsPressed() ? 0.05f : 0.005f));
             }
-            else if (Input.GetKeyDown(KeyCode.Z))
+            else if (ModMain.PreviewCube.WasPressed())
             {
                 secondaryObject.GetComponent<Renderer>().enabled = !secondaryObject.GetComponent<Renderer>().enabled;
             }
