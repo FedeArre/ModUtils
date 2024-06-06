@@ -57,6 +57,9 @@ namespace SimplePartLoader
 
         internal static Checkbox EA_Enabled, Telemetry;
 
+        // Developer stuff
+        internal static Checkbox DevUIEnabled;
+        internal static Keybind
         Stopwatch watch;
         public ModMain()
         {
@@ -140,18 +143,10 @@ namespace SimplePartLoader
             Telemetry = mi.AddCheckboxToUI("ModUtils_Telemetry", "Telemetry enabled", true);
             mi.AddSpacerToUI();
             mi.AddSpacerToUI();
-            mi.AddLabelToUI("Following stuff is testing for v1.5-dev2 - Ignore! :)");
-            mi.AddTextInputToUI("textInputId2", "Text input with default value:", "value");
-            mi.AddLabelToUI("Testing!");
-            mi.AddLabelToUI("Testing a bit more, how is this?");
-            mi.AddTextInputToUI("textInputTest", "Text input test:");
-            mi.AddLabelToUI("Testing even more, this is very long now. Great!? ModUtils v1.5.0 dev2 UI tests :)\nTrying jump line.");
-            mi.AddDropdownToUI("coolDropdown", "Dropdown test", new string[] { "test 1", "test2", "test55" });
-            mi.AddSliderToUI("sliderTest", 0, 10, 2);
-            mi.AddButtonToUI("test butotn");
-            mi.AddCheckboxToUI("checkboxTest", "hola mi vida no desconfies de la musica", true);
-            mi.AddLabelToUI("Setup keybind for do nothing: ");
-            mi.AddKeybindToUI("testKeybind", KeyCode.W);
+            mi.AddLabelToUI("The following stuff is intended for developers only");
+            DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
+            mi.AddSpacerToUI();
+            mi.AddLabelToUI("Keybinds for transparent editor:");
 
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
@@ -390,6 +385,7 @@ namespace SimplePartLoader
                     UI_Mods.SetActive(false);
                 }
 
+                /*
                 if(Input.GetKeyDown(KeyCode.DownArrow))
                 {
                     Debug.Log("Report of car");
@@ -429,7 +425,7 @@ namespace SimplePartLoader
                             MyObjectSerialize(finfo.GetValue(veh), 0);
                         }
                     }
-                }
+                }*/
             }
         }
 
