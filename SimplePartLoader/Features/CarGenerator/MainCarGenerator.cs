@@ -155,6 +155,11 @@ namespace SimplePartLoader.CarGen
                 if (car.carGeneratorData.SpawnRuined)
                     RuinedCars.Add(car);
 
+                if(car.DelayRearBoneFix)
+                {
+                    ModUtils.ExecuteNextFrame(delegate { RearBoneFix(car.emptyCarPrefab); });
+                    ModUtils.ExecuteNextFrame(delegate { RearBoneFix(car.carPrefab); });
+                }
 #if MODUTILS_DEVELOPER_CAR_CREATOR
                 Debug.Log("[ModUtils/CarGenDebug]: Root component count: " + car.carPrefab.GetComponents<MonoBehaviour>().Length);
                 Debug.Log("[ModUtils/CarGenDebug]: Childrens component count: " + car.carPrefab.GetComponentsInChildren<MonoBehaviour>().Length);
@@ -535,6 +540,53 @@ namespace SimplePartLoader.CarGen
                         car.ReportIssue($"{scr.name} ({Functions.GetTransformPath(scr.transform)}) is set as double sided but no target transform is set");
                     }
                 }
+            }
+        }
+
+        internal static void RearBoneFix(GameObject car)
+        {
+            Transform rearAxle = null;
+            MyBoneSCR rearAxleBone = null;
+            Transform pivot1 = null, pivot2 = null;
+
+            // Rear axle lookup
+            Transform rearSusp = car.transform.Find("RearSusp");
+
+            for (int i = 0; i < rearSusp.childCount; i++)
+            {
+                Transform child = rearSusp.GetChild(i);
+                if (child.name.Contains("RearAxle") && child.GetComponent<transparents>())
+                {
+                    rearAxleBone = child.GetComponent<MyBoneSCR>();
+                    if (rearAxleBone)
+                    {
+                        rearAxle = child;
+                        break;
+                    }
+                }
+            }
+
+            // Now lookup for the pivots
+            for (int i = 0; i < rearSusp.childCount; i++)
+            {
+                Transform child = rearSusp.GetChild(i);
+                if(child.name.Contains("AxlePivot"))
+                {
+                    if (pivot1)
+                        pivot2 = child;
+                    else
+                        pivot1 = child;
+                }
+
+                if (pivot1 && pivot2)
+                    break;
+            }
+
+            // Now do the setup if all stuff was found.
+            if(rearAxle && pivot1 && pivot2)
+            {
+                rearAxleBone.targetTransform = pivot2;
+                rearAxleBone.targetTransformB = pivot1;
             }
         }
     }

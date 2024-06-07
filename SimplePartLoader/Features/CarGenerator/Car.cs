@@ -40,6 +40,8 @@ namespace SimplePartLoader.CarGen
         internal bool IssueExternalReport = false;
         internal string ReportedIssue = string.Empty;
 
+        internal bool DelayRearBoneFix = false;
+
         internal void ReportIssue(string issue)
         {
             IssueExternalReport = true;
@@ -72,6 +74,11 @@ namespace SimplePartLoader.CarGen
         public void AddException(string partName, string prefabName, bool forceFittingIgnoringModUtilsConditions = false)
         {
             exceptionsObject.AddException(partName, prefabName, forceFittingIgnoringModUtilsConditions);
+        }
+
+        public void ApplyRearBoneDelayedFix()
+        {
+            DelayRearBoneFix = true;
         }
     }
 }
