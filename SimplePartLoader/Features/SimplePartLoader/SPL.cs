@@ -44,7 +44,7 @@ namespace SimplePartLoader
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid, if the prefab already exists or if essential components are missing</exception>
         /// <returns></returns>
         [Obsolete("This method is deprecated, use ModInstance.Load instead")]
-        public static Part LoadPart(AssetBundle bundle, string prefabName)
+        internal static Part LoadPart(AssetBundle bundle, string prefabName)
         {
             // Safety checks
             if (!bundle)
@@ -145,7 +145,7 @@ namespace SimplePartLoader
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns>The Part instance</returns>
         [Obsolete("This method is deprecated, use ModInstance.Load instead")]
-        public static Part LoadDummy(AssetBundle bundle, string prefabName)
+        internal static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
             return LoadDummy(bundle, prefabName, false);
         }
@@ -159,7 +159,7 @@ namespace SimplePartLoader
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns>The Part instance</returns>
         [Obsolete("This method is deprecated, use ModInstance.Load instead")]
-        public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = true)
+        internal static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = true)
         {
             // Safety checks
             if (!bundle)
