@@ -23,6 +23,8 @@ using System.Linq;
 using System.Reflection;
 using EVP;
 using SimplePartLoader.Utils;
+using System.Net.Http;
+using System.Security.Policy;
 
 namespace SimplePartLoader
 {
@@ -55,7 +57,7 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
 
         // Developer stuff for UI
         internal static Checkbox DevUIEnabled;
@@ -71,6 +73,8 @@ namespace SimplePartLoader
         internal static Keybind Z90;
         internal static Keybind ZPlus;
         internal static Keybind PreviewCube;
+
+        internal static byte[] imageBytes; // Random BGs
 
         Stopwatch watch;
         public ModMain()
@@ -155,6 +159,7 @@ namespace SimplePartLoader
             Telemetry = mi.AddCheckboxToUI("ModUtils_Telemetry", "Telemetry enabled", true);
             mi.AddLabelToUI("Permit ModUI to load. This will cause you to have 2 'Mods' buttons but will make some older mods that require BrennfuchS's ModUI to work");
             DontDisableModUI = mi.AddCheckboxToUI("ModUtils_ModUIEnable", "Enable ModUI loading (Requires game restart)", false);
+            RandomBG = mi.AddCheckboxToUI("ModUtils_RandomBG", "Enable random main menu background", true);
 
             mi.AddSpacerToUI();
             mi.AddSpacerToUI();
@@ -227,16 +232,39 @@ namespace SimplePartLoader
                 SettingSaver.LoadSettings();
 
                 GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
-                if(modUiRemove && !DontDisableModUI.Checked)
+                if (modUiRemove && !DontDisableModUI.Checked)
                 {
                     modUiRemove.SetActive(false);
                 }
 
-                return;
+
+                if (RandomBG.Checked)
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        try
+                        {
+                            HttpResponseMessage response = client.GetAsync(API_URL + "/bg").Result;
+                            response.EnsureSuccessStatusCode();
+
+                            // Image load
+                            imageBytes = response.Content.ReadAsByteArrayAsync().Result;
+                        }
+                        catch (Exception ex)
+                        {
+                            CustomLogger.AddLine("RandomBG", "Failed to load random background!");
+                            CustomLogger.AddLine("RandomBG", ex);
+                        }
+
+                        return;
+                    }
+                }
             }
 
             UI_Mods.SetActive(true);
             UI_Mods.transform.Find("OpenMods").localScale = Vector3.one;
+
+            if(RandomBG.Checked) new GameObject("test").AddComponent<BackgroundDelayChange>();
         }
 
         public override void OnLoad()

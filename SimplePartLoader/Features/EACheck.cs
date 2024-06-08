@@ -187,7 +187,7 @@ namespace SimplePartLoader
             // Autoupdating stuff goes here too now!
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId()); // Update list so EA mods show telemetry
 
-            JSON_ModList jsonList = new JSON_ModList(0);
+            JSON_ModList jsonList = new JSON_ModList(Steamworks.SteamApps.GetAppBuildId());
             foreach (Mod mod in ModLoader.mods)
             {
                 JSON_Mod jsonMod = new JSON_Mod();
@@ -218,7 +218,7 @@ namespace SimplePartLoader
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-
+                    Debug.Log($"Autoupdater results: " + result);
                     AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
 
                     // First check for unsupported mods.
