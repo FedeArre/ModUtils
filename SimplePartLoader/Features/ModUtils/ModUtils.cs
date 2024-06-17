@@ -40,6 +40,7 @@ namespace SimplePartLoader
         {
             GameObject ModLoader = GameObject.Find("ModLoader");
             ModLoader.AddComponent<EACheck>();
+
         }
 
         internal static void OnLoadCalled()
@@ -79,9 +80,20 @@ namespace SimplePartLoader
             }
 
             SPL.DevLog($"UpdatePlayerStatus has changed to {isOnCar} - {mcp}");
+            
             if(PlayerCarChanged != null)
             {
-                PlayerCarChanged?.Invoke();
+                foreach (var handler in PlayerCarChanged.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        CustomLogger.AddLine("ModUtils", ex);
+                    }
+                }
             }
         }
 

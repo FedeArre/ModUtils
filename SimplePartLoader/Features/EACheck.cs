@@ -218,7 +218,6 @@ namespace SimplePartLoader
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-                    Debug.Log($"Autoupdater results: " + result);
                     AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
 
                     // First check for unsupported mods.

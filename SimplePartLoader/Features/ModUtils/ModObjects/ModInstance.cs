@@ -522,9 +522,29 @@ namespace SimplePartLoader
 
             return label;
         }
+
+        public Header AddHeaderToUI(string text)
+        {
+            Header label = new Header(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
+        public SmallHeader AddSmallHeaderToUI(string text)
+        {
+            SmallHeader label = new SmallHeader(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
         public void AddSpacerToUI()
         {
             Spacer s = new Spacer();
+            ModSettings.Add(s);
+        }
+        public void AddSeparatorToUI()
+        {
+            Separator s = new Separator();
             ModSettings.Add(s);
         }
 

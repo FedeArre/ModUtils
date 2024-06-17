@@ -58,16 +58,6 @@ namespace SimplePartLoader.Features.CarGenerator
                     }
                 }
             }
-
-            // DEBUG: REMOVE: TODO:
-            foreach(Transform t in base.GetComponentsInChildren<Transform>())
-            {
-                if(t.gameObject.layer == LayerMask.NameToLayer("Default"))
-                {
-                    Debug.Log($"UI LAYER AT {t.name} at path {Functions.GetTransformPath(t)}");
-                }
-            }
-
             yield return 0;
 
             GameObject.Destroy(this);

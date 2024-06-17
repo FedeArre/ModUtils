@@ -500,10 +500,13 @@
     <Compile Include="Features\UI\Settings\Button.cs" />
     <Compile Include="Features\UI\Settings\Checkbox.cs" />
     <Compile Include="Features\UI\Settings\Dropdown.cs" />
+    <Compile Include="Features\UI\Settings\Header.cs" />
     <Compile Include="Features\UI\Settings\ISetting.cs" />
     <Compile Include="Features\UI\Settings\Keybind.cs" />
     <Compile Include="Features\UI\Settings\Label.cs" />
+    <Compile Include="Features\UI\Settings\Separator.cs" />
     <Compile Include="Features\UI\Settings\Slider.cs" />
+    <Compile Include="Features\UI\Settings\SmallHeader.cs" />
     <Compile Include="Features\UI\Settings\Spacer.cs" />
     <Compile Include="Features\UI\Settings\TextInput.cs" />
     <Compile Include="Features\UniLog.cs" />

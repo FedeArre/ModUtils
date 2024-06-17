@@ -162,13 +162,13 @@ namespace SimplePartLoader
             RandomBG = mi.AddCheckboxToUI("ModUtils_RandomBG", "Enable random main menu background", true);
 
             mi.AddSpacerToUI();
-            mi.AddSpacerToUI();
-            mi.AddLabelToUI("The following stuff is intended for developers only");
+            mi.AddSeparatorToUI();
+            mi.AddHeaderToUI("Settings for developers");
             DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
             mi.AddSpacerToUI();
 
             // Developer binds
-            mi.AddLabelToUI("---Keybinds for transparent editor---");
+            mi.AddSmallHeaderToUI("Transparent editor keybinds");
             mi.AddLabelToUI("Switch between position and rotation:");
             // General
             TogglePosRot = mi.AddKeybindToUI("ModUtils_TransparentEditor_Toggle", KeyCode.Keypad0);

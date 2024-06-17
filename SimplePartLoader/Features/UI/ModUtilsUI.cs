@@ -33,6 +33,9 @@ namespace SimplePartLoader.Features.UI
         static GameObject buttonSettingPrefab;
         static GameObject checkboxSettingPrefab;
         static GameObject keybindSettingPrefab;
+        static GameObject separatorSettingPrefab;
+        static GameObject headerSettingPrefab;
+        static GameObject smallHeaderSettingPrefab;
 
        // static GameObject eventSystemSpecial;
 
@@ -63,6 +66,9 @@ namespace SimplePartLoader.Features.UI
             checkboxSettingPrefab = panel.Find("SettingCheckboxPrefab").gameObject;
             spacerSettingPrefab = panel.Find("SettingSpacer").gameObject;
             keybindSettingPrefab = panel.Find("SettingsKeybindPrefab").gameObject;
+            separatorSettingPrefab = panel.Find("SettingSeparator").gameObject;
+            headerSettingPrefab = panel.Find("SettingHeader").gameObject;
+            smallHeaderSettingPrefab = panel.Find("SettingHeaderSmaller").gameObject;
 
             panel.Find("Footer").GetComponent<TMP_Text>().text = $"ModUtils {ModMain.TESTING_VERSION_NUMBER} - Developed by Federico Arredondo";
             panel.gameObject.SetActive(false);
@@ -102,7 +108,7 @@ namespace SimplePartLoader.Features.UI
                 card.SetParent(viewportContent);
                 card.localScale = Vector3.one;
                 card.Find("Title").GetComponent<TMP_Text>().text = m.Name;
-                card.Find("ModId").GetComponent<TMP_Text>().text = "ID: " + m.ID;
+                card.Find("ModId").GetComponent<TMP_Text>().text = "By: " + m.Author;
 
                 if (m.Icon != null)
                 {
@@ -183,6 +189,26 @@ namespace SimplePartLoader.Features.UI
 
                     tr.Find("Text").GetComponent<TMP_Text>().text = l.Text;
                 }
+                else if (setting is Header)
+                {
+                    Header l = (Header)setting;
+                    Transform tr = GameObject.Instantiate(headerSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    tr.Find("Text").GetComponent<TMP_Text>().text = l.Text;
+                }
+                else if (setting is SmallHeader)
+                {
+                    SmallHeader l = (SmallHeader)setting;
+                    Transform tr = GameObject.Instantiate(smallHeaderSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+
+                    tr.Find("Text").GetComponent<TMP_Text>().text = l.Text;
+                }
                 else if(setting is TextInput)
                 {
                     TextInput l = (TextInput) setting;
@@ -222,6 +248,13 @@ namespace SimplePartLoader.Features.UI
                 else if(setting is Spacer)
                 {
                     Transform tr = GameObject.Instantiate(spacerSettingPrefab).transform;
+                    tr.SetParent(modSettingsAttach);
+                    tr.localScale = Vector3.one;
+                    tr.gameObject.SetActive(true);
+                }
+                else if (setting is Separator)
+                {
+                    Transform tr = GameObject.Instantiate(separatorSettingPrefab).transform;
                     tr.SetParent(modSettingsAttach);
                     tr.localScale = Vector3.one;
                     tr.gameObject.SetActive(true);

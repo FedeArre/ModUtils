@@ -56,39 +56,33 @@ namespace SimplePartLoader
             {
                 yield return new WaitForSeconds(1);
 
-                Debug.Log("UPDATING");
-
-                int totalSpaceCountReq = DisabledModList.Count + UnsupportedModList.Count + DebugEnabled.Count + Dissasembler.Count + UpdateRequired.Count;
-                totalSpaceCountReq = totalSpaceCountReq + (EarlyAccessMod ? 20 : 0);
-
-                ui.transform.Find("Panel").GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalSpaceCountReq * 40);
-                string textToAdd = "ModUtils warnings";
-
+                string textToAdd = "";
                 if (DisabledModList.Count != 0)
                 {
-                    textToAdd += "\nEA check could not authentify some mods";
-                    textToAdd += "\nThe following mods were disabled:";
+                    textToAdd += "\nEA check could not authentify some mods, the following mods were disabled:";
 
                     foreach (string mod in DisabledModList)
                     {
                         textToAdd += "\n- " + mod;
                     }
+                    textToAdd += "\n";
                 }
 
                 if (UpdateRequired.Count != 0)
                 {
-                    textToAdd += "\nFollowing EA mod(s) are not updated";
-                    textToAdd += "\nUpdating them is required to make them work";
+                    textToAdd += "\nFollowing EA mod(s) are not updated, updating them is required to make them work";
 
                     foreach (string mod in UpdateRequired)
                     {
                         textToAdd += "\n- " + mod;
                     }
+                    textToAdd += "\n";
                 }
 
                 if (ThumbnaiLGeneratorEnabled)
                 {
-                    textToAdd += "\nThumbnail generator enabled!";
+                    textToAdd += "\nThumbnail generator enabled - DONT RELEASE MOD WITH THIS ENABLED!";
+                    textToAdd += "\n";
                 }
 
                 if (DebugEnabled.Count != 0)
@@ -99,6 +93,7 @@ namespace SimplePartLoader
                     {
                         textToAdd += "\n - " + mod;
                     }
+                    textToAdd += "\n";
                 }
 
                 if (Dissasembler.Count != 0)
@@ -109,26 +104,26 @@ namespace SimplePartLoader
                     {
                         textToAdd += "\n - " + mod;
                     }
+                    textToAdd += "\n";
                 }
 
                 if (EarlyAccessMod)
                 {
-                    textToAdd += "\nEarly Access (EA) mod detected but loading";
-                    textToAdd += "\nEA mods are not enabled. Enable them on settings";
-                    textToAdd += "\nand restart the game";
+                    textToAdd += "\nEarly Access (EA) mod detected but loading EA mods is not enabled. Enable it on settings and restart the game";
+                    textToAdd += "\n";
                 }
 
                 if (UnsupportedModList.Count != 0)
                 {
-                    textToAdd += "\nThe following mods are marked as";
-                    textToAdd += "\nunsupported / obsolete by the mod author: ";
+                    textToAdd += "\nThe following mods are marked as unsupported / obsolete by the mod author: ";
                     foreach (string mod in UnsupportedModList)
                     {
                         textToAdd += "\n - " + mod;
                     }
+                    textToAdd += "\n";
                 }
 
-                ui.transform.Find("Panel/Text (TMP)").GetComponent<TMP_Text>().text = textToAdd;
+                ui.transform.Find("Panel/Text").GetComponent<TMP_Text>().text = textToAdd;
 
             }
         }
