@@ -26,7 +26,7 @@ namespace SimplePartLoader
         public static bool PREFAB_NAME_COLLISION_CHECK = false;
         
         // All availables paint types in the game
-        [Obsolete("This enum will be removed in ModUtils v1.1.1, use PaintingSystem.Types instead!")]
+        /*[Obsolete("This enum will be removed in ModUtils v1.1.1, use PaintingSystem.Types instead!")]
         public enum PaintingSupportedTypes
         {
             FullPaintingSupport = 1,
@@ -34,7 +34,7 @@ namespace SimplePartLoader
             OnlyPaintAndRust,
             OnlyDirt,
             OnlyPaintAndDirt
-        }
+        }*/
 
         /// <summary>
         /// Adds a prefab as a car part into the game
@@ -43,8 +43,8 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid, if the prefab already exists or if essential components are missing</exception>
         /// <returns></returns>
-        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
-        public static Part LoadPart(AssetBundle bundle, string prefabName)
+        //[Obsolete("This method is deprecated, use ModInstance.Load instead")]
+        /*public static Part LoadPart(AssetBundle bundle, string prefabName)
         {
             // Safety checks
             if (!bundle)
@@ -136,6 +136,7 @@ namespace SimplePartLoader
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
             return p; // We provide the Part instance so the developer can setup the transparents
         }
+        */
 
         /// <summary>
         /// Allows to load a dummy part into the memory to setup it on runtime
@@ -144,7 +145,7 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid or if the prefab already exists</exception>
         /// <returns>The Part instance</returns>
-        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
+        /*[Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadDummy(AssetBundle bundle, string prefabName)
         {
             return LoadDummy(bundle, prefabName, false);
@@ -201,7 +202,7 @@ namespace SimplePartLoader
 
             return p;
         }
-
+        */
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
         /// </summary>
@@ -240,7 +241,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                CustomLogger.AddLine("Parts", "Car part was not found on CopyFullPartToPrefab! Part: {partName}");
+                CustomLogger.AddLine("Parts", $"Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 
@@ -282,6 +283,11 @@ namespace SimplePartLoader
                 if (p.Mod.Settings.AutomaticFitsToEngine != null)
                 {
                     p.PartInfo.FitsToEngine = p.Mod.Settings.AutomaticFitsToEngine;
+                }
+
+                if(p.Mod.Settings.PrefabNamePrefix != "")
+                {
+                    p.CarProps.PrefabName = p.Mod.Settings.PrefabNamePrefix + p.Name;
                 }
             }
             

@@ -16,7 +16,8 @@ namespace SimplePartLoader
         private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
         private string[] FitsToEngine;
-        
+        private string PrefixPrefabName;
+
         public ModInstance Mod
         {
             get { return modInstance; }
@@ -50,6 +51,12 @@ namespace SimplePartLoader
         {
             get { return FitsToEngine; }
             set { FitsToEngine = value; }
+        }
+
+        public string PrefabNamePrefix
+        {
+            get { return PrefixPrefabName; }
+            set { PrefixPrefabName = value; }
         }
 
         public PaintingSystem.PartPaintResolution PaintResolution

@@ -106,6 +106,9 @@ namespace SimplePartLoader
             if (String.IsNullOrWhiteSpace(prefabName))
                 SPL.SplError("Tried to create a part without prefab name");
 
+            if(settings.PrefabNamePrefix != "")
+                prefabName = settings.PrefabNamePrefix + prefabName;
+
             if (Saver.modParts.ContainsKey(prefabName))
                 SPL.SplError($"Tried to create an already existing prefab ({prefabName})");
 
@@ -355,9 +358,15 @@ namespace SimplePartLoader
                     BuildableManager.Buildables[b.PrefabName] = null;
                 }
 
+                foreach (Car c in Cars)
+                {
+                    MainCarGenerator.RegisteredCars.Remove(c);
+                }
+
                 Parts.Clear();
                 Furnitures.Clear();
                 Buildables.Clear();
+                Cars.Clear();
             }
         }
 
