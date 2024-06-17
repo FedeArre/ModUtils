@@ -14,14 +14,10 @@ namespace SimplePartLoader.Utils
         void Start()
         {
             // Hook image
-            GameObject.Find("UIController/MainMenu_Canvas/BG").GetComponent<Image>().sprite.texture.LoadImage(ModMain.imageBytes);
-            GameObject.Destroy(this.gameObject);
-            //StartCoroutine(Test());
-        }
+            if(ModMain.imageBytes.Length > 0)
+                GameObject.Find("UIController/MainMenu_Canvas/BG").GetComponent<Image>().sprite.texture.LoadImage(ModMain.imageBytes);
 
-        IEnumerator Test()
-        {
-            yield return 0;
+            GameObject.Destroy(this.gameObject);
         }
     }
 }
