@@ -230,82 +230,90 @@ namespace SimplePartLoader
         public string GeneratePartReport(Part p, bool showOnlyWrong)
         {
             // Reports by ID - True means it failed the check!
-            bool[] partsChecks = new bool[7];
+            bool[] partsChecks = new bool[8];
             string extraInfoReferences = "";
-
-            partsChecks[0] = !(p.Prefab.GetComponent<CarProperties>() && p.Prefab.GetComponent<Partinfo>());
-
-            MeshCollider mc = p.Prefab.GetComponent<MeshCollider>();
-            partsChecks[1] = !mc;
-
-            if (p.CarProps.triger)
-            {
-                partsChecks[2] = !mc.isTrigger;
-
-                foreach (Collider c in p.Prefab.GetComponentsInChildren<Collider>())
-                {
-                    if (!c.isTrigger && c.gameObject.layer == LayerMask.NameToLayer("Default"))
-                    {
-                        partsChecks[3] = true;
-                    }
-                }
-            }
-            else
-            {
-                partsChecks[4] = mc.isTrigger;
-            }
-
-            foreach (MonoBehaviour c in p.Prefab.GetComponentsInChildren<MonoBehaviour>())
-            {
-                if (c != null)
-                {
-                    Type type = c.GetType();
-
-                    if (type == null) continue;
-
-                    FieldInfo[] fields = type.GetFields();
-                    foreach (FieldInfo field in fields)
-                    {
-                        if (field == null) continue;
-
-                        if (field.FieldType == typeof(Transform))
-                        {
-                            Transform transformValue = (Transform)field.GetValue(c);
-                            if (transformValue && transformValue.root && !transformValue.root.GetComponent<SPL_Part>())
-                            {
-                                partsChecks[5] = true;
-                                extraInfoReferences += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {transformValue.name} (root {transformValue.root.name})\n";
-                            }
-
-                        }
-                        else if (field.FieldType == typeof(GameObject))
-                        {
-                            GameObject goValue = (GameObject)field.GetValue(c);
-                            if (goValue && goValue.transform && goValue.transform.root && !goValue.transform.root.GetComponent<SPL_Part>())
-                            {
-                                partsChecks[5] = true;
-                                extraInfoReferences += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {goValue.transform.name} (root {goValue.transform.root.name})\n";
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (p.Prefab.GetComponent<Pickup>() || p.Prefab.GetComponent<PickupDoor>())
-            {
-                int attachingCount = p.Prefab.GetComponentsInChildren<HexNut>().Length + p.Prefab.GetComponentsInChildren<FlatNut>().Length + p.Prefab.GetComponentsInChildren<BoltNut>().Length + p.Prefab.GetComponentsInChildren<WeldCut>().Length;
-                if (attachingCount == 0)
-                    partsChecks[6] = true;
-            }
-
             bool issuesFound = false;
-            for (int i = 0; i < partsChecks.Length; i++)
+
+            try
             {
-                if (partsChecks[i])
+                partsChecks[0] = !(p.Prefab.GetComponent<CarProperties>() && p.Prefab.GetComponent<Partinfo>());
+
+                MeshCollider mc = p.Prefab.GetComponent<MeshCollider>();
+                partsChecks[1] = !mc;
+
+                if (p.CarProps.triger)
                 {
-                    m_anyPartFailed = true;
-                    issuesFound = true;
+                    partsChecks[2] = !mc.isTrigger;
+
+                    foreach (Collider c in p.Prefab.GetComponentsInChildren<Collider>())
+                    {
+                        if (!c.isTrigger && c.gameObject.layer == LayerMask.NameToLayer("Default"))
+                        {
+                            partsChecks[3] = true;
+                        }
+                    }
                 }
+                else
+                {
+                    partsChecks[4] = mc.isTrigger;
+                }
+
+                foreach (MonoBehaviour c in p.Prefab.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if (c != null)
+                    {
+                        Type type = c.GetType();
+
+                        if (type == null) continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field == null) continue;
+
+                            if (field.FieldType == typeof(Transform))
+                            {
+                                Transform transformValue = (Transform)field.GetValue(c);
+                                if (transformValue && transformValue.root && !transformValue.root.GetComponent<SPL_Part>())
+                                {
+                                    partsChecks[5] = true;
+                                    extraInfoReferences += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {transformValue.name} (root {transformValue.root.name})\n";
+                                }
+
+                            }
+                            else if (field.FieldType == typeof(GameObject))
+                            {
+                                GameObject goValue = (GameObject)field.GetValue(c);
+                                if (goValue && goValue.transform && goValue.transform.root && !goValue.transform.root.GetComponent<SPL_Part>())
+                                {
+                                    partsChecks[5] = true;
+                                    extraInfoReferences += $"- {c.name} | C:{c.GetType().Name} A:{field.Name} ({Functions.GetTransformPath(c.transform)}) references {goValue.transform.name} (root {goValue.transform.root.name})\n";
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (p.Prefab.GetComponent<Pickup>() || p.Prefab.GetComponent<PickupDoor>())
+                {
+                    int attachingCount = p.Prefab.GetComponentsInChildren<HexNut>().Length + p.Prefab.GetComponentsInChildren<FlatNut>().Length + p.Prefab.GetComponentsInChildren<BoltNut>().Length + p.Prefab.GetComponentsInChildren<WeldCut>().Length;
+                    if (attachingCount == 0)
+                        partsChecks[6] = true;
+                }
+
+                issuesFound = false;
+                for (int i = 0; i < partsChecks.Length; i++)
+                {
+                    if (partsChecks[i])
+                    {
+                        m_anyPartFailed = true;
+                        issuesFound = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                partsChecks[7] = true;
             }
 
             // Generate report text
@@ -347,6 +355,7 @@ namespace SimplePartLoader
 
             return resultText;
         }
+
         public string GetPartReportName(int id)
         {
             switch (id)
@@ -358,6 +367,7 @@ namespace SimplePartLoader
                 case 4: return "Mesh collider is Triger, CarProps triger is set to false";
                 case 5: return "Reference issue, check extra info";
                 case 6: return "No attaching method in part";
+                case 7: return "Major issue on part - Exception on tester";
                 default: return "Unknown issue?";
             }
         }

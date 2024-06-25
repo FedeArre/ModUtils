@@ -1,6 +1,10 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
-using SimplePartLoader.Features.Autoupdating;
+using SimplePartLoader.Features.Auto
+    
+    
+    
+    ;
 using SimplePartLoader.Features.UI;
 using System;
 using System.Collections.Generic;

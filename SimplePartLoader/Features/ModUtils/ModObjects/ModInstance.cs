@@ -519,6 +519,7 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("CustomMeshes", $"Repeated engine name found, name {cm.EngineName}");
             }
 
+            cm.DoInternalConversion();
             CustomMeshHandler.Meshes.Add(cm);
         }
 

@@ -56,7 +56,7 @@ namespace SimplePartLoader.Objects
             dataShown += $"\nLocal scale: {gameObject.transform.localScale.ToString("F3")}";
             dataShown += $"\nCurrently editing axis: {GetCurrentlyEditingAxis()}";
 
-            if (Input.GetKeyDown(KeyCode.R)) // Multiplier
+            if (ModMain.Multiplier.WasPressed()) // Multiplier
             {
                 editingRotation = !editingRotation;
             }

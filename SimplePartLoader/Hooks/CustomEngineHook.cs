@@ -39,14 +39,14 @@ internal class CustomEngineHook
         {
             bool flag = false;
 
-            if(cm.FuelLines != null)
+            if(cm.FuelLines.Count != 0)
             {
                 foreach (var pair in cm.FuelLines)
                 {
-                    if (pair.CarName == carName)
+                    if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
                         flag = true;
                         break;
                     }
@@ -62,14 +62,14 @@ internal class CustomEngineHook
         else if (__instance.PrefabName == "WiresMain06") // Battery Wires
         {
             bool flag = false;
-            if (cm.BatteryWires != null)
+            if (cm.BatteryWires.Count != 0)
             {
                 foreach (var pair in cm.BatteryWires)
                 {
-                    if (pair.CarName == carName)
+                    if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
                         flag = true;
                         break;
                     }
@@ -86,14 +86,14 @@ internal class CustomEngineHook
         else if (__instance.PrefabName.Contains("LowerHose")) // Radiator lower hose
         {
             bool flag = false;
-            if (cm.RadiatorLowerHoses != null)
+            if (cm.RadiatorLowerHoses.Count != 0)
             {
                 foreach (var pair in cm.RadiatorLowerHoses)
                 {
-                    if (pair.CarName == carName)
+                    if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
                         flag = true;
                         break;
                     }
@@ -110,14 +110,14 @@ internal class CustomEngineHook
         {
             bool flag = false;
 
-            if(cm.RadiatorUpperHoses != null)
+            if(cm.RadiatorUpperHoses.Count != 0)
             {
                 foreach (var pair in cm.RadiatorUpperHoses)
                 {
-                    if (pair.CarName == carName)
+                    if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Mesh;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Mesh;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
                         flag = true;
                         break;
                     }

@@ -42,7 +42,7 @@ namespace SimplePartLoader.Features.UI
         static ModInstance currentModInstance = null;
 
         static KeybindDetector keybindDetector = null;
-        static Keybind currentlyEditingKeybind = null;
+        internal static Keybind currentlyEditingKeybind = null;
         static TMP_Text currentlyEditingKeybindText = null;
         static bool editingMultiplier = false;
 

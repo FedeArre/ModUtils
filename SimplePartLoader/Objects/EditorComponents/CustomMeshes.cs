@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[DisallowMultipleComponent]
 internal class CustomMeshes : MonoBehaviour
 {
     [Header("Basic settings")]
@@ -17,16 +18,51 @@ internal class CustomMeshes : MonoBehaviour
     public Mesh UpperHoseFallbackMesh = null;
     public Mesh LowerHoseFallbackMesh = null;
 
-    [Header("Meshes")]
-    public StringMeshPair[] FuelLines;
-    public StringMeshPair[] BatteryWires;
-    public StringMeshPair[] RadiatorUpperHoses;
-    public StringMeshPair[] RadiatorLowerHoses;
+    public Dictionary<string, Mesh> FuelLines;
+    public Dictionary<string, Mesh> BatteryWires;
+    public Dictionary<string, Mesh> RadiatorUpperHoses;
+    public Dictionary<string, Mesh> RadiatorLowerHoses;
+
+    public void DoInternalConversion()
+    {
+        FuelLines = new Dictionary<string, Mesh>();
+        BatteryWires = new Dictionary<string, Mesh>();
+        RadiatorUpperHoses = new Dictionary<string, Mesh>();
+        RadiatorLowerHoses = new Dictionary<string, Mesh>();
+
+        foreach (CustomMesh cm in GetComponents<CustomMesh>())
+        {
+            switch (cm.Type)
+            {
+                case MeshType.FuelLine:
+                    FuelLines[cm.CarName] = cm.Mesh;
+                    break;
+                case MeshType.BatteryWire:
+                    BatteryWires[cm.CarName] = cm.Mesh;
+                    break;
+                case MeshType.RadiatorUpperHose:
+                    RadiatorUpperHoses[cm.CarName] = cm.Mesh;
+                    break;
+                case MeshType.RadiatorLowerHose:
+                    RadiatorLowerHoses[cm.CarName] = cm.Mesh;
+                    break;
+            }
+        }
+    }
 }
 
-[Serializable]
-public struct StringMeshPair
+public class CustomMesh : MonoBehaviour
 {
     public string CarName;
-    public Mesh Mesh;
+    public MeshType Type = MeshType.FuelLine;
+    public Mesh Mesh = null;
 }
+
+public enum MeshType
+{
+    FuelLine,
+    BatteryWire,
+    RadiatorUpperHose,
+    RadiatorLowerHose
+}
+

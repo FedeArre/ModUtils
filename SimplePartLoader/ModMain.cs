@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public override string Version => "v1.4.0";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.0-rc1";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.0-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -202,6 +202,10 @@ namespace SimplePartLoader
             mi.AddLabelToUI("Preview cube toggle: ");
             PreviewCube = mi.AddKeybindToUI("ModUtils_TransparentEditor_Cube", KeyCode.Z);
 
+            mi.AddSpacerToUI();
+            mi.AddSmallHeaderToUI("Credits");
+            mi.AddLabelToUI("ModUtils (Also known as SimplePartLoader) was developed by Federico Arredondo (fedes.uy). Special thanks to BrennFuchS, ESTBanana, Reliant Robin, Horsey4, mbdriver and Jim Goose");
+
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
 
@@ -296,21 +300,6 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("Parts", ex);
             }
 
-#if MODUTILS_TIMING_ENABLED
-            watch.Stop();
-            totalTime += watch.ElapsedMilliseconds;
-            Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
-
-            watch.Restart();
-#endif
-            BuildableManager.OnGameLoad();
-#if MODUTILS_TIMING_ENABLED
-            watch.Stop();
-            totalTime += watch.ElapsedMilliseconds;
-            Debug.Log($"[ModUtils/Timing]: Building (BuildingManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
-
-            watch.Restart();
-#endif
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
@@ -351,6 +340,23 @@ namespace SimplePartLoader
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: Save dissasembly & various library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+            watch.Restart();
+#endif
+
+
+#if MODUTILS_TIMING_ENABLED
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+#endif
+            BuildableManager.OnGameLoad();
+#if MODUTILS_TIMING_ENABLED
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: Building (BuildingManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
             watch.Restart();
 #endif
             // Computer UI stuff
@@ -458,7 +464,7 @@ namespace SimplePartLoader
                     UI_Mods.SetActive(true);
                 }
 
-                else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf)
+                else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf && ModUtilsUI.currentlyEditingKeybind == null)
                 {
                     UI_Mods.SetActive(false);
                 }

@@ -4,7 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SimplePartLoader.Features.Autoupdating
+namespace SimplePartLoader.Features.Auto
+
+
+
+
 {
     public class DownloadData
     {

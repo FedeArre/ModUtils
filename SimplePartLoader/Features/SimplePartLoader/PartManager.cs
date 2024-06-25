@@ -58,7 +58,8 @@ namespace SimplePartLoader
             gameParts = new List<GameObject>();
             foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
             {
-                gameParts.Add(part);
+                if(part != null)
+                    gameParts.Add(part);
             }
 
             if (GameObject.Find("SHOPITEMS")) // Safety check for survival mode.
@@ -363,7 +364,7 @@ namespace SimplePartLoader
                 if(t.Owner.CarProps)
                     CustomLogger.AddLine("TransparentEditor", $"Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
 
-                transparentObject.AddComponent<ReworkedTransparentEdit>().transparentData = t;
+                transparentObject.AddComponent<TransparentEdit>().transparentData = t;
             }
             
             return transparentObject;

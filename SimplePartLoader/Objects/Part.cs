@@ -210,13 +210,13 @@ namespace SimplePartLoader
             return Prefab.GetComponentsInChildren<Transform>();
         }
         
-        [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on Modutils 1.5. Use PaintingSystem.Types instead!")]
+        /*[Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on Modutils 1.5. Use PaintingSystem.Types instead!")]
         public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
         {
             PaintingSystem.Types newType = (PaintingSystem.Types)type;
             EnablePartPainting(newType, paintMaterial);
         }
-        
+        */
         public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
             switch (type)

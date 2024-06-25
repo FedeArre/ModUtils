@@ -21,7 +21,10 @@ namespace SimplePartLoader.Utils
             foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
-                    CustomLogger.AddLine("Parts", "PartManager gameParts got a null on it - Restart game");
+                {
+                    CustomLogger.AddLine("Parts", "PartManager gameParts got a null on it - Restart game if casual gamemode. Survival is broken and this message is normal");
+                    continue;
+                }
 
                 if (part.name == partName)
                 {
