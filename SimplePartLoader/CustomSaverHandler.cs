@@ -25,8 +25,7 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to reset the custom data.");
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
+                CustomLogger.AddLine("Saver", ex);
                 return;
             }
         }
@@ -40,47 +39,6 @@ namespace SimplePartLoader
                 LoadBarnData(saveSystem, isBarn, si);
             else
                 LoadGameData(saveSystem, isBarn, saver);
-            /*
-            try
-            {
-                if (!Directory.Exists(SavePath))
-                    Directory.CreateDirectory(SavePath);
-
-                using (StreamReader r = new StreamReader(SavePath + FileName))
-                {
-                    string json = r.ReadToEnd();
-                    if (String.IsNullOrEmpty(json))
-                        return;
-
-                    LoadedData = JsonConvert.DeserializeObject<DataWrapper>(json);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to load the custom data.");
-                Debug.LogError($"[ModUtils/SPL/Saving/Error]: Saver: {saver} | isBarn: {isBarn}");
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
-                return;
-            }
-
-            foreach (SaveData sd in UnityEngine.Object.FindObjectsOfType<SaveData>())
-            {
-                CarProperties carProps = sd.GetComponent<CarProperties>();
-
-                if (!carProps || carProps.ObjectNumber == 0)
-                    continue;
-
-                foreach(SavedData loadedData in LoadedData.Data)
-                {
-                    if(carProps.ObjectNumber == loadedData.ObjectNumber)
-                    {
-                        sd.Data = loadedData.Data;
-                    }
-                }
-            }
-
-            Debug.Log($"[ModUtils/SPL/Saving]: Loading data was succesful, {LoadedData.Data.Count} entries have been loaded");
-            SPL.InvokeDataLoadedEvent();*/
         }
 
         internal static void LoadBarnData(SaveSystem saveSystem, bool isBarn, SaveInside si)
@@ -96,9 +54,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to load the custom data.");
-                Debug.LogError($"[ModUtils/SPL/Saving/Error]: SaveSystem status: {saveSystem} | isBarn: {isBarn} | saveInside {si}");
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
+                CustomLogger.AddLine("BarnSaver", ex);
                 return;
             }
 
@@ -122,7 +78,7 @@ namespace SimplePartLoader
                 }
             }
 
-            Debug.Log($"[ModUtils/SPL/Saving]: Loading barn data was succesful, {LoadedData.Data.Count} entries have been loaded");
+            CustomLogger.AddLine("BarnSaver", $"Loading barn data was succesful, {LoadedData.Data.Count} entries have been loaded");
             SPL.InvokeDataLoadedEvent();
         }
         internal static void LoadGameData(SaveSystem saveSystem, bool isBarn, Saver saver)
@@ -151,9 +107,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: There was an issue trying to load the custom data.");
-                Debug.LogError($"[ModUtils/SPL/Saving/Error]: SaveSystem status: {saveSystem} | isBarn: {isBarn} | saver {saver}");
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
+                CustomLogger.AddLine("Saver", ex);
                 return;
             }
 
@@ -176,7 +130,7 @@ namespace SimplePartLoader
                 }
             }
 
-            Debug.Log($"[ModUtils/SPL/Saving]: Loading game data was succesful, {LoadedData.Data.Count} entries have been loaded");
+            CustomLogger.AddLine("Saver", $"Loading game data was succesful, {LoadedData.Data.Count} entries have been loaded");
             SPL.InvokeDataLoadedEvent();
         }
 
@@ -188,44 +142,6 @@ namespace SimplePartLoader
                 SaveBarnData(saveSystem, isBarn, si);
             else
                 SaveGameData(saveSystem, isBarn);
-
-            /*
-            foreach (SaveData data in UnityEngine.Object.FindObjectsOfType<SaveData>())
-            {
-                CarProperties carProps = data.GetComponent<CarProperties>();
-                if (!carProps)
-                {
-                    Debug.LogWarning("[ModUtils/SPL/Saving/Error]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
-                    continue;
-                }
-
-                SavedData sd = new SavedData();
-
-                sd.PrefabName = data.PartName;
-                sd.Data = data.Data;
-                sd.ObjectNumber = carProps.ObjectNumber;
-                
-                DataToSave.Data.Add(sd);
-            }
-
-            try
-            {
-                if (!Directory.Exists(SavePath))
-                    Directory.CreateDirectory(SavePath);
-
-                using (TextWriter tw = new StreamWriter(SavePath + FileName))
-                {
-                    tw.Write(JsonConvert.SerializeObject(DataToSave));
-                }
-
-                Debug.Log($"[ModUtils/SPL/Saving]: Succesfully saved custom data ({DataToSave.Data.Count})");
-            }
-            catch(Exception ex)
-            {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: Saving was not succesful due to an exception.");
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: " + ex.Message);
-            }*/
-
         }
 
         internal static void SaveBarnData(SaveSystem saveSystem, bool isBarn, SaveInside si)
@@ -242,7 +158,7 @@ namespace SimplePartLoader
                     CarProperties carProps = data.GetComponent<CarProperties>();
                     if (!carProps)
                     {
-                        Debug.LogWarning("[ModUtils/SPL/Saving/Error]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
+                        CustomLogger.AddLine("BarnSaver", $"CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
                         continue;
                     }
 
@@ -259,9 +175,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: Major issue ocurred while saving barn data!");
-                Debug.LogError($"[ModUtils/SPL/Saving/Error]: saveSystem: {saveSystem} | isBarn: {isBarn} | saveInside: {si}");
-                Debug.LogError(ex.ToString());
+                CustomLogger.AddLine("BarnSaver", ex);
             }
         }
 
@@ -275,9 +189,11 @@ namespace SimplePartLoader
                     CarProperties carProps = data.GetComponent<CarProperties>();
                     if (!carProps)
                     {
-                        Debug.LogWarning("[ModUtils/SPL/Saving/Error]: CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
+                        CustomLogger.AddLine("Saver", $"CarProperties was not found on part " + data.name + ", make sure to remove SaveData component if the component is not a car part!");
                         continue;
                     }
+
+                    if (carProps.InBarn) continue; // Handled by barn data already, so it does not get duplicated. Found this was a thing on MaterialMaster development. Amazing
 
                     SavedData sd = new SavedData();
 
@@ -292,9 +208,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.LogError("[ModUtils/SPL/Saving/Error]: Major issue ocurred while saving game data!");
-                Debug.LogError($"[ModUtils/SPL/Saving/Error]: saveSystem: {saveSystem} | isBarn: {isBarn}");
-                Debug.LogError(ex.ToString());
+                CustomLogger.AddLine("Saver", ex);
             }
         }
     }

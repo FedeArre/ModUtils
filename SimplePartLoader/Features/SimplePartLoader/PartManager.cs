@@ -2,11 +2,15 @@
 using KCC;
 using RVP;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Objects;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.ConstrainedExecution;
 using UnityEngine;
 
 namespace SimplePartLoader
@@ -54,7 +58,8 @@ namespace SimplePartLoader
             gameParts = new List<GameObject>();
             foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
             {
-                gameParts.Add(part);
+                if(part != null)
+                    gameParts.Add(part);
             }
 
             if (GameObject.Find("SHOPITEMS")) // Safety check for survival mode.
@@ -73,7 +78,7 @@ namespace SimplePartLoader
 
             if(!GameObject.Find("ModLoader").GetComponent<EACheck>())
             {
-                Debug.Log("[ModUtils/Safety]: EACheck could not be found. This is a safety check. Please report this to the developer of the mod that is causing this.");
+                CustomLogger.AddLine("Main", "EA check component was not present");
                 return;
             }
 
@@ -92,8 +97,7 @@ namespace SimplePartLoader
                 }
                 catch(Exception ex)
                 {
-                    Debug.LogError("[ModUtils/SPL/Error]: Something went wrong during first load event! FirstLoad execution has been stopped. Error: ");
-                    Debug.LogError(ex.ToString());
+                    CustomLogger.AddLine("Parts", ex);
                     return;
                 }
 
@@ -110,7 +114,7 @@ namespace SimplePartLoader
                 {
                     if (!part.Prefab.GetComponent<CarProperties>() || !part.Prefab.GetComponent<Partinfo>())
                     {
-                        Debug.LogWarning($"[ModUtils/SPL/Error]: The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
+                        CustomLogger.AddLine("Parts", $"The part {part.Prefab.name} ({part.PartType}) has a missing component when trying to load it to the game.");
                         modLoadedParts.Remove(part);
                         continue;
                     }
@@ -119,7 +123,7 @@ namespace SimplePartLoader
                     {
                         if(part.Mod.RequiresSteamCheck && !part.Mod.Checked)
                         {
-                            Debug.Log($"[ModUtils/SPL/Safety]: Removing {part.Prefab.name}");
+                            CustomLogger.AddLine("PartsEA", $"Removing {part.Prefab.name}");
                             GameObject.Destroy(part.Prefab);
                             modLoadedParts.Remove(part);
                         }
@@ -127,31 +131,22 @@ namespace SimplePartLoader
 
                     if (!part.Prefab.GetComponent<SPL_Part>())
                     {
-                        part.Prefab.AddComponent<SPL_Part>();
+                        part.Prefab.AddComponent<SPL_Part>().Mod = part.Mod;
                     }
 
-                    // v1.4 - Experimental wrong triger setup detection
-                    if(part.CarProps.triger)
+                    MaterialSetup ms = part.Prefab.GetComponent<MaterialSetup>();
+                    if (ms)
                     {
-                        MeshCollider mc = part.Prefab.GetComponent<MeshCollider>();
-                        if(mc == null)
-                        {
-                            Debug.LogError($"[ModUtils/SPL/Error]: {part.CarProps.PrefabName} does not have a MeshCollider!");
-                            continue;
-                        }
+                        if (ms.SetPartToBlackMaterial)
+                            part.Renderer.material = PaintingSystem.GetBodymatMaterial(part.Mod.Settings.UseBackfaceShader);
 
-                        if(!mc.isTrigger)
-                        {
-                            Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.CarProps.PrefabName} has CarProperties.triger set to true but MeshCollider isTrigger set to false!");
-                        }
+                        if (ms.EnableChromeStationSupport)
+                            part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
 
-                        foreach(Collider c in part.Prefab.GetComponentsInChildren<Collider>())
-                        {
-                            if(!c.isTrigger && c.gameObject.layer == LayerMask.NameToLayer("Default"))
-                            {
-                                Debug.LogError($"[ModUtils/SPL/TrigerSetup/Error]: {part.Prefab.name} child named {c.gameObject.name} has wrong layer for triger setup!");
-                            }
-                        }
+                        if (ms.SupportType != PaintTypes.DontAdd)
+                            PaintingSystem.SetupPart(part, (PaintingSystem.Types) ms.SupportType);
+
+                        GameObject.Destroy(ms);
                     }
                 }
             }
@@ -167,21 +162,19 @@ namespace SimplePartLoader
 
             Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
 
-            if(SPL.DEVELOPER_LOG)
+            if(CustomLogger.DebugEnabled)
             {
-                Debug.Log("[ModUtils/SPL]: Parts catalog has been modified. New size: " + jpl.Parts.Length);
+                CustomLogger.AddLine("Parts", "Parts catalog has been modified. New size: " + jpl.Parts.Length);
                 foreach (Part p in modLoadedParts)
                 {
-                    Debug.Log($"[ModUtils/SPL]: Added part: {p.Name} (GameObject name: {p.Prefab}");
+                    CustomLogger.AddLine("Parts", $"Added part: {p.Name} (GameObject name: {p.Prefab}", true);
                 }
             }
-            
-            
+
             foreach (Part p in modLoadedParts)
             {
                 if(!p.Prefab)
                 {
-                    Debug.LogError("[ModUtils/SPL/Error]: Null part safety on modLoadedParts, name: " + p.Name);
                     continue;
                 }
                 GameObject.DontDestroyOnLoad(p.Prefab);
@@ -209,9 +202,9 @@ namespace SimplePartLoader
                 }
             }
 
-            if(SPL.PREFAB_NAME_COLLISION_CHECK)
+            if (SPL.PREFAB_NAME_COLLISION_CHECK)
             {
-                Debug.Log("[ModUtils/SPL/PrefabNameCollisionCheck]: Checking for prefab name collisions...");
+                CustomLogger.AddLine("PrefabNameCollisionCheck", "Checking for prefab name collisions...");
                 List<string> prefabNames = new List<string>();
                 foreach (GameObject go in gameParts)
                 {
@@ -221,7 +214,7 @@ namespace SimplePartLoader
                     
                     if (prefabNames.Contains(cp.PrefabName))
                     {
-                        Debug.LogError($"[ModUtils/SPL/PrefabNameCollisionCheck]: Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
+                        CustomLogger.AddLine("PrefabNameCollisionCheck", $"Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
                     }
                     else
                     {
@@ -232,7 +225,7 @@ namespace SimplePartLoader
 
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
 
-            // We know load our transparents. We have to load them for the junkyard parts, car prefabs.
+            // We now load our transparents. We have to load them for the junkyard parts, car prefabs.
             foreach(TransparentData t in transparentData)
             {
                 // We check the car part list for every possible part that has the transparent. This is slow but required for dummy part transparent attaching and will not impact FPS (Only loading time).
@@ -240,6 +233,22 @@ namespace SimplePartLoader
                 { 
                     if(t.AttachesTo == part.name)
                     {
+                        bool preventTransparentCreation = false;
+
+                        foreach(transparents transparent in part.GetComponentsInChildren<transparents>())
+                        {
+                            if(transparent.name == t.Name && transparent.SavePosition == t.SavePosition)
+                            {
+                                preventTransparentCreation = true;
+                            }
+                        }
+
+                        if(preventTransparentCreation)
+                        {
+                            CustomLogger.AddLine("Transparents", $"Prevented transparent {t.Name} creation due to existing transparent with same save position ({t.SavePosition})");
+                            break;
+                        }
+
                         SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name})");
 
                         GameObject transparentObject = GetTransparentReadyObject(t);
@@ -348,12 +357,12 @@ namespace SimplePartLoader
 
             if (t.TestingEnabled)
             {
-                Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: {t.Name} ({t.Owner.Name}) has the transparent editor enabled");
+                CustomLogger.AddLine("TransparentEditor", $"{t.Name} ({t.Owner.Name}) has the transparent editor enabled");
                 if(t.Owner.Mod != null)
-                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part added by mod {t.Owner.Mod.Name}");
+                    CustomLogger.AddLine("TransparentEditor", $"Part added by mod {t.Owner.Mod.Name}");
                 
                 if(t.Owner.CarProps)
-                    Debug.LogWarning($"[ModUtils/TransparentEditor/Warning]: Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
+                    CustomLogger.AddLine("TransparentEditor", $"Part prefab name: {t.Owner.CarProps.PrefabName} ({t.Owner.CarProps.PartName})");
 
                 transparentObject.AddComponent<TransparentEdit>().transparentData = t;
             }
@@ -364,9 +373,11 @@ namespace SimplePartLoader
         internal static void LoadPrefabGeneratorParts()
         {
             foreach (Part part in prefabGenParts)
-            {
+            {;
                 // We first get the data from our part
                 PrefabGenerator data = part.Prefab.GetComponent<PrefabGenerator>();
+
+                CustomLogger.AddLine("Debug", "Prefab generator trying to generate " + data.PrefabName);
 
                 // We convert all our HexNut / FlatNut / BoltNut / WeldCut to be supported by the game.
                 // This is to allow developers to use either the "Mark as [..]" components or work directly with the components
@@ -377,7 +388,7 @@ namespace SimplePartLoader
                         HexNut hx = t.GetComponent<HexNut>();
                         CarProperties cp = hx.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         hx.gameObject.AddComponent<DISABLER>();
 
@@ -394,7 +405,7 @@ namespace SimplePartLoader
                         BoltNut bn = t.GetComponent<BoltNut>();
                         CarProperties cp = bn.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         bn.gameObject.AddComponent<DISABLER>();
 
@@ -411,7 +422,7 @@ namespace SimplePartLoader
                         FlatNut fn = t.GetComponent<FlatNut>();
                         CarProperties cp = fn.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         fn.gameObject.AddComponent<DISABLER>();
 
@@ -428,7 +439,7 @@ namespace SimplePartLoader
                         WeldCut wc = t.GetComponent<WeldCut>();
                         CarProperties cp = wc.gameObject.AddComponent<CarProperties>();
                         cp.Attached = true;
-                        cp.DMGdisplacepart = true;
+                        cp.DMGdisplacepart = part.BoltDisplacement;
                         
                         wc.gameObject.AddComponent<DISABLER>();
 
@@ -444,7 +455,7 @@ namespace SimplePartLoader
 
                 if(!data.EnableMeshChange && part.GetComponent<MeshFilter>())
                 {
-                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Part {part.Name} has a MeshFilter component but EnableMeshChange is set to false. This will cause the part to not be loaded properly. Please set EnableMeshChange to true or remove the MeshFilter component.");
+                    part.ReportIssue($"Wrong setup in Prefab Generator - Has a MeshFilter component but EnableMeshChange is set to false.");
                     continue;
                 }
                 
@@ -453,20 +464,17 @@ namespace SimplePartLoader
 
                 if (!part.CarProps)
                 {
-                    Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Prefab generator was unable to create {part.Name}");
+                    CustomLogger.AddLine("Parts", $"Prefab generator was unable to create {part.Name}");
                     continue;
                 }
 
                 // Now we remove all specific childs / move them.
                 foreach(ChildDestroy cd in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                 {
-                    if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
-                    {
-                        Debug.Log($"[ModUtils/SPL/PrefabGen/DevLog]: Part {part.Prefab.name} - Trying to destroy {cd.name} (SW: {cd.StartsWith} | EW: {cd.EndsWith})");
-                    }
-
                     foreach(Transform t in part.GetTransforms())
                     {
+                        if (t == part.Prefab.transform) continue;
+
                         if (cd.StartsWith)
                         {
                             if (t.name.StartsWith(cd.ChildName))
@@ -555,6 +563,7 @@ namespace SimplePartLoader
 
                 part.PartInfo.DontShowInCatalog = !data.EnablePartOnCatalog;
                 part.PartInfo.DontSpawnInJunyard = !data.EnablePartOnJunkyard;
+                part.PartInfo.HingePivot = null; // Force reset of it (if required)
 
                 // Mesh stuff
                 if (data.EnableMeshChange)
@@ -575,7 +584,7 @@ namespace SimplePartLoader
                             }
                             else
                             {
-                                Debug.Log($"[ModUtils/PaintingSystem/Warning]: {part.Prefab} prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}. This is only a warning, but you should fix it.");
+                                part.ReportIssue($"Prefab has {part.Renderer.materials.Length} materials but the dummy original has {dummyMats.Length}");
                                 part.Renderer.materials = dummyMats;
                             }
                             break;
@@ -587,7 +596,7 @@ namespace SimplePartLoader
                     }
 
                     if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable && (part.CarProps.Paintable || part.CarProps.DMGdeformMesh || part.CarProps.DMGdisplacepart))
-                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Mesh from {data.PrefabName} is not readable. This will cause the part to not be loaded properly. Please make the mesh readable.");
+                        part.ReportIssue($"Mesh is not readable and part is paintable or deformable.");
                 }
 
                 // To enable chroming on our part
@@ -599,7 +608,7 @@ namespace SimplePartLoader
                 if (data.CatalogImage)
                 {
                     if (data.CatalogImage.width < 500 || data.CatalogImage.height < 500)
-                        Debug.LogError($"[ModUtils/SPL/PrefabGen/Error]: Thumbnail of {data.PrefabName} is too small! Size has to be at least 500x500!");
+                        part.ReportIssue($"Thumbnail is too small! Size has to be at least 500x500!");
 
                     part.PartInfo.Thumbnail = data.CatalogImage;
                 }
@@ -712,9 +721,7 @@ namespace SimplePartLoader
                     DestroyConsideringSetting(part, markedTransparent.gameObject);
                 }
 
-                if(part.Mod != null && part.Mod.Settings.EnableDeveloperLog)
-                    Debug.Log($"[ModUtils/SPL/Debug]: Loaded {part.Name} (ingame: {part.CarProps.PartName}) through prefab generator");
-                
+                part.PrefabGenLoaded = true;
                 // Destroy some stuff
                 DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());
                 

@@ -6,17 +6,19 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static EVP.VehicleAudio;
+using static PaintIn3D.P3dCoordCopier;
 
 namespace SimplePartLoader.CarGen
 {
     public class CarGenUtils
     {
-        public static void DeleteRootTransparent(GameObject go, string transparentToDel)
+        public static void DeleteRootTransparent(GameObject go, string transparentToDel, Car c)
         {
             Transform t = go.transform.Find(transparentToDel);
             if (!t)
             {
-                Debug.LogError("[ModUtils/CarGenUtils/Error]: Invalid transparent delete - " + transparentToDel);
+                c.ReportIssue("Invalid transparent delete - " + transparentToDel);
             }
             else
             {
@@ -48,7 +50,7 @@ namespace SimplePartLoader.CarGen
             bool callAgain = false;
             if(iterationCount > 30)
             {
-                Debug.LogError("[ModUtils/CarGen/Warning]: Recursive build on " + car.carGeneratorData.CarName + " car reached 30 iterations, aborting.");
+                CustomLogger.AddLine("CarGenerator", $"Recursive build on " + car.carGeneratorData.CarName + " car reached 30 iterations, aborting.");
                 return;
             }
 
@@ -63,14 +65,50 @@ namespace SimplePartLoader.CarGen
                     isParentCustom = true;
                 }
 
-                GameObject part = PartLookup(t.name, isParentCustom, car.exceptionsObject, t.Type);
+                GameObject part = PartLookup(t.name, isParentCustom, car, t.Type);
+                
+                if(t.name == t.transform.parent.name)
+                {
+                    car.ReportIssue($"Car generation prevented infinite loop for {t.name}");
+                    continue;
+                }
 
                 if (!part)
                 {
-                    if (car.EnableDebug)
-                        Debug.LogWarning("[ModUtils/CarGen/PartLookup/Warning]: Part lookup could not find part for " + t.name);
-                    
+                    if (CustomLogger.DebugEnabled)
+                        CustomLogger.AddLine("CarDebug", "Part lookup could not find part for " + t.name);
+
                     continue;
+                }
+
+                SPL_Part splPart = part.GetComponent<SPL_Part>();
+                if (splPart && splPart.Mod != null && splPart.Mod.Mod != null && splPart.Mod != car.loadedBy)
+                {
+                    if(!car.OtherModBuildingExceptions.Contains(splPart.Mod.Mod.ID))
+                    {
+                        car.ReportIssue($"Car generation prevented part fitting for {t.name} because part was from other mod ({splPart.Mod.Mod.ID})");
+                        continue;
+                    }
+                }
+
+                if(!string.IsNullOrEmpty(car.AutomaticFitToCar))
+                {
+                    Partinfo pi = part.GetComponent<Partinfo>();
+                    bool flag = false;
+                    foreach(string s in pi.FitsToCar)
+                    {
+                        if(s == car.AutomaticFitToCar)
+                        {
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if(!flag && !car.FitToCarExceptions.Contains(pi.RenamedPrefab))
+                    {
+                        Array.Resize(ref pi.FitsToCar, pi.FitsToCar.Length + 1);
+                        pi.FitsToCar[pi.FitsToCar.Length - 1] = car.AutomaticFitToCar;
+                    }
                 }
 
                 CarBuilding.CopyPartIntoTransform(part, t.transform);
@@ -97,16 +135,94 @@ namespace SimplePartLoader.CarGen
             return true;
         }
 
-        internal static GameObject PartLookup(string name, bool parentIsCustom, BuildingExceptions exceptions, int type)
+        internal static GameObject PartLookup(string name, bool parentIsCustom, Car car, int type)
         {
             GameObject foundPart = null;
+
+            BuildingExceptions exceptions = car.exceptionsObject;
 
             // Hardcoded exceptions
             if (name == "Spacer")
                 return null;
-            
+
+            // Even faster lookup, priorize mod-loaded stuff first!
+            foreach (Part partObj in car.loadedBy.Parts)
+            {
+                GameObject part = partObj.Prefab;
+
+                if (part == null)
+                    continue;
+
+                if (part.name == name)
+                {
+                    foundPart = part;
+
+                    if (exceptions.ExceptionList.ContainsKey(name))
+                    {
+                        CarProperties carProps = part.GetComponent<CarProperties>();
+                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        {
+                            foundPart = null;
+                            continue;
+                        }
+                    }
+
+                    if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart.GetComponent<CarProperties>().Type != type && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart)
+                        break;
+
+                }
+            }
+
+            if (foundPart)
+                return foundPart;
+
+            // Slow lookup by Partinfo RenamedPrefab. Only happens if part was not found yet (looking on mod parts only)
+            foreach (Part partObj in car.loadedBy.Parts)
+            {
+                GameObject part = partObj.Prefab;
+                if (part == null)
+                    continue;
+
+                Partinfo pi = part.GetComponent<Partinfo>();
+                if (pi.RenamedPrefab == name)
+                {
+                    foundPart = part;
+
+                    if (exceptions.ExceptionList.ContainsKey(name))
+                    {
+                        CarProperties carProps = part.GetComponent<CarProperties>();
+                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        {
+                            foundPart = null;
+                            continue;
+                        }
+                    }
+
+                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom && !exceptions.IgnoringStatusForPart(name))
+                    {
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart)
+                        break;
+                }
+            }
+
             // Fast lookup, only by GameObject name (Works for almost all parts)
-            foreach(GameObject part in PartManager.gameParts)
+            foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
                     continue;

@@ -8,15 +8,19 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
-using static NWH.VehiclePhysics2.Demo.DemoSettings;
 
 namespace SimplePartLoader
 {
     public class ModInstance
     {
         private Mod thisMod;
+
         private List<Part> loadedParts;
         private List<Furniture> loadedFurniture;
+        private List<Car> loadedCars;
+        private List<Buildable> loadedBuildables;
+        private List<BuildableMaterial> loadedBuildableMats;
+
         private ModSettings settings;
 
         internal bool RequiresSteamCheck = false;
@@ -25,7 +29,13 @@ namespace SimplePartLoader
         internal bool CheckedAndAllowed = true;
 
         internal bool Thumbnails = false;
-        
+
+        internal List<ISetting> ModSettings = new List<ISetting>();
+
+        internal Action OnSettingsLoad;
+        internal bool SettingsLoaded;
+        internal bool CardLoaded;
+
         public List<Part> Parts
         {
             get { return loadedParts; }
@@ -36,6 +46,22 @@ namespace SimplePartLoader
         {
             get { return loadedFurniture; }
             internal set { loadedFurniture = value; }
+        }
+        public List<Car> Cars
+        {
+            get { return loadedCars; }
+            internal set { loadedCars = value; }
+        }
+        public List<Buildable> Buildables
+        {
+            get { return loadedBuildables; }
+            internal set { loadedBuildables = value; }
+        }
+
+        public List<BuildableMaterial> BuildableMaterials
+        {
+            get { return loadedBuildableMats; }
+            internal set { loadedBuildableMats = value; }
         }
         
         public Mod Mod
@@ -61,11 +87,14 @@ namespace SimplePartLoader
         internal ModInstance(Mod mod)
         {
             thisMod = mod;
+
             loadedParts = new List<Part>();
             loadedFurniture = new List<Furniture>();
-            settings = new ModSettings(this);
+            loadedCars = new List<Car>();
+            loadedBuildables = new List<Buildable>();
+            loadedBuildableMats = new List<BuildableMaterial>();
 
-            DebugIfEnabled($"[ModUtils/RegisteredMods]: Succesfully registered " + mod.Name);
+            settings = new ModSettings(this);
         }
 
         public Part Load(AssetBundle bundle, string prefabName)
@@ -76,6 +105,9 @@ namespace SimplePartLoader
 
             if (String.IsNullOrWhiteSpace(prefabName))
                 SPL.SplError("Tried to create a part without prefab name");
+
+            if(settings.PrefabNamePrefix != "")
+                prefabName = settings.PrefabNamePrefix + prefabName;
 
             if (Saver.modParts.ContainsKey(prefabName))
                 SPL.SplError($"Tried to create an already existing prefab ({prefabName})");
@@ -117,6 +149,9 @@ namespace SimplePartLoader
                 loadedParts.Add(part);
                 
                 part.PartType = PartTypes.FULL_PART;
+
+                if (Saver.modParts.ContainsKey(part.CarProps.PrefabName))
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {part.CarProps.PrefabName} on Saver.modParts. Part loading is {prefabName}");
                 
                 Saver.modParts.Add(part.CarProps.PrefabName, prefab);
 
@@ -130,7 +165,17 @@ namespace SimplePartLoader
                     part.PartInfo.FitsToEngine = part.Mod.Settings.AutomaticFitsToEngine;
                 }
                 
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (full part) {prefabName} from {thisMod.Name}");
+                PartProperties pp = part.GetComponent<PartProperties>();
+                if(pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        part.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
+
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
             
@@ -139,24 +184,52 @@ namespace SimplePartLoader
             if (prefabGen)
             {
                 p.Name = prefabGen.PrefabName;
+
+                if (Saver.modParts.ContainsKey(p.Name))
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+                
                 Saver.modParts.Add(p.Name, prefab);
 
                 PartManager.prefabGenParts.Add(p);
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY_PREFABGEN;
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part with Prefab generator) {prefabName} from {thisMod.Name}");
+
+                PartProperties pp = p.GetComponent<PartProperties>();
+                if (pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        p.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
             }
             else
             {
-                p.Name = prefabName;
+                p.Name = prefabName; 
+                
+                if (Saver.modParts.ContainsKey(p.Name))
+                    CustomLogger.AddLine("Parts", $"Duplicate entry {p.Name} on Saver.modParts. Part loading is {prefabName}");
+
                 Saver.modParts.Add(prefabName, prefab);
                 
                 PartManager.dummyParts.Add(p);
                 loadedParts.Add(p);
 
                 p.PartType = PartTypes.DUMMY;
-                DebugIfEnabled($"[ModUtils/SPL]: Succesfully loaded part (dummy part) {prefabName} from {thisMod.Name}");
+
+                PartProperties pp = p.GetComponent<PartProperties>();
+                if (pp)
+                {
+                    pp.Properties.ForEach(property =>
+                    {
+                        p.Properties.Add(property);
+                    });
+
+                    GameObject.Destroy(pp);
+                }
             }
 
             return p;
@@ -166,27 +239,27 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a furniture without valid AssetBundle");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a furniture without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                Debug.Log("[ModUtils/Furniture/Error]: Tried to create a part without prefab name");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a part without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
-                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create an already existing prefab ({prefabName})");
+                CustomLogger.AddLine("Furnitures", $"Tried to create an already existing prefab ({prefabName})");
 
             GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
             if (!prefab)
-                Debug.Log($"[ModUtils/Furniture/Error]: Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
 
             FurnitureGenerator furnitureGen = prefab.GetComponent<FurnitureGenerator>();
             if (!furnitureGen)
-                Debug.Log($"[ModUtils/Furniture/Error]: {prefabName} has no Furniture Generator component");
+                CustomLogger.AddLine("Furnitures", $"{prefabName} has no Furniture Generator component");
             
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
 
             if(FurnitureManager.Furnitures.ContainsKey(furnitureGen.PrefabName))
             {
-                Debug.Log($"[ModUtils/Furniture/Error]: {furnitureGen.PrefabName} prefab name is already on use!");
+                CustomLogger.AddLine("Furnitures", $"{furnitureGen.PrefabName} prefab name is already on use!");
                 return null;
             }
             
@@ -196,7 +269,6 @@ namespace SimplePartLoader
 
             loadedFurniture.Add(furn);
             FurnitureManager.Furnitures.Add(furn.PrefabName, furn);
-            DebugIfEnabled($"[ModUtils/Furniture]: Succesfully loaded {furn.PrefabName} (mod: {Mod.Name})");
             
             return furn;
         }
@@ -216,7 +288,6 @@ namespace SimplePartLoader
         
         internal async void Check(ulong SteamID)
         {
-            Debug.Log($"Checking for {SteamID} at mod {Mod.Name}");
             if (!RequiresSteamCheck)
                 return;
 
@@ -242,15 +313,14 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/EACheck/Error]: An exception occured");
-                Debug.LogError(ex);
+                CustomLogger.AddLine("EACheck", ex);
             }
 
             if(!allowed)
             {
-                Debug.Log("[ModUtils/EACheck]: User is not allowed to use this mod - " + Mod.Name);
+                CustomLogger.AddLine("EACheck", $"User is not allowed to use mod " + Mod.Name);
                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Mod.Name);
-                
+
                 foreach (Part p in Parts)
                 {
                     if (PartManager.modLoadedParts.Contains(p))
@@ -283,8 +353,20 @@ namespace SimplePartLoader
                     FurnitureManager.Furnitures.Remove(f);
                 }
 
+                foreach(Buildable b in Buildables)
+                {
+                    BuildableManager.Buildables[b.PrefabName] = null;
+                }
+
+                foreach (Car c in Cars)
+                {
+                    MainCarGenerator.RegisteredCars.Remove(c);
+                }
+
                 Parts.Clear();
                 Furnitures.Clear();
+                Buildables.Clear();
+                Cars.Clear();
             }
         }
 
@@ -292,40 +374,256 @@ namespace SimplePartLoader
         {
             // Safety checks
             if (!bundle)
-                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without valid AssetBundle");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a car without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
-                Debug.LogError("[ModUtils/CarGen/Error]: Tried to create a car without car / empty / transparents name");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a car without car / empty / transparents name");
 
             GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
             GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
             GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
             
             if (!carPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
             
             if (!emptyCarPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
             
             if (!transparentsPrefab)
-                Debug.LogError($"[ModUtils/CarGen/Error]: Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+                CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
 
             CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
             if(!carGen)
-                Debug.LogError($"[ModUtils/CarGen/Error]: {carObject} has no Car Generator component");
+                CustomLogger.AddLine("CarGenerator", $"{carObject} has no Car Generator component");
 
             Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
             car.loadedBy = this;
 
+            Cars.Add(car);
+
             MainCarGenerator.RegisteredCars.Add(car);
             return car;
         }
-        public void DebugIfEnabled(string text)
+
+        public void EnableDebug(bool saveDissasembler = false)
         {
-            if (settings.EnableDeveloperLog)
+            ErrorMessageHandler.GetInstance().DebugEnabled.Add(Mod.ID);
+            CustomLogger.DebugEnabled = true;
+
+            if (saveDissasembler)
             {
-                Debug.Log(text);
+                ErrorMessageHandler.GetInstance().Dissasembler.Add(Mod.ID);
+                CustomLogger.SaveDissasamble = true;
             }
+        }
+
+        public Buildable LoadBuildable(AssetBundle bundle, string prefabName)
+        {
+            // Safety checks
+            if (!bundle)
+                CustomLogger.AddLine("Buildables", $"Tried to create a buildable without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                CustomLogger.AddLine("Buildables", $"Tried to create a buildable without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+
+            if (!prefab)
+                CustomLogger.AddLine("Buildables", $"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+
+            BuildableGenerator buildGen = prefab.GetComponent<BuildableGenerator>();
+            if (!buildGen)
+                CustomLogger.AddLine("Buildables", $"{prefabName} does not have Buildable Generator component!");
+
+            if (BuildableManager.Buildables.Contains(buildGen.PrefabName))
+                CustomLogger.AddLine("Buildables", $"{buildGen.PrefabName} (from {prefabName}) prefab name is already registered in ModUtils!");
+
+            if (Saver.modParts.Contains(buildGen.PrefabName))
+                CustomLogger.AddLine("Buildables", $"{buildGen.PrefabName} (from {prefabName}) prefab name is already registered in game saver!");
+
+            Buildable b = new Buildable(buildGen.PrefabName, prefab, (BuildableType) buildGen.Type);
+            b.loadedBy = this;
+
+            prefab.AddComponent<SaveItem>().PrefabName = buildGen.PrefabName;
+            prefab.tag = "Building";
+
+            if (b.Type == BuildableType.DOOR && buildGen.OpenPosition && buildGen.ClosedPosition)
+            {
+                OpenGarage garage = prefab.AddComponent<OpenGarage>();
+                garage.OpenOnOThisClick = true;
+                garage.GateClosed = buildGen.ClosedPosition.gameObject;
+                garage.GateOpen = buildGen.OpenPosition.gameObject;
+            }
+
+            BuildableManager.Buildables.Add(buildGen.PrefabName, b);
+            Saver.modParts.Add(buildGen.PrefabName, prefab);
+
+            Buildables.Add(b);
+            return b;
+        }
+
+        public BuildableMaterial LoadBuildableMaterial(AssetBundle bundle, string prefabName, string materialName, Vector3 shopPosition, Vector3 shopRotation)
+        {
+            // Safety checks
+            if (!bundle)
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material prefab but it was not found in the AssetBundle {prefabName}");
+
+            Material mat = bundle.LoadAsset<Material>(materialName);
+            if (!mat)
+                CustomLogger.AddLine("BuildablesMats", $"Tried to create a buildable material but it was not found in the AssetBundle {materialName}");
+
+            if (BuildableManager.BuildableMaterials.Contains(materialName))
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material name is already registered in ModUtils!");
+
+            if (Saver.modParts.Contains(materialName))
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material name is already registered in game saver!");
+
+            if (shopPosition == null || shopRotation == null)
+                CustomLogger.AddLine("BuildablesMats", $"{materialName} (from {prefabName}) material does not have shop position or shop rotation!");
+
+            BuildableMaterial bm = new BuildableMaterial(materialName, mat, this, shopPosition, shopRotation, prefab);
+
+            BuildableManager.BuildableMaterials.Add(materialName, bm);
+            Saver.modParts.Add(materialName, mat);
+
+            BuildableMaterials.Add(bm);
+            return bm;
+        }
+
+        public void LoadCustomMeshObject(AssetBundle bundle, string prefabName)
+        {
+            // Safety checks
+            if (!bundle)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load custom meshes object without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object without valid prefab name");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object prefab but it was not found in the AssetBundle {prefabName}");
+
+            CustomMeshes cm = prefab.GetComponent<CustomMeshes>();
+            if (!cm)
+                CustomLogger.AddLine("CustomMeshes", $"Tried to load a custom meshes object but component was not found in the GameObject {prefabName}");
+
+            if(CustomMeshHandler.IsEngineNameUsed(cm))
+            {
+                CustomLogger.AddLine("CustomMeshes", $"Repeated engine name found, name {cm.EngineName}");
+            }
+
+            cm.DoInternalConversion();
+            CustomMeshHandler.Meshes.Add(cm);
+        }
+
+
+        // Mod settings update
+        public Label AddLabelToUI(string text)
+        {
+            Label label = new Label(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
+
+        public Header AddHeaderToUI(string text)
+        {
+            Header label = new Header(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
+        public SmallHeader AddSmallHeaderToUI(string text)
+        {
+            SmallHeader label = new SmallHeader(text);
+            ModSettings.Add(label);
+
+            return label;
+        }
+        public void AddSpacerToUI()
+        {
+            Spacer s = new Spacer();
+            ModSettings.Add(s);
+        }
+        public void AddSeparatorToUI()
+        {
+            Separator s = new Separator();
+            ModSettings.Add(s);
+        }
+
+        public TextInput AddTextInputToUI(string saveId, string text, string defaultValue = "", Action<string> onValueChange = null)
+        {
+            TextInput textInput = new TextInput(saveId, text, defaultValue, onValueChange);
+            ModSettings.Add(textInput);
+
+            return textInput;
+        }
+
+        public ModDropdown AddDropdownToUI(string saveId, string text, string[] options, int defaultOption = 0, Action<int> onValueChange = null)
+        {
+            ModDropdown dropdown = new ModDropdown(saveId, text, options, defaultOption, onValueChange);
+            ModSettings.Add(dropdown);
+            return dropdown;
+        }
+
+        public ModSlider AddSliderToUI(string saveId, float minValue, float maxValue, float value, bool wholeNumbers = true, Action<float> onValueChange = null)
+        {
+            if(minValue > maxValue || value < minValue || value > maxValue)
+            {
+                CustomLogger.AddLine("ModUtilsUI", $"Wrong setup of slider in {Mod.ID} - discarding setting!");
+                return null;
+            }
+
+            ModSlider s = new ModSlider(saveId, minValue, maxValue, value, wholeNumbers, onValueChange);
+            ModSettings.Add(s);
+            return s;
+        }
+
+        public ModButton AddButtonToUI(string text, Action onButtonClick = null)
+        {
+            ModButton mb = new ModButton(text, onButtonClick);
+            ModSettings.Add(mb);
+            return mb;
+        }
+
+        public Checkbox AddCheckboxToUI(string saveId, string text, bool value, Action<bool> onValueChange = null) 
+        {
+            Checkbox ch = new Checkbox(saveId, text, value, onValueChange);
+            ModSettings.Add(ch);
+            return ch;
+        }
+        public Keybind AddKeybindToUI(string saveId, KeyCode key, KeyCode multiplier = KeyCode.None)
+        {
+            Keybind kb = new Keybind(saveId, key, multiplier);
+            ModSettings.Add(kb);
+            return kb;
+        }
+
+        public void SetSettingsLoadedFunction(Action func)
+        {
+            OnSettingsLoad = func;
+        }
+
+        internal List<ISetting> GetSaveablesSettings()
+        {
+            List<ISetting> settings = new List<ISetting>();
+
+            foreach(ISetting setting in ModSettings)
+            {
+                if(setting is Checkbox || setting is ModSlider || setting is ModDropdown || setting is TextInput || setting is Keybind)
+                {
+                    settings.Add(setting);
+                }
+            }
+
+            return settings.Count == 0 ? null : settings;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace SimplePartLoader.CarGen
 
             if (Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -39,7 +39,7 @@ namespace SimplePartLoader.CarGen
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
                 return;
             }
 
@@ -65,6 +65,8 @@ namespace SimplePartLoader.CarGen
             counter_colorMap.enabled = false;
 
             CheckHighResolutionPaint(Prefab, res);
+
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         public static void EnablePaintAndRust(GameObject Prefab, PaintingSystem.PartPaintResolution res)
@@ -74,7 +76,7 @@ namespace SimplePartLoader.CarGen
 
             if (Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -96,7 +98,7 @@ namespace SimplePartLoader.CarGen
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
                 return;
             }
 
@@ -139,6 +141,7 @@ namespace SimplePartLoader.CarGen
             counter_colorMap.enabled = false;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
 
@@ -149,7 +152,7 @@ namespace SimplePartLoader.CarGen
 
             if (Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -171,7 +174,7 @@ namespace SimplePartLoader.CarGen
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
                 return;
             }
 
@@ -201,7 +204,7 @@ namespace SimplePartLoader.CarGen
 
             if (Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -231,13 +234,13 @@ namespace SimplePartLoader.CarGen
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
                 return;
             }
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
                 return;
             }
 
@@ -304,6 +307,7 @@ namespace SimplePartLoader.CarGen
             counter_dirt.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         public static void EnablePaintAndDirt(GameObject Prefab, PaintingSystem.PartPaintResolution res)
@@ -313,7 +317,7 @@ namespace SimplePartLoader.CarGen
 
             if (Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/CarGen/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -343,13 +347,13 @@ namespace SimplePartLoader.CarGen
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + Prefab.name);
                 return;
             }
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/CarGen/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + Prefab.name);
                 return;
             }
 
@@ -381,6 +385,7 @@ namespace SimplePartLoader.CarGen
             paintableTexture_dirt.Group = 5;
 
             CheckHighResolutionPaint(Prefab, res);
+            PaintingSystem.TryApplyL2Overwrite(Prefab);
         }
 
         internal static void CheckHighResolutionPaint(GameObject Prefab, PaintingSystem.PartPaintResolution res)

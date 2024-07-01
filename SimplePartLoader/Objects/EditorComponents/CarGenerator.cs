@@ -10,13 +10,13 @@ public class CarGenerator : MonoBehaviour
     public string CarName = "";
     public int CarPrice = 0;
     public CarBase BaseCarToUse = CarBase.Chad;
-    public List<string> TransparentsToDelete = new List<string>();
 
     [Header("Custom meshes - Fuel line")]
     public Mesh Inline4FuelLine;
     public Mesh V8EngineFuelLine;
     public Mesh Inline6FuelLine;
-    
+    public Mesh Inline6DieselFuelLine;
+
     [Header("Custom meshes - Brake line")]
     public bool EnableCustomBrakeLine;
     public Mesh BrakeLineMesh;
@@ -29,6 +29,7 @@ public class CarGenerator : MonoBehaviour
     public Mesh Inline4BatteryWires;
     public Mesh V8EngineBatteryWires;
     public Mesh Inline6BatteryWires;
+    public Mesh Inline6DieselBatteryWires;
 
     [Header("Fixes & settings (Don't touch if you don't know what are you doing!)")]
     public bool EnableAttachFix = true;
@@ -41,9 +42,23 @@ public class CarGenerator : MonoBehaviour
     public bool EnableAutomaticFluidSetup = true;
     public bool EnableAWD = false;
     public bool Disable_NWH_Rebuild = false;
+
+    [Header("Spawn settings")]
+    public bool SpawnOnJobs = false;
+    public bool SpawnRuined = false;
+    public bool SpawnOnBarn = false;
+
+    [Header("Transparent remover")]
+    public bool RemoveOriginalTransparents = false;
+    public bool DontRemoveBatteryWires = true;
+    public bool DontRemoveFuelLine = true;
+    public bool DontRemoveBrakeLine = true;
+    public List<string> TransparentExceptions = new List<string>();
 }
 
 public enum CarBase
 {
-    Chad
+    Chad,
+    LAD,
+    Wolf
 }

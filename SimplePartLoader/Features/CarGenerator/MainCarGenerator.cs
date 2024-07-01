@@ -1,9 +1,14 @@
-﻿using PaintIn3D;
+﻿//#define MODUTILS_DEVELOPER_CAR_CREATOR
+
+using PaintIn3D;
+using SimplePartLoader.Features.CarGenerator;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -13,18 +18,22 @@ namespace SimplePartLoader.CarGen
     internal class MainCarGenerator
     {
         internal static List<Car> RegisteredCars = new List<Car>();
+        internal static List<Car> RuinedCars = new List<Car>();
         internal static Hashtable AvailableBases = new Hashtable();
         
         internal static void BaseSetup()
         {
             AvailableBases[CarBase.Chad] = new Chad();
+            AvailableBases[CarBase.LAD] = new LAD();
+            AvailableBases[CarBase.Wolf] = new Wolf();
         }
 
         internal static void StartCarGen()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
-
+#endif
             foreach (Car car in RegisteredCars)
             {
                 if(!car.loadedBy.CheckAllow)
@@ -37,10 +46,39 @@ namespace SimplePartLoader.CarGen
                 CarBuilding.CopyCarToPrefab(baseData.GetCar(), car.carPrefab);
 
                 // Then, destroy all transparents requested by user
-                foreach (string transparent in car.carGeneratorData.TransparentsToDelete)
+                if(car.carGeneratorData.RemoveOriginalTransparents)
                 {
-                    CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent);
-                    CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent);
+                    List<string> transparentsToDelete = new List<string>();
+
+                    if (car.carGeneratorData.DontRemoveFuelLine)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("FuelLine")) car.carGeneratorData.TransparentExceptions.Add("FuelLine");
+                    }
+
+                    if (car.carGeneratorData.DontRemoveBatteryWires)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("WiresMain06")) car.carGeneratorData.TransparentExceptions.Add("WiresMain06");
+                    }
+
+                    if (car.carGeneratorData.DontRemoveBrakeLine)
+                    {
+                        if (!car.carGeneratorData.TransparentExceptions.Contains("MainBrakeLine")) car.carGeneratorData.TransparentExceptions.Add("MainBrakeLine");
+                    }
+
+                    foreach (transparents tr in car.emptyCarPrefab.GetComponentsInChildren<transparents>())
+                    {
+                        if (tr.transform.parent != car.emptyCarPrefab.transform) continue; // Transparent is not root, ignore
+
+                        if (car.carGeneratorData.TransparentExceptions.Contains(tr.name)) continue; // Transparent is ignored by user
+
+                        transparentsToDelete.Add(tr.name);
+                    }
+
+                    foreach (string transparent in transparentsToDelete)
+                    {
+                        CarGenUtils.DeleteRootTransparent(car.emptyCarPrefab, transparent, car);
+                        CarGenUtils.DeleteRootTransparent(car.carPrefab, transparent, car);
+                    }
                 }
 
                 // Add custom transparents to our car
@@ -64,11 +102,38 @@ namespace SimplePartLoader.CarGen
                 mcp.CarPrice = car.carGeneratorData.CarPrice;
                 mcp.PREFAB = car.emptyCarPrefab;
 
+                // Fix InsideItems object
+                Transform emptyInsideItems = car.emptyCarPrefab.transform.Find("InsideItems");
+                Transform builtInsideItems = car.carPrefab.transform.Find("InsideItems");
+
+                InsideItems emptyInsideItemsComp = emptyInsideItems.GetComponent<InsideItems>();
+                InsideItems builtInsideItemsComp = builtInsideItems.GetComponent<InsideItems>();
+                InsideCollider emptyInsideItemsColl = emptyInsideItems.GetChild(0).GetComponent<InsideCollider>();
+                InsideCollider builtInsideItemsColl = builtInsideItems.GetChild(0).GetComponent<InsideCollider>();
+
+                emptyInsideItemsComp.InsideCollider = emptyInsideItemsColl.gameObject;
+                emptyInsideItemsColl.insideitems = emptyInsideItemsComp;
+
+                builtInsideItemsComp.InsideCollider = builtInsideItemsColl.gameObject;
+                builtInsideItemsColl.insideitems = builtInsideItemsComp;
+
+                // Custom steering breaking fix
+                car.emptyCarPrefab.AddComponent<SteeringFix>();
+                car.carPrefab.AddComponent<SteeringFix>();
+
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
                 baseData.SetupTemplate(car.carPrefab, car);
-                car.OnSetupCarTemplate?.Invoke(car.emptyCarPrefab);
-                car.OnSetupCarTemplate?.Invoke(car.carPrefab);
+
+                try
+                {
+                    car.OnSetupCarTemplate?.Invoke(car.emptyCarPrefab);
+                    car.OnSetupCarTemplate?.Invoke(car.carPrefab);
+                }
+                catch(Exception ex)
+                {
+                    CustomLogger.AddLine("CarGenerator", ex);
+                }
 
                 if (!car.carGeneratorData.DisableModUtilsTemplateSetup)
                     baseData.ForceTemplateExceptions(car.exceptionsObject);
@@ -79,28 +144,126 @@ namespace SimplePartLoader.CarGen
                 // Saving setup
                 if (Saver.modParts.ContainsKey(car.carGeneratorData.CarName))
                 {
-                    Debug.LogError("[ModUtils/CarGen/Error]: Name collision detected! " + car.carGeneratorData.CarName);
+                    CustomLogger.AddLine("CarGenerator", $"Name collision detected! " + car.carGeneratorData.CarName);
                 }
 
                 Saver.modParts.Add(car.carGeneratorData.CarName, car.emptyCarPrefab);
                 
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
-            }
 
+                if (car.carGeneratorData.SpawnRuined)
+                    RuinedCars.Add(car);
+
+                if(car.DelayRearBoneFix)
+                {
+                    ModUtils.ExecuteNextFrame(delegate { RearBoneFix(car.emptyCarPrefab); });
+                    ModUtils.ExecuteNextFrame(delegate { RearBoneFix(car.carPrefab); });
+                }
+#if MODUTILS_DEVELOPER_CAR_CREATOR
+                Debug.Log("[ModUtils/CarGenDebug]: Root component count: " + car.carPrefab.GetComponents<MonoBehaviour>().Length);
+                Debug.Log("[ModUtils/CarGenDebug]: Childrens component count: " + car.carPrefab.GetComponentsInChildren<MonoBehaviour>().Length);
+                foreach(MonoBehaviour c in car.carPrefab.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if(c != null)
+                    { 
+                        Type type = c.GetType();
+                        Debug.Log(type);
+
+                        if (type == null) continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        Debug.Log(fields);
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field == null) continue;
+
+                            if (field.FieldType == typeof(Transform))
+                            {
+                                Debug.Log(field.Name);
+                                Transform transformValue = (Transform)field.GetValue(c);
+                                if (transformValue && transformValue.root)
+                                {
+                                    Debug.Log($"TransformFind: {transformValue.root.name} ({transformValue.name}) @ {c}");
+                                }
+
+                            }
+                            else if (field.FieldType == typeof(GameObject))
+                            {
+                                GameObject goValue = (GameObject)field.GetValue(c);
+                                if (goValue && goValue.transform && goValue.transform.root)
+                                {
+                                    Debug.Log($"GameObjectFind: {goValue.transform.root.name} ({goValue.transform.name}) @ {c}");
+                                }
+                            }
+                        }
+                    }
+                }
+                foreach (MonoBehaviour c in car.carPrefab.GetComponentsInChildren<MonoBehaviour>())
+                {
+                    if (c != null)
+                    {
+                        Type type = c.GetType();
+                        Debug.Log(type);
+
+                        if (type == null) continue;
+
+                        FieldInfo[] fields = type.GetFields();
+                        Debug.Log(fields);
+                        foreach (FieldInfo field in fields)
+                        {
+                            if (field == null) continue;
+
+                            if (field.FieldType == typeof(Transform))
+                            {
+                                Debug.Log(field.Name);
+                                Transform transformValue = (Transform)field.GetValue(c);
+                                if (transformValue && transformValue.root)
+                                {
+                                    Debug.Log($"TransformFind: {transformValue.root.name} ({transformValue.name}) @ {c}");
+                                }
+
+                            }
+                            else if (field.FieldType == typeof(GameObject))
+                            {
+                                GameObject goValue = (GameObject)field.GetValue(c);
+                                if (goValue && goValue.transform && goValue.transform.root)
+                                {
+                                    Debug.Log($"GameObjectFind: {goValue.transform.root.name} ({goValue.transform.name}) @ {c}");
+                                }
+                            }
+                        }
+                    }
+                }
+#endif
+            }
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/CarGenerator]: Car loading ({RegisteredCars.Count} cars) took {watch.ElapsedMilliseconds}");
+#endif
         }
 
         internal static void AddCars()
         {
-            GameObject CarsParent = GameObject.Find("CarsParent");
-            CarList CarsComp = CarsParent.GetComponent<CarList>();
+            GameObject carsParent = GameObject.Find("CarsParent");
+            CarList carsComp = carsParent.GetComponent<CarList>();
             
             foreach (Car car in RegisteredCars)
             {
-                Array.Resize(ref CarsComp.Cars, CarsComp.Cars.Length + 1);
-                CarsComp.Cars[CarsComp.Cars.Length - 1] = car.carPrefab;
+                Array.Resize(ref carsComp.Cars, carsComp.Cars.Length + 1);
+                carsComp.Cars[carsComp.Cars.Length - 1] = car.carPrefab;
+
+                if(car.carGeneratorData.SpawnOnJobs)
+                {
+                    Array.Resize(ref carsComp.JobCars, carsComp.JobCars.Length + 1);
+                    carsComp.JobCars[carsComp.JobCars.Length - 1] = car.carPrefab;
+                }
+
+                if (car.carGeneratorData.SpawnOnBarn)
+                {
+                    Array.Resize(ref carsComp.BarnCars, carsComp.BarnCars.Length + 1);
+                    carsComp.BarnCars[carsComp.JobCars.Length - 1] = car.carPrefab;
+                }
             }
         }
 
@@ -110,7 +273,10 @@ namespace SimplePartLoader.CarGen
             CarGenUtils.RecursiveCarBuild(car, 0);
 
             if (car.carGeneratorData.TransparentReferenceUpdate)
-                CarBuilding.UpdateTransparentsReferences(car.carPrefab, car.IgnoreLogErrors);
+            {
+                CarBuilding.UpdateTransparentsReferences(car.carPrefab, car);
+                CarBuilding.UpdateVisualObjects(car);
+            }
 
             if (car.carGeneratorData.BoneTargetTransformFix)
             {
@@ -131,13 +297,22 @@ namespace SimplePartLoader.CarGen
             {
                 foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
+                    partinfo.HingePivot = null;
                     if (!String.IsNullOrEmpty(partinfo.RenamedPrefab))
                         partinfo.gameObject.name = partinfo.RenamedPrefab;
                 }
             }
 
             baseData.PostBuild(car.carPrefab, car);
-            car.OnPostBuild?.Invoke(car.carPrefab);
+
+            try
+            {
+                car.OnPostBuild?.Invoke(car.carPrefab);
+            }
+            catch (Exception ex)
+            {
+                CustomLogger.AddLine("CarGenerator", ex);
+            }
 
             // Attach fix
             if(car.carGeneratorData.EnableAttachFix)
@@ -174,7 +349,8 @@ namespace SimplePartLoader.CarGen
                     
                     if (!flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
+                        car.ReportIssue($"Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
+                        continue;
                     }
 
                     flatNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
@@ -188,22 +364,39 @@ namespace SimplePartLoader.CarGen
 
                     if (!boltNut.gameObject.transform.parent.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
+                        car.ReportIssue($"Boltnut error 1 (Parent does not have Partinfo) detected in {boltNut.transform.parent.name}!");
                         continue;
                     }
+
+                    //Debug.Log($"Now at boltnut {boltNut} ({boltNut.transform.parent.name}) {boltNut.otherobjectName} {boltNut.otherobject}");
 
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().ImportantBolts += 1f;
                     boltNut.gameObject.transform.parent.GetComponent<Partinfo>().fixedImportantBolts += 1f;
                     
-                    if (car.EnableDebug && !boltNut.otherobject)
+                    if (!boltNut.otherobject)
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
-                        continue;
+                        if(string.IsNullOrEmpty(boltNut.otherobjectNameL) || string.IsNullOrEmpty(boltNut.otherobjectNameR))
+                        {
+                            boltNut.otherobjectNameL = boltNut.otherobjectName;
+                            boltNut.otherobjectNameR = boltNut.otherobjectName;
+                            boltNut.ReStart();
+
+                            if(!boltNut.otherobject)
+                            {
+                                car.ReportIssue($"Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            car.ReportIssue($"Boltnut error 2 (Missing otherobject) detected in {boltNut.transform.parent.name} - Otherobject should be {boltNut.otherobjectName}!");
+                            continue;
+                        }
                     }
                     
                     if (!boltNut.otherobject.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
+                        car.ReportIssue($"Boltnut error 3 (Otherobject missing partinfo) detected in {boltNut.transform.parent.name} - Otherobject is {boltNut.otherobjectName}!");
                         continue;
                     }
                     
@@ -216,7 +409,7 @@ namespace SimplePartLoader.CarGen
                     weldCut.ReStart();
                     weldCut.welded = true;
 
-                    if(car.EnableDebug)
+                    if(CustomLogger.DebugEnabled)
                     {
                         Debug.Log($"[ModUtils/CarGen/AttachDebug]: Weld object ${weldCut.gameObject?.name}, parent is {weldCut.transform.parent.name}");
                     }
@@ -226,13 +419,13 @@ namespace SimplePartLoader.CarGen
 
                     if (!weldCut.otherobject)
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
+                        car.ReportIssue($"Weldcut error 1 (Missing otherobject) detected in {weldCut.transform.parent.name} - Otherobject should be {weldCut.otherobjectName}!"); 
                         continue;
                     }
                     
                     if (!weldCut.otherobject.GetComponent<Partinfo>())
                     {
-                        Debug.LogError($"[ModUtils/CarGen/AttachFix/Error]: Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
+                        car.ReportIssue($"Weldcut error 2 (Otherobject missing partinfo) detected in {weldCut.transform.parent.name} - Otherobject is {weldCut.otherobjectName}!");
                         continue;
                     }
                     
@@ -259,8 +452,8 @@ namespace SimplePartLoader.CarGen
 
             if (car.carGeneratorData.FixLights)
             {
-                CommonFixes.CarLightsFix(car.carPrefab, car.EnableDebug);
-                CommonFixes.Windows(car.carPrefab, car.EnableDebug);
+                CommonFixes.CarLightsFix(car.carPrefab, false);
+                CommonFixes.Windows(car.carPrefab, false);
             }
 
             if (car.carGeneratorData.EnableAutomaticPainting)
@@ -291,13 +484,18 @@ namespace SimplePartLoader.CarGen
             }
 
             // Since painting generally crashes the creation, this will help developers
-            if (car.EnableDebug)
+            if (CustomLogger.DebugEnabled)
             {
                 foreach (CarProperties carProps in car.carPrefab.GetComponentsInChildren<CarProperties>())
                 {
                     if (carProps.Paintable && !carProps.GetComponent<P3dPaintableTexture>())
                     {
-                        Debug.LogWarning("[ModUtils/CarGen/PostBuild/Warning]: CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                        car.ReportIssue("CarProperties.Paintable set to true but missing P3D support on " + carProps.name);
+                    }
+                    MeshRenderer mr = carProps.GetComponent<MeshRenderer>();
+                    if (carProps.Washable && mr && mr.materials.Length < 2)
+                    {
+                        car.ReportIssue("CarProperties.Washable set to true but no proper material setup on part " + carProps.name);
                     }
                 }
 
@@ -309,6 +507,86 @@ namespace SimplePartLoader.CarGen
                     if (pi.fixedImportantBolts != 0)
                         Debug.Log($"[ModUtils/CarGen/PostBuild/Debug]: {pi} ({pi.name}) has {pi.fixedImportantBolts} BoltNuts");
                 }
+
+                foreach (transparents tr in car.carPrefab.GetComponentsInChildren<transparents>())
+                {
+                    if(tr.DEPENDANTS.Length > 0)
+                    {
+                        for(int i = 0; i < tr.DEPENDANTS.Length; i++)
+                        {
+                            if (tr.DEPENDANTS[i] == null || tr.DEPENDANTS[i].dependant == null)
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has a dependant which is null");
+                            else if (!tr.DEPENDANTS[i].dependant.GetComponent<transparents>())
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has a dependant which is not a transparent");
+                        }
+                    }
+
+                    if (tr.ATTACHABLES.Length > 0)
+                    {
+                        for (int i = 0; i < tr.ATTACHABLES.Length; i++)
+                        {
+                            if (tr.ATTACHABLES[i] == null || tr.ATTACHABLES[i].Attachable == null)
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has an attachable which is null");
+                            else if (!tr.ATTACHABLES[i].Attachable.GetComponent<transparents>())
+                                car.ReportIssue($"{tr.name} ({Functions.GetTransformPath(tr.transform)}) has an attachable which is not a transparent");
+                        }
+                    }
+                }
+
+                foreach(MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
+                {
+                    if(scr.doubleSided && !scr.targetTransform)
+                    {
+                        car.ReportIssue($"{scr.name} ({Functions.GetTransformPath(scr.transform)}) is set as double sided but no target transform is set");
+                    }
+                }
+            }
+        }
+
+        internal static void RearBoneFix(GameObject car)
+        {
+            Transform rearAxle = null;
+            MyBoneSCR rearAxleBone = null;
+            Transform pivot1 = null, pivot2 = null;
+
+            // Rear axle lookup
+            Transform rearSusp = car.transform.Find("RearSusp");
+
+            for (int i = 0; i < rearSusp.childCount; i++)
+            {
+                Transform child = rearSusp.GetChild(i);
+                if (child.name.Contains("RearAxle") && child.GetComponent<transparents>())
+                {
+                    rearAxleBone = child.GetComponent<MyBoneSCR>();
+                    if (rearAxleBone)
+                    {
+                        rearAxle = child;
+                        break;
+                    }
+                }
+            }
+
+            // Now lookup for the pivots
+            for (int i = 0; i < rearSusp.childCount; i++)
+            {
+                Transform child = rearSusp.GetChild(i);
+                if(child.name.Contains("AxlePivot"))
+                {
+                    if (pivot1)
+                        pivot2 = child;
+                    else
+                        pivot1 = child;
+                }
+
+                if (pivot1 && pivot2)
+                    break;
+            }
+
+            // Now do the setup if all stuff was found.
+            if(rearAxle && pivot1 && pivot2)
+            {
+                rearAxleBone.targetTransform = pivot2;
+                rearAxleBone.targetTransformB = pivot1;
             }
         }
     }

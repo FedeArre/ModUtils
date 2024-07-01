@@ -13,16 +13,17 @@ namespace SimplePartLoader
         private bool Immediate = false;
         private bool Cloning = true;
         private bool CullShader = false;
-        private bool DebugEnabled = false;
         private PaintingSystem.PartPaintResolution PaintRes = PaintingSystem.PartPaintResolution.Low;
         private string[] FitsToCar;
         private string[] FitsToEngine;
-        
+        private string PrefixPrefabName;
+
         public ModInstance Mod
         {
             get { return modInstance; }
         }
-        
+
+        [Obsolete("This feature has been removed - Please use Mod Status Report!")]
         public bool EnableDeveloperLog
         {
             get { return DeveloperLog; }
@@ -50,6 +51,12 @@ namespace SimplePartLoader
         {
             get { return FitsToEngine; }
             set { FitsToEngine = value; }
+        }
+
+        public string PrefabNamePrefix
+        {
+            get { return PrefixPrefabName; }
+            set { PrefixPrefabName = value; }
         }
 
         public PaintingSystem.PartPaintResolution PaintResolution

@@ -48,6 +48,16 @@ namespace SimplePartLoader.Objects.Furniture
 
         void Update()
         {
+            if (ModMain.DevUIEnabled.Checked && Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
+            {
+                DevUI.GetInstance().WasModPressed = true;
+            }
+
+            if (DevUI.GetInstance().WasModPressed && Input.GetKey(KeyCode.L) && Input.GetKey(KeyCode.O) && Input.GetKeyDown(KeyCode.G))
+            {
+                DevUI.GetInstance().LogPressed();
+            }
+
             RaycastHit rcHit;
             ShowText = false;
 

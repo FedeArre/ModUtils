@@ -73,7 +73,6 @@ namespace SimplePartLoader
 
         public static void LoadFurniture(SaveSystem ss)
         {
-            Debug.Log($"[ModUtils/Furniture/Loader]: Starting furniture loader.");
             string jsonToUse = (string)ss.get("ModUtilsFurnitureSave", "");
 
             SaveData = null;
@@ -97,7 +96,9 @@ namespace SimplePartLoader
             else
                 return;
             
-            Debug.Log($"[ModUtils/Furniture/Loader]: Trying to load {SaveData.Furnitures.Count} furnitures.");
+            if(SaveData.Furnitures.Count != 0)
+                CustomLogger.AddLine("FurnitureLoader", $"Trying to load {SaveData.Furnitures.Count} furnitures.");
+
             // And then with the data loaded we load the Furnitures
             foreach (FurnitureData fd in SaveData.Furnitures)
             {
@@ -115,10 +116,10 @@ namespace SimplePartLoader
                 }
                 else
                 {
-                    Debug.Log("[ModUtils/Furniture/Loader]: A furniture was loaded but not found in-game! Name: " + fd.PrefabName);
+                    CustomLogger.AddLine("FurnitureLoader", $"A furniture was loaded but not found in-game! Name: " + fd.PrefabName);
                 }
             }
-            Debug.Log($"[ModUtils/Furniture/Loader]: Furniture load finished.");
+            CustomLogger.AddLine("FurnitureLoader", $"Furniture load finished.");
         }
 
         public static void SaveFurniture(SaveSystem ss)
@@ -126,7 +127,9 @@ namespace SimplePartLoader
             SaveData = new FurnitureWrapper();
             
             ModUtilsFurniture[] AllFurnitures = UnityEngine.Object.FindObjectsOfType<ModUtilsFurniture>();
-            Debug.Log($"[ModUtils/Furniture/Saver]: Trying to save {AllFurnitures.Length} furnitures.");
+
+            if(AllFurnitures.Length > 0 )
+                CustomLogger.AddLine("FurnitureSaver", $"Trying to save {AllFurnitures.Length} furnitures.");
             
             foreach (ModUtilsFurniture f in AllFurnitures)
             {
@@ -149,11 +152,11 @@ namespace SimplePartLoader
             try
             {
                 ss.add("ModUtilsFurnitureSave", JsonConvert.SerializeObject(SaveData));
-                Debug.Log($"[ModUtils/Furniture/Saver]: Succesfully saved {AllFurnitures.Length} furnitures.");
+                CustomLogger.AddLine("FurnitureSaver", $"Succesfully saved {AllFurnitures.Length} furnitures.");
             }
             catch (Exception ex)
             {
-                Debug.LogError("[ModUtils/Furniture/Saver/Error]: Saving went wrong - Exception: " + ex.Message);
+                CustomLogger.AddLine("FurnitureSaver", ex);
             }
         }
     }

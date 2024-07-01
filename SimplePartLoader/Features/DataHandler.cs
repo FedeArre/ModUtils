@@ -41,14 +41,12 @@ namespace SimplePartLoader.Features
             try
             {
                 SavedStuff = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-                Debug.Log($"[ModUtils/DataHandler]: Loaded {SavedStuff.Count} data entries!");
+                CustomLogger.AddLine("DataHandler", $"Loaded {SavedStuff.Count} data entries!");
             }
             catch(Exception ex)
             {
                 SavedStuff = new Dictionary<string, object>();
-                Debug.LogError("[ModUtils/DataHandler/Error]: An exception occured trying to load DataHandler data! - " + ex.Message);
-                Debug.LogError("[ModUtils/DataHandler/Error]: Inner: " + ex.InnerException);
-                Debug.LogError("[ModUtils/DataHandler/Error]: StackTrace: " + ex.StackTrace);
+                CustomLogger.AddLine("DataHandler", ex);
             }
         }
 
@@ -64,9 +62,7 @@ namespace SimplePartLoader.Features
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/DataHandler/Error]: An exception occured trying to save DataHandler data! - " + ex.Message);
-                Debug.LogError("[ModUtils/DataHandler/Error]: Inner: " + ex.InnerException);
-                Debug.LogError("[ModUtils/DataHandler/Error]: StackTrace: " + ex.StackTrace);
+                CustomLogger.AddLine("DataHandler", ex);
             }
         }
     }

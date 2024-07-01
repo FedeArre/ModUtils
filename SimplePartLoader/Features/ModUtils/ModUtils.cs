@@ -1,4 +1,5 @@
-﻿using Rewired;
+﻿using EnviroSamples;
+using Rewired;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,8 @@ namespace SimplePartLoader
     public class ModUtils
     {
         public static GameObject Player { get; internal set; }
+        public static GameObject PlayerHand { get; internal set; }
+        public static FirstPersonAIO PlayerAIO { get; internal set; }
         public static GameObject CursorCanvas { get; internal set; }
         public static tools PlayerTools { get; internal set; }
         public static AudioManager AudioList { get; internal set; }
@@ -24,6 +27,10 @@ namespace SimplePartLoader
         public static event OnPlayerCarChangeDelegate PlayerCarChanged;
 
         internal static List<ModInstance> RegisteredMods = new List<ModInstance>();
+
+        // Delayed function executer
+        internal static ExternalFunctionExecuter DelayFuncExecute;
+
         public static List<ModInstance> ModInstances
         {
             get { return RegisteredMods; }
@@ -33,6 +40,7 @@ namespace SimplePartLoader
         {
             GameObject ModLoader = GameObject.Find("ModLoader");
             ModLoader.AddComponent<EACheck>();
+
         }
 
         internal static void OnLoadCalled()
@@ -41,8 +49,9 @@ namespace SimplePartLoader
             CursorCanvas = GameObject.Find("CursorCanvas");
             PlayerTools = Player.GetComponent<tools>();
             RewiredPlayer = ReInput.players.GetPlayer(0);
-            
-            GameObject PlayerHand = GameObject.Find("hand");
+            PlayerAIO = Player.GetComponent<FirstPersonAIO>();
+
+            PlayerHand = GameObject.Find("hand");
             AudioList = PlayerHand.GetComponent<AudioManager>();
             Source = PlayerHand.GetComponent<AudioSource>();
 
@@ -56,6 +65,7 @@ namespace SimplePartLoader
 
             GameObject dummy = new GameObject("SPL_Dummy");
             dummy.AddComponent<SPL_CarTracking>().AddToAll();
+            DelayFuncExecute = dummy.AddComponent<ExternalFunctionExecuter>();
         }
 
         internal static void UpdatePlayerStatus(bool isOnCar, MainCarProperties mcp = null)
@@ -70,9 +80,20 @@ namespace SimplePartLoader
             }
 
             SPL.DevLog($"UpdatePlayerStatus has changed to {isOnCar} - {mcp}");
+            
             if(PlayerCarChanged != null)
             {
-                PlayerCarChanged?.Invoke();
+                foreach (var handler in PlayerCarChanged.GetInvocationList())
+                {
+                    try
+                    {
+                        handler.DynamicInvoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        CustomLogger.AddLine("ModUtils", ex);
+                    }
+                }
             }
         }
 
@@ -84,7 +105,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetPlayer but Player was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -97,7 +118,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetPlayerTools but PlayerTools was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -110,7 +131,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetAudios but the audio list was null. Make sure that you are using it after OnLoad!");
                 return null;
             }
         }
@@ -123,7 +144,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
+                CustomLogger.AddLine("Utils", $"Tried to use PlaySound but AudioClip / source was null. Make sure that you are using it after OnLoad and have a valid AudioClip!");
             }
         }
 
@@ -135,7 +156,7 @@ namespace SimplePartLoader
             }
             else
             {
-                Debug.LogError("[ModUtils/Utils/Error]: Tried to use GetKeyPlayer but Rewired has not started yet, make sure to GetKeyPlayer this after OnLoad!");
+                CustomLogger.AddLine("Utils", $"Tried to use GetKeyPlayer but Rewired has not started yet, make sure to GetKeyPlayer this after OnLoad!");
                 return null;
             }
         }
@@ -200,7 +221,7 @@ namespace SimplePartLoader
             {
                 if(mod.ID == mi.Mod.ID)
                 {
-                    Debug.LogError($"[ModUtils/ModRegister/Error]: Tried to register mod {mod.ID} but it is already registered!");
+                    CustomLogger.AddLine("ModRegister", $"Tried to register mod {mod.ID} but it is already registered!");
                     return null;
                 }
             }
@@ -220,6 +241,11 @@ namespace SimplePartLoader
         {
             if (!PartManager.CarCategoriesToAdd.Contains(name))
                 PartManager.CarCategoriesToAdd.Add(name);
+        }
+
+        public static void ExecuteNextFrame(Action functionToCall)
+        {
+            DelayFuncExecute.AddFunction(functionToCall);
         }
     }
 }

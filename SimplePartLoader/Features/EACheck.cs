@@ -1,6 +1,11 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
-using SimplePartLoader.Features.Autoupdating;
+using SimplePartLoader.Features.Auto
+    
+    
+    
+    ;
+using SimplePartLoader.Features.UI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -8,6 +13,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Reflection;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -24,13 +33,17 @@ namespace SimplePartLoader
 
         GameObject UI;
 
-        string DownloadFolder = Application.dataPath + "/../Mods/ModUtilsUpdating";
+        string DownloadFolder = "";
 
         List<JSON_Mod_API_Result> AutoupdaterResult;
         Queue<JSON_Mod_API_Result> Data;
 
         JSON_Mod_API_Result CurrentDownloadingMod;
         Text progressText;
+        void Start()
+        {
+            DownloadFolder = Application.dataPath + "/../Mods/ModUtilsUpdating";
+        }
 
         void Update()
         {
@@ -38,13 +51,131 @@ namespace SimplePartLoader
                 return;
 
             frameCount++;
+
             if (!SteamManager.Initialized)
                 return;
 
-            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID;
-            Debug.Log("[ModUtils/EACheck]: Identified user: " + steamID);
-            Debug.Log("[ModUtils/Steam]: APP build id: " + Steamworks.SteamApps.GetAppBuildId());
+            ulong steamID = Steamworks.SteamUser.GetSteamID().m_SteamID; // User SteamID
+            CustomLogger.AddLine("EACheck", $"Identified user: " + steamID);
+            CustomLogger.AddLine("EACheck", $"App build id: " + Steamworks.SteamApps.GetAppBuildId());
+
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
+
+            // Load keys
+            Dictionary<string, string> foundKeys = new Dictionary<string, string>();
+            string ModsFolderPath = Application.dataPath + "/../Mods/";
+            string[] files = Directory.GetFiles(ModsFolderPath);
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                try
+                {
+                    string stuff = File.ReadAllText(files[i]);
+                    if (stuff.StartsWith("MDU783-"))
+                    {
+                        CustomLogger.AddLine("EACheck", $"Adding {Path.GetFileName(files[i])} as loadable mod");
+                        foundKeys.Add(files[i], stuff.Substring(7));
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CustomLogger.AddLine("EACheck", ex);
+                }
+            }
+
+            if (!ModMain.EA_Enabled.Checked && foundKeys.Count != 0)
+            {
+                ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
+                CustomLogger.AddLine("EACheck", $"Early Access Mods found but loading of them is not allowed!");
+            }
+            else if (foundKeys.Count != 0)
+            {
+                Stopwatch watch = new Stopwatch();
+                // If we have keys, we now start loading the mods
+                foreach (var item in foundKeys)
+                {
+                    CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
+                    watch.Start();
+                    try
+                    {
+                        ServicePointManager.DefaultConnectionLimit = 15;
+                        using (HttpClient client = new HttpClient())
+                        {
+                            client.Timeout = TimeSpan.FromMinutes(30);
+
+                            EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
+                            eamo.Key = item.Value;
+                            eamo.SteamId = steamID + "";
+
+                            HttpContent content = new StringContent(JsonConvert.SerializeObject(eamo), System.Text.Encoding.UTF8, "application/json");
+                            client.DefaultRequestHeaders.Range = new RangeHeaderValue(0, 300);
+                            HttpResponseMessage response = client.PostAsync(ModMain.API_URL + "/eachecknew", content).Result;
+                            watch.Stop();
+
+                            CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode} and took {watch.ElapsedMilliseconds}ms");
+
+                            watch.Start();
+
+                            byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
+                            CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
+
+                            if (response.StatusCode == HttpStatusCode.NoContent) // no permission
+                            {
+                                ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
+
+                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
+
+                                continue;
+                            }
+
+                            if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound) // invalid key
+                            {
+                                ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
+
+                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
+                                continue;
+                            }
+
+                            Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+                            Type typeFromHandle = typeof(Mod);
+                            for (int i = 0; i < types.Length; i++)
+                            {
+                                if (typeFromHandle.IsAssignableFrom(types[i]))
+                                {
+                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
+                                    Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                    ModLoader.mods.Add(m);
+                                    m.OnMenuLoad();
+                                    break;
+                                }
+                            }
+
+                            CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.\n\n");
+                        }
+                    }
+                    catch (AggregateException ae)
+                    {
+                        CustomLogger.AddLine("EACheck", "Agregate exception occured");
+                        ae.Handle((x) =>
+                        {
+                            CustomLogger.AddLine("EACheck", x);
+                            CustomLogger.AddLine("EACheck", item.Value);
+                            return true;
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
+                        CustomLogger.AddLine("EACheck", ex);
+                    }
+                    finally
+                    {
+                        watch.Restart();
+                    }
+                }
+            }
 
             foreach (ModInstance mi in ModUtils.ModInstances)
             {
@@ -54,7 +185,12 @@ namespace SimplePartLoader
                 }
             }
 
+            SettingSaver.LoadSettings(); // Reload settings in case an EA mod is using settings. Great edge case.
+            ModUtilsUI.ModCardLoad();
+
             // Autoupdating stuff goes here too now!
+            KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId()); // Update list so EA mods show telemetry
+
             JSON_ModList jsonList = new JSON_ModList(Steamworks.SteamApps.GetAppBuildId());
             foreach (Mod mod in ModLoader.mods)
             {
@@ -66,10 +202,13 @@ namespace SimplePartLoader
                 jsonList.mods.Add(jsonMod);
             }
 
+            if (ModMain.EA_Enabled.Checked)
+                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+
             try
             {
                 var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/mods");
-                Debug.LogError("Current API url: " + ModMain.API_URL);
+                
                 httpWebRequest.ContentType = "application/json";
                 httpWebRequest.Accept = "application/json";
                 httpWebRequest.Method = "POST";
@@ -83,8 +222,20 @@ namespace SimplePartLoader
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
-
                     AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
+
+                    // First check for unsupported mods.
+
+                    List<JSON_Mod_API_Result> unsupportedMods = new List<JSON_Mod_API_Result>();
+                    if (AutoupdaterResult.Count > 0)
+                    {
+                        foreach (var item in AutoupdaterResult)
+                        {
+                            if (item.unsupported) unsupportedMods.Add(item);
+                        }
+
+                        foreach(var item in unsupportedMods) AutoupdaterResult.Remove(item);
+                    }
 
                     if (AutoupdaterResult.Count > 0)
                     {
@@ -116,12 +267,22 @@ namespace SimplePartLoader
                         AutoupdaterResult.ForEach(x => names += $"{x.mod_name}, ");
                         names = names.Substring(0, names.Length - 2);
                         UI.transform.Find("Panel/TextMods").GetComponent<Text>().text = names;
+
+                        CustomLogger.AddLine("Autoupdating", $"Found updates for {names}");
+                    }
+
+                    if(unsupportedMods.Count > 0)
+                    {
+                        foreach(var item in unsupportedMods)
+                        {
+                            ErrorMessageHandler.GetInstance().UnsupportedModList.Add(item.mod_name);
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.Log("[ModUtils/Autoupdater/Error]: Error occured while trying to fetch updates, error: " + ex.ToString());
+                CustomLogger.AddLine("Autoupdating", ex);
                 GameObject.Instantiate(ModMain.UI_Error_Prefab);
             }
             checkDone = true;
@@ -171,13 +332,11 @@ namespace SimplePartLoader
                 try
                 {
                     client.DownloadFileAsync(new Uri(dd.current_download_link), DownloadFolder + $"\\{dd.file_name}");
-                    Debug.Log($"Now downloading: " + dd.mod_name);
                 }
                 catch (Exception ex)
                 {
                     progressText.text = "An error occurred, please report this and attach the log file!";
-                    Debug.Log($"Error trying to download a mod, error: " + ex.Message);
-                    Debug.Log($"Inner: " + ex.InnerException);
+                    CustomLogger.AddLine("ClientHelper", ex);
                 }
                 return;
             }
@@ -192,14 +351,14 @@ namespace SimplePartLoader
                 else
                 {
                     progressText.text = "Failed to start helper, not present. Please send your log to check what went wrong!";
-                    Debug.Log($"[ModUtils/Autoupdating/Error]: Could not find helper!");
+                    CustomLogger.AddLine("ClientHelper", $"Helper could not be started");
                     return;
                 }
             }
             catch(Exception ex)
             {
                 progressText.text = "Failed to start helper, error: " + ex.Message;
-                Debug.Log($"[ModUtils/Autoupdating/Error]: Major error trying to open updater helper, data: {ex.Message} ({ex.InnerException})");
+                CustomLogger.AddLine("ClientHelper", ex);
                 return;
             }
 
@@ -213,7 +372,7 @@ namespace SimplePartLoader
             }
             catch(Exception ex)
             {
-                Debug.Log("Could not kill game, slowly exiting! - " + ex.Message);
+                CustomLogger.AddLine("ClientHelper", ex);
                 Environment.Exit(0);
             }
         }
@@ -231,7 +390,7 @@ namespace SimplePartLoader
         {
             if (e.Error != null)
             {
-                Debug.Log($"Error on mod download finish, error: " + e.Error.ToString());
+                CustomLogger.AddLine("EACheckDownloads", e.Error);
                 progressText.text = "An error ocurred while downloading the file, if this happens again report this!\n\nError: " + e.Error.Message;
                 return;
             }

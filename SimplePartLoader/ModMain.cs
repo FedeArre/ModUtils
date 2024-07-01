@@ -1,7 +1,8 @@
-﻿using Autoupdater.Objects;
-using ModUI;
-using ModUI.Settings;
-using static ModUI.Settings.ModSettings;
+﻿// The following preprocessor declaration disables the timing feature from ModUtils.
+// This module can create unrequired overhead on final builds
+//#define MODUTILS_TIMING_ENABLED
+
+using Autoupdater.Objects;
 using Newtonsoft.Json;
 using SimplePartLoader;
 using SimplePartLoader.CarGen;
@@ -10,35 +11,40 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
-using System.Net.Http;
-using System.Threading.Tasks;
-using UnityEngine.ProBuilder;
 using SimplePartLoader.Features;
+using SimplePartLoader.Features.CarGenerator;
+using HarmonyLib;
+using SimplePartLoader.Features.UI;
+using static Unity.Burst.Intrinsics.X86.Avx;
+using System.Linq;
+using System.Reflection;
+using EVP;
+using SimplePartLoader.Utils;
+using System.Net.Http;
+using System.Security.Policy;
 
 namespace SimplePartLoader
 {
-    public class ModMain : Mod, IModDescription, IModSettings
+    public class ModMain : Mod
     {
         // Looking for docs? https://fedearre.github.io/my-garage-modding-docs/
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.3.1";
+        public override string Version => "v1.4.0";
         
         bool TESTING_VERSION_REMEMBER = true;
-        string TESTING_VERSION_NUMBER = "charger development build - 6";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.0-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
-        public string Description => "Allows you to create awesome stuff!";
-
         // Autoupdater
         public const string API_URL = "https://modding.fedes.uy/api";
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab;
+
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -46,39 +52,50 @@ namespace SimplePartLoader
         Transform PlayerTransform;
         bool PlayerOnCar;
         
-        // Mod delete
-        string[] modsToDelete = { "Extra Buildings.dll", "Autoupdater.dll" };
-        
         // Mod shop
         AssetBundle Bundle;
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        // Mod settings
-        internal static ModUI.Settings.ModSettings.Toggle TelemetryToggle;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
 
+        // Developer stuff for UI
+        internal static Checkbox DevUIEnabled;
+        internal static Keybind TogglePosRot;
+        internal static Keybind Multiplier;
+        internal static Keybind XMinus;
+        internal static Keybind X90;
+        internal static Keybind XPlus;
+        internal static Keybind YMinus;
+        internal static Keybind Y90;
+        internal static Keybind YPlus;
+        internal static Keybind ZMinus;
+        internal static Keybind Z90;
+        internal static Keybind ZPlus;
+        internal static Keybind PreviewCube;
+
+        internal static byte[] imageBytes; // Random BGs
+
+        Stopwatch watch;
         public ModMain()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
-            long totalTime = 0;
-
+            watch.Start();
+#endif
+            watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 
-            Debug.Log("ModUtils is loading - Version: " + Version);
-            Debug.Log("Developed by Federico Arredondo - www.github.com/FedeArre");
-            if(TESTING_VERSION_REMEMBER)
+            CustomLogger.AddLine("Main", "ModUtils is loading - Version: " + Version);
+            CustomLogger.AddLine("Main", "Developed by Federico Arredondo - www.github.com/FedeArre");
+            if (TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
-            // Mod delete
+            var harmony = new Harmony("com.fedes.modutils");
+            harmony.PatchAll();
+
+            // Deleting unused stuff
             string ModsFolderPath = Application.dataPath + "/../Mods/";
-            foreach(string s in modsToDelete)
-            {
-                if (File.Exists(ModsFolderPath + s))
-                {
-                    File.Delete(ModsFolderPath + s);
-                    Debug.Log($"[ModUtils/Legacy]: Mod {s} has been replaced by ModUtils");
-                }
-            }
 
             if (Directory.Exists(ModsFolderPath + "Autoupdater/"))
             {
@@ -115,12 +132,16 @@ namespace SimplePartLoader
             UI_BrokenInstallation_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasBrokenInstallation");
             UI_DeveloperLogEnabled_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDevLog");
             UI_Downloader_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasDownloader");
+            UI_Developer = AutoupdaterBundle.LoadAsset<GameObject>("DevCanvas");
+            UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
+            UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
+            UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
 
             // Computer stuff
             ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
             ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
             ComputerUI.SetupComputer(AutoupdaterBundle.LoadAsset<GameObject>("AppLauncher"), AutoupdaterBundle.LoadAsset<GameObject>("AppLauncherIcon"));
-            
+
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -130,68 +151,163 @@ namespace SimplePartLoader
             PaintingSystem.CullBaseMaterial = AutoupdaterBundle.LoadAsset<Material>("testMat");
             AutoupdaterBundle.Unload(false);
 
+            // UI update
+            ModInstance mi = ModUtils.RegisterMod(this);
+            mi.SetSettingsLoadedFunction(LoadSettings);
+            EA_Enabled = mi.AddCheckboxToUI("ModUtils_EnableEA", "Enable Early Access (requires game restart)", false);
+            mi.AddLabelToUI("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored in any way.");
+            Telemetry = mi.AddCheckboxToUI("ModUtils_Telemetry", "Telemetry enabled", true);
+            mi.AddLabelToUI("Permit ModUI to load. This will cause you to have 2 'Mods' buttons but will make some older mods that require BrennfuchS's ModUI to work");
+            DontDisableModUI = mi.AddCheckboxToUI("ModUtils_ModUIEnable", "Enable ModUI loading (Requires game restart)", false);
+            RandomBG = mi.AddCheckboxToUI("ModUtils_RandomBG", "Enable random main menu background", true);
+
+            mi.AddSpacerToUI();
+            mi.AddSeparatorToUI();
+            mi.AddHeaderToUI("Settings for developers");
+            DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
+            mi.AddSpacerToUI();
+
+            // Developer binds
+            mi.AddSmallHeaderToUI("Transparent editor keybinds");
+            mi.AddLabelToUI("Switch between position and rotation:");
+            // General
+            TogglePosRot = mi.AddKeybindToUI("ModUtils_TransparentEditor_Toggle", KeyCode.Keypad0);
+            mi.AddLabelToUI("Multiplier:");
+            Multiplier = mi.AddKeybindToUI("ModUtils_TransparentEditor_Multp", KeyCode.LeftShift);
+
+            // X axis
+            mi.AddLabelToUI("X- :");
+            XMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_X-", KeyCode.Keypad1);
+            mi.AddLabelToUI("X90 :");
+            X90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_X90", KeyCode.Keypad2);
+            mi.AddLabelToUI("X+ :");
+            XPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_X+", KeyCode.Keypad3);
+
+            // Y axis
+            mi.AddLabelToUI("Y- :");
+            YMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y-", KeyCode.Keypad4);
+            mi.AddLabelToUI("Y90 :");
+            Y90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y90", KeyCode.Keypad5);
+            mi.AddLabelToUI("Y+ :");
+            YPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Y+", KeyCode.Keypad6);
+
+            // Z axis
+            mi.AddLabelToUI("Z- :");
+            ZMinus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z-", KeyCode.Keypad7);
+            mi.AddLabelToUI("Z90 :");
+            Z90 = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z90", KeyCode.Keypad8);
+            mi.AddLabelToUI("Z+ :");
+            ZPlus = mi.AddKeybindToUI("ModUtils_TransparentEditor_Z+", KeyCode.Keypad9);
+
+            mi.AddLabelToUI("Preview cube toggle: ");
+            PreviewCube = mi.AddKeybindToUI("ModUtils_TransparentEditor_Cube", KeyCode.Z);
+
+            mi.AddSpacerToUI();
+            mi.AddSmallHeaderToUI("Credits");
+            mi.AddLabelToUI("ModUtils (Also known as SimplePartLoader) was developed by Federico Arredondo (fedes.uy). Special thanks to BrennFuchS, ESTBanana, Reliant Robin, Horsey4, mbdriver and Jim Goose");
+
             ModUtils.SetupSteamworks();
             MainCarGenerator.BaseSetup();
 
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
+#endif
         }
 
         public override void OnMenuLoad()
         {
             if (!MenuFirstLoad)
             {
+                watch.Stop();
+                CustomLogger.AddLine("Timing", $"Mods took {watch.ElapsedMilliseconds} ms to load.");
+
                 MenuFirstLoad = true;
-                Debug.Log("[ModUtils/Main]: Printing mod list.");
-                foreach(Mod m in ModLoader.mods)
+                CustomLogger.AddLine("Main", "Printing mod list");
+                foreach (Mod m in ModLoader.mods)
                 {
-                    Debug.Log($"{m.Name} (ID: {m.ID}) - Version {m.Version}");
+                    CustomLogger.AddLine("Main", $"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
 
-                // Enable heartbeat
-                KeepAlive.GetInstance().Ready();
-                
-                return;
+                UI_Mods = GameObject.Instantiate(UI_Mods_Prefab);
+                GameObject.DontDestroyOnLoad(UI_Mods);
+
+                ModUtilsUI.PrepareUI();
+                SettingSaver.LoadSettings();
+
+                GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
+                if (modUiRemove && !DontDisableModUI.Checked)
+                {
+                    modUiRemove.SetActive(false);
+                }
+
+
+                if (RandomBG.Checked)
+                {
+                    using (HttpClient client = new HttpClient())
+                    {
+                        try
+                        {
+                            HttpResponseMessage response = client.GetAsync(API_URL + "/bg").Result;
+                            response.EnsureSuccessStatusCode();
+
+                            // Image load
+                            imageBytes = response.Content.ReadAsByteArrayAsync().Result;
+                        }
+                        catch (Exception ex)
+                        {
+                            CustomLogger.AddLine("RandomBG", "Failed to load random background!");
+                            CustomLogger.AddLine("RandomBG", ex);
+                        }
+
+                        return;
+                    }
+                }
             }
 
-            if(SPL.DEVELOPER_LOG)
-            {
-                GameObject.Instantiate(UI_DeveloperLogEnabled_Prefab);
-            }
+            UI_Mods.SetActive(true);
+            UI_Mods.transform.Find("OpenMods").localScale = Vector3.one;
+
+            if(RandomBG.Checked) new GameObject("test").AddComponent<BackgroundDelayChange>();
         }
 
         public override void OnLoad()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             long totalTime = 0;
 
             watch.Start();
 
             Debug.Log($"[ModUtils/Timing]: OnLoad method was called!");
-
+#endif
             // ModUtils library time
             ModUtils.OnLoadCalled();
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: ModUtils library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
 
             // PartManager library time
             watch.Restart();
-            PartManager.OnLoadCalled();
-            watch.Stop();
-            totalTime += watch.ElapsedMilliseconds;
-            Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
-
-            watch.Restart();
+#endif
+            try
+            {
+                PartManager.OnLoadCalled();
+            }
+            catch(Exception ex)
+            {
+                CustomLogger.AddLine("Parts", ex);
+            }
 
             PlayerTransform = ModUtils.GetPlayer().transform;
 
             if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
                 CustomSaverHandler.NewGame();
 
-            if(SPL.ENABLE_SAVE_DISSASAMBLE)
+            if(CustomLogger.SaveDissasamble)
             {
-                Debug.Log("[ModUtils/Dev]: Save dissasembling has been enabled!");
+                CustomLogger.AddLine("Dev", "Save dissasembling has been enabled! - Information in Player.log");
                 SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
                 if (File.Exists(Application.persistentDataPath + "/save1/save.dat"))
                 {
@@ -212,24 +328,45 @@ namespace SimplePartLoader
                     Debug.Log("[ModUtils/Dev]: Loaded " + save.table.Count + " entries.");
                 }
             }
-            
+
+            UI_Mods.transform.Find("OpenMods").localScale = Vector3.one / 2;
+            UI_Mods.SetActive(false);
+
             // Mod shop load
             if (ModUtils.GetPlayerTools().MapMagic)
                 return;
 
-
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: Save dissasembly & various library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
             watch.Restart();
+#endif
 
+
+#if MODUTILS_TIMING_ENABLED
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: SPL (PartManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+#endif
+            BuildableManager.OnGameLoad();
+#if MODUTILS_TIMING_ENABLED
+            watch.Stop();
+            totalTime += watch.ElapsedMilliseconds;
+            Debug.Log($"[ModUtils/Timing]: Building (BuildingManager) library succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
+
+            watch.Restart();
+#endif
             // Computer UI stuff
             ComputerUI.LoadComputerTable();
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: In-game computer succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
             watch.Restart();
-
+#endif
             // Furniture stuff
             FurnitureManager.SetupFurniture();
 
@@ -242,11 +379,29 @@ namespace SimplePartLoader
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
 
+            // Load modshop into map
+            try
+            {
+                GameObject scene = GameObject.Find("SceneManager");
+                Transform centerMap = scene.transform.Find("MapCanvas/GameObject/MAP/CenterOfMap");
+                Transform shopRef = centerMap.Find("Shop");
+                GameObject modShopObj = GameObject.Instantiate(shopRef.gameObject);
+                modShopObj.transform.SetParent(centerMap);
+                modShopObj.transform.Find("GameObject").GetComponent<Text>().text = "Mod shop";
+                modShopObj.transform.localPosition = new Vector3(217f, -27f, 0f);
+            }
+            catch { }
+
+            new GameObject("tempRuinedOverwrite").AddComponent<RuinedOverwrite>();
+
+            CatalogMassUpdate.ApplyChanges();
+
+#if MODUTILS_TIMING_ENABLED
             watch.Stop();
             totalTime += watch.ElapsedMilliseconds;
             Debug.Log($"[ModUtils/Timing]: Furniture manager & ModShop succesfully loaded - Took {watch.ElapsedMilliseconds} ms");
             Debug.Log($"[ModUtils/Timing]: ModUtils loading took ${totalTime} ms");
-
+#endif
         }
 
         public override void Continue()
@@ -303,7 +458,109 @@ namespace SimplePartLoader
                         ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
                     }
                 }
+
+                if(ModUtils.PlayerTools.EscMenu.activeSelf && !UI_Mods.activeSelf)
+                {
+                    UI_Mods.SetActive(true);
+                }
+
+                else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf && ModUtilsUI.currentlyEditingKeybind == null)
+                {
+                    UI_Mods.SetActive(false);
+                }
+
+                /*
+                if(Input.GetKeyDown(KeyCode.DownArrow))
+                {
+                    Debug.Log("Report of car");
+                    NWH.VehiclePhysics2.VehicleController veh = ModUtils.GetPlayerCurrentCar().GetComponent<NWH.VehiclePhysics2.VehicleController>();
+
+                    Type type = veh.GetType();
+
+                    IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
+                    IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
+
+                    foreach (var pinfo in pinfos)
+                    {
+                        if (pinfo.GetType() == typeof(object)) continue;
+                        Debug.Log($"P{pinfo.Name} - {pinfo.GetValue(veh)}");
+
+                        if (pinfo.GetValue(veh) == null || pinfo.GetValue(veh).GetType() == typeof(object)) continue;
+
+                        Type t = pinfo.GetValue(veh).GetType();
+                        bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                        if(!isPrimitiveType)
+                        {
+                            MyObjectSerialize(pinfo.GetValue(veh), 0);
+                        }
+                    }
+
+                    foreach (var finfo in finfos)
+                    {
+                        if (finfo.GetType() == typeof(object)) continue;
+                        Debug.Log($"F{finfo.Name} - {finfo.GetValue(veh)}");
+
+                        if (finfo.GetValue(veh) == null || finfo.GetValue(veh).GetType() == typeof(object)) continue;
+
+                        Type t = finfo.GetValue(veh).GetType();
+                        bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string) || t != typeof(IEnumerable));
+                        if (!isPrimitiveType)
+                        {
+                            MyObjectSerialize(finfo.GetValue(veh), 0);
+                        }
+                    }
+                }*/
             }
+        }
+        /*
+        public void MyObjectSerialize(object obj, int iterations)
+        {
+            if (iterations > 15)
+            {
+                Debug.Log("end");
+                return;
+            }
+
+            Type type = obj.GetType();
+            if (type == null || type == typeof(object)) return;
+
+            Debug.Log($"-------- {type.Name} ");
+            IEnumerable<PropertyInfo> pinfos = type.GetProperties(Extension.bindingFlags);
+            IEnumerable<FieldInfo> finfos = type.GetFields(Extension.bindingFlags);
+
+            foreach (var pinfo in pinfos)
+            {
+                if (pinfo.GetType() == typeof(object)) continue;
+                Debug.Log($"P{pinfo.Name} - {pinfo.GetValue(obj)}");
+
+                if (pinfo.GetValue(obj) == null || pinfo.GetValue(obj).GetType() == typeof(object)) continue;
+
+                Type t = pinfo.GetValue(obj).GetType();
+                bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                if (!isPrimitiveType)
+                {
+                    MyObjectSerialize(pinfo.GetValue(obj), iterations + 1);
+                }
+            }
+
+            foreach (var finfo in finfos)
+            {if (finfo.GetType() == typeof(object)) continue;
+                Debug.Log($"F{finfo.Name} - {finfo.GetValue(obj)}");
+
+                if (finfo.GetValue(obj) == null || finfo.GetValue(obj).GetType() == typeof(object)) continue;
+
+                Type t = finfo.GetValue(obj).GetType();
+                bool isPrimitiveType = t.IsPrimitive || t.IsValueType || (t == typeof(string));
+                if (!isPrimitiveType)
+                {
+                    MyObjectSerialize(finfo.GetValue(obj), iterations+1);
+                }
+            }
+        }
+        */
+        public override void OnNewMapLoad()
+        {
+            BuildableManager.OnNewMapEnabled();
         }
 
         public override void LateUpdate()
@@ -315,15 +572,10 @@ namespace SimplePartLoader
             }
         }
 
-        public void CreateModSettings(ModUI.Settings.ModSettings modSettings)
+        public  void LoadSettings()
         {
-            TelemetryToggle = modSettings.AddToggle("Telemetry enabled", "TelemetryEnabledModutils", true);
-            modSettings.AddLabel("Telemetry is used by mod developers to know how they mod performs. ModUtils will send a list of the mods you are currently using while playing, no data is stored.");
-            modSettings.AddSpace();
-            modSettings.AddSpace();
-            modSettings.AddSpace();
+            // Enable heartbeat
+            KeepAlive.GetInstance().Ready();
         }
-
-        public void ModSettingsLoaded() { }
     }
 }

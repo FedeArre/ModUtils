@@ -10,19 +10,22 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>SimplePartLoader</RootNamespace>
     <AssemblyName>_SimplePartLoader</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>C:\SteamLibrary\steamapps\common\My Garage\Mods\</OutputPath>
+    <Optimize>true</Optimize>
+    <OutputPath>C:\Program Files %28x86%29\Steam\steamapps\common\My Garage\Mods\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,10 +37,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="!!ModUI, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\Mods\!!ModUI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="0Harmony, Version=2.3.1.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Lib.Harmony.2.3.1.1\lib\net452\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -451,16 +452,30 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CustomLogger.cs" />
     <Compile Include="Features\Autoupdating\Autoupdating.cs" />
     <Compile Include="Features\Autoupdating\DownloadData.cs" />
+    <Compile Include="Features\Building\Buildable.cs" />
+    <Compile Include="Features\Building\BuildableManager.cs" />
+    <Compile Include="Features\Building\BuildableMaterial.cs" />
+    <Compile Include="Features\Building\DelayedBuildableLoader.cs" />
     <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
     <Compile Include="Features\CarGenerator\Car.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
     <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
+    <Compile Include="Features\CarGenerator\CatalogMassUpdate.cs" />
+    <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatedJunkyard.cs" />
+    <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatorComponent.cs" />
+    <Compile Include="Features\CarGenerator\RuinedOverwrite.cs" />
+    <Compile Include="Features\CarGenerator\SteeringFix.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
+    <Compile Include="Features\CustomMeshes\CustomMeshHandler.cs" />
+    <Compile Include="Features\DevUI\ComponentDevUI.cs" />
     <Compile Include="Features\Computer\AppLauncher\AppLauncherHandling.cs" />
     <Compile Include="Features\Computer\ComputerApp.cs" />
     <Compile Include="Features\Computer\AssetScripts\ActionMenuController.cs" />
@@ -475,11 +490,39 @@
     <Compile Include="Features\Computer\AssetScripts\WindowController.cs" />
     <Compile Include="Features\Computer\ComputerUI.cs" />
     <Compile Include="Features\DataHandler.cs" />
+    <Compile Include="Features\DevUI\DevUI.cs" />
+    <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
+    <Compile Include="Features\UI\KeybindDetector.cs" />
+    <Compile Include="Features\UI\ModUtilsUI.cs" />
+    <Compile Include="Features\UI\Saving\SettingSaver.cs" />
+    <Compile Include="Features\UI\Saving\UISettingsWrapper.cs" />
+    <Compile Include="Features\UI\Settings\Button.cs" />
+    <Compile Include="Features\UI\Settings\Checkbox.cs" />
+    <Compile Include="Features\UI\Settings\Dropdown.cs" />
+    <Compile Include="Features\UI\Settings\Header.cs" />
+    <Compile Include="Features\UI\Settings\ISetting.cs" />
+    <Compile Include="Features\UI\Settings\Keybind.cs" />
+    <Compile Include="Features\UI\Settings\Label.cs" />
+    <Compile Include="Features\UI\Settings\Separator.cs" />
+    <Compile Include="Features\UI\Settings\Slider.cs" />
+    <Compile Include="Features\UI\Settings\SmallHeader.cs" />
+    <Compile Include="Features\UI\Settings\Spacer.cs" />
+    <Compile Include="Features\UI\Settings\TextInput.cs" />
+    <Compile Include="Features\UniLog.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
     <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Hooks\CustomEngineHook.cs" />
+    <Compile Include="Hooks\FixTryHook.cs" />
+    <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
+    <Compile Include="Objects\EditorComponents\CustomEngine.cs" />
+    <Compile Include="Objects\EditorComponents\CustomMeshes.cs" />
+    <Compile Include="Objects\EditorComponents\L2PaintOverwrite.cs" />
+    <Compile Include="Objects\EditorComponents\MaterialSetup.cs" />
+    <Compile Include="Objects\EditorComponents\BuildableGenerator.cs" />
     <Compile Include="Objects\EditorComponents\CarGenerator.cs" />
     <Compile Include="Objects\EditorComponents\ChildDestroy.cs" />
     <Compile Include="Objects\EditorComponents\ChildMove.cs" />
@@ -487,6 +530,7 @@
     <Compile Include="Objects\EditorComponents\InternalMarker.cs" />
     <Compile Include="Objects\EditorComponents\OriginalMesh.cs" />
     <Compile Include="Objects\EditorComponents\FurnitureCollider.cs" />
+    <Compile Include="Objects\EditorComponents\PartProperties.cs" />
     <Compile Include="Objects\Furniture\CustomFurnitureSaleItem.cs" />
     <Compile Include="Objects\Furniture\Furniture.cs" />
     <Compile Include="Objects\Furniture\PlayerFurniturePickup.cs" />
@@ -515,6 +559,7 @@
     <Compile Include="Objects\EditorComponents\MarkAsFlatnut.cs" />
     <Compile Include="Objects\EditorComponents\MarkAsHexnut.cs" />
     <Compile Include="Objects\Part.cs" />
+    <Compile Include="Objects\ReworkedTransparentEdit.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="Features\SimplePartLoader\PartManager.cs" />
@@ -526,6 +571,7 @@
     </Compile>
     <Compile Include="Features\SimplePartLoader\SPL.cs" />
     <Compile Include="Objects\TransparentEdit.cs" />
+    <Compile Include="Utils\BackgroundDelayChange.cs" />
     <Compile Include="Utils\CarBuilding.cs" />
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
@@ -539,10 +585,12 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\autoupdater_ui_canvas" />
     <None Include="Resources\extra_buildings_models" />
     <None Include="Resources\SimplePartLoaderIcon" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

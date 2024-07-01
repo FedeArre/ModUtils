@@ -20,6 +20,7 @@ namespace SimplePartLoader
         public delegate void DataLoadedDelegate();
         public static event DataLoadedDelegate DataLoaded;
 
+        [Obsolete("This feature has been removed and will be fully removed on ModUtils v1.5")]
         public static bool DEVELOPER_LOG = false;
         public static bool ENABLE_SAVE_DISSASAMBLE = false;
         public static bool PREFAB_NAME_COLLISION_CHECK = false;
@@ -42,9 +43,12 @@ namespace SimplePartLoader
         /// <param name="prefabName">The name of the prefab to be loaded</param>
         /// <exception cref="Exception">An exception will be thrown if the bundle or prefabName are invalid, if the prefab already exists or if essential components are missing</exception>
         /// <returns></returns>
-        [Obsolete("This method is deprecated, use ModInstance.Load instead")]
+        //[Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadPart(AssetBundle bundle, string prefabName)
         {
+            Debug.Log("LoadPart method is not longer supported. PrefabName: " + prefabName);
+            return null;
+            /*
             // Safety checks
             if (!bundle)
                 SplError("Tried to create a part without valid AssetBundle");
@@ -133,9 +137,9 @@ namespace SimplePartLoader
             Saver.modParts.Add(p.CarProps.PrefabName, prefab);
 
             GameObject.DontDestroyOnLoad(prefab); // We make sure that our prefab is not deleted in the first scene change
-            Debug.Log("[ModUtils/SPL]: Succesfully loaded part (not-dummy) " + prefabName);
-            return p; // We provide the Part instance so the developer can setup the transparents
+            return p; // We provide the Part instance so the developer can setup the transparents*/
         }
+        
 
         /// <summary>
         /// Allows to load a dummy part into the memory to setup it on runtime
@@ -161,7 +165,9 @@ namespace SimplePartLoader
         [Obsolete("This method is deprecated, use ModInstance.Load instead")]
         public static Part LoadDummy(AssetBundle bundle, string prefabName, bool betterCopy = true)
         {
-            // Safety checks
+            Debug.Log("LoadDummy method is not longer supported. PrefabName: " + prefabName);
+            return null;
+            /*// Safety checks
             if (!bundle)
                 SplError("Tried to create a part without valid AssetBundle");
 
@@ -199,9 +205,9 @@ namespace SimplePartLoader
                 DevLog($"Dummy part (Not using prefab generator) added into list ({prefabName})");
             }
 
-            return p;
+            return p;*/
         }
-
+        
         /// <summary>
         /// Allows to copy all the components from a car part of the game into a dummy part.
         /// </summary>
@@ -213,13 +219,13 @@ namespace SimplePartLoader
         {
             if (p == null) // Safety check
             {
-                Debug.LogError("[ModUtils/SPL/Error]: Tried to do full copy into empty part");
+                CustomLogger.AddLine("Parts", "Tried to do full copy into empty part");
                 return;
             }
             
             if(p.Prefab.GetComponents<Component>() == null)
             {
-                Debug.Log("[ModUtils/SPL/Error]: The part that was going to be copied had a null component. Part: " + p.Name);
+                CustomLogger.AddLine("Parts", "The part that was going to be copied had a null component. Part: " + p.Name);
                 return;
             }
 
@@ -240,7 +246,7 @@ namespace SimplePartLoader
 
             if (!carPart)
             {
-                Debug.LogError($"[ModUtils/SPL/Error] Car part was not found on CopyFullPartToPrefab! Part: {partName}");
+                CustomLogger.AddLine("Parts", $"Car part was not found on CopyFullPartToPrefab! Part: {partName}");
                 return;
             }
 
@@ -283,11 +289,14 @@ namespace SimplePartLoader
                 {
                     p.PartInfo.FitsToEngine = p.Mod.Settings.AutomaticFitsToEngine;
                 }
+
+                if(p.Mod.Settings.PrefabNamePrefix != "")
+                {
+                    p.CarProps.PrefabName = p.Mod.Settings.PrefabNamePrefix + p.Name;
+                }
             }
             
             p.OriginalGameobject = carPart;
-
-            Debug.LogError($"[ModUtils/SPL]: {p.Name} was succesfully loaded");
         }
 
         /// <summary>
@@ -297,8 +306,6 @@ namespace SimplePartLoader
         /// <param name="addToCatalog"></param>
         public static void ForcePartRegister(Part p, bool addToCatalog = false)
         {
-            Debug.LogError("[ModUtils/SPL]: Forcing register of part " + p.Name + " into the internal mod parts list.");
-
             PartManager.modLoadedParts.Add(p);
             GameObject.DontDestroyOnLoad(p.Prefab);
             PartManager.gameParts.Add(p.Prefab);
@@ -403,9 +410,7 @@ namespace SimplePartLoader
                     }
                     catch(Exception ex)
                     {
-                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while loading a mod, you should report this to the mod developer.");
-                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        CustomLogger.AddLine("Parts", ex);
                     }
                 }
             }
@@ -416,9 +421,10 @@ namespace SimplePartLoader
         /// </summary>
         internal static void InvokeLoadFinishedEvent()
         {
+#if MODUTILS_TIMING_ENABLED
             var watch1 = new System.Diagnostics.Stopwatch();
             watch1.Start();
-
+#endif
             if (LoadFinish != null)
             {
                 DevLog("Load finish has been called - Developer logging is enabled (Please disable before releasing your mod!)");
@@ -426,25 +432,27 @@ namespace SimplePartLoader
                 {
                     try
                     {
+#if MODUTILS_TIMING_ENABLED
                         var watch2 = new System.Diagnostics.Stopwatch();
                         watch2.Start();
-
+#endif
                         handler.DynamicInvoke();
 
+#if MODUTILS_TIMING_ENABLED
                         watch2.Stop();
                         Debug.Log($"[ModUtils/Timing/FirstLoad]: {handler.Method.ReflectedType.Assembly.FullName} FirstLoad took {watch2.ElapsedMilliseconds}ms");
+#endif
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while on load finish, you should report this to the mod developer.");
-                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
+                        CustomLogger.AddLine("Parts", ex);
                     }
                 }
             }
+#if MODUTILS_TIMING_ENABLED
             watch1.Stop();
             Debug.Log($"[ModUtils/Timing/FirstLoad]: FirstLoad total took {watch1.ElapsedMilliseconds}ms");
-
+#endif
         }
 
         /// <summary>
@@ -463,10 +471,7 @@ namespace SimplePartLoader
                     }
                     catch (Exception ex)
                     {
-                        Debug.Log("[ModUtils/SPL/Error]: Exception caught while on data loaded event, you should report this to the mod developer.");
-                        Debug.Log($"[ModUtils/SPL/Error]: Exception details: {ex.ToString()} (ST: {ex.StackTrace})");
-                        Debug.Log($"[ModUtils/SPL/Error]: Method: {handler.Method.Name}, type: {handler.Method.ReflectedType.Name}, assembly: {handler.Method.ReflectedType.Assembly.FullName}");
-
+                        CustomLogger.AddLine("Parts", ex);
                     }
                 }
             }
@@ -478,18 +483,18 @@ namespace SimplePartLoader
         /// <param name="str">The string to be printed on log</param>
         internal static void DevLog(string str)
         {
-            if (DEVELOPER_LOG)
-                Debug.Log("[ModUtils/Dev/SPL]: " + str);
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("Debug", str);
         }
 
         internal static void DevLog(Part p, string str)
         {
-            if(p.Mod != null)
+            if (CustomLogger.DebugEnabled)
             {
-                if(p.Mod.Settings.EnableDeveloperLog)
-                {
-                    Debug.Log($"[ModUtils/Dev/SPL]: {str} (part: part_{p.Prefab.name}, mod: {p.Mod.Name})");
-                }
+                if(p.Mod != null)
+                    CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, mod: {p.Mod.Name})");
+                else
+                    CustomLogger.AddLine("Debug", $"{str} (part: {p.Prefab.name}, origin mod unknown)");
             }
         }
 
@@ -500,8 +505,8 @@ namespace SimplePartLoader
         /// <exception cref="Exception">Generic exception to stop execution</exception>
         internal static void SplError(string str)
         {
-            Debug.LogError("[ModUtils/SPL/Error]: " + str);
-            throw new Exception("ModUtils exception");
+            CustomLogger.AddLine("SplError", str);
+            throw new Exception("ModUtils major exception - Read above");
         }
         
         // Compatibility for older versions

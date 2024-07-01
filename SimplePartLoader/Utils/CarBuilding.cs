@@ -11,9 +11,7 @@ namespace SimplePartLoader.Utils
 {
     public class CarBuilding
     {
-        /// <summary>
-        /// Enables the debug mode for car building functions
-        /// </summary>
+        [Obsolete("The following property will be removed in ModUtils v1.5 - Use ModInstance.EnableDebug instead")]
         public static bool ENABLE_CARBUILDING_DEBUG = false;
 
         /// <summary>
@@ -30,13 +28,13 @@ namespace SimplePartLoader.Utils
                 if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
                     continue;
 
+                if(comp == null) continue;
+
                 DevLog($"Now copying component to base object ({comp})");
                 prefab.AddComponent(comp.GetType()).GetCopyOf(comp, true);
             }
 
             AttachPrefabChilds(prefab, originalCar); // Call the recursive function that copies all the child hierarchy.
-
-            Debug.Log($"[ModUtils/CarBuilding]: Car {originalCar.name} cloned to prefab");
         }
 
         /// <summary>
@@ -66,8 +64,15 @@ namespace SimplePartLoader.Utils
                 if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
                     continue;
 
+                if (comp == null) continue;
+
                 DevLog($"Now copying component to added part ({comp})");
                 addedPart.AddComponent(comp.GetType()).GetCopyOf(comp, true);
+                /*if(comp is Partinfo)
+                {
+                    Partinfo pi = (Partinfo)comp;
+                    addedPart.name = pi.RenamedPrefab != null ? pi.RenamedPrefab : addedPart.name;
+                }*/
             }
             
             AttachPrefabChilds(addedPart, partToAdd);
@@ -127,9 +132,10 @@ namespace SimplePartLoader.Utils
         /// Updates all the DEPENDANTS and ATTACHABLES on the given GameObject
         /// </summary>
         /// <param name="p">The GameObject that will be updated</param>
-        public static void UpdateTransparentsReferences(GameObject p, bool ignoreErrors = false)
+        public static void UpdateTransparentsReferences(GameObject p, Car c)
         {
             bool referenceUpdated = false;
+
             foreach (transparents t in p.GetComponentsInChildren<transparents>())
             {
                 if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
@@ -146,7 +152,15 @@ namespace SimplePartLoader.Utils
                             continue;
                         }
 
-                        int savePosition = dp.dependant.GetComponent<transparents>().SavePosition;
+                        transparents tr = dp.dependant.GetComponent<transparents>();
+                        if(!tr)
+                        {
+                            if (c == null) continue;
+                            c.ReportIssue($"Dependant {dp.dependant} of object {t} does not have transparents component. Something is not setup properly on Unity side");
+                            continue;
+                        }
+
+                        int savePosition = tr.SavePosition;
                         foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
                         {
                             if(t2 == null)
@@ -165,12 +179,14 @@ namespace SimplePartLoader.Utils
                                 break;
                             }
                         }
-                        if (!referenceUpdated && !ignoreErrors)
+                        if (!referenceUpdated)
                         {
-                            if(dp.dependant == null)
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object (null) not found in " + p.name + ", on part " + t.name);
+                            if (c == null) continue;
+
+                            if (dp.dependant == null)
+                                c.ReportIssue("Dependant object (null) not found in " + p.name + ", on part " + t.name);
                             else
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Dependant object " + dp.dependant.name + " not found in " + p.name + ", on part " + t.name);
+                                c.ReportIssue("Dependant object " + dp.dependant.name + " not found in " + p.name + ", on part " + t.name);
                         }
                     }
                     t.DEPENDANTS = newDependants;
@@ -212,10 +228,12 @@ namespace SimplePartLoader.Utils
                         }
                         if (!referenceUpdated)
                         {
+                            if (c == null) continue;
+
                             if (dp.Attachable == null)
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object (null) not found in " + p.name + ", on part " + t.name);
+                                c.ReportIssue("Attachable object (null) not found in " + p.name + ", on part " + t.name);
                             else
-                                Debug.LogError("[ModUtils/CarBuilding/Error]: Attachable object " + dp.Attachable.name + " not found in " + p.name + ", on part " + t.name);
+                                c.ReportIssue("Attachable object " + dp.Attachable.name + " not found in " + p.name + ", on part " + t.name);
                         }
                     }
                     t.ATTACHABLES = newAttachables;
@@ -223,10 +241,40 @@ namespace SimplePartLoader.Utils
             }
         }
 
+        public static void UpdateVisualObjects(Car c)
+        {
+            UpdateVisualObjects(c.carPrefab);
+        }
+
+        public static void UpdateVisualObjects(GameObject go)
+        {
+            foreach (CarProperties cp in go.GetComponentsInChildren<CarProperties>())
+            {
+                if (cp.VisualObject)
+                {
+                    bool updated = false;
+                    foreach (Transform t in cp.transform)
+                    {
+                        if (t.name == cp.VisualObject.name)
+                        {
+                            cp.VisualObject = t.gameObject;
+                            updated = true;
+                            break;
+                        }
+                    }
+
+                    if (!updated && cp.GetComponent<MeshRenderer>())
+                    {
+                        cp.VisualObject = cp.gameObject;
+                    }
+                }
+            }
+        }
+
         // Compatibility method
         public static void UpdateTransparentsReferences(GameObject p)
         {
-            UpdateTransparentsReferences(p, false);
+            UpdateTransparentsReferences(p, null);
         }
 
         /// <summary>
@@ -235,8 +283,8 @@ namespace SimplePartLoader.Utils
         /// <param name="str">The message to show on log</param>
         internal static void DevLog(string str)
         {
-            if (ENABLE_CARBUILDING_DEBUG)
-                Debug.Log("[ModUtils/CarBuilding]: " + str);
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("CarDebug", str);
         }
     }
 }

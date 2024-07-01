@@ -10,5 +10,6 @@ namespace SimplePartLoader
     public class SPL_Part : MonoBehaviour
     {
         // Empty - Just used to identify if a part was added by SPL!
+        internal ModInstance Mod { get; set; }
     }
 }

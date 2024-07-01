@@ -38,7 +38,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -55,6 +55,7 @@ namespace SimplePartLoader
 
                 CheckHighResolutionPaint(part, paintableTexture);
 
+                TryApplyL2Overwrite(part);
                 part.CarProps.Paintable = true;
                 part.Paintable = true;
             }
@@ -78,7 +79,7 @@ namespace SimplePartLoader
 
                 if (l2Material_index == -1)
                 {
-                    Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                    CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                     return;
                 }
 
@@ -91,6 +92,14 @@ namespace SimplePartLoader
                 
                 P3dSlot p3dSlot_colorMap = new P3dSlot(l2Material_index, "_L2ColorMap");
 
+                // Check for original mesh
+                OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+                Mesh meshToUse = null;
+                if (orMesh)
+                {
+                    meshToUse = orMesh.Mesh;
+                }
+
                 // Setting up the components
 
                 // Material cloner
@@ -101,10 +110,12 @@ namespace SimplePartLoader
 
                 counter_colorMap.PaintableTexture = paintableTexture_colorMap;
                 counter_colorMap.Threshold = 0.1f;
-                counter_colorMap.enabled = false;          
+                counter_colorMap.enabled = false;
+                counter_colorMap.MaskMesh = meshToUse;
 
                 CheckHighResolutionPaint(part, paintableTexture_colorMap);
-                
+
+                TryApplyL2Overwrite(part);
                 // Final details
                 part.Paintable = true;
                 part.CarProps.Paintable = true;
@@ -117,7 +128,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -139,8 +150,16 @@ namespace SimplePartLoader
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
+            }
+
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if (orMesh)
+            {
+                meshToUse = orMesh.Mesh;
             }
 
             // Now we add all the painting components
@@ -176,13 +195,16 @@ namespace SimplePartLoader
             counter_rust.Threshold = 0.5f;
             counter_rust.enabled = false;
             counter_rust.Color = new Color(0, 0, 0, 1f);
-            
+            counter_rust.MaskMesh = meshToUse;
+
             counter_colorMap.PaintableTexture = paintableTexture_colorMap;
             counter_colorMap.Threshold = 0.1f;
             counter_colorMap.enabled = false;
-            
+            counter_colorMap.MaskMesh = meshToUse;
+
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
-            
+
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -197,7 +219,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -219,8 +241,16 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
+            }
+
+            // Check for original mesh
+            OriginalMesh orMesh = Prefab.GetComponent<OriginalMesh>();
+            Mesh meshToUse = null;
+            if (orMesh)
+            {
+                meshToUse = orMesh.Mesh;
             }
 
             // Setting up the components
@@ -240,7 +270,8 @@ namespace SimplePartLoader
             counter_dirt.Threshold = 0.7f;
             counter_dirt.enabled = false;
             counter_dirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
-            
+            counter_dirt.MaskMesh = meshToUse;
+
             // Final details
             part.CarProps.Washable = true;
         }
@@ -251,7 +282,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -281,13 +312,13 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if(l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -354,7 +385,8 @@ namespace SimplePartLoader
             counter_dirt.MaskMesh = meshToUse;
 
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
-            
+
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -369,7 +401,7 @@ namespace SimplePartLoader
 
             if (part.Paintable || Prefab.GetComponent<P3dPaintable>())
             {
-                Debug.LogError($"[ModUtils/PaintingSystem/Error]: Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
+                CustomLogger.AddLine("PaintingSystem", $"Tried to use EnablePaintSupport on {Prefab.name} but already has painting components.");
                 return;
             }
 
@@ -399,13 +431,13 @@ namespace SimplePartLoader
 
             if (alphaMaterial_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
             if (l2Material_index == -1)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -438,6 +470,7 @@ namespace SimplePartLoader
             
             CheckHighResolutionPaint(part, paintableTexture_colorMap);
 
+            TryApplyL2Overwrite(part);
             // Final details
             part.Paintable = true;
             part.CarProps.Paintable = true;
@@ -486,7 +519,7 @@ namespace SimplePartLoader
 
             if (!DirtMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetDirtMaterial was not able to retrive a dirt material. Make sure you are using it on FirstLoad event.");
             }
             return DirtMaterial;
         }
@@ -509,7 +542,7 @@ namespace SimplePartLoader
 
             if (!PaintRustMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetPaintRustMaterial was not able to retrive a paint-rust material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetPaintRustMaterial was not able to retrive a paint-rust material. Make sure you are using it on FirstLoad event.");
             }
             return PaintRustMaterial;
         }
@@ -537,7 +570,7 @@ namespace SimplePartLoader
 
             if (!BaseMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetBodymatMaterial was not able to retrive the body material. Make sure you are using it on FirstLoad event.");
             }
             
             return useBackfaceShader ? CullBaseMaterial : BaseMaterial;
@@ -562,7 +595,7 @@ namespace SimplePartLoader
             
             if (!ChromeMaterial)
             {
-                Debug.LogError("[ModUtils/PaintingSystem/Error]: GetChromeMaterial was not able to retrive the chrome material. Make sure you are using it on FirstLoad event.");
+                CustomLogger.AddLine("PaintingSystem", $"GetChromeMaterial was not able to retrive the chrome material. Make sure you are using it on FirstLoad event.");
             }
             return ChromeMaterial;
         }
@@ -582,7 +615,7 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= bodymatIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup bodymat index {bodymatIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 bool shader = false;
@@ -604,7 +637,7 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= paintRustIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup paint/rust index {paintRustIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 matsOfPart[paintRustIndex] = GetPaintRustMaterial();
@@ -614,13 +647,83 @@ namespace SimplePartLoader
             {
                 if (matsOfPart.Length <= dirtIndex)
                 {
-                    Debug.LogError($"[ModUtils/PaintingSystem/Error]: SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
+                    CustomLogger.AddLine("PaintingSystem", $"SetMaterialsForObject tried to setup dirt index {dirtIndex} on part {p.Prefab.name} but it only has {matsOfPart.Length} materials.");
                     return;
                 }
                 matsOfPart[dirtIndex] = GetDirtMaterial();
             }
 
             p.Renderer.materials = matsOfPart;
+        }
+
+        public static void SetupPart(Part p, PaintingSystem.Types type, bool dontUseBlack = false)
+        {
+            switch (type)
+            {
+                case Types.FullPaintingSupport:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaint:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyDirt:
+                    SetMaterialsForObject(p, -1, -1, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaintAndDirt:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    p.EnablePartPainting(type);
+                    break;
+                case Types.OnlyPaintAndRust:
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    p.EnablePartPainting(type);
+                    break;
+            }
+        }
+
+        internal static void TryApplyL2Overwrite(Part p)
+        {
+            TryApplyL2Overwrite(p.Prefab);
+        }
+
+        internal static void TryApplyL2Overwrite(GameObject go)
+        {
+            L2PaintOverwrite comp = go.GetComponent<L2PaintOverwrite>();
+            if (!comp)
+                return;
+
+            Material matToChange = go.GetComponent<Renderer>().material;
+            if (!matToChange || matToChange.shader.name != "Thunderbyte/RustDirt2Layers")
+                return;
+
+            if(comp._texcoord)
+                matToChange.SetTexture("_texcoord", comp._texcoord);
+
+            if (comp._GrungeMap)
+                matToChange.SetTexture("_GrungeMap", comp._GrungeMap);
+
+            if (comp._L1ColorMap)
+                matToChange.SetTexture("_L1ColorMap", comp._L1ColorMap);
+
+            if (comp._L1EmissionMap)
+                matToChange.SetTexture("_L1EmissionMap", comp._L1EmissionMap);
+
+            if (comp._L1MetallicRustDustSmoothness)
+                matToChange.SetTexture("_L1MetallicRustDustSmoothness", comp._L1MetallicRustDustSmoothness);
+
+            if (comp._L1Normal)
+                matToChange.SetTexture("_L1Normal", comp._L1Normal);
+
+            if (comp._L2EmissionMap)
+                matToChange.SetTexture("_L2EmissionMap", comp._L2EmissionMap);
+
+            if (comp._L2MetallicRustDustSmoothness)
+                matToChange.SetTexture("_L2MetallicRustDustSmoothness", comp._L2MetallicRustDustSmoothness);
+
+            if (comp._L2Normal)
+                matToChange.SetTexture("_L2Normal", comp._L2Normal);
         }
     }
 }

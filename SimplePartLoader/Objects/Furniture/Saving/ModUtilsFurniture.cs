@@ -23,13 +23,12 @@ namespace SimplePartLoader.Objects.Furniture.Saving
             furnitureRef = (SimplePartLoader.Furniture) FurnitureManager.Furnitures[PrefabName];
             if(furnitureRef == null)
             {
-                Debug.Log("[ModUtils/Furniture/Error]: Could not find reference for furniture with prefab name " + PrefabName);
+                CustomLogger.AddLine("Furnitures", $"Could not find reference for furniture with prefab name " + PrefabName);
             }
         }
 
         public void OnDrop()
         {
-            Debug.Log("ModUtilsFurniture ONDROP call!");
             if(furnitureRef.TrailerAttaching && Joint)
             {
                 return;
@@ -52,9 +51,7 @@ namespace SimplePartLoader.Objects.Furniture.Saving
         }
 
         public void OnPickup()
-        {
-            Debug.Log("ModUtilsFurniture ONPICKUP call!");
-            
+        {   
             PreventFreeze = true;
             CanPickup = false;
             
@@ -66,7 +63,6 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 
         public void OnBuy()
         {
-            Debug.Log("ModUtilsFurniture ONBUY call!");
             Rigidbody rb = GetComponent<Rigidbody>();
             if (rb)
             {
@@ -77,7 +73,6 @@ namespace SimplePartLoader.Objects.Furniture.Saving
         
         IEnumerator FreezeRoutine()
         {
-            Debug.Log("ModUtilsFurniture FREEZEROUTINE call!");
             Rigidbody rb = GetComponent<Rigidbody>();
             if(rb)
             {
@@ -99,7 +94,6 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 	    {
 		    if (CanPickup && other.gameObject.name == "InsideCol" && transform.name != "CarLift")
 		    {
-                Debug.Log("ModUtilsFurniture ONTRIGGERENTER(TRUE) call!");
                 InTrailer = true;
                 if (!Joint)
                 {
@@ -120,14 +114,12 @@ namespace SimplePartLoader.Objects.Furniture.Saving
 	    {
 		    if (other.gameObject.name == "InsideCol")
 		    {
-                Debug.Log("ModUtilsFurniture ONTRIGGERXIT(TRUE) call!");
                 InTrailer = false;
 		    }
 	    }
 
         public void ChildDestroyed()
         {
-            Debug.Log("ModUtilsFurniture CHILDDESTROY call!");
             GameObject.Destroy(this);
         }
     }

@@ -21,7 +21,10 @@ namespace SimplePartLoader.Utils
             foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
-                    Debug.LogError("[ModUtils/Error]: PartManager part list got a null on it, restart game!");
+                {
+                    CustomLogger.AddLine("Parts", "PartManager gameParts got a null on it - Restart game if casual gamemode. Survival is broken and this message is normal");
+                    continue;
+                }
 
                 if (part.name == partName)
                 {
@@ -312,6 +315,12 @@ namespace SimplePartLoader.Utils
                 if (cp)
                     cp.DMGdisplacepart = false;
             }
+        }
+
+        public static void AddValueToArray(ref string[] array, string newValue)
+        {
+            Array.Resize(ref array, array.Length + 1);
+            array[array.Length - 1] = newValue;
         }
     }
 }

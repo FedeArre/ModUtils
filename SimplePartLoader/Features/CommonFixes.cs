@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -14,18 +15,18 @@ namespace SimplePartLoader
         {
             if(p == null)
             {
-                Debug.LogError("[ModUtils/CommonFixes]: Invalid part was passed on");
+                CustomLogger.AddLine("CommonFixes", $"Invalid part was passed on");
                 return;
             }
 
-            FixPart(p.Prefab, type, p.Mod.Settings.EnableDeveloperLog);
+            FixPart(p.Prefab, type);
         }
 
         public static void FixPart(GameObject prefab, FixType type, bool printData = true)
         {
             if (!prefab)
             {
-                Debug.LogError("[ModUtils/CommonFixes]: Invalid part was passed on");
+                CustomLogger.AddLine("CommonFixes", $"Invalid part was passed on");
                 return;
             }
 
@@ -35,10 +36,6 @@ namespace SimplePartLoader
                 {
                     case FixType.CarLights:
                         CarLightsFix(prefab, printData);
-                        break;
-
-                    case FixType.DriverPassangerSeat:
-                        SeatFix(prefab, printData);
                         break;
 
                     case FixType.Oilpan:
@@ -72,15 +69,15 @@ namespace SimplePartLoader
                     case FixType.Cluster:
                         Cluster(prefab, printData);
                         break;
+
+                    case FixType.MyBoneSCR:
+                        Bones(prefab);
+                        break;
                 }
             }
             catch(Exception ex)
             {
-                Debug.LogError("[ModUtils/CommonFixes/Error]: A fatal error occured while applying a CommonFix");
-                Debug.LogError("[ModUtils/CommonFixes/Error]: Part name: " + prefab.name);
-                Debug.LogError("[ModUtils/CommonFixes/Error]: Fix: " + type);
-                Debug.LogError("[ModUtils/CommonFixes/Error]: Exception: " + ex.Message);
-                Debug.LogError("[ModUtils/CommonFixes/Error]: StackTrace: " + ex.StackTrace);
+                CustomLogger.AddLine("CommonFixes", ex);
             }
             
         }
@@ -91,16 +88,11 @@ namespace SimplePartLoader
             foreach (CarLight cl in prefab.GetComponentsInChildren<CarLight>())
             {
                 cl.gameObject.AddComponent<LightFix>();
-                if (printData)
-                    Debug.Log($"[ModUtils/CommonFix/Light]: Adding light fix to {prefab} ({cl.gameObject.name})");
             }
         }
 
         internal static void RadiatorFix(GameObject prefab, bool printData)
         {
-            if(printData)
-                Debug.Log($"[ModUtils/CommonFix/Radiator]: Applying radiator fix to {prefab}");
-            
             Transform CoolantContainer = prefab.transform.Find("CoolantFluidContainer");
             Transform CoolantFluidLevel = prefab.transform.Find("VisualFLuid");
             Transform CoolantCupTransform = prefab.transform.Find("CoolantFluidReservuarCUP/CoolantFluidReservuarCUP");
@@ -114,9 +106,6 @@ namespace SimplePartLoader
 
         internal static void FuelTankFix(GameObject prefab, bool printData)
         {
-            if(printData)
-                Debug.Log($"[ModUtils/CommonFix/FuelTank]: Applying fuel tank fix to {prefab}");
-            
             Transform FuelTankContainer = prefab.transform.Find("FuelContainer");
             Transform FuelTankCup = prefab.transform.Find("FuelReservuarCUP/FuelReservuarCUP");
             FLUID FuelTankComponent = FuelTankContainer.GetComponent<FLUID>();
@@ -128,9 +117,6 @@ namespace SimplePartLoader
 
         internal static void BrakeCylinderFix(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/BrakeCylinder]: Applying brake cylinder fix to {prefab}");
-
             Transform BrakeFluidContainer = prefab.transform.Find("BrakeFluidContainer");
             Transform BrakeFluidVisual = prefab.transform.Find("VisualFluid");
             Transform BrakeFluidCup = prefab.transform.Find("BrakeFluidReservuarCUP/BrakeFluidReservuarCUP");
@@ -144,13 +130,10 @@ namespace SimplePartLoader
 
         internal static void DipstickFix(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Dipstick]: Applying dipstick fix to {prefab}");
-
             Transform Dipstick = prefab.transform.Find("Dipstick/Dipstick");
             if(!Dipstick)
             {
-                Debug.LogError("[ModUtils/CommonFix/Dipstick]: Dipstick not found. Make sure to be passing the cylinder block as parameter!");
+                CustomLogger.AddLine("CommonFixes", $"Dipstick not found. Make sure to be passing the cylinder block as parameter! - " + prefab.name);
                 return;
             }
             
@@ -160,9 +143,6 @@ namespace SimplePartLoader
 
         internal static void CylinderHeadCoverFix(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/CylinderHeadCover]: Applying cylinder head cover fix to {prefab}");
-
             Transform CylinderHeadContainer = prefab.transform.Find("OilFluidContainerHead");
             Transform CylinderHeadCup = prefab.transform.Find("OilReservuarCUP/OilReservuarCUP");
             FLUID OilCylinderHeadComponent = CylinderHeadContainer.GetComponent<FLUID>();
@@ -174,9 +154,6 @@ namespace SimplePartLoader
 
         internal static void OilpanFix(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Oilpan]: Applying oilpan fix to {prefab}");
-
             Transform OilpanContainer = prefab.transform.Find("OilFluidContainer");
             Transform OilpanCup = prefab.transform.Find("OilReservuarSCREW/OilReservuarSCREW");
             FLUID OilpanComponent = OilpanContainer.GetComponent<FLUID>();
@@ -186,36 +163,19 @@ namespace SimplePartLoader
             OilpanCupComponent.Fluid = OilpanContainer.gameObject;
         }
 
-        internal static void SeatFix(GameObject prefab, bool printData)
-        {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Seat]: COMPATIBILITY! - Seat fix tried to be applied to {prefab} (Fix is not needed anymore)");
-        }
-        
         internal static void Windows(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Windows]: Applying windows fix to {prefab}");
-
             foreach (RVP.ShatterPart shatterComp in prefab.GetComponentsInChildren<RVP.ShatterPart>())
             {
                 Transform t = shatterComp.transform.Find("ShatterParticles");
                 if (t)
                 {
                     shatterComp.shatterParticles = t.GetComponent<ParticleSystem>();
-                    Debug.Log("[ModUtils/CommonFix/Windows]: RVP.ShatterPart (windows) fix applied to " + shatterComp.name);
-                }
-                else
-                {
-                    Debug.Log("[ModUtils/CommonFix/Windows]: RVP.ShatterPart (windows) fix could not be applied to " + shatterComp.name);
                 }
             }
         }
         internal static void Cluster(GameObject prefab, bool printData)
         {
-            if (printData)
-                Debug.Log($"[ModUtils/CommonFix/Cluster]: Applying cluster fix to {prefab}");
-
             CarProperties clusterProps = prefab.GetComponent<CarProperties>();
 
             Transform batLight = prefab.transform.Find("BatLight");
@@ -226,22 +186,44 @@ namespace SimplePartLoader
             if(batLight)
                 clusterProps.ClusterBat = batLight.gameObject;
             else if (printData)
-                Debug.Log("[ModUtils/CommonFix/Cluster]: BatLight not found at prefab " + prefab);
+                CustomLogger.AddLine("CommonFixes", $"BatLight not found at prefab " + prefab);
 
             if (high)
                 clusterProps.ClusterHigh = high.gameObject;
             else if (printData)
-                Debug.Log("[ModUtils/CommonFix/Cluster]: High not found at prefab " + prefab);
+                CustomLogger.AddLine("CommonFixes", $"High not found at prefab " + prefab);
             
             if (left)
                 clusterProps.ClusterL = left.gameObject;
             else if (printData)
-                Debug.Log("[ModUtils/CommonFix/Cluster]: Left not found at prefab " + prefab);
+                CustomLogger.AddLine("CommonFixes", $"Left not found at prefab " + prefab);
             
             if (right)
                 clusterProps.ClusterR = right.gameObject;
             else if (printData)
-                Debug.Log("[ModUtils/CommonFix/Cluster]: Right not found at prefab " + prefab);
+                CustomLogger.AddLine("CommonFixes", $"Right not found at prefab " + prefab);
+        }
+
+        internal static void Bones(GameObject prefab)
+        {
+            foreach (MyBoneSCR scr in prefab.GetComponentsInChildren<MyBoneSCR>())
+            {
+                if (scr.transform.childCount != 0 && scr.transform.GetChild(0).name.Contains("Pivot"))
+                {
+                    scr.LocalStrtetchTarget = scr.transform.GetChild(0);
+                }
+            }
+
+            foreach (MyBoneSCR scr in prefab.GetComponentsInChildren<MyBoneSCR>())
+            {
+                if (scr.thisTransform != null)
+                {
+                    if (!scr.thisTransform.root != prefab.transform)
+                    {
+                        scr.thisTransform = scr.transform;
+                    }
+                }
+            }
         }
     }
 
@@ -256,6 +238,7 @@ namespace SimplePartLoader
         Oilpan,
         DriverPassangerSeat,
         Windows,
-        Cluster
+        Cluster,
+        MyBoneSCR
     }
 }

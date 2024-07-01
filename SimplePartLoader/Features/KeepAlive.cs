@@ -21,7 +21,7 @@ namespace SimplePartLoader
         private KeepAlive()
         {
             // UNSAFE! This has to be removed after ModUtils backend update!
-            ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
+            //ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
             // Keep the json to post on memory
             JSON_ModList jsonList = new JSON_ModList(-1);
@@ -58,11 +58,15 @@ namespace SimplePartLoader
 
                 jsonList.mods.Add(jsonMod);
             }
+
+            if (ModMain.EA_Enabled.Checked)
+                jsonList.SteamId = Steamworks.SteamUser.GetSteamID().m_SteamID;
+
             serializedJson = JsonConvert.SerializeObject(jsonList);
         }
         private async void SendCurrentStatus()
         {
-            if(!ModMain.TelemetryToggle.Value) // If telemetry is not enabled, :(
+            if(!ModMain.Telemetry.Checked)
                 return;
 
             try
@@ -72,7 +76,7 @@ namespace SimplePartLoader
             }
             catch (Exception ex)
             {
-                Debug.Log("[ModUtils/KeepAlive/Error]: Error occured while trying to send heartbeat, error: " + ex.ToString());
+                CustomLogger.AddLine("KeepAlive", ex);
             }
         }
         public static KeepAlive GetInstance()
@@ -84,7 +88,7 @@ namespace SimplePartLoader
 
         public void Ready()
         {
-            Debug.Log("[ModUtils/KeepAlive]: Enabled!"); 
+            CustomLogger.AddLine("KeepAlive", $"Enabled");
         }
     }
 }

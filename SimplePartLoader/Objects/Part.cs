@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using SimplePartLoader;
+using System.Collections.Generic;
 
 namespace SimplePartLoader
 {
@@ -13,7 +14,7 @@ namespace SimplePartLoader
         public CarProperties CarProps;
         public Partinfo PartInfo;
         public Renderer Renderer;
-        
+
         internal GameObject OriginalGameobject;
 
         internal string Name;
@@ -22,14 +23,22 @@ namespace SimplePartLoader
         internal Hashtable languages = new Hashtable();
 
         internal bool SavingEnabled;
+        internal bool PrefabGenLoaded = false;
+
         public bool UseBetterCopy;
+        public bool BoltDisplacement = true;
+
         public ShaderSettings ForceShaderStatus = ShaderSettings.NONE;
-        
+
+        internal bool IssueExternalReport = false;
+        internal string ReportedIssue = string.Empty;
+
         private PartTypes Type;
         private ModInstance modInstance;
 
         public bool RotateThumbnail;
-        
+        public List<string> Properties = new List<string>();
+
         public ModInstance Mod
         {
             get { return modInstance; }
@@ -95,6 +104,12 @@ namespace SimplePartLoader
 
         public TransparentData AddTransparent(string attachesTo, Vector3 transparentLocalPos, Quaternion transaprentLocalRot, bool testingModeEnable = false)
         {
+            if(attachesTo == PartInfo.RenamedPrefab)
+            {
+                ReportIssue($"Tried to generate part with same name as renamed prefab ({attachesTo})");
+                return null;
+            }
+
             TransparentData td = new TransparentData(PartInfo.RenamedPrefab, attachesTo, transparentLocalPos, transaprentLocalRot, testingModeEnable);
             MeshFilter mf = Prefab.GetComponent<MeshFilter>();
             if (mf)
@@ -175,6 +190,12 @@ namespace SimplePartLoader
             }
         }
 
+        internal void ReportIssue(string issue)
+        {
+            IssueExternalReport = true;
+            ReportedIssue += issue + "\n";
+        }
+
         public void UpdateHingePivotPosition(Vector3 newLocalPosition)
         {
             Transform t = Prefab.transform.Find("HingePivot");
@@ -189,13 +210,13 @@ namespace SimplePartLoader
             return Prefab.GetComponentsInChildren<Transform>();
         }
         
-        [Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on SimplePartLoader 1.5. Use PaintingSystem.Types instead!")]
+        /*[Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on Modutils 1.5. Use PaintingSystem.Types instead!")]
         public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
         {
             PaintingSystem.Types newType = (PaintingSystem.Types)type;
             EnablePartPainting(newType, paintMaterial);
         }
-        
+        */
         public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
             switch (type)
@@ -221,7 +242,7 @@ namespace SimplePartLoader
                     break;
 
                 default:
-                    Debug.LogError("[ModUtils/SPL/Error]: An invalid type has been sent to Part.EnablePainting, part: " +Prefab.name);
+                    CustomLogger.AddLine("Parts", $"An invalid type has been sent to Part.EnablePainting, part: " + Prefab.name);
                     break;
             }
         }
@@ -331,6 +352,23 @@ namespace SimplePartLoader
             }
         }
 
+        public void RemovePaintCounters()
+        {
+            foreach (P3dChangeCounter counter in Prefab.GetComponentsInChildren<P3dChangeCounter>())
+                GameObject.Destroy(counter);
+        }
+
+        public void SetStandardShader()
+        {
+            Material[] objectMats = Renderer.materials;
+            Shader standardShader = Shader.Find("Standard");
+
+            foreach (Material m in objectMats)
+                m.shader = standardShader;
+
+            Renderer.materials = objectMats;
+        }
+
         private void GenerateHingePivot(OpeningType type)
         {
             Transform t = Prefab.transform.Find("HingePivot");
@@ -350,6 +388,21 @@ namespace SimplePartLoader
             t.gameObject.layer = LayerMask.NameToLayer("OpenableParts");
 
             PartInfo.HingePivot = t.gameObject;
+        }
+
+        public string GetTypeName()
+        {
+            switch(Type)
+            {
+                case PartTypes.FULL_PART: return "Full part";
+                case PartTypes.DUMMY_PREFABGEN: return "Prefab generator";
+                default: return "Dummy";
+            }
+        }
+
+        public bool HasProperty(string property)
+        {
+            return Properties.Contains(property);
         }
     }
 
