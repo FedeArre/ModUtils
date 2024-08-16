@@ -45,9 +45,15 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
+
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -68,9 +74,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -92,9 +103,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -116,9 +132,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if(pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
