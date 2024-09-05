@@ -609,7 +609,16 @@ namespace SimplePartLoader
         /// <param name="dirtIndex">Should be always at index 1, dirt material</param>
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1)
         {
+            SetMaterialsForObject(p, bodymatIndex, paintRustIndex, dirtIndex, false);
+        }
+
+        public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1, bool force = true)
+        {
             Material[] matsOfPart = p.Renderer.materials;
+            if(force && matsOfPart.Length < 3)
+            {
+                matsOfPart = new Material[3];
+            }
 
             if (bodymatIndex != -1)
             {
@@ -619,9 +628,9 @@ namespace SimplePartLoader
                     return;
                 }
                 bool shader = false;
-                if(p.Mod != null)
+                if (p.Mod != null)
                 {
-                    if(p.ForceShaderStatus != ShaderSettings.NONE)
+                    if (p.ForceShaderStatus != ShaderSettings.NONE)
                     {
                         shader = p.ForceShaderStatus == ShaderSettings.FORCE_BACKSIDE;
                     }
@@ -661,23 +670,23 @@ namespace SimplePartLoader
             switch (type)
             {
                 case Types.FullPaintingSupport:
-                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1, true);
                     p.EnablePartPainting(type);
                     break;
                 case Types.OnlyPaint:
-                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1, true);
                     p.EnablePartPainting(type);
                     break;
                 case Types.OnlyDirt:
-                    SetMaterialsForObject(p, -1, -1, 1);
+                    SetMaterialsForObject(p, -1, -1, 1, true);
                     p.EnablePartPainting(type);
                     break;
                 case Types.OnlyPaintAndDirt:
-                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1);
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, 1, true);
                     p.EnablePartPainting(type);
                     break;
                 case Types.OnlyPaintAndRust:
-                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1);
+                    SetMaterialsForObject(p, dontUseBlack ? -1 : 2, 0, -1, true);
                     p.EnablePartPainting(type);
                     break;
             }

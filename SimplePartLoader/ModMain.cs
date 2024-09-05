@@ -36,8 +36,8 @@ namespace SimplePartLoader
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.5.0";
         
-        bool TESTING_VERSION_REMEMBER = false;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.0-rc2";
+        bool TESTING_VERSION_REMEMBER = true;
+        internal static string TESTING_VERSION_NUMBER = "v1.6.0-internal_dev";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
