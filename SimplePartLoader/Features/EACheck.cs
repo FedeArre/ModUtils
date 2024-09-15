@@ -161,6 +161,11 @@ namespace SimplePartLoader
                         ae.Handle((x) =>
                         {
                             CustomLogger.AddLine("EACheck", x);
+                            if (x.InnerException != null)
+                            {
+                                CustomLogger.AddLine("EACheck", x.InnerException);
+                            }
+
                             CustomLogger.AddLine("EACheck", item.Value);
                             return true;
                         });
@@ -169,6 +174,10 @@ namespace SimplePartLoader
                     {
                         ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
                         CustomLogger.AddLine("EACheck", ex);
+                        if (ex.InnerException != null)
+                        {
+                            CustomLogger.AddLine("EACheck", ex.InnerException);
+                        }
                     }
                     finally
                     {
