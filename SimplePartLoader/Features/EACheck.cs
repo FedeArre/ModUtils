@@ -91,11 +91,8 @@ namespace SimplePartLoader
             else if (foundKeys.Count != 0)
             {
                 Stopwatch watch = new Stopwatch();
-                Dictionary<string, byte[]> loadedModData = new Dictionary<string, byte[]>();
-
                 // If we have keys, we now start loading the mods
-
-                Parallel.ForEach(foundKeys, new ParallelOptions { MaxDegreeOfParallelism = 10} , (item) =>
+                foreach (var item in foundKeys)
                 {
                     CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
                     watch.Start();
@@ -129,7 +126,7 @@ namespace SimplePartLoader
                                 CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
                                 CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
 
-                                return;
+                                continue;
                             }
 
                             if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound) // invalid key
@@ -138,12 +135,24 @@ namespace SimplePartLoader
 
                                 CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
                                 CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
-                                return;
+                                continue;
                             }
 
-                            loadedModData.Add(Path.GetFileName(item.Key), assemblyBytes);
+                            Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+                            Type typeFromHandle = typeof(Mod);
+                            for (int i = 0; i < types.Length; i++)
+                            {
+                                if (typeFromHandle.IsAssignableFrom(types[i]))
+                                {
+                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
+                                    Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                    ModLoader.mods.Add(m);
+                                    m.OnMenuLoad();
+                                    break;
+                                }
+                            }
 
-                            CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)} into memory, took {watch.ElapsedMilliseconds}ms in total.\n\n");
+                            CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.\n\n");
                         }
                     }
                     catch (AggregateException ae)
@@ -173,54 +182,6 @@ namespace SimplePartLoader
                     finally
                     {
                         watch.Restart();
-                    }
-                });
-
-                CustomLogger.AddLine("EACheck", "Now starting to load the mods into the game");
-                string lastKey = "";
-                foreach(var kvp in loadedModData)
-                {
-                    try
-                    {
-                        lastKey = kvp.Key;
-                        CustomLogger.AddLine("EACheck", $"Loading mod from assembly " + kvp.Key);
-                        Type[] types = Assembly.Load(kvp.Value).GetTypes();
-                        Type typeFromHandle = typeof(Mod);
-                        for (int i = 0; i < types.Length; i++)
-                        {
-                            if (typeFromHandle.IsAssignableFrom(types[i]))
-                            {
-                                Mod m = (Mod)Activator.CreateInstance(types[i]);
-                                ModLoader.mods.Add(m);
-                                m.OnMenuLoad();
-                                break;
-                            }
-                        }
-
-                    }
-                    catch (AggregateException ae)
-                    {
-                        CustomLogger.AddLine("EACheck", "Agregate exception occured");
-                        ae.Handle((x) =>
-                        {
-                            CustomLogger.AddLine("EACheck", x);
-                            if (x.InnerException != null)
-                            {
-                                CustomLogger.AddLine("EACheck", x.InnerException);
-                            }
-
-                            CustomLogger.AddLine("EACheck", "Crashed on " + lastKey);
-                            return true;
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(lastKey + " (FATAL)"));
-                        CustomLogger.AddLine("EACheck", ex);
-                        if (ex.InnerException != null)
-                        {
-                            CustomLogger.AddLine("EACheck", ex.InnerException);
-                        }
                     }
                 }
             }
