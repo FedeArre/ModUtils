@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using SimplePartLoader;
 using UnityEngine;
-using static PaintIn3D.P3dSeamFixer;
 
 [HarmonyPatch(typeof(CarProperties), nameof(CarProperties.SetMesh))]
 internal class CustomEngineHook

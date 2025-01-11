@@ -21,7 +21,7 @@
     <OutputPath>C:\Program Files %28x86%29\Steam\steamapps\common\My Garage\Mods\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -37,8 +37,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.3.1.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.3.1.1\lib\net452\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\My Garage\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -493,6 +494,7 @@
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
+    <Compile Include="Features\StartOptionBuilder\MainStartOptionBuilder.cs" />
     <Compile Include="Features\UI\KeybindDetector.cs" />
     <Compile Include="Features\UI\ModUtilsUI.cs" />
     <Compile Include="Features\UI\Saving\SettingSaver.cs" />
@@ -561,6 +563,7 @@
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\ReworkedTransparentEdit.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
+    <Compile Include="Objects\StartOption.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="Features\SimplePartLoader\PartManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

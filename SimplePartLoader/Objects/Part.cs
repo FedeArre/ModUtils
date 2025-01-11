@@ -5,6 +5,7 @@ using System.Collections;
 using UnityEngine;
 using SimplePartLoader;
 using System.Collections.Generic;
+using SimplePartLoader.Objects;
 
 namespace SimplePartLoader
 {
@@ -403,6 +404,41 @@ namespace SimplePartLoader
         public bool HasProperty(string property)
         {
             return Properties.Contains(property);
+        }
+
+        /// <summary>
+        /// Adds a start option to the part. This does not work on prefab generator parts.
+        /// </summary>
+        /// <param name="option">The start option instance</param>
+        public void AddStartOption(StartOption option)
+        {
+            if(CarProps == null)
+            {
+                CustomLogger.AddLine("Parts", $"Tried to add start option to a part that is not a full part, part: {Prefab.name}");
+                return;
+            }
+
+            // This is terrible. There is no better option as the game has 9 different variables per part for the start options instead of an array!
+            if (!CarProps.StartOption1)
+                CarProps.StartOption1 = option.Prefab;
+            else if (!CarProps.StartOption2)
+                CarProps.StartOption2 = option.Prefab;
+            else if (!CarProps.StartOption3)
+                CarProps.StartOption3 = option.Prefab;
+            else if (!CarProps.StartOption4)
+                CarProps.StartOption4 = option.Prefab;
+            else if (!CarProps.StartOption5)
+                CarProps.StartOption5 = option.Prefab;
+            else if(!CarProps.StartOption6)
+                CarProps.StartOption6 = option.Prefab;
+            else if(!CarProps.StartOption7)
+                CarProps.StartOption7 = option.Prefab;
+            else if (!CarProps.StartOption8)
+                CarProps.StartOption8 = option.Prefab;
+            else if (!CarProps.StartOption9)
+                CarProps.StartOption9 = option.Prefab;
+            else
+                CustomLogger.AddLine("Parts", $"Tried to add start option to a part that already has the maximum of possible start options (9), part: {Prefab.name}");
         }
     }
 
