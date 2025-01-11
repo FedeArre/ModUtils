@@ -137,11 +137,6 @@ namespace SimplePartLoader
             UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
             UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
 
-            // Computer stuff
-            ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
-            ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
-            ComputerUI.SetupComputer(AutoupdaterBundle.LoadAsset<GameObject>("AppLauncher"), AutoupdaterBundle.LoadAsset<GameObject>("AppLauncherIcon"));
-
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -359,14 +354,7 @@ namespace SimplePartLoader
 
             watch.Restart();
 #endif
-            // Computer UI stuff
-            ComputerUI.LoadComputerTable();
-#if MODUTILS_TIMING_ENABLED
-            watch.Stop();
-            totalTime += watch.ElapsedMilliseconds;
-            Debug.Log($"[ModUtils/Timing]: In-game computer succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
-            watch.Restart();
-#endif
+
             // Furniture stuff
             FurnitureManager.SetupFurniture();
 
@@ -404,11 +392,6 @@ namespace SimplePartLoader
 #endif
         }
 
-        public override void Continue()
-        {
-            ComputerUI.Continue();
-        }
-
         public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
         {
             if (ModUtils.GetPlayerTools().MapMagic)
@@ -418,7 +401,6 @@ namespace SimplePartLoader
             if (!isBarn)
             {
                 FurnitureManager.SaveFurniture(saver);
-                ComputerUI.Save();
                 DataHandler.OnSave(saver);
             }
         }
@@ -563,16 +545,7 @@ namespace SimplePartLoader
             BuildableManager.OnNewMapEnabled();
         }
 
-        public override void LateUpdate()
-        {
-            if (ComputerUI.PlayerAtComputer && Input.GetKeyDown(KeyCode.Escape))
-            {
-                ComputerUI.Close();
-                ModUtils.PlayerTools.ESC();
-            }
-        }
-
-        public  void LoadSettings()
+        public void LoadSettings()
         {
             // Enable heartbeat
             KeepAlive.GetInstance().Ready();

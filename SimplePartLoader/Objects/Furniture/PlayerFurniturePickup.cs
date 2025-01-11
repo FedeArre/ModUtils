@@ -65,11 +65,6 @@ namespace SimplePartLoader.Objects.Furniture
             {
                 if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, Items))
                 {
-                    if(rcHit.collider.name == "ModUtilsComputer")
-                    {
-                        ComputerUI.RaycastHandler(rcHit);
-                    }
-
                     if (rcHit.collider.transform.name.StartsWith("MODUTILS_FURNITURE_")) // If looking at ModUtils furniture
                     {
                         if (Input.GetMouseButtonDown(0))
