@@ -12,4 +12,10 @@ namespace SimplePartLoader
         // Empty - Just used to identify if a part was added by SPL!
         internal ModInstance Mod { get; set; }
     }
+
+    public class SPL_StartOption : MonoBehaviour
+    {
+        // Empty - Just used to identify if a start option was added by SPL!
+        internal ModInstance Mod { get; set; }
+    }
 }

@@ -438,7 +438,12 @@ namespace SimplePartLoader
             else if (!CarProps.StartOption9)
                 CarProps.StartOption9 = option.Prefab;
             else
+            {
                 CustomLogger.AddLine("Parts", $"Tried to add start option to a part that already has the maximum of possible start options (9), part: {Prefab.name}");
+                return;
+            }
+
+            CustomLogger.AddLine("Parts", $"Succesfully set start option {option.PartToCopy}");
         }
     }
 

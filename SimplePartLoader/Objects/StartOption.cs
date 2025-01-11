@@ -36,7 +36,7 @@ namespace SimplePartLoader
         /// </summary>
         public StartOptionSettings Settings { get; set; } = new StartOptionSettings();
 
-        public StartOption(GameObject prefab, string partToCopy, Dictionary<string, string> exceptions, ModInstance loadedBy)
+        internal StartOption(GameObject prefab, string partToCopy, Dictionary<string, string> exceptions, ModInstance loadedBy)
         {
             Prefab = prefab;
             Exceptions = exceptions;

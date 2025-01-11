@@ -2,6 +2,7 @@
 using KCC;
 using RVP;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Objects;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
@@ -287,6 +288,7 @@ namespace SimplePartLoader
             if (!hasFirstLoadOccured)
             {
                 hasFirstLoadOccured = true;
+                MainStartOptionBuilder.StartBuilder();
                 MainCarGenerator.StartCarGen();
             }
 

@@ -1,4 +1,5 @@
-﻿using SimplePartLoader.CarGen;
+﻿using PaintIn3D;
+using SimplePartLoader.CarGen;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,9 @@ namespace SimplePartLoader.Features.StartOptionBuilder
         {
             foreach(var startOption in StartOptions)
             {
+                if(CustomLogger.DebugEnabled)
+                    CustomLogger.AddLine("StartOptionBuilder", $"Now trying to build {startOption.PartToCopy} from {startOption.LoadedBy.Name}");
+                
                 // Lookup part reference of the original
                 GameObject originalPart = PartLookup(startOption.PartToCopy, startOption);
 
@@ -28,7 +32,27 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 }
 
                 // Copy part into the prefab
-                CarBuilding.CopyPartIntoTransform(originalPart, startOption.Prefab.transform);
+                startOption.Prefab.layer = originalPart.layer;
+
+                foreach (Component comp in originalPart.GetComponents<Component>())
+                {
+                    if (comp is P3dPaintable || comp is P3dPaintableTexture || comp is P3dChangeCounter || comp is P3dMaterialCloner || comp is P3dColorCounter || comp is Transform)
+                        continue;
+
+                    if (comp == null) continue;
+
+                    if (CustomLogger.DebugEnabled)
+                        CustomLogger.AddLine("StartOptionBuilder", $"Now copying component to base object ({comp})");
+                    startOption.Prefab.AddComponent(comp.GetType()).GetCopyOf(comp, true);
+                }
+
+                CarBuilding.AttachPrefabChilds(startOption.Prefab, originalPart);
+
+                // Also add ModUtils custom identifier
+                startOption.Prefab.AddComponent<SPL_StartOption>();
+
+                if (CustomLogger.DebugEnabled)
+                    CustomLogger.AddLine("StartOptionBuilder", $"Copied {originalPart} to {startOption.Prefab.transform}");
 
                 // Now, recursively copy all children up to 10 levels deep. 
                 RecursiveBuild(startOption, 0);
