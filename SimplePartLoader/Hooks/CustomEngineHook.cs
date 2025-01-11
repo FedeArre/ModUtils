@@ -89,8 +89,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.BatteryWireFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.BatteryWireFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.BatteryWireFallbackMesh;
             }
         }
         else if (__instance.PrefabName.Contains("LowerHose")) // Radiator lower hose
@@ -117,8 +117,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.LowerHoseFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.LowerHoseFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.LowerHoseFallbackMesh;
             }
         }
         else if (__instance.PrefabName.Contains("UpperHose")) // Radiator upper hose
@@ -146,8 +146,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.UpperHoseFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.UpperHoseFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.UpperHoseFallbackMesh;
             }
         }
     }

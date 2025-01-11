@@ -23,7 +23,7 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                     CustomLogger.AddLine("StartOptionBuilder", $"Now trying to build {startOption.PartToCopy} from {startOption.LoadedBy.Name}");
                 
                 // Lookup part reference of the original
-                GameObject originalPart = PartLookup(startOption.PartToCopy, startOption);
+                GameObject originalPart = PartLookup(startOption.PartToCopy, startOption, true);
 
                 if(originalPart is null)
                 {
@@ -228,9 +228,27 @@ namespace SimplePartLoader.Features.StartOptionBuilder
             }
         }
 
-        internal static GameObject PartLookup(string name, StartOption startOption)
+        internal static GameObject PartLookup(string name, StartOption startOption, bool isPrefabName = false)
         {
             GameObject foundPart = null;
+
+            if(isPrefabName)
+            {
+                // Slow lookup by Carprops prefab name. Only happens if isPrefabName is passed
+                foreach (Part partObj in startOption.LoadedBy.Parts)
+                {
+                    GameObject part = partObj.Prefab;
+                    if (part == null)
+                        continue;
+
+                    CarProperties cp = part.GetComponent<CarProperties>();
+                    if (cp.PrefabName == name)
+                    {
+                        foundPart = part;
+                        break;
+                    }
+                }
+            }
 
             // Even faster lookup, priorize mod-loaded stuff first!
             foreach (Part partObj in startOption.LoadedBy.Parts)

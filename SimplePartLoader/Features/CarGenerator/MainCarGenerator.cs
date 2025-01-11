@@ -26,6 +26,8 @@ namespace SimplePartLoader.CarGen
             AvailableBases[CarBase.Chad] = new Chad();
             AvailableBases[CarBase.LAD] = new LAD();
             AvailableBases[CarBase.Wolf] = new Wolf();
+            AvailableBases[CarBase.B200] = new B200();
+            AvailableBases[CarBase.Rat] = new Rat();
         }
 
         internal static void StartCarGen()
@@ -101,6 +103,10 @@ namespace SimplePartLoader.CarGen
                 mcp.CarName = car.carGeneratorData.CarName;
                 mcp.CarPrice = car.carGeneratorData.CarPrice;
                 mcp.PREFAB = car.emptyCarPrefab;
+
+                // Make sure AWD is turned on if the base has it, otherwise it will crash due to NWH differential setup being wrong!
+                if (mcp.AWD)
+                    car.carGeneratorData.EnableAWD = true;
 
                 // Fix InsideItems object
                 Transform emptyInsideItems = car.emptyCarPrefab.transform.Find("InsideItems");

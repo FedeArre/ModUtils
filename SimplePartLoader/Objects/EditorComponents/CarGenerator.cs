@@ -60,5 +60,7 @@ public enum CarBase
 {
     Chad,
     LAD,
-    Wolf
+    Wolf,
+    B200,
+    Rat
 }

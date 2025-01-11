@@ -462,9 +462,11 @@
     <Compile Include="Features\Building\DelayedBuildableLoader.cs" />
     <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
     <Compile Include="Features\CarGenerator\Car.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\B200.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
     <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
     <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Rat.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\CatalogMassUpdate.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatedJunkyard.cs" />
