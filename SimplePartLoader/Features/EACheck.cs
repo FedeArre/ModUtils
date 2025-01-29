@@ -6,6 +6,7 @@ using SimplePartLoader.Features.Auto
     
     ;
 using SimplePartLoader.Features.UI;
+using SimplePartLoader.Objects.DTO;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,6 +17,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,126 +64,238 @@ namespace SimplePartLoader
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId());
 
             // Load keys
-            Dictionary<string, string> foundKeys = new Dictionary<string, string>();
             string ModsFolderPath = Application.dataPath + "/../Mods/";
-            string[] files = Directory.GetFiles(ModsFolderPath);
+            string CachedFolderPath = Application.dataPath + "/../Mods/LockedCache";
 
-            for (int i = 0; i < files.Length; i++)
+            if(!Directory.Exists(CachedFolderPath))
             {
-                try
-                {
-                    string stuff = File.ReadAllText(files[i]);
-                    if (stuff.StartsWith("MDU783-"))
-                    {
-                        CustomLogger.AddLine("EACheck", $"Adding {Path.GetFileName(files[i])} as loadable mod");
-                        foundKeys.Add(files[i], stuff.Substring(7));
-                    }
-                }
-                catch (Exception ex)
-                {
-                    CustomLogger.AddLine("EACheck", ex);
-                }
+                CustomLogger.AddLine("EACheck", "Creating cache folder as it does not exist");
+                Directory.CreateDirectory(CachedFolderPath);
             }
 
-            if (!ModMain.EA_Enabled.Checked && foundKeys.Count != 0)
+            Dictionary<string, string> foundKeys = new Dictionary<string, string>();
+            Dictionary<string, KeyAnswer> aesKeys = new Dictionary<string, KeyAnswer>();
+            string[] modKeys = Directory.GetFiles(ModsFolderPath, "*.locked");
+            string[] cachedMods = Directory.GetFiles(CachedFolderPath, "*.modutilscache");
+
+            if ((modKeys.Length > 0) && !ModMain.EA_Enabled.Checked)
             {
                 ErrorMessageHandler.GetInstance().EarlyAccessMod = true;
-                CustomLogger.AddLine("EACheck", $"Early Access Mods found but loading of them is not allowed!");
+                CustomLogger.AddLine("EACheck", $"Locked mods found but loading of them is not allowed!");
             }
-            else if (foundKeys.Count != 0)
+
+            // If we have user consent to load EA/PL mods, we first read all the keys.
+            if(ModMain.EA_Enabled.Checked)
             {
-                Stopwatch watch = new Stopwatch();
-                // If we have keys, we now start loading the mods
-                foreach (var item in foundKeys)
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(ModMain.API_URL);
+                client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
+
+                try
                 {
-                    CustomLogger.AddLine("EACheck", $"Trying to load " + Path.GetFileName(item.Key));
-                    watch.Start();
-                    try
+                    foreach (string file in modKeys)
                     {
-                        ServicePointManager.DefaultConnectionLimit = 15;
-                        using (HttpClient client = new HttpClient())
+                        string contents = File.ReadAllText(file);
+                        if (contents.StartsWith("MODUTILS-22-LKM-")) // We know is a valid key, we add it to our tracker.
                         {
-                            client.Timeout = TimeSpan.FromMinutes(30);
+                            CustomLogger.AddLine("EACheck", $"Found key on {Path.GetFileName(file)}");
+                            foundKeys.Add(file, contents);
+                        }
+                    }
+                }
+                catch(Exception ex)
+                {
+                    CustomLogger.AddLine("EACheck", $"Error trying to read key of a file.");
+                    CustomLogger.AddLine("EACheck", ex);
+                }
 
-                            EarlyAccessObjectModel eamo = new EarlyAccessObjectModel();
-                            eamo.Key = item.Value;
-                            eamo.SteamId = steamID + "";
+                // We have all the keys, now we ask the API if they are still valid.
+                if(foundKeys.Count > 0)
+                {
+                    foreach(var item in foundKeys)
+                    {
+                        KeyValidationDTO key = new KeyValidationDTO()
+                        {
+                            Key = item.Value,
+                            SteamID = steamID.ToString().Trim()
+                        };
+                        CustomLogger.AddLine("EACheck", $"Trying to validate {Path.GetFileName(item.Key)} key.");
 
-                            HttpContent content = new StringContent(JsonConvert.SerializeObject(eamo), System.Text.Encoding.UTF8, "application/json");
-                            client.DefaultRequestHeaders.Range = new RangeHeaderValue(0, 300);
-                            HttpResponseMessage response = client.PostAsync(ModMain.API_URL + "/eachecknew", content).Result;
-                            watch.Stop();
+                        var response = client.PostAsync("v1/locked/key-auth", new StringContent(JsonConvert.SerializeObject(key), Encoding.UTF8, "application/json")).Result;
 
-                            CustomLogger.AddLine("EACheck", $"Request done, status code is {response.StatusCode} and took {watch.ElapsedMilliseconds}ms");
+                        if (response.IsSuccessStatusCode)
+                        {
+                            CustomLogger.AddLine("EACheck", $"Recieved 200 for {Path.GetFileNameWithoutExtension(item.Key)} key.");
+                            var responseBody = response.Content.ReadAsStringAsync().Result;
+                            var jsonResponse = JsonConvert.DeserializeObject<KeyAnswerDTO>(responseBody);
 
-                            watch.Start();
+                            KeyAnswer keyAnswer = new KeyAnswer()
+                            {
+                                ModId = jsonResponse.ModId,
+                                Checksum = jsonResponse.Checksum,
+                                Key = Convert.FromBase64String(jsonResponse.Key),
+                                IV = Convert.FromBase64String(jsonResponse.IV),
+                                PublicKey = key.Key
+                            };
 
-                            byte[] assemblyBytes = response.Content.ReadAsByteArrayAsync().Result;
-                            CustomLogger.AddLine("EACheck", $"Recieved {assemblyBytes.Length} bytes");
-
-                            if (response.StatusCode == HttpStatusCode.NoContent) // no permission
+                            aesKeys.Add(jsonResponse.ModId, keyAnswer);
+                            CustomLogger.AddLine("EACheck", $"Succesfully added {Path.GetFileName(item.Key)} key.");
+                        }
+                        else
+                        {
+                            if (response.StatusCode == HttpStatusCode.Unauthorized)
                             {
                                 ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
 
-                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
-                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
-
-                                continue;
+                                CustomLogger.AddLine("EACheck", $"Recieved 401 - User is not allowed for this mod");
                             }
-
-                            if (assemblyBytes.Length == 0 || response.StatusCode == HttpStatusCode.NotFound) // invalid key
+                            else if (response.StatusCode == HttpStatusCode.NotFound)
                             {
                                 ErrorMessageHandler.GetInstance().UpdateRequired.Add(Path.GetFileName(item.Key));
 
-                                CustomLogger.AddLine("EACheck", $"Could not load " + Path.GetFileName(item.Key));
-                                CustomLogger.AddLine("EACheck", $"Status code: " + response.StatusCode);
+                                CustomLogger.AddLine("EACheck", $"Recieved 404 - Update may be required.");
+                            }
+                            else
+                            {
+                                ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key));
+                                CustomLogger.AddLine("EACheck", $"Error trying to validate key of {item.Key}");
+                                CustomLogger.AddLine("EACheck", $"{response.StatusCode}");
+                                CustomLogger.AddLine("EACheck", response.Content.ReadAsStringAsync().Result);
+                            }
+                        }
+                    }
+
+                    // aesKey is now populated. checksum cached.
+                    CustomLogger.AddLine("EACheck", "Cache checksum check");
+                    List<string> updateModPathList = new List<string>();
+
+                    // load all files to be downloaded
+                    foreach (var item in aesKeys)
+                    {
+                        string modPath = $"{CachedFolderPath}/{item.Key}.modutilscache";
+                        if (!cachedMods.Contains(modPath))
+                        {
+                            updateModPathList.Add(modPath);
+                        }
+                    }
+
+                    foreach (string file in cachedMods)
+                    {
+                        var checksum = GenerateChecksum(file);
+                        string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+
+                        CustomLogger.AddLine("EACheck", $"Checking {fileNameWithoutExtension}.modutilscache");
+
+                        if (aesKeys.ContainsKey(fileNameWithoutExtension))
+                        {
+                            var aesChecksum = aesKeys[fileNameWithoutExtension].Checksum;
+
+                            if (aesChecksum == checksum)
+                            {
+                                CustomLogger.AddLine("EACheck", $"Checksum of {Path.GetFileName(file)} matches, not updating.");
+
+                                string modPathToRemove = $"{CachedFolderPath}/{fileNameWithoutExtension}.modutilscache";
+                                if (updateModPathList.Contains(modPathToRemove))
+                                {
+                                    updateModPathList.Remove(modPathToRemove);
+                                    CustomLogger.AddLine("EACheck", $"Removed from update list.");
+                                }
+                            }
+                            else
+                            {
+                                CustomLogger.AddLine("EACheck", $"Checksum mismatch for {fileNameWithoutExtension}.modutilscache");
+                            }
+                        }
+                        else
+                        {
+                            CustomLogger.AddLine("EACheck", $"{Path.GetFileName(file)} cache file found but no mod key available.");
+                        }
+                    }
+
+                    CustomLogger.AddLine("EACheck", $"Cache download count is {updateModPathList.Count}");
+                    if (updateModPathList.Count > 0)
+                    {
+                        // update mods
+                        foreach (var item in updateModPathList)
+                        {
+                            if(File.Exists(item))
+                                File.Delete(item); // delete existing file
+
+                            if(aesKeys.ContainsKey(Path.GetFileNameWithoutExtension(item)))
+                            {
+                                KeyAnswer key = aesKeys[Path.GetFileNameWithoutExtension(item)];
+                                string path = CachedFolderPath + $"/{key.ModId}.modutilscache";
+
+                                try
+                                {
+                                    using (var response = client.GetAsync($"v1/locked/download?ModId={key.ModId}", HttpCompletionOption.ResponseHeadersRead).Result)
+                                    {
+                                        response.EnsureSuccessStatusCode();
+
+                                        using (var httpStream = response.Content.ReadAsStreamAsync().Result)
+                                        using (var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None))
+                                        {
+                                            httpStream.CopyTo(fileStream);
+                                            CustomLogger.AddLine("EACheck", $"{Path.GetFileName(item)} succesfully downloaded from MuS");
+                                        }
+                                    }
+                                }
+                                catch(Exception ex)
+                                {
+                                    CustomLogger.AddLine("EACheck", $"{Path.GetFileName(item)} cache file was being downloaded but an issue occured.");
+                                    CustomLogger.AddLine("EACheck", ex);
+                                }
+                            }
+                            else
+                            {
+                                CustomLogger.AddLine("EACheck", $"{Path.GetFileName(item)} cache file found and set for update without available key.");
+                            }
+                        }
+                    }
+
+                    // load cached
+                    CustomLogger.AddLine("tee", CachedFolderPath);
+                    cachedMods = Directory.GetFiles(CachedFolderPath, "*.modutilscache");
+                    foreach (string file in cachedMods)
+                    {
+                        var modId = Path.GetFileNameWithoutExtension(file);
+                        if (aesKeys.ContainsKey(modId))
+                        {
+                            KeyAnswer key = aesKeys[modId];
+                            byte[] fileByteEncrypted = File.ReadAllBytes(file);
+                            byte[] fileBytes = null;
+
+                            try
+                            {
+                                fileBytes = Decrypt(fileByteEncrypted, key.Key, key.IV);
+                                CustomLogger.AddLine("EACheck", $"D:{modId}");
+                            }
+                            catch (Exception ex)
+                            {
+                                CustomLogger.AddLine("EACheck", $"Major error trying to decrypt {modId}");
+                                CustomLogger.AddLine("EACheck", ex);
                                 continue;
                             }
 
-                            Type[] types = Assembly.Load(assemblyBytes).GetTypes();
+
+                            Type[] types = Assembly.Load(fileBytes).GetTypes();
                             Type typeFromHandle = typeof(Mod);
                             for (int i = 0; i < types.Length; i++)
                             {
                                 if (typeFromHandle.IsAssignableFrom(types[i]))
                                 {
-                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {response.StatusCode}");
+                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {modId}");
                                     Mod m = (Mod)Activator.CreateInstance(types[i]);
                                     ModLoader.mods.Add(m);
                                     m.OnMenuLoad();
                                     break;
                                 }
                             }
-
-                            CustomLogger.AddLine("EACheck", $"Succesfully loaded {Path.GetFileName(item.Key)}, took {watch.ElapsedMilliseconds}ms in total.\n\n");
                         }
-                    }
-                    catch (AggregateException ae)
-                    {
-                        CustomLogger.AddLine("EACheck", "Agregate exception occured");
-                        ae.Handle((x) =>
+                        else
                         {
-                            CustomLogger.AddLine("EACheck", x);
-                            if (x.InnerException != null)
-                            {
-                                CustomLogger.AddLine("EACheck", x.InnerException);
-                            }
-
-                            CustomLogger.AddLine("EACheck", item.Value);
-                            return true;
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        ErrorMessageHandler.GetInstance().DisabledModList.Add(Path.GetFileName(item.Key + " (FATAL)"));
-                        CustomLogger.AddLine("EACheck", ex);
-                        if (ex.InnerException != null)
-                        {
-                            CustomLogger.AddLine("EACheck", ex.InnerException);
+                            CustomLogger.AddLine("EACheck", $"{modId} was ready to be loaded but no key available.");
                         }
-                    }
-                    finally
-                    {
-                        watch.Restart();
                     }
                 }
             }
@@ -411,6 +525,48 @@ namespace SimplePartLoader
             }
 
             StartDownloads();
+        }
+
+        public string GenerateChecksum(string filePath)
+        {
+            using (MD5 md5Hash = MD5.Create())
+            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            {
+                byte[] hashBytes = md5Hash.ComputeHash(fs);
+
+                StringBuilder builder = new StringBuilder();
+                foreach (byte b in hashBytes)
+                {
+                    builder.Append(b.ToString("x2"));
+                }
+                return builder.ToString();
+            }
+        }
+
+        public static byte[] Decrypt(byte[] cipherText, byte[] key, byte[] iv)
+        {
+            Aes aes = Aes.Create();
+            aes.Key = key;
+            aes.IV = iv;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+
+            ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+            MemoryStream ms = new MemoryStream(cipherText);
+            CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+            MemoryStream output = new MemoryStream();
+
+            cs.CopyTo(output);
+            byte[] decryptedBytes = output.ToArray();
+
+            // Cleanup
+            output.Close();
+            cs.Close();
+            ms.Close();
+            decryptor.Dispose();
+            aes.Dispose();
+
+            return decryptedBytes;
         }
     }
 }

@@ -509,6 +509,8 @@
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
+    <Compile Include="Objects\DTO\KeyAnswerDTO.cs" />
+    <Compile Include="Objects\DTO\KeyValidationDTO.cs" />
     <Compile Include="Objects\EditorComponents\CustomEngine.cs" />
     <Compile Include="Objects\EditorComponents\CustomMeshes.cs" />
     <Compile Include="Objects\EditorComponents\L2PaintOverwrite.cs" />
