@@ -332,7 +332,8 @@ namespace SimplePartLoader.CarGen
             Steering oldSteering = vehController.steering;
 
             newSteering.linearity = oldSteering.linearity;
-            newSteering.maximumSteerAngle = 44;
+            newSteering.Mouselinearity = oldSteering.Mouselinearity;
+            newSteering.maximumSteerAngle = 50;
             newSteering.returnToCenter = true;
             newSteering.smoothing = 0.05f;
             newSteering.steeringWheelTurnRatio = 5;
@@ -461,12 +462,13 @@ namespace SimplePartLoader.CarGen
             FrontGroup.camberAtBottom = 1;
             FrontGroup.camberAtTop = -5;
             FrontGroup.steerCoefficient = 1;
-            FrontGroup.trackWidth = 1.5f;
+            FrontGroup.trackWidth = 1.4558f;
+            FrontGroup.antiRollBarForce = 3000;
 
             RearGroup.name = "Rear";
             RearGroup.ackermanPercent = 0;
             RearGroup.antiRollBarForce = 3000;
-            RearGroup.brakeCoefficient = 0.5f;
+            RearGroup.brakeCoefficient = 0.7f;
             RearGroup.camberAtBottom = 1;
             RearGroup.camberAtTop = -5;
             RearGroup.handbrakeCoefficient = 2;
@@ -595,6 +597,17 @@ namespace SimplePartLoader.CarGen
             vehBrakes.brakeWhileIdle = false;
 
             vehController.brakes = vehBrakes;
+
+            // ModUtils v1.5.1 tweaks.
+            vehController.lateralSlipThreshold = 0.2f;
+            vehController.longitudinalSlipThreshold = 0.7f;
+            vehController.lowSpeedSubsteps = 15;
+            vehController.maxAngularVelocity = 3;
+            vehController.transmissionPosition = new Vector3(0f, 0.2f, 0.2f);
+            vehController.vehicleDimensions = new Vector3(1.9f, 1.3f, 5.1f);
+            vehController.enginePosition = new Vector3(0f, 0.4f, 1.5f);
+            vehController.centerOfMass = new Vector3(0f, 0.5f, 0.15f);
+            vehController.inertiaTensor = new Vector3(2000, 3000, 500);
         }
     }
 }

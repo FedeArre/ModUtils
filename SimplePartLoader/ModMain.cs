@@ -42,7 +42,7 @@ namespace SimplePartLoader
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        public const string API_URL = "https://modding.fedes.uy/api";
+        public const string API_URL = "https://localhost:7060/v1/";
 
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
         AssetBundle AutoupdaterBundle;
@@ -79,6 +79,8 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
+            ModUtils.Version = Version;
+
 #if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
