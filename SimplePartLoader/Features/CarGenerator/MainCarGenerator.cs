@@ -28,6 +28,7 @@ namespace SimplePartLoader.CarGen
             AvailableBases[CarBase.Wolf] = new Wolf();
             AvailableBases[CarBase.B200] = new B200();
             AvailableBases[CarBase.Rat] = new Rat();
+            AvailableBases[CarBase.Niv] = new Niv();
         }
 
         internal static void StartCarGen()

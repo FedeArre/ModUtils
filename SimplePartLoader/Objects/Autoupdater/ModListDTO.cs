@@ -7,19 +7,19 @@ using UnityEngine;
 
 namespace Autoupdater.Objects
 {
-    internal class JSON_ModList
+    internal class ModListDTO
     {
-        public List<JSON_Mod> mods { get; }
+        public List<ModDTO> mods { get; set; }
         public string GameVersion { get; set; }
         public int BuildId { get; set; }
         public ulong SteamId { get; set; }
 
-        public JSON_ModList(int buildId)
+        public ModListDTO(int buildId)
         {
-            mods = new List<JSON_Mod>();
+            mods = new List<ModDTO>();
             GameVersion = Application.version;
             BuildId = buildId;
-            SteamId = 0; // No need.
+            SteamId = 0;
         }
     }
 }

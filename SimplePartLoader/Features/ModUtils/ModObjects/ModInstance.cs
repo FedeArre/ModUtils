@@ -322,7 +322,7 @@ namespace SimplePartLoader
             if (!RequiresSteamCheck)
                 return;
 
-            EarlyAccessJson eaJson = new EarlyAccessJson();
+            SimpleLockDTO eaJson = new SimpleLockDTO();
             eaJson.ModId = Mod.ID;
             eaJson.SteamId = SteamID.ToString();
 
@@ -333,7 +333,7 @@ namespace SimplePartLoader
                 string json = JsonConvert.SerializeObject(eaJson);
                 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var result = await KeepAlive.GetInstance().client.PostAsync(ModMain.API_URL + "/eacheck", content);
+                var result = await ModMain.Client.PostAsync("v1/locked/simple-locked", content);
                 string contents = await result.Content.ReadAsStringAsync();
 
                 if (contents == "true")

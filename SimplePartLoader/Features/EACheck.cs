@@ -87,10 +87,6 @@ namespace SimplePartLoader
             // If we have user consent to load EA/PL mods, we first read all the keys.
             if(ModMain.EA_Enabled.Checked)
             {
-                HttpClient client = new HttpClient();
-                client.BaseAddress = new Uri(ModMain.API_URL);
-                client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
-
                 try
                 {
                     foreach (string file in modKeys)
@@ -121,7 +117,7 @@ namespace SimplePartLoader
                         };
                         CustomLogger.AddLine("EACheck", $"Trying to validate {Path.GetFileName(item.Key)} key.");
 
-                        var response = client.PostAsync("v1/locked/key-auth", new StringContent(JsonConvert.SerializeObject(key), Encoding.UTF8, "application/json")).Result;
+                        var response = ModMain.Client.PostAsync("v1/locked/key-auth", new StringContent(JsonConvert.SerializeObject(key), Encoding.UTF8, "application/json")).Result;
 
                         if (response.IsSuccessStatusCode)
                         {
@@ -228,7 +224,7 @@ namespace SimplePartLoader
 
                                 try
                                 {
-                                    using (var response = client.GetAsync($"v1/locked/download?ModId={key.ModId}", HttpCompletionOption.ResponseHeadersRead).Result)
+                                    using (var response = ModMain.Client.GetAsync($"v1/locked/download?ModId={key.ModId}", HttpCompletionOption.ResponseHeadersRead).Result)
                                     {
                                         response.EnsureSuccessStatusCode();
 
@@ -314,10 +310,10 @@ namespace SimplePartLoader
             // Autoupdating stuff goes here too now!
             KeepAlive.GetInstance().UpdateJsonList(Steamworks.SteamApps.GetAppBuildId()); // Update list so EA mods show telemetry
 
-            JSON_ModList jsonList = new JSON_ModList(Steamworks.SteamApps.GetAppBuildId());
+            ModListDTO jsonList = new ModListDTO(Steamworks.SteamApps.GetAppBuildId());
             foreach (Mod mod in ModLoader.mods)
             {
-                JSON_Mod jsonMod = new JSON_Mod();
+                ModDTO jsonMod = new ModDTO();
 
                 jsonMod.modId = mod.ID;
                 jsonMod.version = mod.Version;
@@ -330,78 +326,66 @@ namespace SimplePartLoader
 
             try
             {
-                var httpWebRequest = (HttpWebRequest)WebRequest.Create(ModMain.API_URL + "/mods");
-                
-                httpWebRequest.ContentType = "application/json";
-                httpWebRequest.Accept = "application/json";
-                httpWebRequest.Method = "POST";
+                var content = new StringContent(JsonConvert.SerializeObject(jsonList), Encoding.UTF8, "application/json");
+                var result = ModMain.Client.PostAsync("v1/updating/mods", content).Result;
+                string contents = result.Content.ReadAsStringAsync().Result;
 
-                using (var streamWriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+                AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(contents);
+
+                // First check for unsupported mods.
+                List<JSON_Mod_API_Result> unsupportedMods = new List<JSON_Mod_API_Result>();
+                if (AutoupdaterResult.Count > 0)
                 {
-                    streamWriter.Write(JsonConvert.SerializeObject(jsonList));
+                    foreach (var item in AutoupdaterResult)
+                    {
+                        if (item.unsupported) unsupportedMods.Add(item);
+                    }
+
+                    foreach (var item in unsupportedMods) AutoupdaterResult.Remove(item);
                 }
 
-                var httpResponse = (HttpWebResponse)httpWebRequest.GetResponse();
-                using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                if (AutoupdaterResult.Count > 0)
                 {
-                    var result = streamReader.ReadToEnd();
-                    AutoupdaterResult = JsonConvert.DeserializeObject<List<JSON_Mod_API_Result>>(result);
+                    // Updates available.
+                    Data = new Queue<JSON_Mod_API_Result>();
 
-                    // First check for unsupported mods.
+                    JSON_Mod_API_Result fakeResult = new JSON_Mod_API_Result();
+                    fakeResult.current_download_link = "https://github.com/FedeArre/ModUtils/releases/download/updatehelper/UpdaterHelper.exe";
+                    fakeResult.file_name = "ModUtilsAutoupdater.exe";
+                    fakeResult.mod_name = "Autoupdating helper";
+                    Data.Enqueue(fakeResult);
 
-                    List<JSON_Mod_API_Result> unsupportedMods = new List<JSON_Mod_API_Result>();
-                    if (AutoupdaterResult.Count > 0)
+                    AutoupdaterResult.ForEach(d => Data.Enqueue(d));
+
+                    UI = GameObject.Instantiate(ModMain.UI_Prefab);
+                    foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
                     {
-                        foreach (var item in AutoupdaterResult)
+                        if (btt.name == "ButtonNo")
                         {
-                            if (item.unsupported) unsupportedMods.Add(item);
+                            btt.onClick.AddListener(UI_ButtonNo);
                         }
-
-                        foreach(var item in unsupportedMods) AutoupdaterResult.Remove(item);
+                        else if (btt.name == "ButtonYes")
+                        {
+                            btt.onClick.AddListener(UI_ButtonYes);
+                        }
                     }
 
-                    if (AutoupdaterResult.Count > 0)
+                    string names = "";
+                    AutoupdaterResult.ForEach(x => names += $"{x.mod_name}, ");
+                    names = names.Substring(0, names.Length - 2);
+                    UI.transform.Find("Panel/TextMods").GetComponent<Text>().text = names;
+
+                    CustomLogger.AddLine("Autoupdating", $"Found updates for {names}");
+                }
+
+                if (unsupportedMods.Count > 0)
+                {
+                    foreach (var item in unsupportedMods)
                     {
-                        // Updates available.
-                        Data = new Queue<JSON_Mod_API_Result>();
-
-                        JSON_Mod_API_Result fakeResult = new JSON_Mod_API_Result();
-                        fakeResult.current_download_link = "https://github.com/FedeArre/ModUtils/releases/download/updatehelper/UpdaterHelper.exe";
-                        fakeResult.file_name = "ModUtilsAutoupdater.exe";
-                        fakeResult.mod_name = "Autoupdating helper";
-                        Data.Enqueue(fakeResult);
-
-                        AutoupdaterResult.ForEach(d => Data.Enqueue(d));
-
-                        UI = GameObject.Instantiate(ModMain.UI_Prefab);
-                        foreach (UnityEngine.UI.Button btt in UI.GetComponentsInChildren<UnityEngine.UI.Button>())
-                        {
-                            if (btt.name == "ButtonNo")
-                            {
-                                btt.onClick.AddListener(UI_ButtonNo);
-                            }
-                            else if (btt.name == "ButtonYes")
-                            {
-                                btt.onClick.AddListener(UI_ButtonYes);
-                            }
-                        }
-
-                        string names = "";
-                        AutoupdaterResult.ForEach(x => names += $"{x.mod_name}, ");
-                        names = names.Substring(0, names.Length - 2);
-                        UI.transform.Find("Panel/TextMods").GetComponent<Text>().text = names;
-
-                        CustomLogger.AddLine("Autoupdating", $"Found updates for {names}");
-                    }
-
-                    if(unsupportedMods.Count > 0)
-                    {
-                        foreach(var item in unsupportedMods)
-                        {
-                            ErrorMessageHandler.GetInstance().UnsupportedModList.Add(item.mod_name);
-                        }
+                        ErrorMessageHandler.GetInstance().UnsupportedModList.Add(item.mod_name);
                     }
                 }
+
             }
             catch (Exception ex)
             {

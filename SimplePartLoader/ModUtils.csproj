@@ -466,6 +466,7 @@
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
     <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
     <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Niv.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Rat.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\CatalogMassUpdate.cs" />
@@ -503,7 +504,7 @@
     <Compile Include="Features\UniLog.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
-    <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\SimpleLockDTO.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Hooks\CustomEngineHook.cs" />
@@ -538,8 +539,8 @@
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="Features\ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
-    <Compile Include="Objects\Autoupdater\JSON_Mod.cs" />
-    <Compile Include="Objects\Autoupdater\JSON_ModList.cs" />
+    <Compile Include="Objects\Autoupdater\ModDTO.cs" />
+    <Compile Include="Objects\Autoupdater\ModListDTO.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod_API_Result.cs" />
     <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />

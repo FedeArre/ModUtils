@@ -62,5 +62,6 @@ public enum CarBase
     LAD,
     Wolf,
     B200,
-    Rat
+    Rat,
+    Niv
 }

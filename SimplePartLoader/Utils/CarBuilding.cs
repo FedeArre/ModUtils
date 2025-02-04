@@ -98,12 +98,13 @@ namespace SimplePartLoader.Utils
                 childObject.layer = original.transform.GetChild(i).gameObject.layer;
                 childObject.tag = original.transform.GetChild(i).tag;
 
-                childObject.SetActive(original.activeSelf); // EXPERIMENTAL!
-
                 childObject.transform.localPosition = original.transform.GetChild(i).localPosition;
                 childObject.transform.localRotation = original.transform.GetChild(i).localRotation;
                 childObject.transform.localScale = original.transform.GetChild(i).localScale;
 
+                childObject.SetActive(original.activeSelf); // EXPERIMENTAL!
+                Debug.Log(original.activeSelf);
+                Debug.Log(original.active);
                 foreach (Component comp in original.transform.GetChild(i).GetComponents<Component>())
                 {
                     if (comp is Transform || comp == null)

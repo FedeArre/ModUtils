@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Autoupdater.Objects
 {
-    internal class JSON_Mod
+    internal class ModDTO
     {
-        public string modId;
-        public string version;
+        public string modId { get; set; }
+        public string version { get; set; }
     }
 }

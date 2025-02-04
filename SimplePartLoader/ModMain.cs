@@ -59,6 +59,8 @@ namespace SimplePartLoader
 
         internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
 
+        internal static HttpClient Client;
+
         // Developer stuff for UI
         internal static Checkbox DevUIEnabled;
         internal static Keybind TogglePosRot;
@@ -79,7 +81,12 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
+            // Some setups
             ModUtils.Version = Version;
+
+            Client = new HttpClient();
+            Client.BaseAddress = new Uri(ModMain.API_URL);
+            Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
 
 #if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
