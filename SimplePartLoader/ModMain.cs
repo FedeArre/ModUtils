@@ -34,14 +34,15 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.5.0";
+        public override string Version => "v1.5.0b";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.6.0-internal_dev";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.1-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
+        //public const string API_URL = "https://modding.fedes.uy/";
         public const string API_URL = "https://localhost:7060/";
 
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
@@ -248,23 +249,18 @@ namespace SimplePartLoader
 
                 if (RandomBG.Checked)
                 {
-                    using (HttpClient client = new HttpClient())
+                    try
                     {
-                        try
-                        {
-                            HttpResponseMessage response = client.GetAsync(API_URL + "/bg").Result;
-                            response.EnsureSuccessStatusCode();
+                        HttpResponseMessage response = Client.GetAsync("/v1/menu").Result;
+                        response.EnsureSuccessStatusCode();
 
-                            // Image load
-                            imageBytes = response.Content.ReadAsByteArrayAsync().Result;
-                        }
-                        catch (Exception ex)
-                        {
-                            CustomLogger.AddLine("RandomBG", "Failed to load random background!");
-                            CustomLogger.AddLine("RandomBG", ex);
-                        }
-
-                        return;
+                        // Image load
+                        imageBytes = response.Content.ReadAsByteArrayAsync().Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        CustomLogger.AddLine("RandomBG", "Failed to load random background!");
+                        CustomLogger.AddLine("RandomBG", ex);
                     }
                 }
             }

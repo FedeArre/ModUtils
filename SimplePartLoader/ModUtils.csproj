@@ -468,12 +468,14 @@
     <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Niv.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Rat.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\TrailerLong.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\CatalogMassUpdate.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatedJunkyard.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatorComponent.cs" />
     <Compile Include="Features\CarGenerator\RuinedOverwrite.cs" />
     <Compile Include="Features\CarGenerator\SteeringFix.cs" />
+    <Compile Include="Features\CarGenerator\TrailerGenerator.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />

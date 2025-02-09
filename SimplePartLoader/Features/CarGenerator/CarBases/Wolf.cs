@@ -15,6 +15,11 @@ namespace SimplePartLoader.CarGen
     {
         public GameObject GetCar() => (GameObject)cachedResources.Load("Wolf");
 
+        public VehicleType VehType()
+        {
+            return VehicleType.Car;
+        }
+
         public void ForceTemplateExceptions(BuildingExceptions exceptions)
         {
             exceptions.ExceptionList["CylinderBlock"] = "CylinderBlockI6D";

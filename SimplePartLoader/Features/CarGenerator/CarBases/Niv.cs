@@ -18,6 +18,12 @@ namespace SimplePartLoader.CarGen
             return (GameObject)cachedResources.Load("Niv");
         }
 
+
+        public VehicleType VehType()
+        {
+            return VehicleType.Car;
+        }
+
         public void ForceTemplateExceptions(BuildingExceptions exceptions)
         {
             exceptions.ExceptionList["TaxiSign"] = "none";

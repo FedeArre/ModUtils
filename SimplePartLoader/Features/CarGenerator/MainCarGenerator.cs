@@ -2,6 +2,7 @@
 
 using PaintIn3D;
 using SimplePartLoader.Features.CarGenerator;
+using SimplePartLoader.Features.CarGenerator.CarBases;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections;
@@ -12,6 +13,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.ParticleSystem;
 
 namespace SimplePartLoader.CarGen
 {
@@ -29,6 +31,7 @@ namespace SimplePartLoader.CarGen
             AvailableBases[CarBase.B200] = new B200();
             AvailableBases[CarBase.Rat] = new Rat();
             AvailableBases[CarBase.Niv] = new Niv();
+            AvailableBases[CarBase.TrailerCar] = new TrailerLong();
         }
 
         internal static void StartCarGen()
@@ -95,19 +98,29 @@ namespace SimplePartLoader.CarGen
                 car.emptyCarPrefab.name = car.carGeneratorData.CarName;
                 car.carPrefab.name = car.carGeneratorData.CarName;
 
-                MainCarProperties mcpEmpty = car.emptyCarPrefab.GetComponent<MainCarProperties>();
-                mcpEmpty.CarName = car.carGeneratorData.CarName;
-                mcpEmpty.CarPrice = car.carGeneratorData.CarPrice;
-                mcpEmpty.PREFAB = car.emptyCarPrefab;
+                if(baseData.VehType() == VehicleType.Car)
+                {
+                    MainCarProperties mcpEmpty = car.emptyCarPrefab.GetComponent<MainCarProperties>();
+                    mcpEmpty.CarName = car.carGeneratorData.CarName;
+                    mcpEmpty.CarPrice = car.carGeneratorData.CarPrice;
+                    mcpEmpty.PREFAB = car.emptyCarPrefab;
 
-                MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
-                mcp.CarName = car.carGeneratorData.CarName;
-                mcp.CarPrice = car.carGeneratorData.CarPrice;
-                mcp.PREFAB = car.emptyCarPrefab;
+                    MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
+                    mcp.CarName = car.carGeneratorData.CarName;
+                    mcp.CarPrice = car.carGeneratorData.CarPrice;
+                    mcp.PREFAB = car.emptyCarPrefab;
 
-                // Make sure AWD is turned on if the base has it, otherwise it will crash due to NWH differential setup being wrong!
-                if (mcp.AWD)
-                    car.carGeneratorData.EnableAWD = true;
+                    // Make sure AWD is turned on if the base has it, otherwise it will crash due to NWH differential setup being wrong!
+                    if (mcp.AWD)
+                        car.carGeneratorData.EnableAWD = true;
+                }
+                else
+                {
+                    MainTrailerProperties mtp = car.carPrefab.GetComponent<MainTrailerProperties>();
+                    mtp.PrefabName = car.carGeneratorData.CarName;
+                    mtp.TrailerPrice = car.carGeneratorData.CarPrice;
+                }
+
 
                 // Fix InsideItems object
                 Transform emptyInsideItems = car.emptyCarPrefab.transform.Find("InsideItems");
@@ -125,8 +138,11 @@ namespace SimplePartLoader.CarGen
                 builtInsideItemsColl.insideitems = builtInsideItemsComp;
 
                 // Custom steering breaking fix
-                car.emptyCarPrefab.AddComponent<SteeringFix>();
-                car.carPrefab.AddComponent<SteeringFix>();
+                if(baseData.VehType() == VehicleType.Car)
+                {
+                    car.emptyCarPrefab.AddComponent<SteeringFix>();
+                    car.carPrefab.AddComponent<SteeringFix>();
+                }
 
                 // Base setup
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
@@ -159,7 +175,7 @@ namespace SimplePartLoader.CarGen
                 GameObject.DontDestroyOnLoad(car.emptyCarPrefab);
                 GameObject.DontDestroyOnLoad(car.carPrefab);
 
-                if (car.carGeneratorData.SpawnRuined)
+                if (car.carGeneratorData.SpawnRuined && baseData.VehType() == VehicleType.Car)
                     RuinedCars.Add(car);
 
                 if(car.DelayRearBoneFix)
@@ -257,6 +273,10 @@ namespace SimplePartLoader.CarGen
             
             foreach (Car car in RegisteredCars)
             {
+                ICarBase baseData = (ICarBase)MainCarGenerator.AvailableBases[car.carGeneratorData.BaseCarToUse];
+                if (baseData.VehType() == VehicleType.Trailer) 
+                    continue;
+
                 Array.Resize(ref carsComp.Cars, carsComp.Cars.Length + 1);
                 carsComp.Cars[carsComp.Cars.Length - 1] = car.carPrefab;
 
@@ -272,6 +292,8 @@ namespace SimplePartLoader.CarGen
                     carsComp.BarnCars[carsComp.JobCars.Length - 1] = car.carPrefab;
                 }
             }
+
+            TrailerGenerator.GenerateSaleItems();
         }
 
         internal static void BuildCar(Car car)
@@ -338,11 +360,14 @@ namespace SimplePartLoader.CarGen
                         partinfo.gameObject.name = partinfo.RenamedPrefab;
                 }
 
-                foreach (CarProperties carProps in car.carPrefab.transform.GetComponentsInChildren<CarProperties>())
+                if(baseData.VehType() == VehicleType.Car)
                 {
-                    carProps.MainProperties = mcp;
+                    foreach (CarProperties carProps in car.carPrefab.transform.GetComponentsInChildren<CarProperties>())
+                    {
+                        carProps.MainProperties = mcp;
+                    }
                 }
-
+                
                 foreach (HexNut hexNut in car.carPrefab.GetComponentsInChildren<HexNut>())
                 {
                     hexNut.tight = true;
@@ -441,7 +466,7 @@ namespace SimplePartLoader.CarGen
                 }
             }
 
-            if(car.carGeneratorData.EnableAutomaticPartCount)
+            if(car.carGeneratorData.EnableAutomaticPartCount && baseData.VehType() == VehicleType.Car)
             {
                 int partCount = 0;
                 CarProperties[] componentsInChildren = car.carPrefab.GetComponentsInChildren<CarProperties>();

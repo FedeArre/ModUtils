@@ -63,5 +63,6 @@ public enum CarBase
     Wolf,
     B200,
     Rat,
-    Niv
+    Niv,
+    TrailerCar
 }
