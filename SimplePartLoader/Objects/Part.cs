@@ -120,6 +120,10 @@ namespace SimplePartLoader
 
             td.Owner = this;
             PartManager.transparentData.Add(td);
+
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("Transparents", $"Mod {modInstance.Mod.ID} added transparent of {Name} to {attachesTo}");
+
             return td;
         }
 
