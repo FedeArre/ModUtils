@@ -18,33 +18,33 @@ internal class CustomMeshes : MonoBehaviour
     public Mesh UpperHoseFallbackMesh = null;
     public Mesh LowerHoseFallbackMesh = null;
 
-    public Dictionary<string, Mesh> FuelLines;
-    public Dictionary<string, Mesh> BatteryWires;
-    public Dictionary<string, Mesh> RadiatorUpperHoses;
-    public Dictionary<string, Mesh> RadiatorLowerHoses;
+    public Dictionary<string, CustomMesh> FuelLines;
+    public Dictionary<string, CustomMesh> BatteryWires;
+    public Dictionary<string, CustomMesh> RadiatorUpperHoses;
+    public Dictionary<string, CustomMesh> RadiatorLowerHoses;
 
     public void DoInternalConversion()
     {
-        FuelLines = new Dictionary<string, Mesh>();
-        BatteryWires = new Dictionary<string, Mesh>();
-        RadiatorUpperHoses = new Dictionary<string, Mesh>();
-        RadiatorLowerHoses = new Dictionary<string, Mesh>();
+        FuelLines = new Dictionary<string, CustomMesh>();
+        BatteryWires = new Dictionary<string, CustomMesh>();
+        RadiatorUpperHoses = new Dictionary<string, CustomMesh>();
+        RadiatorLowerHoses = new Dictionary<string, CustomMesh>();
 
         foreach (CustomMesh cm in GetComponents<CustomMesh>())
         {
             switch (cm.Type)
             {
                 case MeshType.FuelLine:
-                    FuelLines[cm.CarName] = cm.Mesh;
+                    FuelLines[cm.CarName] = cm;
                     break;
                 case MeshType.BatteryWire:
-                    BatteryWires[cm.CarName] = cm.Mesh;
+                    BatteryWires[cm.CarName] = cm;
                     break;
                 case MeshType.RadiatorUpperHose:
-                    RadiatorUpperHoses[cm.CarName] = cm.Mesh;
+                    RadiatorUpperHoses[cm.CarName] = cm;
                     break;
                 case MeshType.RadiatorLowerHose:
-                    RadiatorLowerHoses[cm.CarName] = cm.Mesh;
+                    RadiatorLowerHoses[cm.CarName] = cm;
                     break;
             }
         }
@@ -56,6 +56,7 @@ public class CustomMesh : MonoBehaviour
     public string CarName;
     public MeshType Type = MeshType.FuelLine;
     public Mesh Mesh = null;
+    public Material[] Materials = null;
 }
 
 public enum MeshType

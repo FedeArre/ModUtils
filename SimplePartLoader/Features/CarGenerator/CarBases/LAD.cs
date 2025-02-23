@@ -15,6 +15,11 @@ namespace SimplePartLoader.CarGen
     {
         public GameObject GetCar() => (GameObject)cachedResources.Load("LAD");
 
+        public VehicleType VehType()
+        {
+            return VehicleType.Car;
+        }
+
         public void ForceTemplateExceptions(BuildingExceptions exceptions)
         {
             exceptions.ExceptionList["SafetyNet06"] = "none";
@@ -226,6 +231,11 @@ namespace SimplePartLoader.CarGen
                 {
                     wiresMainTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselBatteryWires;
                 }
+
+                if (car.carGeneratorData.Inline6RBatteryWires)
+                {
+                    wiresMainTransparent.ChildrenMesh4 = car.carGeneratorData.Inline6RBatteryWires;
+                }
             }
 
             // Fuel line setup
@@ -249,9 +259,14 @@ namespace SimplePartLoader.CarGen
                     fuelLineTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6FuelLine;
                 }
 
-                if (car.carGeneratorData.Inline6DieselBatteryWires)
+                if (car.carGeneratorData.Inline6DieselFuelLine)
                 {
-                    fuelLineTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselBatteryWires;
+                    fuelLineTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselFuelLine;
+                }
+
+                if (car.carGeneratorData.Inline6RFuelLine)
+                {
+                    fuelLineTransparent.ChildrenMesh4 = car.carGeneratorData.Inline6RFuelLine;
                 }
             }
 

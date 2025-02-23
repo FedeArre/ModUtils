@@ -60,7 +60,6 @@ namespace SimplePartLoader.Features.CarGenerator
                     yield return new WaitForEndOfFrame();
 
                     instanciated.transform.position = creationPos;
-                    Debug.Log(creationPos);
                     break;
                 }
             }

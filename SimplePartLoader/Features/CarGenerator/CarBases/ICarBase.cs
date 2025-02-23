@@ -13,5 +13,12 @@ namespace SimplePartLoader.CarGen
         void SetupTemplate(GameObject objective, Car car);
         void PostBuild(GameObject objective, Car car);
         void ForceTemplateExceptions(BuildingExceptions exceptions);
+        VehicleType VehType();
+    }
+
+    enum VehicleType
+    {
+        Car = 1,
+        Trailer = 2
     }
 }

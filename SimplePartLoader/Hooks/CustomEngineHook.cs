@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using SimplePartLoader;
 using UnityEngine;
-using static PaintIn3D.P3dSeamFixer;
 
 [HarmonyPatch(typeof(CarProperties), nameof(CarProperties.SetMesh))]
 internal class CustomEngineHook
@@ -45,9 +44,15 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
+
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -68,9 +73,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -79,8 +89,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.BatteryWireFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.BatteryWireFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.BatteryWireFallbackMesh;
             }
         }
         else if (__instance.PrefabName.Contains("LowerHose")) // Radiator lower hose
@@ -92,9 +102,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if (pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -102,8 +117,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.LowerHoseFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.LowerHoseFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.LowerHoseFallbackMesh;
             }
         }
         else if (__instance.PrefabName.Contains("UpperHose")) // Radiator upper hose
@@ -116,9 +131,14 @@ internal class CustomEngineHook
                 {
                     if (pair.Key == carName)
                     {
-                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value;
-                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value;
+                        __instance.gameObject.GetComponent<MeshFilter>().mesh = pair.Value.Mesh;
+                        __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = pair.Value.Mesh;
                         flag = true;
+
+                        if(pair.Value.Materials != null)
+                        {
+                            __instance.gameObject.GetComponent<MeshRenderer>().materials = pair.Value.Materials;
+                        }
                         break;
                     }
                 }
@@ -126,8 +146,8 @@ internal class CustomEngineHook
 
             if (!flag && cm.UpperHoseFallbackMesh)
             {
-                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.FuelLineFallbackMesh;
-                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.FuelLineFallbackMesh;
+                __instance.gameObject.GetComponent<MeshFilter>().mesh = cm.UpperHoseFallbackMesh;
+                __instance.gameObject.GetComponent<MeshCollider>().sharedMesh = cm.UpperHoseFallbackMesh;
             }
         }
     }

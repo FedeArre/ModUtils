@@ -36,11 +36,16 @@ namespace SimplePartLoader
             get { return RegisteredMods; }
         }
         
+        public static string Version
+        {
+            get;
+            internal set;
+        }
+
         internal static void SetupSteamworks()
         {
             GameObject ModLoader = GameObject.Find("ModLoader");
             ModLoader.AddComponent<EACheck>();
-
         }
 
         internal static void OnLoadCalled()

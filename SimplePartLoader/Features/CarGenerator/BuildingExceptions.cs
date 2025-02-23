@@ -8,7 +8,12 @@ namespace SimplePartLoader.CarGen
 {
     internal class BuildingExceptions
     {
-        internal Dictionary<string, string> ExceptionList = new Dictionary<string, string>();
+        internal Dictionary<string, string> ExceptionList = new Dictionary<string, string>()
+        {
+            { "Spacer", "disabled_by_default" },
+            { "Jackstand", "disabled_by_default" }
+        };
+
         internal List<string> ForceIgnore = new List<string>();
 
         public void AddException(string partName, string prefabName, bool forceFittingIgnoringParent = false)

@@ -21,7 +21,7 @@
     <OutputPath>C:\Program Files %28x86%29\Steam\steamapps\common\My Garage\Mods\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <WarningLevel>5</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
@@ -37,8 +37,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.3.1.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Lib.Harmony.2.3.1.1\lib\net452\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\My Garage\BepInEx\core\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -461,38 +462,31 @@
     <Compile Include="Features\Building\DelayedBuildableLoader.cs" />
     <Compile Include="Features\CarGenerator\BuildingExceptions.cs" />
     <Compile Include="Features\CarGenerator\Car.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\B200.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Chad.cs" />
     <Compile Include="Features\CarGenerator\CarBases\ICarBase.cs" />
     <Compile Include="Features\CarGenerator\CarBases\LAD.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Niv.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\Rat.cs" />
+    <Compile Include="Features\CarGenerator\CarBases\TrailerLong.cs" />
     <Compile Include="Features\CarGenerator\CarBases\Wolf.cs" />
     <Compile Include="Features\CarGenerator\CatalogMassUpdate.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatedJunkyard.cs" />
     <Compile Include="Features\CarGenerator\JunkyardEmulator\EmulatorComponent.cs" />
     <Compile Include="Features\CarGenerator\RuinedOverwrite.cs" />
     <Compile Include="Features\CarGenerator\SteeringFix.cs" />
+    <Compile Include="Features\CarGenerator\TrailerGenerator.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenPainting.cs" />
     <Compile Include="Features\CarGenerator\Utils\CarGenUtils.cs" />
     <Compile Include="Features\CarGenerator\MainCarGenerator.cs" />
     <Compile Include="ErrorMessageHandler.cs" />
     <Compile Include="Features\CustomMeshes\CustomMeshHandler.cs" />
     <Compile Include="Features\DevUI\ComponentDevUI.cs" />
-    <Compile Include="Features\Computer\AppLauncher\AppLauncherHandling.cs" />
-    <Compile Include="Features\Computer\ComputerApp.cs" />
-    <Compile Include="Features\Computer\AssetScripts\ActionMenuController.cs" />
-    <Compile Include="Features\Computer\ComputerIdentifier.cs" />
-    <Compile Include="Features\Computer\ComputerLogic.cs" />
-    <Compile Include="Features\Computer\AssetScripts\CustomCursorStandaloneInputModule.cs" />
-    <Compile Include="Features\Computer\AssetScripts\D90Button.cs" />
-    <Compile Include="Features\Computer\AssetScripts\DesktopIcon.cs" />
-    <Compile Include="Features\Computer\AssetScripts\DigitalClock.cs" />
-    <Compile Include="Features\Computer\AssetScripts\DraggableTopbar.cs" />
-    <Compile Include="Features\Computer\AssetScripts\PauseMenu.cs" />
-    <Compile Include="Features\Computer\AssetScripts\WindowController.cs" />
-    <Compile Include="Features\Computer\ComputerUI.cs" />
     <Compile Include="Features\DataHandler.cs" />
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
+    <Compile Include="Features\StartOptionBuilder\MainStartOptionBuilder.cs" />
     <Compile Include="Features\UI\KeybindDetector.cs" />
     <Compile Include="Features\UI\ModUtilsUI.cs" />
     <Compile Include="Features\UI\Saving\SettingSaver.cs" />
@@ -512,12 +506,14 @@
     <Compile Include="Features\UniLog.cs" />
     <Compile Include="FurnitureManager.cs" />
     <Compile Include="Features\EACheck.cs" />
-    <Compile Include="Features\ModUtils\ModObjects\EarlyAccessJson.cs" />
+    <Compile Include="Features\ModUtils\ModObjects\SimpleLockDTO.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
+    <Compile Include="Objects\DTO\KeyAnswerDTO.cs" />
+    <Compile Include="Objects\DTO\KeyValidationDTO.cs" />
     <Compile Include="Objects\EditorComponents\CustomEngine.cs" />
     <Compile Include="Objects\EditorComponents\CustomMeshes.cs" />
     <Compile Include="Objects\EditorComponents\L2PaintOverwrite.cs" />
@@ -545,8 +541,8 @@
     <Compile Include="CustomSaverHandler.cs" />
     <Compile Include="Features\ModUtils\ModUtils.cs" />
     <Compile Include="ModMain.cs" />
-    <Compile Include="Objects\Autoupdater\JSON_Mod.cs" />
-    <Compile Include="Objects\Autoupdater\JSON_ModList.cs" />
+    <Compile Include="Objects\Autoupdater\ModDTO.cs" />
+    <Compile Include="Objects\Autoupdater\ModListDTO.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod_API_Result.cs" />
     <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />
@@ -561,6 +557,7 @@
     <Compile Include="Objects\Part.cs" />
     <Compile Include="Objects\ReworkedTransparentEdit.cs" />
     <Compile Include="Objects\SPL_Part.cs" />
+    <Compile Include="Objects\StartOption.cs" />
     <Compile Include="Objects\TransparentData.cs" />
     <Compile Include="Features\SimplePartLoader\PartManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,7 +1,6 @@
-﻿using NWH.VehiclePhysics2;
-using NWH.VehiclePhysics2.Modules.Rigging;
+﻿using NWH.VehiclePhysics2.Powertrain.Wheel;
 using NWH.VehiclePhysics2.Powertrain;
-using NWH.VehiclePhysics2.Powertrain.Wheel;
+using NWH.VehiclePhysics2;
 using NWH.WheelController3D;
 using System;
 using System.Collections.Generic;
@@ -12,12 +11,9 @@ using UnityEngine;
 
 namespace SimplePartLoader.CarGen
 {
-    internal class Chad : ICarBase
+    internal class Rat : ICarBase
     {
-        public GameObject GetCar()
-        {
-            return (GameObject)cachedResources.Load("Chad");
-        }
+        public GameObject GetCar() => (GameObject)cachedResources.Load("Rat");
 
         public VehicleType VehType()
         {
@@ -26,22 +22,42 @@ namespace SimplePartLoader.CarGen
 
         public void ForceTemplateExceptions(BuildingExceptions exceptions)
         {
-            exceptions.ExceptionList["CylinderBlock"] = "CylinderBlockV8";
-            exceptions.ExceptionList["GearBox06"] = "GearBox07";
-            exceptions.ExceptionList["Rim"] = "Rim15Ch5";
+            exceptions.ExceptionList["CylinderBlock"] = "CylinderBlockI6D";
+            exceptions.ExceptionList["GearBox06"] = "GearBox125";
+            exceptions.ExceptionList["Rim"] = "Rim16Niv";
+            exceptions.ExceptionList["HubCap16"] = "WheelCovers_18";
+            exceptions.ExceptionList["SeatFL06"] = "SeatFL18";
+            exceptions.ExceptionList["SeatFR06"] = "SeatFR18";
+            exceptions.ExceptionList["Exhaust06"] = "ExhaustI412";
+
+            exceptions.ExceptionList["TaxiSign"] = "none";
+            exceptions.ExceptionList["TrailerHook06"] = "none";
+            exceptions.ExceptionList["SpeedoDigital"] = "none";
+            exceptions.ExceptionList["Spoiler12"] = "none";
+            exceptions.ExceptionList["Spoiler18"] = "none";
+            exceptions.ExceptionList["RoofSpoiler18"] = "none";
+            exceptions.ExceptionList["LSideSkirt18"] = "none";
+            exceptions.ExceptionList["RSideSkirt18"] = "none";
+            exceptions.ExceptionList["RollCage"] = "none";
+            exceptions.ExceptionList["WideBodyPanelFL18"] = "none";
+            exceptions.ExceptionList["WideBodyPanelFR18"] = "none";
+            exceptions.ExceptionList["WideBodyPanelRL18"] = "none";
+            exceptions.ExceptionList["WideBodyPanelRR18"] = "none";
+            exceptions.ExceptionList["SunstripB18"] = "none";
+            exceptions.ExceptionList["SunstripF18"] = "none";
         }
-        
+
         public void PostBuild(GameObject objective, Car car)
         {
             // Bone target fix
             foreach (MyBoneSCR scr in objective.GetComponentsInChildren<MyBoneSCR>())
             {
-                if(CustomLogger.DebugEnabled)
+                if (CustomLogger.DebugEnabled)
                     CustomLogger.AddLine("CarDebug", $"Bone found at {scr.name} ({Utils.Functions.GetTransformPath(scr.transform)})");
-                
+
                 if (scr.transform.childCount != 0)
                 {
-                    if(scr.LocalStrtetchTarget != null)
+                    if (scr.LocalStrtetchTarget != null)
                     {
                         Transform newBone = null;
                         foreach (Transform t in scr.transform)
@@ -52,7 +68,7 @@ namespace SimplePartLoader.CarGen
                                 break;
                             }
                         }
-                        
+
                         if (newBone)
                         {
                             scr.LocalStrtetchTarget = newBone;
@@ -61,21 +77,24 @@ namespace SimplePartLoader.CarGen
                 }
             }
 
-            // ModUtils Chad template
+            // ModUtils Rat template
             if (car.carGeneratorData.DisableModUtilsTemplateSetup)
                 return;
 
             // All fluid fixes
-            Transform engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlockV8");
+            Transform engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlockI6D");
+            if(engine == null)
+                engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlock");
+
             if (engine)
             {
                 engine.name = "CylinderBlock";
 
                 CommonFixes.FixPart(engine.gameObject, FixType.Dipstick);
-                CommonFixes.FixPart(engine.Find("OilPan07/OilPan07").gameObject, FixType.Oilpan);
-                CommonFixes.FixPart(engine.Find("CylinderHeadR07/CylinderHeadR07/CylinderHeadCoverR07/CylinderHeadCoverR07").gameObject, FixType.CylinderHeadCover);
+                CommonFixes.FixPart(engine.Find("OilPan12/OilPan12").gameObject, FixType.Oilpan);
+                CommonFixes.FixPart(engine.Find("CylinderHead12/CylinderHead12/CylinderHeadCover12/CylinderHeadCover12").gameObject, FixType.CylinderHeadCover);
 
-                FLUID OilContainerComponent = engine.Find("OilPan07/OilPan07/OilFluidContainer").GetComponent<FLUID>();
+                FLUID OilContainerComponent = engine.Find("OilPan12/OilPan12/OilFluidContainer").GetComponent<FLUID>();
 
                 OilContainerComponent.FluidSize = 2f;
                 OilContainerComponent.Condition = 1f;
@@ -84,36 +103,37 @@ namespace SimplePartLoader.CarGen
                 OilContainerComponent.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
             }
 
-            Transform radiator = objective.transform.Find("RadiatorSupport07/RadiatorSupport07/Radiator07/Radiator07");
-            if(radiator)
+            Transform radiator = objective.transform.Find("RadiatorSupport18/RadiatorSupport18/Radiator12/Radiator12");
+            if (radiator)
             {
                 CommonFixes.FixPart(radiator.gameObject, FixType.Radiator);
                 FLUID CoolantFluid = radiator.Find("CoolantFluidContainer").GetComponent<FLUID>();
 
-                CoolantFluid.FluidSize = 6f;
+                CoolantFluid.FluidSize = 3f;
                 CoolantFluid.Condition = 1f;
-                CoolantFluid.transform.parent.GetComponent<CarProperties>().FluidSize = 6f;
+                CoolantFluid.transform.parent.GetComponent<CarProperties>().FluidSize = 3f;
                 CoolantFluid.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
             }
 
-            Transform gasTank = objective.transform.Find("FloorTrunk07/FloorTrunk07/GasTank07/GasTank07");
-            if(gasTank)
+            Transform gasTank = objective.transform.Find("FloorTrunk18/FloorTrunk18/GasTank18/GasTank18");
+            if (gasTank)
             {
                 CommonFixes.FixPart(gasTank.gameObject, FixType.FuelTank);
 
                 FLUID FuelTankComponent = gasTank.Find("FuelContainer").GetComponent<FLUID>();
-                
+
                 FuelTankComponent.Condition = 1;
+                FuelTankComponent.DieselPercent = 100;
                 FuelTankComponent.FluidSize = 25f;
                 FuelTankComponent.transform.parent.GetComponent<CarProperties>().FluidSize = 25f;
                 FuelTankComponent.transform.parent.GetComponent<CarProperties>().FluidCondition = 1f;
             }
 
-            Transform brakeFluidContainer = objective.transform.Find("Firewall07/Firewall07/BrakeMasterCylinder07/BrakeMasterCylinder07");
-            if(brakeFluidContainer)
+            Transform brakeFluidContainer = objective.transform.Find("Firewall18/Firewall18/BrakeMasterCylinder12/BrakeMasterCylinder12");
+            if (brakeFluidContainer)
             {
                 CommonFixes.FixPart(brakeFluidContainer.gameObject, FixType.BrakeCylinder);
-                FLUID BrakeFluidComponent =  brakeFluidContainer.Find("BrakeFluidContainer").GetComponent<FLUID>();
+                FLUID BrakeFluidComponent = brakeFluidContainer.Find("BrakeFluidContainer").GetComponent<FLUID>();
 
                 BrakeFluidComponent.FluidSize = BrakeFluidComponent.ContainerSize;
                 BrakeFluidComponent.Condition = 1f;
@@ -122,50 +142,50 @@ namespace SimplePartLoader.CarGen
             }
 
             // Window lifts
-            Transform WindowLiftHandleLeft = objective.transform.Find("Firewall07/Firewall07/DoorFL07/DoorFL07/WindowLiftFLC07/WindowLiftFLC07/WIndowHandle.003");
-            Transform WindowLiftTransparentLeft = objective.transform.Find("Firewall07/Firewall07/DoorFL07/DoorFL07/WindowLiftFLC07/WindowLiftFLC07/WindowFL07");
+            //FL
+            WindowLift FL_WindowLift = objective.transform.Find("Firewall18/Firewall18/DoorFL18/DoorFL18/WindowLiftFL18/WindowLiftFL18").GetComponent<WindowLift>();
+            if (FL_WindowLift)
+            {
+                FL_WindowLift.Window = objective.transform.Find("Firewall18/Firewall18/DoorFL18/DoorFL18/WindowLiftFL18/WindowLiftFL18/WindowFLc18").gameObject;
+                FL_WindowLift.WindowClosed = objective.transform.Find("Firewall18/Firewall18/DoorFL18/DoorFL18/WindowLiftFL18/WindowLiftFL18/windUP").gameObject;
+                FL_WindowLift.WindowOpen = objective.transform.Find("Firewall18/Firewall18/DoorFL18/DoorFL18/WindowLiftFL18/WindowLiftFL18/WinDown").gameObject;
+            }
 
-            if(WindowLiftHandleLeft && WindowLiftTransparentLeft)
-                WindowLiftHandleLeft.GetComponent<WindowLift>().Window = WindowLiftTransparentLeft.gameObject;
-
-            Transform WindowLiftHandleRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WIndowHandle.003");
-            Transform WindowLiftTransparentRight = objective.transform.Find("Firewall07/Firewall07/DoorFR07/DoorFR07/WindowLiftFRC07/WindowLiftFRC07/WindowFR07");
-
-            if(WindowLiftHandleRight && WindowLiftTransparentRight)
-                WindowLiftHandleRight.GetComponent<WindowLift>().Window = WindowLiftTransparentRight.gameObject;
+            // FR
+            WindowLift FR_WindowLift = objective.transform.Find("Firewall18/Firewall18/DoorFR18/DoorFR18/WindowLiftFRc18/WindowLiftFRc18").GetComponent<WindowLift>();
+            if (FR_WindowLift)
+            {
+                FR_WindowLift.Window = objective.transform.Find("Firewall18/Firewall18/DoorFR18/DoorFR18/WindowLiftFRc18/WindowLiftFRc18/WindowFRc18").gameObject;
+                FR_WindowLift.WindowClosed = objective.transform.Find("Firewall18/Firewall18/DoorFR18/DoorFR18/WindowLiftFRc18/WindowLiftFRc18/WinUP").gameObject;
+                FR_WindowLift.WindowOpen = objective.transform.Find("Firewall18/Firewall18/DoorFR18/DoorFR18/WindowLiftFRc18/WindowLiftFRc18/WinDown").gameObject;
+            }
 
         }
 
         public void SetupTemplate(GameObject objective, Car car)
         {
             MainCarProperties mcp = objective.GetComponent<MainCarProperties>();
-            
+
             // Front & rear suspension bone fixes
             Transform FrontSusp = objective.transform.Find("FrontSusp");
-            Transform RearSusp = objective.transform.Find("RearSusp");
             Transform EnginneTranny = objective.transform.Find("EngineTranny");
 
             MyBoneSCR MyBoneComponentF = FrontSusp.GetComponent<MyBoneSCR>();
-            MyBoneSCR MyBoneComponentR = RearSusp.GetComponent<MyBoneSCR>();
             MyBoneSCR MyBoneComponentEngine = EnginneTranny.GetComponent<MyBoneSCR>();
 
             MyBoneComponentF.thisTransform = FrontSusp;
             MyBoneComponentF.targetTransform = objective.transform.Find("FRSuspensionPosition");
             MyBoneComponentF.targetTransformB = objective.transform.Find("FLSuspensionPosition");
 
-            MyBoneComponentR.thisTransform = RearSusp;
-            MyBoneComponentR.targetTransform = objective.transform.Find("RRSuspensionPosition");
-            MyBoneComponentR.targetTransformB = objective.transform.Find("RLSuspensionPosition");
-
             MyBoneComponentEngine.thisTransform = EnginneTranny;
             MyBoneComponentEngine.targetTransform = objective.transform.Find("FRSuspensionPosition");
             MyBoneComponentEngine.targetTransformB = objective.transform.Find("FLSuspensionPosition");
 
             // Custom brake line setup
-            if(car.carGeneratorData.EnableCustomBrakeLine)
+            if (car.carGeneratorData.EnableCustomBrakeLine)
             {
                 Transform brakeLine = objective.transform.Find("MainBrakeLine");
-                if(brakeLine)
+                if (brakeLine)
                 {
                     transparents brakeLineTransparent = brakeLine.GetComponent<transparents>();
                     brakeLineTransparent.ChildrenMesh = car.carGeneratorData.BrakeLineMesh;
@@ -186,20 +206,20 @@ namespace SimplePartLoader.CarGen
 
             // Custom wire setup
             Transform wiresMain = objective.transform.Find("WiresMain06");
-            if(wiresMain)
+            if (wiresMain)
             {
                 transparents wiresMainTransparent = wiresMain.GetComponent<transparents>();
-                if(car.carGeneratorData.Inline4BatteryWires)
+                if (car.carGeneratorData.Inline4BatteryWires)
                 {
                     wiresMainTransparent.ChildrenMesh = car.carGeneratorData.Inline4BatteryWires;
                 }
 
-                if(car.carGeneratorData.V8EngineBatteryWires)
+                if (car.carGeneratorData.V8EngineBatteryWires)
                 {
                     wiresMainTransparent.ChildrenMesh1 = car.carGeneratorData.V8EngineBatteryWires;
                 }
 
-                if(car.carGeneratorData.Inline6BatteryWires)
+                if (car.carGeneratorData.Inline6BatteryWires)
                 {
                     wiresMainTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6BatteryWires;
                 }
@@ -217,7 +237,7 @@ namespace SimplePartLoader.CarGen
 
             // Fuel line setup
             Transform fuelLine = objective.transform.Find("FuelLine");
-            if(fuelLine)
+            if (fuelLine)
             {
                 transparents fuelLineTransparent = fuelLine.GetComponent<transparents>();
 
@@ -254,8 +274,8 @@ namespace SimplePartLoader.CarGen
             Hbrake.GetComponent<Rigidbody>().mass = 0.1f;
             Hbrake.GetComponent<MeshCollider>().isTrigger = true;
 
-            // NWH vehicle controller creation (So does not overlap with Chad stuff)
-            if(!car.carGeneratorData.Disable_NWH_Rebuild)
+            // NWH vehicle controller creation
+            if (!car.carGeneratorData.Disable_NWH_Rebuild)
                 RecreateNWH(objective, mcp, car.carGeneratorData.EnableAWD);
 
             // Fix crash sound
@@ -270,8 +290,8 @@ namespace SimplePartLoader.CarGen
             smokeComponent2.particleSystems.Add(smokeComponent2.GetComponent<ParticleSystem>());
 
             // Fixing RVP.SUSP
-            Transform WheelControllerFR = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFR");
-            Transform WheelControllerFL = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFL");
+            Transform WheelControllerFR = objective.transform.Find("FrontSusp/Crossmemmber18/WheelContParentFR");
+            Transform WheelControllerFL = objective.transform.Find("FrontSusp/Crossmemmber18/WheelContParentFL");
 
             WheelControllerFL.GetComponent<RVP.SUSP>().tr = WheelControllerFL;
             WheelControllerFR.GetComponent<RVP.SUSP>().tr = WheelControllerFR;
@@ -287,33 +307,13 @@ namespace SimplePartLoader.CarGen
                     scr.LocalStrtetchTarget = scr.transform.GetChild(0);
                     scr.targetTransform = null;
                 }
-                else if (scr.transform.name == "HandbbrakeCable07")
+                else if (scr.transform.name == "HandbbrakeCable12")
                 {
                     scr.LocalStrtetchTarget = scr.transform.parent.Find("DummyPivHbrak");
                 }
-                else if (scr.name == "RearAxle07")
+                else if (scr.transform.name == "DriveShaft12")
                 {
-                    Transform NonRot1 = null, NonRot2 = null;
-
-                    foreach (Transform child in objective.transform.Find("RearSusp").GetComponentsInChildren<Transform>())
-                    {
-                        if (child.name == "NonROtVIsualANDrAxlePivot")
-                        {
-                            if (NonRot1)
-                                NonRot2 = child;
-                            else
-                                NonRot1 = child;
-                        }
-
-                        if (NonRot1 && NonRot2)
-                            break;
-                    }
-                    scr.targetTransform = NonRot2;
-                    scr.targetTransformB = NonRot1;
-                }
-                else if (scr.transform.name == "DriveShaft07")
-                {
-                    scr.targetTransform = objective.transform.Find("RearSusp/RearAxle07/Pivotdriveshaft");
+                    scr.targetTransform = objective.transform.Find("RearSusp/CrossmemmberR18/Pivotdriveshaft");
                 }
             }
 
@@ -347,8 +347,7 @@ namespace SimplePartLoader.CarGen
             Steering oldSteering = vehController.steering;
 
             newSteering.linearity = oldSteering.linearity;
-            newSteering.Mouselinearity = oldSteering.Mouselinearity;
-            newSteering.maximumSteerAngle = 50;
+            newSteering.maximumSteerAngle = 44;
             newSteering.returnToCenter = true;
             newSteering.smoothing = 0.05f;
             newSteering.steeringWheelTurnRatio = 5;
@@ -423,53 +422,46 @@ namespace SimplePartLoader.CarGen
 
             vehController.powertrain = vehPowertrain;
 
-            WheelFR = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFR/WheelControllerFR").GetComponent<WheelController>();
-            WheelFL = objective.transform.Find("FrontSusp/Crossmemmber07/WheelContParentFL/WheelControllerFL").GetComponent<WheelController>();
+            WheelFR = objective.transform.Find("FrontSusp/Crossmemmber18/WheelContParentFR/WheelControllerFR").GetComponent<WheelController>();
+            WheelFL = objective.transform.Find("FrontSusp/Crossmemmber18/WheelContParentFL/WheelControllerFL").GetComponent<WheelController>();
             WheelRR = objective.transform.Find("RearSusp/WheelControllerRR").GetComponent<WheelController>();
             WheelRL = objective.transform.Find("RearSusp/WheelControllerRL").GetComponent<WheelController>();
-
-            WheelFR.maxDriveSlip = 0;
-            WheelFL.maxDriveSlip = 0;
-            WheelRR.maxDriveSlip = 0;
-            WheelRL.maxDriveSlip = 0;
 
             mainCarProps.FRwhellcontroller = WheelFR.gameObject;
             mainCarProps.FLwhellcontroller = WheelFL.gameObject;
             mainCarProps.RRwhellcontroller = WheelRR.gameObject;
             mainCarProps.RLwhellcontroller = WheelRL.gameObject;
 
-            WheelFL.parent = objective;
             WheelFR.parent = objective;
-            WheelRL.parent = objective;
+            WheelFL.parent = objective;
             WheelRR.parent = objective;
+            WheelRL.parent = objective;
 
             // Now we fix the list in VehicleController
-            NWH_WheelFL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
-            NWH_WheelFL.wheelController = WheelFL;
-            NWH_WheelFL.wheelGroupSelector.index = 0;
-            NWH_WheelFL.name = "WheelWheelControllerFL";
-
             NWH_WheelFR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
             NWH_WheelFR.wheelController = WheelFR;
             NWH_WheelFR.wheelGroupSelector.index = 0;
             NWH_WheelFR.name = "WheelWheelControllerFR";
 
-
-            NWH_WheelRL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
-            NWH_WheelRL.wheelController = WheelRL;
-            NWH_WheelRL.wheelGroupSelector.index = 1;
-            NWH_WheelRL.name = "WheelWheelControllerRL";
+            NWH_WheelFL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
+            NWH_WheelFL.wheelController = WheelFL;
+            NWH_WheelFL.wheelGroupSelector.index = 0;
+            NWH_WheelFL.name = "WheelWheelControllerFL";
 
             NWH_WheelRR = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
             NWH_WheelRR.wheelController = WheelRR;
             NWH_WheelRR.wheelGroupSelector.index = 1;
             NWH_WheelRR.name = "WheelWheelControllerRR";
 
-            
-            WheelControllers.Add(NWH_WheelFL);
-            WheelControllers.Add(NWH_WheelFR);
-            WheelControllers.Add(NWH_WheelRL);
+            NWH_WheelRL = new NWH.VehiclePhysics2.Powertrain.WheelComponent();
+            NWH_WheelRL.wheelController = WheelRL;
+            NWH_WheelRL.wheelGroupSelector.index = 1;
+            NWH_WheelRL.name = "WheelWheelControllerRL";
+
             WheelControllers.Add(NWH_WheelRR);
+            WheelControllers.Add(NWH_WheelRL);
+            WheelControllers.Add(NWH_WheelFR);
+            WheelControllers.Add(NWH_WheelFL);
 
             FrontGroup.name = "Front";
             FrontGroup.ackermanPercent = 0.14f;
@@ -477,13 +469,12 @@ namespace SimplePartLoader.CarGen
             FrontGroup.camberAtBottom = 1;
             FrontGroup.camberAtTop = -5;
             FrontGroup.steerCoefficient = 1;
-            FrontGroup.trackWidth = 1.4558f;
-            FrontGroup.antiRollBarForce = 3000;
+            FrontGroup.trackWidth = 1.4559f;
 
             RearGroup.name = "Rear";
             RearGroup.ackermanPercent = 0;
             RearGroup.antiRollBarForce = 3000;
-            RearGroup.brakeCoefficient = 0.7f;
+            RearGroup.brakeCoefficient = 0.5f;
             RearGroup.camberAtBottom = 1;
             RearGroup.camberAtTop = -5;
             RearGroup.handbrakeCoefficient = 2;
@@ -503,12 +494,12 @@ namespace SimplePartLoader.CarGen
 
             // Differentials setup
             // If Chad is setup for AWD but misses transfer case it wont work, that's why both types are supported
-            if (awd) 
+            if (awd)
             {
                 DifferentialComponent RearDiff = new DifferentialComponent("Rear Differential", NWH_WheelRL, NWH_WheelRR);
                 DifferentialComponent FrontDiff = new DifferentialComponent("Front Differential", NWH_WheelFL, NWH_WheelFR);
                 DifferentialComponent TransferCase = new DifferentialComponent("TransferCase", FrontDiff, RearDiff);
-                
+
                 List<DifferentialComponent> Diffs = new List<DifferentialComponent>();
                 Diffs.Add(RearDiff);
                 Diffs.Add(TransferCase);
@@ -588,7 +579,7 @@ namespace SimplePartLoader.CarGen
                 OutputSelector outputSelectorRL = new OutputSelector();
                 OutputSelector outputSelectorRR = new OutputSelector();
                 OutputSelector outputSelectorRearDiff = new OutputSelector();
-                
+
                 outputSelectorRL.name = "WheelWheelControllerRL";
                 outputSelectorRR.name = "WheelWheelControllerRR";
                 outputSelectorRearDiff.name = "Rear Differential";
@@ -613,16 +604,8 @@ namespace SimplePartLoader.CarGen
 
             vehController.brakes = vehBrakes;
 
-            // ModUtils v1.5.1 tweaks.
-            vehController.lateralSlipThreshold = 0.2f;
-            vehController.longitudinalSlipThreshold = 0.7f;
-            vehController.lowSpeedSubsteps = 15;
-            vehController.maxAngularVelocity = 3;
-            vehController.transmissionPosition = new Vector3(0f, 0.2f, 0.2f);
-            vehController.vehicleDimensions = new Vector3(1.9f, 1.3f, 5.1f);
-            vehController.enginePosition = new Vector3(0f, 0.4f, 1.5f);
-            vehController.centerOfMass = new Vector3(0f, 0.5f, 0.15f);
-            vehController.inertiaTensor = new Vector3(2000, 3000, 500);
+            FrontGroup.antiRollBarForce = 0.6f;
+            RearGroup.antiRollBarForce = 1f;
         }
     }
 }

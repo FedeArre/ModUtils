@@ -16,18 +16,17 @@ namespace SimplePartLoader
     {
         private static KeepAlive Instance;
         string serializedJson;
-        public HttpClient client = new HttpClient();
-        
+
         private KeepAlive()
         {
             // UNSAFE! This has to be removed after ModUtils backend update!
             //ServicePointManager.ServerCertificateValidationCallback += (sender, cert, chain, sslPolicyErrors) => true;
 
             // Keep the json to post on memory
-            JSON_ModList jsonList = new JSON_ModList(-1);
+            ModListDTO jsonList = new ModListDTO(-1);
             foreach (Mod mod in ModLoader.mods)
             {
-                JSON_Mod jsonMod = new JSON_Mod();
+                ModDTO jsonMod = new ModDTO();
 
                 jsonMod.modId = mod.ID;
                 jsonMod.version = mod.Version;
@@ -48,10 +47,10 @@ namespace SimplePartLoader
 
         public void UpdateJsonList(int buildId)
         {
-            JSON_ModList jsonList = new JSON_ModList(buildId);
+            ModListDTO jsonList = new ModListDTO(buildId);
             foreach (Mod mod in ModLoader.mods)
             {
-                JSON_Mod jsonMod = new JSON_Mod();
+                ModDTO jsonMod = new ModDTO();
 
                 jsonMod.modId = mod.ID;
                 jsonMod.version = mod.Version;
@@ -64,6 +63,7 @@ namespace SimplePartLoader
 
             serializedJson = JsonConvert.SerializeObject(jsonList);
         }
+
         private async void SendCurrentStatus()
         {
             if(!ModMain.Telemetry.Checked)
@@ -72,7 +72,7 @@ namespace SimplePartLoader
             try
             {
                 var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
-                _ = await client.PostAsync(ModMain.API_URL + "/alive", content);
+                _ = await ModMain.Client.PostAsync("v1/telemetry", content);
             }
             catch (Exception ex)
             {
@@ -88,7 +88,7 @@ namespace SimplePartLoader
 
         public void Ready()
         {
-            CustomLogger.AddLine("KeepAlive", $"Enabled");
+            CustomLogger.AddLine("KeepAlive", $"Enabled KeepAlive service");
         }
     }
 }

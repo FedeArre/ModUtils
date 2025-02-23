@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Utils;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,11 @@ namespace SimplePartLoader
             internal set { loadedBuildableMats = value; }
         }
         
+        public List<StartOption> StartOptions
+        {
+            get; internal set;
+        }
+
         public Mod Mod
         {
             get { return thisMod; }
@@ -235,6 +241,31 @@ namespace SimplePartLoader
             return p;
         }
 
+        public StartOption LoadStartOption(AssetBundle bundle, string prefabName, string partToCopy, Dictionary<string, string> exceptions = null)
+        {
+            // Safety checks
+            if (!bundle)
+                CustomLogger.AddLine("StartOptions", $"Tried to create a start option without valid AssetBundle");
+
+            if (String.IsNullOrWhiteSpace(prefabName))
+                CustomLogger.AddLine("StartOptions", $"Tried to create a start option without prefab name");
+
+            if (String.IsNullOrWhiteSpace(partToCopy))
+                CustomLogger.AddLine("StartOptions", $"Tried to create a start option without part to copy specified");
+
+            GameObject prefab = bundle.LoadAsset<GameObject>(prefabName);
+            if (!prefab)
+                CustomLogger.AddLine("StartOptions", $"Tried to create a prefab but it was not found in the AssetBundle ({prefabName})");
+
+            if (exceptions == null)
+                exceptions = new Dictionary<string, string>();
+
+            StartOption startOption = new StartOption(prefab, partToCopy, exceptions, this);
+            MainStartOptionBuilder.StartOptions.Add(startOption);
+
+            return startOption;
+        }
+
         public Furniture LoadFurniture(AssetBundle bundle, string prefabName)
         {
             // Safety checks
@@ -242,7 +273,7 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("Furnitures", $"Tried to create a furniture without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(prefabName))
-                CustomLogger.AddLine("Furnitures", $"Tried to create a part without prefab name");
+                CustomLogger.AddLine("Furnitures", $"Tried to create a furniture without prefab name");
 
             if (Saver.modParts.ContainsKey(prefabName))
                 CustomLogger.AddLine("Furnitures", $"Tried to create an already existing prefab ({prefabName})");
@@ -291,7 +322,7 @@ namespace SimplePartLoader
             if (!RequiresSteamCheck)
                 return;
 
-            EarlyAccessJson eaJson = new EarlyAccessJson();
+            SimpleLockDTO eaJson = new SimpleLockDTO();
             eaJson.ModId = Mod.ID;
             eaJson.SteamId = SteamID.ToString();
 
@@ -302,7 +333,7 @@ namespace SimplePartLoader
                 string json = JsonConvert.SerializeObject(eaJson);
                 
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var result = await KeepAlive.GetInstance().client.PostAsync(ModMain.API_URL + "/eacheck", content);
+                var result = await ModMain.Client.PostAsync("v1/locked/simple-locked", content);
                 string contents = await result.Content.ReadAsStringAsync();
 
                 if (contents == "true")

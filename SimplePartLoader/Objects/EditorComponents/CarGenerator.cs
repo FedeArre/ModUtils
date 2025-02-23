@@ -16,6 +16,7 @@ public class CarGenerator : MonoBehaviour
     public Mesh V8EngineFuelLine;
     public Mesh Inline6FuelLine;
     public Mesh Inline6DieselFuelLine;
+    public Mesh Inline6RFuelLine;
 
     [Header("Custom meshes - Brake line")]
     public bool EnableCustomBrakeLine;
@@ -30,6 +31,7 @@ public class CarGenerator : MonoBehaviour
     public Mesh V8EngineBatteryWires;
     public Mesh Inline6BatteryWires;
     public Mesh Inline6DieselBatteryWires;
+    public Mesh Inline6RBatteryWires;
 
     [Header("Fixes & settings (Don't touch if you don't know what are you doing!)")]
     public bool EnableAttachFix = true;
@@ -60,5 +62,9 @@ public enum CarBase
 {
     Chad,
     LAD,
-    Wolf
+    Wolf,
+    B200,
+    Rat,
+    Niv,
+    TrailerCar
 }

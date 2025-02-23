@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# Default severity for analyzer diagnostics with category 'CodeQuality'
+dotnet_analyzer_diagnostic.category-CodeQuality.severity = none
+
+# IDE0040: Agregar modificadores de accesibilidad
+dotnet_style_require_accessibility_modifiers = never

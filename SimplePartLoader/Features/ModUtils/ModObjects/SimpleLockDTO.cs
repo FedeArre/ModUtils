@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimplePartLoader
 {
-    internal class EarlyAccessJson
+    internal class SimpleLockDTO
     {
         public string ModId;
         public string SteamId;

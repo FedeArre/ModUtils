@@ -141,10 +141,6 @@ namespace SimplePartLoader.CarGen
 
             BuildingExceptions exceptions = car.exceptionsObject;
 
-            // Hardcoded exceptions
-            if (name == "Spacer")
-                return null;
-
             // Even faster lookup, priorize mod-loaded stuff first!
             foreach (Part partObj in car.loadedBy.Parts)
             {
@@ -241,7 +237,6 @@ namespace SimplePartLoader.CarGen
                         }
                     }
 
-                    // TODO: Consider if this two are a good idea
                     if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
                     {
                         foundPart = null;

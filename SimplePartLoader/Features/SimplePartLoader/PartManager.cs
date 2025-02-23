@@ -2,6 +2,7 @@
 using KCC;
 using RVP;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Objects;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
@@ -56,10 +57,19 @@ namespace SimplePartLoader
         {
             // We first load all our parts into the list.
             gameParts = new List<GameObject>();
-            foreach(GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
+            foreach (GameObject part in GameObject.Find("PartsParent").GetComponent<JunkPartsList>().Parts)
             {
-                if(part != null)
+                if (part != null && part.tag != "Item")
                     gameParts.Add(part);
+                else if (part != null && part.tag == "Item")
+                {
+                    // Handle special case to get brake shoes / pads for new cars that only come on box.
+                    PickupTool pt = part.GetComponent<PickupTool>();
+                    if (pt && pt.Box)
+                    {
+                        gameParts.Add(pt.InBoxprefab);
+                    }
+                }
             }
 
             if (GameObject.Find("SHOPITEMS")) // Safety check for survival mode.
@@ -287,6 +297,7 @@ namespace SimplePartLoader
             if (!hasFirstLoadOccured)
             {
                 hasFirstLoadOccured = true;
+                MainStartOptionBuilder.StartBuilder();
                 MainCarGenerator.StartCarGen();
             }
 

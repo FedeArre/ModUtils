@@ -34,15 +34,16 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.4.0";
+        public override string Version => "v1.5.1B";
         
-        bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.0-rc2";
+        bool TESTING_VERSION_REMEMBER = false;
+        internal static string TESTING_VERSION_NUMBER = "v1.5.1-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        public const string API_URL = "https://modding.fedes.uy/api";
+        public const string API_URL = "https://modding.fedes.uy/";
+        //public const string API_URL = "https://localhost:7060/";
 
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
         AssetBundle AutoupdaterBundle;
@@ -58,6 +59,8 @@ namespace SimplePartLoader
         Material FloorMat;
 
         internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
+
+        internal static HttpClient Client;
 
         // Developer stuff for UI
         internal static Checkbox DevUIEnabled;
@@ -79,6 +82,13 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
+            // Some setups
+            ModUtils.Version = Version;
+
+            Client = new HttpClient();
+            Client.BaseAddress = new Uri(API_URL);
+            Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
+
 #if MODUTILS_TIMING_ENABLED
             var watch = new System.Diagnostics.Stopwatch();
             watch.Start();
@@ -136,11 +146,6 @@ namespace SimplePartLoader
             UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
             UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
             UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
-
-            // Computer stuff
-            ComputerUI.UI_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("Computer");
-            ComputerUI.ComputerModelPrefab = AutoupdaterBundle.LoadAsset<GameObject>("ComputerPrefab");
-            ComputerUI.SetupComputer(AutoupdaterBundle.LoadAsset<GameObject>("AppLauncher"), AutoupdaterBundle.LoadAsset<GameObject>("AppLauncherIcon"));
 
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
@@ -244,23 +249,18 @@ namespace SimplePartLoader
 
                 if (RandomBG.Checked)
                 {
-                    using (HttpClient client = new HttpClient())
+                    try
                     {
-                        try
-                        {
-                            HttpResponseMessage response = client.GetAsync(API_URL + "/bg").Result;
-                            response.EnsureSuccessStatusCode();
+                        HttpResponseMessage response = Client.GetAsync("/v1/menu").Result;
+                        response.EnsureSuccessStatusCode();
 
-                            // Image load
-                            imageBytes = response.Content.ReadAsByteArrayAsync().Result;
-                        }
-                        catch (Exception ex)
-                        {
-                            CustomLogger.AddLine("RandomBG", "Failed to load random background!");
-                            CustomLogger.AddLine("RandomBG", ex);
-                        }
-
-                        return;
+                        // Image load
+                        imageBytes = response.Content.ReadAsByteArrayAsync().Result;
+                    }
+                    catch (Exception ex)
+                    {
+                        CustomLogger.AddLine("RandomBG", "Failed to load random background!");
+                        CustomLogger.AddLine("RandomBG", ex);
                     }
                 }
             }
@@ -359,14 +359,7 @@ namespace SimplePartLoader
 
             watch.Restart();
 #endif
-            // Computer UI stuff
-            ComputerUI.LoadComputerTable();
-#if MODUTILS_TIMING_ENABLED
-            watch.Stop();
-            totalTime += watch.ElapsedMilliseconds;
-            Debug.Log($"[ModUtils/Timing]: In-game computer succesfully loaded - Took ${watch.ElapsedMilliseconds} ms");
-            watch.Restart();
-#endif
+
             // Furniture stuff
             FurnitureManager.SetupFurniture();
 
@@ -404,11 +397,6 @@ namespace SimplePartLoader
 #endif
         }
 
-        public override void Continue()
-        {
-            ComputerUI.Continue();
-        }
-
         public override void OnSaveSystemSave(SaveSystem saver, bool isBarn)
         {
             if (ModUtils.GetPlayerTools().MapMagic)
@@ -418,7 +406,6 @@ namespace SimplePartLoader
             if (!isBarn)
             {
                 FurnitureManager.SaveFurniture(saver);
-                ComputerUI.Save();
                 DataHandler.OnSave(saver);
             }
         }
@@ -563,16 +550,7 @@ namespace SimplePartLoader
             BuildableManager.OnNewMapEnabled();
         }
 
-        public override void LateUpdate()
-        {
-            if (ComputerUI.PlayerAtComputer && Input.GetKeyDown(KeyCode.Escape))
-            {
-                ComputerUI.Close();
-                ModUtils.PlayerTools.ESC();
-            }
-        }
-
-        public  void LoadSettings()
+        public void LoadSettings()
         {
             // Enable heartbeat
             KeepAlive.GetInstance().Ready();
