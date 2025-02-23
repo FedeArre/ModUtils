@@ -72,9 +72,7 @@ namespace SimplePartLoader
             try
             {
                 var content = new StringContent(serializedJson, Encoding.UTF8, "application/json");
-                Debug.Log("telemetry sending json: " + serializedJson);
-                var resultado = await ModMain.Client.PostAsync("v1/telemetry", content);
-                Debug.Log(await resultado.Content.ReadAsStringAsync());
+                _ = await ModMain.Client.PostAsync("v1/telemetry", content);
             }
             catch (Exception ex)
             {

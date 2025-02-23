@@ -168,7 +168,7 @@ namespace SimplePartLoader
                     // load all files to be downloaded
                     foreach (var item in aesKeys)
                     {
-                        string modPath = $"{CachedFolderPath}/{item.Key}.modutilscache";
+                        string modPath = Path.Combine(CachedFolderPath, $"{item.Key}.modutilscache");
                         if (!cachedMods.Contains(modPath))
                         {
                             updateModPathList.Add(modPath);
@@ -179,6 +179,7 @@ namespace SimplePartLoader
                     {
                         var checksum = GenerateChecksum(file);
                         string fileNameWithoutExtension = Path.GetFileNameWithoutExtension(file);
+                        string modPath = Path.Combine(CachedFolderPath, $"{fileNameWithoutExtension}.modutilscache");
 
                         CustomLogger.AddLine("EACheck", $"Checking {fileNameWithoutExtension}.modutilscache");
 
@@ -190,16 +191,21 @@ namespace SimplePartLoader
                             {
                                 CustomLogger.AddLine("EACheck", $"Checksum of {Path.GetFileName(file)} matches, not updating.");
 
-                                string modPathToRemove = $"{CachedFolderPath}/{fileNameWithoutExtension}.modutilscache";
-                                if (updateModPathList.Contains(modPathToRemove))
+                                if (updateModPathList.Contains(modPath))
                                 {
-                                    updateModPathList.Remove(modPathToRemove);
+                                    updateModPathList.Remove(modPath);
                                     CustomLogger.AddLine("EACheck", $"Removed from update list.");
                                 }
                             }
                             else
                             {
-                                CustomLogger.AddLine("EACheck", $"Checksum mismatch for {fileNameWithoutExtension}.modutilscache");
+                                CustomLogger.AddLine("EACheck", $"Checksum mismatch for {fileNameWithoutExtension}.modutilscache ({checksum})");
+                               
+                                if (!updateModPathList.Contains(modPath))
+                                {
+                                    updateModPathList.Add(modPath);
+                                    CustomLogger.AddLine("EACheck", $"Added to update list due to checksum mismatch.");
+                                }
                             }
                         }
                         else
@@ -220,7 +226,7 @@ namespace SimplePartLoader
                             if(aesKeys.ContainsKey(Path.GetFileNameWithoutExtension(item)))
                             {
                                 KeyAnswer key = aesKeys[Path.GetFileNameWithoutExtension(item)];
-                                string path = CachedFolderPath + $"/{key.ModId}.modutilscache";
+                                string path = Path.Combine(CachedFolderPath, $"{key.ModId}.modutilscache");
 
                                 try
                                 {
@@ -250,7 +256,7 @@ namespace SimplePartLoader
                     }
 
                     // load cached
-                    CustomLogger.AddLine("tee", CachedFolderPath);
+                    CustomLogger.AddLine("EACheck", "Cache folder: " + CachedFolderPath);
                     cachedMods = Directory.GetFiles(CachedFolderPath, "*.modutilscache");
                     foreach (string file in cachedMods)
                     {
@@ -263,8 +269,9 @@ namespace SimplePartLoader
 
                             try
                             {
+                                CustomLogger.AddLine("EACheck", $"Found key of {key.ModId}.");
                                 fileBytes = Decrypt(fileByteEncrypted, key.Key, key.IV);
-                                CustomLogger.AddLine("EACheck", $"D:{modId}");
+                                CustomLogger.AddLine("EACheck", $"D: {modId}");
                             }
                             catch (Exception ex)
                             {
@@ -273,19 +280,27 @@ namespace SimplePartLoader
                                 continue;
                             }
 
-
-                            Type[] types = Assembly.Load(fileBytes).GetTypes();
-                            Type typeFromHandle = typeof(Mod);
-                            for (int i = 0; i < types.Length; i++)
+                            try
                             {
-                                if (typeFromHandle.IsAssignableFrom(types[i]))
+                                Type[] types = Assembly.Load(fileBytes).GetTypes();
+                                Type typeFromHandle = typeof(Mod);
+                                for (int i = 0; i < types.Length; i++)
                                 {
-                                    CustomLogger.AddLine("EACheck", $"Trying to start mod {modId}");
-                                    Mod m = (Mod)Activator.CreateInstance(types[i]);
-                                    ModLoader.mods.Add(m);
-                                    m.OnMenuLoad();
-                                    break;
+                                    if (typeFromHandle.IsAssignableFrom(types[i]))
+                                    {
+                                        CustomLogger.AddLine("EACheck", $"Trying to start mod {modId}");
+                                        Mod m = (Mod)Activator.CreateInstance(types[i]);
+                                        ModLoader.mods.Add(m);
+                                        m.OnMenuLoad();
+                                        break;
+                                    }
                                 }
+                            }
+                            catch(Exception ex)
+                            {
+                                ErrorMessageHandler.GetInstance().DisabledModList.Add(modId + " (FATAL)");
+                                CustomLogger.AddLine("EACheck", $"Fatal error on mod load of " + modId);
+                                CustomLogger.AddLine("EACheck", ex);
                             }
                         }
                         else
@@ -514,9 +529,9 @@ namespace SimplePartLoader
         public string GenerateChecksum(string filePath)
         {
             using (MD5 md5Hash = MD5.Create())
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+            using (var stream = File.OpenRead(filePath))
             {
-                byte[] hashBytes = md5Hash.ComputeHash(fs);
+                byte[] hashBytes = md5Hash.ComputeHash(stream);
 
                 StringBuilder builder = new StringBuilder();
                 foreach (byte b in hashBytes)
@@ -534,7 +549,7 @@ namespace SimplePartLoader
             aes.IV = iv;
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
-
+            
             ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
             MemoryStream ms = new MemoryStream(cipherText);
             CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);

@@ -80,7 +80,6 @@ namespace SimplePartLoader.CarGen
             if (!engine)
                 engine = objective.transform.Find("EngineTranny/CylinderBlock/CylinderBlock");
 
-            Debug.Log($"engine {engine}");
             if (engine)
             {
                 engine.name = "CylinderBlock";
@@ -99,7 +98,6 @@ namespace SimplePartLoader.CarGen
             }
 
             Transform radiator = objective.transform.Find("Frontpanel08/Frontpanel08/Radiator06/Radiator06");
-            Debug.Log($"rad {radiator}");
             if (radiator)
             {
                 CommonFixes.FixPart(radiator.gameObject, FixType.Radiator);
@@ -112,7 +110,6 @@ namespace SimplePartLoader.CarGen
             }
 
             Transform gasTank = objective.transform.Find("Floor08/Floor08/GasTank08/GasTank08");
-            Debug.Log($"gas {gasTank}");
             if (gasTank)
             {
                 CommonFixes.FixPart(gasTank.gameObject, FixType.FuelTank);
@@ -126,7 +123,6 @@ namespace SimplePartLoader.CarGen
             }
 
             Transform brakeFluidContainer = objective.transform.Find("Firewall08/Firewall08/BrakeMasterCylinder06/BrakeMasterCylinder06");
-            Debug.Log($"brake {brakeFluidContainer}");
             if (brakeFluidContainer)
             {
                 CommonFixes.FixPart(brakeFluidContainer.gameObject, FixType.BrakeCylinder);
@@ -225,6 +221,11 @@ namespace SimplePartLoader.CarGen
                 {
                     wiresMainTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselBatteryWires;
                 }
+
+                if (car.carGeneratorData.Inline6RBatteryWires)
+                {
+                    wiresMainTransparent.ChildrenMesh4 = car.carGeneratorData.Inline6RBatteryWires;
+                }
             }
 
             // Fuel line setup
@@ -248,9 +249,14 @@ namespace SimplePartLoader.CarGen
                     fuelLineTransparent.ChildrenMesh2 = car.carGeneratorData.Inline6FuelLine;
                 }
 
-                if (car.carGeneratorData.Inline6DieselBatteryWires)
+                if (car.carGeneratorData.Inline6DieselFuelLine)
                 {
-                    fuelLineTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselBatteryWires;
+                    fuelLineTransparent.ChildrenMesh3 = car.carGeneratorData.Inline6DieselFuelLine;
+                }
+
+                if (car.carGeneratorData.Inline6RFuelLine)
+                {
+                    fuelLineTransparent.ChildrenMesh4 = car.carGeneratorData.Inline6RFuelLine;
                 }
             }
 

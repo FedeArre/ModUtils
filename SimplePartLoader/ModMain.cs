@@ -34,16 +34,16 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.5.0b";
+        public override string Version => "v1.5.1B";
         
-        bool TESTING_VERSION_REMEMBER = true;
+        bool TESTING_VERSION_REMEMBER = false;
         internal static string TESTING_VERSION_NUMBER = "v1.5.1-rc2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
-        //public const string API_URL = "https://modding.fedes.uy/";
-        public const string API_URL = "https://localhost:7060/";
+        public const string API_URL = "https://modding.fedes.uy/";
+        //public const string API_URL = "https://localhost:7060/";
 
         internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
         AssetBundle AutoupdaterBundle;
@@ -86,7 +86,7 @@ namespace SimplePartLoader
             ModUtils.Version = Version;
 
             Client = new HttpClient();
-            Client.BaseAddress = new Uri(ModMain.API_URL);
+            Client.BaseAddress = new Uri(API_URL);
             Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
 
 #if MODUTILS_TIMING_ENABLED
