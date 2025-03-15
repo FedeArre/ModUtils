@@ -34,7 +34,7 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.5.1B";
+        public override string Version => "v1.5.1";
         
         bool TESTING_VERSION_REMEMBER = false;
         internal static string TESTING_VERSION_NUMBER = "v1.5.1-rc2";

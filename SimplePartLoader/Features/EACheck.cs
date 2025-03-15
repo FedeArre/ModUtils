@@ -453,7 +453,15 @@ namespace SimplePartLoader
                 CurrentDownloadingMod = dd;
                 try
                 {
-                    client.DownloadFileAsync(new Uri(dd.current_download_link), DownloadFolder + $"\\{dd.file_name}");
+                    Debug.Log("Now downloading: " + new Uri(dd.current_download_link));
+                    using (var response = ModMain.Client.GetAsync(new Uri(dd.current_download_link)).Result)
+                    {
+                        response.EnsureSuccessStatusCode();
+
+                        using (Stream contentStream = response.Content.ReadAsStreamAsync().Result)
+                        using (FileStream fileStream = new FileStream(Path.Combine(DownloadFolder, dd.file_name), FileMode.Create, FileAccess.Write, FileShare.None))
+                            contentStream.CopyToAsync(fileStream);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -465,7 +473,7 @@ namespace SimplePartLoader
 
             try
             {
-                if(File.Exists(DownloadFolder + "/ModUtilsAutoupdater.exe")) 
+                if (File.Exists(Path.Combine(DownloadFolder, "ModUtilsAutoupdater.exe")))
                 {
                     File.SetAttributes(DownloadFolder + "/ModUtilsAutoupdater.exe", FileAttributes.Normal);
                     Process.Start(DownloadFolder + "/ModUtilsAutoupdater.exe");

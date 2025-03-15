@@ -145,8 +145,10 @@ namespace SimplePartLoader.CarGen
                 }
 
                 // Base setup
+                if(CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Setting up base for {car.carGeneratorData.CarName}");
                 baseData.SetupTemplate(car.emptyCarPrefab, car);
                 baseData.SetupTemplate(car.carPrefab, car);
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending base setup for {car.carGeneratorData.CarName}, starting custom call");
 
                 try
                 {
@@ -162,7 +164,9 @@ namespace SimplePartLoader.CarGen
                     baseData.ForceTemplateExceptions(car.exceptionsObject);
 
                 // Now, we can build our car
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Starting car build for {car.carGeneratorData.CarName}");
                 BuildCar(car);
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending car build for {car.carGeneratorData.CarName}");
 
                 // Saving setup
                 if (Saver.modParts.ContainsKey(car.carGeneratorData.CarName))
@@ -301,14 +305,18 @@ namespace SimplePartLoader.CarGen
             // Build our car
             CarGenUtils.RecursiveCarBuild(car, 0);
 
+            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Recursive call build done for {car.carGeneratorData.CarName}");
+
             if (car.carGeneratorData.TransparentReferenceUpdate)
             {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Updating transparents references and visual object references for {car.carGeneratorData.CarName}");
                 CarBuilding.UpdateTransparentsReferences(car.carPrefab, car);
                 CarBuilding.UpdateVisualObjects(car);
             }
 
             if (car.carGeneratorData.BoneTargetTransformFix)
             {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Apply bone target transform fix for {car.carGeneratorData.CarName}");
                 foreach (MyBoneSCR scr in car.carPrefab.GetComponentsInChildren<MyBoneSCR>())
                 {
                     if (scr.thisTransform != null)
@@ -324,6 +332,7 @@ namespace SimplePartLoader.CarGen
             // Force part name already so is easy to work on
             if(car.carGeneratorData.EnableAttachFix)
             {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Applying EnableAttachFix - part rename setup {car.carGeneratorData.CarName}");
                 foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
                     partinfo.HingePivot = null;
@@ -332,7 +341,9 @@ namespace SimplePartLoader.CarGen
                 }
             }
 
+            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Calling base postbuild for {car.carGeneratorData.CarName}");
             baseData.PostBuild(car.carPrefab, car);
+            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending base postbuild in {car.carGeneratorData.CarName}, starting custom");
 
             try
             {
@@ -346,6 +357,8 @@ namespace SimplePartLoader.CarGen
             // Attach fix
             if(car.carGeneratorData.EnableAttachFix)
             {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Now reseting counts and reattaching car {car.carGeneratorData.CarName}");
+
                 MainCarProperties mcp = car.carPrefab.GetComponent<MainCarProperties>();
                 foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
@@ -360,34 +373,51 @@ namespace SimplePartLoader.CarGen
                         partinfo.gameObject.name = partinfo.RenamedPrefab;
                 }
 
-                if(baseData.VehType() == VehicleType.Car)
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Resetting all MCPs to new one {car.carGeneratorData.CarName}");
+
+                if (baseData.VehType() == VehicleType.Car)
                 {
                     foreach (CarProperties carProps in car.carPrefab.transform.GetComponentsInChildren<CarProperties>())
                     {
                         carProps.MainProperties = mcp;
                     }
                 }
-                
+
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Fixing hexnuts {car.carGeneratorData.CarName}");
+
                 foreach (HexNut hexNut in car.carPrefab.GetComponentsInChildren<HexNut>())
                 {
                     hexNut.tight = true;
-                    hexNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
-                    hexNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
+
+                    Partinfo pi = hexNut.gameObject.transform.parent.GetComponent<Partinfo>();
+                    if (!pi)
+                    {
+                        car.ReportIssue($"Hexnut error (Parent does not have Partinfo) detected in {hexNut.transform.parent.name}!");
+                        continue;
+                    }
+
+                    pi.attachedbolts += 1f;
+                    pi.tightnuts += 1f;
                 }
+
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Fixing flatnuts {car.carGeneratorData.CarName}");
 
                 foreach (FlatNut flatNut in car.carPrefab.GetComponentsInChildren<FlatNut>())
                 {
                     flatNut.tight = true;
-                    
-                    if (!flatNut.gameObject.transform.parent.GetComponent<Partinfo>())
+
+                    Partinfo pi = flatNut.gameObject.transform.parent.GetComponent<Partinfo>();
+                    if (!pi)
                     {
                         car.ReportIssue($"Flatnut error (Parent does not have Partinfo) detected in {flatNut.transform.parent.name}!");
                         continue;
                     }
 
-                    flatNut.gameObject.transform.parent.GetComponent<Partinfo>().attachedbolts += 1f;
-                    flatNut.gameObject.transform.parent.GetComponent<Partinfo>().tightnuts += 1f;
+                    pi.attachedbolts += 1f;
+                    pi.tightnuts += 1f;
                 }
+
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Fixing boltnuts {car.carGeneratorData.CarName}");
 
                 foreach (BoltNut boltNut in car.carPrefab.GetComponentsInChildren<BoltNut>())
                 {
@@ -436,6 +466,8 @@ namespace SimplePartLoader.CarGen
                     boltNut.otherobject.GetComponent<Partinfo>().ImportantBolts += 1f;
                 }
 
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Attach fix - Fixing weldcuts {car.carGeneratorData.CarName}");
+
                 foreach (WeldCut weldCut in car.carPrefab.GetComponentsInChildren<WeldCut>())
                 {
                     weldCut.ReStart();
@@ -464,10 +496,14 @@ namespace SimplePartLoader.CarGen
                     weldCut.otherobject.GetComponent<Partinfo>().fixedwelds += 1f;
                     weldCut.otherobject.GetComponent<Partinfo>().attachedwelds += 1f;
                 }
+
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending attach fix on {car.carGeneratorData.CarName}");
             }
+
 
             if(car.carGeneratorData.EnableAutomaticPartCount && baseData.VehType() == VehicleType.Car)
             {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Determining part count on {car.carGeneratorData.CarName}");
                 int partCount = 0;
                 CarProperties[] componentsInChildren = car.carPrefab.GetComponentsInChildren<CarProperties>();
                 for (int i = 0; i < componentsInChildren.Length; i++)
@@ -480,17 +516,21 @@ namespace SimplePartLoader.CarGen
                 
                 car.carPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
                 car.emptyCarPrefab.GetComponent<MainCarProperties>().PartsCount = partCount;
+
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending automatic part count in {car.carGeneratorData.CarName}");
             }
 
             if (car.carGeneratorData.FixLights)
             {
+                if(CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Fixing windows and lights for {car.carGeneratorData.CarName}");
                 CommonFixes.CarLightsFix(car.carPrefab, false);
                 CommonFixes.Windows(car.carPrefab, false);
             }
 
             if (car.carGeneratorData.EnableAutomaticPainting)
             {
-                foreach(Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Painting setup being done for {car.carGeneratorData.CarName}");
+                foreach (Partinfo pi in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
                     CarProperties cp = pi.GetComponent<CarProperties>();
                     if (!cp)
