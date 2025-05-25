@@ -86,7 +86,7 @@ namespace SimplePartLoader.Features.StartOptionBuilder
 
                         if (cp.Paintable && cp.Washable && cp.MeshRepairable)
                         {
-                            CarGenPainting.EnableFullSupport(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                            GamePainting.InternalSetupPart(cp.gameObject);
                         }
                         else if (cp.Paintable && !cp.Washable && cp.MeshRepairable)
                         {

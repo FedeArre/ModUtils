@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace SimplePartLoader.CarGen
 {
+    [Obsolete("This class is deprecated, does not work anymore and will be removed in the near future. Use GamePainting instead.")]
     public class CarGenPainting
     {
         public static void EnablePaintOnly(GameObject Prefab, PaintingSystem.PartPaintResolution res)

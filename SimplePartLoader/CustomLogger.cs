@@ -33,6 +33,11 @@ namespace SimplePartLoader
 
             Debug.LogError(message);
 
+            if(ex.InnerException != null)
+            {
+                Debug.LogError($"InnerException available for the above exception: {ex.InnerException.Message} - {ex.InnerException.StackTrace}");
+            }
+
             if (!dontShowInLog)
                 lines.Add(message);
 

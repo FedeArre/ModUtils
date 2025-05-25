@@ -1,6 +1,7 @@
 ﻿//#define MODUTILS_DEVELOPER_CAR_CREATOR
 
 using PaintIn3D;
+using SimplePartLoader.Features;
 using SimplePartLoader.Features.CarGenerator;
 using SimplePartLoader.Features.CarGenerator.CarBases;
 using SimplePartLoader.Utils;
@@ -13,6 +14,7 @@ using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static UnityEngine.ParticleSystem;
 
 namespace SimplePartLoader.CarGen
@@ -538,19 +540,46 @@ namespace SimplePartLoader.CarGen
                     
                     if(cp.Paintable && cp.Washable && cp.MeshRepairable)
                     {
-                        CarGenPainting.EnableFullSupport(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                        GamePainting.InternalSetupPart(cp.gameObject);
                     }
                     else if(cp.Paintable && !cp.Washable && cp.MeshRepairable)
                     {
-                        CarGenPainting.EnablePaintOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
+                        {
+                            MetallicRustDust = true,
+                            ClearCoat = true,
+                            MainTex = false,
+                            ColorMap = true,
+                            Counters = true,
+                            HoleMap = true,
+                            PolishMap = true
+                        });
                     }
                     else if(cp.Paintable && cp.Washable && !cp.MeshRepairable)
                     {
-                        CarGenPainting.EnablePaintAndDirt(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
+                        {
+                            MetallicRustDust = false,
+                            ClearCoat = true,
+                            MainTex = true,
+                            ColorMap = true,
+                            Counters = true,
+                            HoleMap = false,
+                            PolishMap = true
+                        });
                     }
                     else if(!cp.Paintable && cp.Washable)
                     {
-                        CarGenPainting.EnableDirtOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
+                        {
+                            MetallicRustDust = false,
+                            ClearCoat = false,
+                            MainTex = true,
+                            ColorMap = false,
+                            Counters = true,
+                            HoleMap = false,
+                            PolishMap = false
+                        });
                     }
                 }
             }

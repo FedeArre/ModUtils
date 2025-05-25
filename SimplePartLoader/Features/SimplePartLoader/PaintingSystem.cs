@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
+    [Obsolete("Please use the new GamePainting API instead. This is kept for compatibility purposes")]
     public class PaintingSystem
     {
         static Material ChromeMaterial = null;
@@ -70,7 +71,7 @@ namespace SimplePartLoader
                 // Looking up the material or creating it.
                 for (int i = 0; i < prefabRenderer.materials.Length; i++)
                 {
-                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                    if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers URP")
                     {
                         l2Material_index = i;
                         break;
@@ -79,7 +80,7 @@ namespace SimplePartLoader
 
                 if (l2Material_index == -1)
                 {
-                    CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                    CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers URP material (Paint & Rust) on part " + part.Prefab.name);
                     return;
                 }
 
@@ -141,7 +142,7 @@ namespace SimplePartLoader
             // Looking up the material or creating it.
             for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers URP")
                 {
                     l2Material_index = i;
                     break;
@@ -150,7 +151,7 @@ namespace SimplePartLoader
 
             if (l2Material_index == -1)
             {
-                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers material (Paint & Rust) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Thunderbyte/RustDirt2Layers URP material (Paint & Rust) on part " + part.Prefab.name);
                 return;
             }
 
@@ -241,7 +242,7 @@ namespace SimplePartLoader
 
             if(alphaMaterial_index == -1)
             {
-                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material (Dirt) on part " + part.Prefab.name);
+                CustomLogger.AddLine("PaintingSystem", $"Missing Paint in 3D/Alpha material URP (Dirt) on part " + part.Prefab.name);
                 return;
             }
 
@@ -294,7 +295,7 @@ namespace SimplePartLoader
 
             for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers URP")
                 {
                     l2Material_index = i;
                     break;
@@ -413,7 +414,7 @@ namespace SimplePartLoader
 
             for (int i = 0; i < prefabRenderer.materials.Length; i++)
             {
-                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers")
+                if (prefabRenderer.materials[i].shader.name == "Thunderbyte/RustDirt2Layers URP")
                 {
                     l2Material_index = i;
                     break;
@@ -599,7 +600,8 @@ namespace SimplePartLoader
             }
             return ChromeMaterial;
         }
-        
+
+        [Obsolete("Use SetupPart method instead")]
         /// <summary>
         /// Sets the painting materials for a given Part. If index is -1 no material is affected for that type
         /// </summary>
@@ -612,6 +614,7 @@ namespace SimplePartLoader
             SetMaterialsForObject(p, bodymatIndex, paintRustIndex, dirtIndex, false);
         }
 
+        [Obsolete("Use SetupPart method instead")]
         public static void SetMaterialsForObject(Part p, int bodymatIndex = -1, int paintRustIndex = -1, int dirtIndex = -1, bool force = true)
         {
             Material[] matsOfPart = p.Renderer.materials;
@@ -704,7 +707,7 @@ namespace SimplePartLoader
                 return;
 
             Material matToChange = go.GetComponent<Renderer>().material;
-            if (!matToChange || matToChange.shader.name != "Thunderbyte/RustDirt2Layers")
+            if (!matToChange || matToChange.shader.name != "Thunderbyte/RustDirt2Layers URP")
                 return;
 
             if(comp._texcoord)

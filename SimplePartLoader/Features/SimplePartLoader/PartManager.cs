@@ -601,8 +601,7 @@ namespace SimplePartLoader
                             break;
                             
                         case PrefabGenerator.MaterialSettingTypes.PaintingSetup:
-                            PaintingSystem.SetMaterialsForObject(part, 2, 0, 1);
-                            part.EnablePartPainting(PaintingSystem.Types.FullPaintingSupport);
+                            GamePainting.SetupPart(part);
                             break;
                     }
 

@@ -59,12 +59,27 @@ namespace SimplePartLoader
             set { PrefixPrefabName = value; }
         }
 
+        [Obsolete("Use PaintQuality instead")]
         public PaintingSystem.PartPaintResolution PaintResolution
         {
             get { return PaintRes; }
             set { PaintRes = value; }
         }
 
+
+        public GamePainting.Quality PaintQuality { get; set; } = GamePainting.Quality.Low;
+
+
+        public enum PartPaintResolution
+        {
+            VeryLow = 1,
+            Low = 2,
+            Medium = 2,
+            High = 3,
+            VeryHigh = 4,
+        }
+
+        [Obsolete("This setting does not work anymore")]
         public bool UseBackfaceShader
         {
             get { return CullShader; }
