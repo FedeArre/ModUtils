@@ -22,6 +22,15 @@ namespace SimplePartLoader
             VeryHigh = 5
         }
 
+        public enum PaintPreset
+        {
+            FullSupport,
+            Paint,
+            PaintRust,
+            PaintDirt,
+            Dirt
+        }
+
         public class PartPaintSetup
         {
             public bool ColorMap { get; set; } = true;
@@ -249,6 +258,20 @@ namespace SimplePartLoader
                 default:
                     return 512;
             }
+        }
+
+        public static PartPaintSetup GetPreset(PaintPreset preset)
+        {
+            return new PartPaintSetup()
+            {
+                Counters = true,
+                ColorMap = preset is PaintPreset.FullSupport || preset is PaintPreset.Paint || preset is PaintPreset.PaintRust || preset is PaintPreset.PaintDirt,
+                MetallicRustDust = preset is PaintPreset.FullSupport || preset is PaintPreset.PaintRust,
+                ClearCoat = preset is PaintPreset.FullSupport || preset is PaintPreset.Paint || preset is PaintPreset.PaintRust || preset is PaintPreset.PaintDirt,
+                HoleMap = preset is PaintPreset.FullSupport || preset is PaintPreset.Paint || preset is PaintPreset.PaintRust,
+                MainTex = preset is PaintPreset.FullSupport || preset is PaintPreset.PaintDirt || preset is PaintPreset.Dirt,
+                PolishMap = preset is PaintPreset.FullSupport || preset is PaintPreset.Paint || preset is PaintPreset.PaintRust || preset is PaintPreset.PaintDirt
+            };
         }
     }
 }

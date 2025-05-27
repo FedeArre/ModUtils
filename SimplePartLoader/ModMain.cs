@@ -58,7 +58,7 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility;
         internal static ModDropdown ForcedPaintQuality;
 
         internal static HttpClient Client;
@@ -167,6 +167,7 @@ namespace SimplePartLoader
             mi.AddLabelToUI("Permit ModUI to load. This will cause you to have 2 'Mods' buttons but will make some older mods that require BrennfuchS's ModUI to work");
             DontDisableModUI = mi.AddCheckboxToUI("ModUtils_ModUIEnable", "Enable ModUI loading (Requires game restart)", false);
             RandomBG = mi.AddCheckboxToUI("ModUtils_RandomBG", "Enable random main menu background", true);
+            UrpCompatibility = mi.AddCheckboxToUI("ModUtils_UrpCompatibility", "Enable URP compatibility layer (For old mods)", true);
             ForcedPaintQuality = mi.AddDropdownToUI("ModUtils_paintQuality", "Force paint quality", new string[] { "None", "Very low", "Low", "Medium", "High", "Very high" }, 0);
             mi.AddSpacerToUI();
             mi.AddSeparatorToUI();

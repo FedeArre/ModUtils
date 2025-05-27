@@ -218,6 +218,8 @@ namespace SimplePartLoader
         [Obsolete("Please use GamePainting.SetupPart instead")]
         public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
+            Renderer.materials = new Material[1];
+
             switch (type)
             {
                 case PaintingSystem.Types.FullPaintingSupport:
@@ -225,19 +227,19 @@ namespace SimplePartLoader
                     break;
 
                 case PaintingSystem.Types.OnlyPaint:
-                    PaintingSystem.EnablePaintOnly(this, paintMaterial);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.Paint));
                     break;
 
                 case PaintingSystem.Types.OnlyPaintAndRust:
-                    PaintingSystem.EnablePaintAndRust(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.PaintRust));
                     break;
 
                 case PaintingSystem.Types.OnlyDirt:
-                    PaintingSystem.EnableDirtOnly(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.Dirt));
                     break;
 
                 case PaintingSystem.Types.OnlyPaintAndDirt:
-                    PaintingSystem.EnablePaintAndDirt(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.PaintDirt));
                     break;
 
                 default:
@@ -357,16 +359,8 @@ namespace SimplePartLoader
                 GameObject.Destroy(counter);
         }
 
-        public void SetStandardShader()
-        {
-            Material[] objectMats = Renderer.materials;
-            Shader standardShader = Shader.Find("Standard");
-
-            foreach (Material m in objectMats)
-                m.shader = standardShader;
-
-            Renderer.materials = objectMats;
-        }
+        [Obsolete("This method does not longer have a purpose. You have to remove it")]
+        public void SetStandardShader() { }
 
         private void GenerateHingePivot(OpeningType type)
         {

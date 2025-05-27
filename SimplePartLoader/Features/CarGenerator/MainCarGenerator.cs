@@ -540,46 +540,19 @@ namespace SimplePartLoader.CarGen
                     
                     if(cp.Paintable && cp.Washable && cp.MeshRepairable)
                     {
-                        GamePainting.InternalSetupPart(cp.gameObject);
+                        GamePainting.InternalSetupPart(cp.gameObject, car.loadedBy);
                     }
                     else if(cp.Paintable && !cp.Washable && cp.MeshRepairable)
                     {
-                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
-                        {
-                            MetallicRustDust = true,
-                            ClearCoat = true,
-                            MainTex = false,
-                            ColorMap = true,
-                            Counters = true,
-                            HoleMap = true,
-                            PolishMap = true
-                        });
+                        GamePainting.InternalSetupPart(cp.gameObject, car.loadedBy, GamePainting.GetPreset(GamePainting.PaintPreset.PaintRust));
                     }
                     else if(cp.Paintable && cp.Washable && !cp.MeshRepairable)
                     {
-                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
-                        {
-                            MetallicRustDust = false,
-                            ClearCoat = true,
-                            MainTex = true,
-                            ColorMap = true,
-                            Counters = true,
-                            HoleMap = false,
-                            PolishMap = true
-                        });
+                        GamePainting.InternalSetupPart(cp.gameObject, car.loadedBy, GamePainting.GetPreset(GamePainting.PaintPreset.PaintDirt));
                     }
                     else if(!cp.Paintable && cp.Washable)
                     {
-                        GamePainting.InternalSetupPart(cp.gameObject, new GamePainting.PartPaintSetup()
-                        {
-                            MetallicRustDust = false,
-                            ClearCoat = false,
-                            MainTex = true,
-                            ColorMap = false,
-                            Counters = true,
-                            HoleMap = false,
-                            PolishMap = false
-                        });
+                        GamePainting.InternalSetupPart(cp.gameObject, car.loadedBy, GamePainting.GetPreset(GamePainting.PaintPreset.Dirt));
                     }
                 }
             }

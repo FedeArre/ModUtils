@@ -148,13 +148,42 @@ namespace SimplePartLoader
                     if (ms)
                     {
                         if (ms.SetPartToBlackMaterial)
-                            part.Renderer.material = PaintingSystem.GetBodymatMaterial(part.Mod.Settings.UseBackfaceShader);
+                            part.Renderer.material = GamePainting.GetBlackMaterial();
 
                         if (ms.EnableChromeStationSupport)
-                            part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
+                            part.CarProps.ChromeMat = GamePainting.GetChromeMaterial();
 
                         if (ms.SupportType != PaintTypes.DontAdd)
-                            PaintingSystem.SetupPart(part, (PaintingSystem.Types) ms.SupportType);
+                        {
+                            GamePainting.PaintPreset preset;
+                            switch(ms.SupportType)
+                            {
+                                case PaintTypes.FullPaintingSupport:
+                                    preset = GamePainting.PaintPreset.FullSupport;
+                                    break;
+
+                                case PaintTypes.OnlyPaint:
+                                    preset = GamePainting.PaintPreset.Paint;
+                                    break;
+
+                                case PaintTypes.OnlyPaintAndRust:
+                                    preset = GamePainting.PaintPreset.PaintRust;
+                                    break;
+
+                                case PaintTypes.OnlyPaintAndDirt:
+                                    preset = GamePainting.PaintPreset.PaintDirt;
+                                    break;
+
+                                case PaintTypes.OnlyDirt:
+                                    preset = GamePainting.PaintPreset.Dirt;
+                                    break;
+
+                                default:
+                                    preset = GamePainting.PaintPreset.FullSupport;
+                                    break;
+                            }
+                            GamePainting.SetupPart(part, GamePainting.GetPreset(preset));
+                        }
 
                         GameObject.Destroy(ms);
                     }
@@ -612,7 +641,7 @@ namespace SimplePartLoader
                 // To enable chroming on our part
                 if (data.EnableChromed)
                 {
-                    part.CarProps.ChromeMat = PaintingSystem.GetChromeMaterial();
+                    part.CarProps.ChromeMat = GamePainting.GetChromeMaterial();
                 }
 
                 if (data.CatalogImage)
