@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.1B";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test1";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test4";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -334,6 +334,56 @@ namespace SimplePartLoader
 
             UI_Mods.transform.Find("OpenMods").localScale = Vector3.one / 2;
             UI_Mods.SetActive(false);
+
+            // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+            if (ModMain.UrpCompatibility.Checked)
+            {
+                foreach(var part in PartManager.prefabGenParts)
+                {
+                    if (part.CarProps == null || part.CarProps.PrefabName == null || part.CarProps.PrefabName == "")
+                        continue;
+
+                    MeshRenderer[] renderers = part.Prefab.GetComponentsInChildren<MeshRenderer>();
+                    bool changesApplied = false;
+
+                    foreach (var renderer in renderers)
+                    {
+                        Material[] partMats = renderer.materials;
+
+                        foreach (Material mat in partMats)
+                        {
+                            if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard" || mat.shader.name == "Standard (Specular setup)"))
+                            {
+                                changesApplied = true;
+                                var color = mat.color;
+                                var texture = mat.mainTexture;
+
+                                bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
+                                mat.shader = Shader.Find("Universal Render Pipeline/Lit");
+
+                                if (texture)
+                                {
+                                    mat.SetTexture("_BaseMap", texture);
+                                }
+                                else
+                                {
+                                    mat.SetTexture("_BaseMap", null);
+                                }
+
+                                mat.SetColor("_BaseColor", color);
+                                mat.SetFloat("_Cull", doubleSided ? 0 : 2);
+                            }
+                        }
+
+                        renderer.materials = partMats;
+
+                        if (changesApplied)
+                        {
+                            CustomLogger.AddLine("URPCompatibility", $"Part {part.Name} ({part.CarProps.PrefabName}) materials were converted to URP compatible materials.");
+                        }
+                    }
+                }
+            }
 
             // Mod shop load
             if (ModUtils.GetPlayerTools().MapMagic)

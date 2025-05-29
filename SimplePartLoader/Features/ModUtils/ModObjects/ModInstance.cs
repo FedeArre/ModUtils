@@ -195,7 +195,7 @@ namespace SimplePartLoader
 
                         foreach (Material mat in partMats)
                         {
-                            if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard"))
+                            if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard" || mat.shader.name == "Standard (Specular setup)"))
                             {
                                 changesApplied = true;
                                 var color = mat.color;

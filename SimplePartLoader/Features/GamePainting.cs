@@ -199,6 +199,13 @@ namespace SimplePartLoader
             return ChromeMaterial;
         }
 
+        public static Material GetPaintMaterial()
+        {
+            if (!PaintMaterial) PreloadMaterials();
+
+            return PaintMaterial;
+        }
+
         private static void PreloadMaterials()
         {
             foreach (GameObject go in PartManager.gameParts)

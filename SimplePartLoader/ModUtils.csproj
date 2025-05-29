@@ -512,6 +512,7 @@
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
+    <Compile Include="Hooks\UrpShaderCompatibilityHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
     <Compile Include="Objects\DTO\KeyAnswerDTO.cs" />
     <Compile Include="Objects\DTO\KeyValidationDTO.cs" />

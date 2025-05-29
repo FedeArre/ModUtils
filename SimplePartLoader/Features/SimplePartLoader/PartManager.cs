@@ -630,6 +630,7 @@ namespace SimplePartLoader
                             break;
                             
                         case PrefabGenerator.MaterialSettingTypes.PaintingSetup:
+                            part.Renderer.materials = new Material[1];
                             GamePainting.SetupPart(part);
                             break;
                     }

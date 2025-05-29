@@ -359,8 +359,18 @@ namespace SimplePartLoader
                 GameObject.Destroy(counter);
         }
 
-        [Obsolete("This method does not longer have a purpose. You have to remove it")]
-        public void SetStandardShader() { }
+        public void SetStandardShader()
+        {
+            var materials = Renderer.materials;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+
+            foreach (var mat in materials)
+            {
+                mat.shader = shader;
+            }
+
+            Renderer.materials = materials;
+        }
 
         private void GenerateHingePivot(OpeningType type)
         {

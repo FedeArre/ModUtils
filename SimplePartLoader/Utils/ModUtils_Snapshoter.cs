@@ -37,8 +37,15 @@ namespace SimplePartLoader.Utils
                     GameObject instanciated = GameObject.Instantiate(p.Prefab);
                     if (instanciated.GetComponent<CarProperties>() && instanciated.GetComponent<CarProperties>().Paintable)
                     {
-                        instanciated.GetComponent<P3dPaintableTexture>().Color = Color.gray;
-                        instanciated.GetComponent<P3dPaintableTexture>().Activate();
+                        var texture = instanciated.GetComponent<P3dPaintableTexture>();
+                        if(texture is null)
+                        {
+                            CustomLogger.AddLine("ThumbnailGenerator", $"Part {p.CarProps.PrefabName} does not have a P3dPaintableTexture component! Skipping thumbnail generation.");
+                            break;
+                        }
+
+                        texture.Color = Color.gray;
+                        texture.Activate();
                     }
 
                     foreach (var a in instanciated.GetComponentsInChildren<HexNut>())
