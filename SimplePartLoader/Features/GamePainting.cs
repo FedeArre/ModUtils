@@ -9,6 +9,7 @@ namespace SimplePartLoader
         private static Material ChromeMaterial;
         private static Material BlackMaterial;
         private static Material PaintMaterial;
+        private static Material ChromePaintableMaterial;
         private static Material GlassMaterial;
         private static PartPaintSetup DefaultSettings = new PartPaintSetup();
 
@@ -43,6 +44,13 @@ namespace SimplePartLoader
             public bool Counters { get; set; } = true;
         }
 
+        internal class SpecialDirtPartSetup
+        {
+            public bool Chrome { get; set; }
+            public bool Glass { get; set; }
+            public bool Counters { get; set; } = true;
+        }
+
         public static void SetupPart(Part p, PartPaintSetup config = null)
         {
             InternalSetupPart(p.Prefab, p.Mod, config);
@@ -50,7 +58,12 @@ namespace SimplePartLoader
 
         public static void SetupGlassPart(Part p, bool enablePaintCounter = true)
         {
-            InternalSetupGlassPart(p.Prefab, enablePaintCounter);
+            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Glass = true, Counters = enablePaintCounter });
+        }
+
+        public static void SetupChromePart(Part p, bool enablePaintCounter = true)
+        {
+            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Chrome = true, Counters = enablePaintCounter });
         }
 
         internal static void InternalSetupPart(GameObject prefab, ModInstance mod, PartPaintSetup config = null)
@@ -191,15 +204,33 @@ namespace SimplePartLoader
             }
         }
 
-        internal static void InternalSetupGlassPart(GameObject prefab, bool enablePaintCounter)
+        internal static void InternalSetupSpecialDirtPart(GameObject prefab, SpecialDirtPartSetup config)
         {
-            if (!PaintMaterial)
+            if (config is null)
+                config = new SpecialDirtPartSetup();
+
+            if (config.Glass)
             {
-                PreloadMaterials();
-                if (!PaintMaterial)
+                if (!GlassMaterial)
                 {
-                    CustomLogger.AddLine("GamePainting", "Error, material preload failed. Could not set painting for " + prefab.name);
-                    return;
+                    PreloadMaterials();
+                    if (!GlassMaterial)
+                    {
+                        CustomLogger.AddLine("GamePainting", "Error, material preload failed. Could not set painting for " + prefab.name);
+                        return;
+                    }
+                }
+            }
+            else if (config.Chrome)
+            {
+                if (!ChromePaintableMaterial)
+                {
+                    PreloadMaterials();
+                    if (!ChromePaintableMaterial)
+                    {
+                        CustomLogger.AddLine("GamePainting", "Error, material preload failed. Could not set painting for " + prefab.name);
+                        return;
+                    }
                 }
             }
 
@@ -219,7 +250,7 @@ namespace SimplePartLoader
             CustomLogger.AddLine("GamePainting", "Testing part " + prefab.name);
 
             // Ensure part has correct material
-            prefab.GetComponent<MeshRenderer>().material = GlassMaterial;
+            prefab.GetComponent<MeshRenderer>().material = config.Glass ? GlassMaterial : ChromePaintableMaterial;
             prefab.AddComponent<P3dPaintable>();
             prefab.AddComponent<P3dMaterialCloner>();
 
@@ -238,7 +269,7 @@ namespace SimplePartLoader
 
             cp.Washable = true;
 
-            if (enablePaintCounter)
+            if (config.Counters)
             {
                 P3dChangeCounter counterDirt = prefab.AddComponent<P3dChangeCounter>();
                 counterDirt.PaintableTexture = p3dDirt;
@@ -289,13 +320,17 @@ namespace SimplePartLoader
                     {
                         GlassMaterial = go.transform.GetComponent<MeshRenderer>().material;
                     }
+                    else if(go.name == "BumperR07")
+                    {
+                        ChromePaintableMaterial = go.transform.GetComponent<MeshRenderer>().material;
+                    }
                 }
 
-                if (BlackMaterial && ChromeMaterial && PaintMaterial && GlassMaterial)
+                if (BlackMaterial && ChromeMaterial && PaintMaterial && GlassMaterial && ChromePaintableMaterial)
                     break;
             }
 
-            if (!BlackMaterial || !ChromeMaterial || !PaintMaterial || !GlassMaterial)
+            if (!BlackMaterial || !ChromeMaterial || !PaintMaterial || !GlassMaterial || !ChromePaintableMaterial)
             {
                 CustomLogger.AddLine("GamePainting", "Error, material preload failed. Is player in-game?");
             }
@@ -305,6 +340,7 @@ namespace SimplePartLoader
             CustomLogger.AddLine("GamePainting", $"Chrome: {ChromeMaterial} with shader {ChromeMaterial.shader.name}");
             CustomLogger.AddLine("GamePainting", $"Paint: {PaintMaterial} with shader {PaintMaterial.shader.name}");
             CustomLogger.AddLine("GamePainting", $"Glass: {GlassMaterial} with shader {GlassMaterial.shader.name}");
+            CustomLogger.AddLine("GamePainting", $"Chrome paintable: {ChromePaintableMaterial} with shader {ChromePaintableMaterial.shader.name}");
         }
 
         private static int GetPaintRes(Quality res)
