@@ -218,6 +218,13 @@ namespace SimplePartLoader
         [Obsolete("Please use GamePainting.SetupPart instead")]
         public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
+            if (Prefab.GetComponent<P3dPaintable>())
+            {
+                CustomLogger.AddLine("UrpCompatibilityLayerPaintingSystem", $"Part {Name} already has a P3dPaintable component, skipping.");
+                return;
+            }
+
+
             Renderer.materials = new Material[1];
 
             switch (type)

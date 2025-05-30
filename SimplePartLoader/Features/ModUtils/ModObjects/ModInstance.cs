@@ -187,43 +187,10 @@ namespace SimplePartLoader
                 if (ModMain.UrpCompatibility.Checked)
                 {
                     MeshRenderer[] renderers = prefab.GetComponentsInChildren<MeshRenderer>();
-                    bool changesApplied = false;
 
                     foreach (var renderer in renderers)
                     {
-                        Material[] partMats = renderer.materials;
-
-                        foreach (Material mat in partMats)
-                        {
-                            if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard" || mat.shader.name == "Standard (Specular setup)"))
-                            {
-                                changesApplied = true;
-                                var color = mat.color;
-                                var texture = mat.mainTexture;
-
-                                bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
-                                mat.shader = Shader.Find("Universal Render Pipeline/Lit");
-
-                                if (texture)
-                                {
-                                    mat.SetTexture("_BaseMap", texture);
-                                }
-                                else
-                                {
-                                    mat.SetTexture("_BaseMap", null);
-                                }
-
-                                mat.SetColor("_BaseColor", color);
-                                mat.SetFloat("_Cull", doubleSided ? 0 : 2);
-                            }
-                        }
-
-                        renderer.materials = partMats;
-
-                        if (changesApplied)
-                        {
-                            CustomLogger.AddLine("URPCompatibility", $"Part {part.Name} ({part.CarProps.PrefabName}) materials were converted to URP compatible materials.");
-                        }
+                        CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
                     }
                 }
 
@@ -350,40 +317,7 @@ namespace SimplePartLoader
             var renderer = furn.Prefab.GetComponent<MeshRenderer>();
             if (ModMain.UrpCompatibility.Checked && renderer)
             {
-                Material[] furnMats = renderer.materials;
-                bool changesApplied = false;
-
-                foreach (Material mat in furnMats)
-                {
-                    if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard"))
-                    {
-                        changesApplied = true;
-                        var color = mat.color;
-                        var texture = mat.mainTexture;
-
-                        bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
-                        mat.shader = Shader.Find("Universal Render Pipeline/Lit");
-
-                        if (texture)
-                        {
-                            mat.SetTexture("_BaseMap", texture);
-                        }
-                        else
-                        {
-                            mat.SetTexture("_BaseMap", null);
-                        }
-
-                        mat.SetColor("_BaseColor", color);
-                        mat.SetFloat("_Cull", doubleSided ? 0 : 2);
-                    }
-                }
-
-                renderer.materials = furnMats;
-
-                if (changesApplied)
-                {
-                    CustomLogger.AddLine("URPCompatibility", $"Furniture {furn.Name} materials were converted to URP compatible materials.");
-                }
+                CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
             }
 
             return furn;
@@ -575,40 +509,7 @@ namespace SimplePartLoader
             var renderer = prefab.GetComponent<MeshRenderer>();
             if (ModMain.UrpCompatibility.Checked && renderer)
             {
-                Material[] furnMats = renderer.materials;
-                bool changesApplied = false;
-
-                foreach (Material mat in furnMats)
-                {
-                    if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard"))
-                    {
-                        changesApplied = true;
-                        var color = mat.color;
-                        var texture = mat.mainTexture;
-
-                        bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
-                        mat.shader = Shader.Find("Universal Render Pipeline/Lit");
-
-                        if (texture)
-                        {
-                            mat.SetTexture("_BaseMap", texture);
-                        }
-                        else
-                        {
-                            mat.SetTexture("_BaseMap", null);
-                        }
-
-                        mat.SetColor("_BaseColor", color);
-                        mat.SetFloat("_Cull", doubleSided ? 0 : 2);
-                    }
-                }
-
-                renderer.materials = furnMats;
-
-                if (changesApplied)
-                {
-                    CustomLogger.AddLine("URPCompatibility", $"Buildable {buildGen.PrefabName} materials were converted to URP compatible materials.");
-                }
+                CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
             }
 
             BuildableManager.Buildables.Add(buildGen.PrefabName, b);

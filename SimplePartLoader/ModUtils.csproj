@@ -572,6 +572,7 @@
     <Compile Include="Objects\TransparentEdit.cs" />
     <Compile Include="Utils\BackgroundDelayChange.cs" />
     <Compile Include="Utils\CarBuilding.cs" />
+    <Compile Include="Utils\CompatibilityLayer.cs" />
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Features\SimplePartLoader\PaintingSystem.cs" />

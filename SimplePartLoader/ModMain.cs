@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.1B";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test4";
+        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test5";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -344,43 +344,10 @@ namespace SimplePartLoader
                         continue;
 
                     MeshRenderer[] renderers = part.Prefab.GetComponentsInChildren<MeshRenderer>();
-                    bool changesApplied = false;
 
                     foreach (var renderer in renderers)
                     {
-                        Material[] partMats = renderer.materials;
-
-                        foreach (Material mat in partMats)
-                        {
-                            if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard" || mat.shader.name == "Standard (Specular setup)"))
-                            {
-                                changesApplied = true;
-                                var color = mat.color;
-                                var texture = mat.mainTexture;
-
-                                bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
-                                mat.shader = Shader.Find("Universal Render Pipeline/Lit");
-
-                                if (texture)
-                                {
-                                    mat.SetTexture("_BaseMap", texture);
-                                }
-                                else
-                                {
-                                    mat.SetTexture("_BaseMap", null);
-                                }
-
-                                mat.SetColor("_BaseColor", color);
-                                mat.SetFloat("_Cull", doubleSided ? 0 : 2);
-                            }
-                        }
-
-                        renderer.materials = partMats;
-
-                        if (changesApplied)
-                        {
-                            CustomLogger.AddLine("URPCompatibility", $"Part {part.Name} ({part.CarProps.PrefabName}) materials were converted to URP compatible materials.");
-                        }
+                        CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
                     }
                 }
             }
