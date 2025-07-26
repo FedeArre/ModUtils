@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SimplePartLoader
 {
@@ -251,6 +252,27 @@ namespace SimplePartLoader
         public static void ExecuteNextFrame(Action functionToCall)
         {
             DelayFuncExecute.AddFunction(functionToCall);
+        }
+
+        // Material cull helpers - delegates to Functions class for implementation
+        public static void SetMaterialCull(Material material, UnityEngine.Rendering.CullMode cullMode)
+        {
+            Utils.Functions.SetMaterialCull(material, cullMode);
+        }
+
+        public static void SetRendererCull(Renderer renderer, UnityEngine.Rendering.CullMode cullMode)
+        {
+            Utils.Functions.SetRendererCull(renderer, cullMode);
+        }
+
+        public static void SetGameObjectCull(GameObject gameObject, UnityEngine.Rendering.CullMode cullMode)
+        {
+            Utils.Functions.SetGameObjectCull(gameObject, cullMode);
+        }
+
+        public static void SetGameObjectCullRecursive(GameObject gameObject, UnityEngine.Rendering.CullMode cullMode)
+        {
+            Utils.Functions.SetGameObjectCullRecursive(gameObject, cullMode);
         }
     }
 }
