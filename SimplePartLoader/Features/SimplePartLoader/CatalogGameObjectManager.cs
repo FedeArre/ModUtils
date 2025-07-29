@@ -49,27 +49,6 @@ namespace SimplePartLoader
         }
 
         /// <summary>
-        /// Removes a GameObject from the injection list.
-        /// </summary>
-        /// <param name="gameObject">The GameObject to remove from injection list</param>
-        /// <returns>True if the GameObject was removed, false if it wasn't in the list</returns>
-        public static bool UnregisterGameObjectForCatalog(GameObject gameObject)
-        {
-            if (gameObject == null)
-            {
-                return false;
-            }
-
-            bool removed = gameObjectsToInject.Remove(gameObject);
-            if (removed)
-            {
-                CustomLogger.AddLine("CatalogGameObjectManager", $"Unregistered GameObject '{gameObject.name}' from catalog injection");
-            }
-
-            return removed;
-        }
-
-        /// <summary>
         /// Gets all GameObjects currently registered for catalog injection.
         /// This is called internally by PartManager during the catalog setup phase.
         /// </summary>
@@ -77,21 +56,6 @@ namespace SimplePartLoader
         internal static IReadOnlyList<GameObject> GetGameObjectsToInject()
         {
             return gameObjectsToInject.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Clears all registered GameObjects from the injection list.
-        /// This should only be used for cleanup or reset scenarios.
-        /// </summary>
-        internal static void ClearAll()
-        {
-            int count = gameObjectsToInject.Count;
-            gameObjectsToInject.Clear();
-            
-            if (count > 0)
-            {
-                CustomLogger.AddLine("CatalogGameObjectManager", $"Cleared {count} GameObjects from catalog injection list");
-            }
         }
 
         /// <summary>
