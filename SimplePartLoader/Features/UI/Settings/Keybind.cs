@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace SimplePartLoader
 {
+    [Serializable]
     public class Keybind : ISetting
     {
         public KeyCode Key;

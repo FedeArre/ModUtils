@@ -577,6 +577,7 @@
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Features\SimplePartLoader\PaintingSystem.cs" />
     <Compile Include="Utils\ModUtils_Snapshoter.cs" />
+    <Compile Include="Utils\ShaderExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

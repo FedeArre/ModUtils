@@ -1,10 +1,5 @@
 ﻿using Autoupdater.Objects;
 using Newtonsoft.Json;
-using SimplePartLoader.Features.Auto
-    
-    
-    
-    ;
 using SimplePartLoader.Features.UI;
 using SimplePartLoader.Objects.DTO;
 using System;
@@ -15,12 +10,9 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
@@ -67,7 +59,7 @@ namespace SimplePartLoader
             string ModsFolderPath = Application.dataPath + "/../Mods/";
             string CachedFolderPath = Application.dataPath + "/../Mods/LockedCache";
 
-            if(!Directory.Exists(CachedFolderPath))
+            if (!Directory.Exists(CachedFolderPath))
             {
                 CustomLogger.AddLine("EACheck", "Creating cache folder as it does not exist");
                 Directory.CreateDirectory(CachedFolderPath);
@@ -85,7 +77,7 @@ namespace SimplePartLoader
             }
 
             // If we have user consent to load EA/PL mods, we first read all the keys.
-            if(ModMain.EA_Enabled.Checked)
+            if (ModMain.EA_Enabled.Checked)
             {
                 try
                 {
@@ -99,16 +91,16 @@ namespace SimplePartLoader
                         }
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     CustomLogger.AddLine("EACheck", $"Error trying to read key of a file.");
                     CustomLogger.AddLine("EACheck", ex);
                 }
 
                 // We have all the keys, now we ask the API if they are still valid.
-                if(foundKeys.Count > 0)
+                if (foundKeys.Count > 0)
                 {
-                    foreach(var item in foundKeys)
+                    foreach (var item in foundKeys)
                     {
                         KeyValidationDTO key = new KeyValidationDTO()
                         {
@@ -200,7 +192,7 @@ namespace SimplePartLoader
                             else
                             {
                                 CustomLogger.AddLine("EACheck", $"Checksum mismatch for {fileNameWithoutExtension}.modutilscache ({checksum})");
-                               
+
                                 if (!updateModPathList.Contains(modPath))
                                 {
                                     updateModPathList.Add(modPath);
@@ -220,10 +212,10 @@ namespace SimplePartLoader
                         // update mods
                         foreach (var item in updateModPathList)
                         {
-                            if(File.Exists(item))
+                            if (File.Exists(item))
                                 File.Delete(item); // delete existing file
 
-                            if(aesKeys.ContainsKey(Path.GetFileNameWithoutExtension(item)))
+                            if (aesKeys.ContainsKey(Path.GetFileNameWithoutExtension(item)))
                             {
                                 KeyAnswer key = aesKeys[Path.GetFileNameWithoutExtension(item)];
                                 string path = Path.Combine(CachedFolderPath, $"{key.ModId}.modutilscache");
@@ -242,7 +234,7 @@ namespace SimplePartLoader
                                         }
                                     }
                                 }
-                                catch(Exception ex)
+                                catch (Exception ex)
                                 {
                                     CustomLogger.AddLine("EACheck", $"{Path.GetFileName(item)} cache file was being downloaded but an issue occured.");
                                     CustomLogger.AddLine("EACheck", ex);
@@ -296,7 +288,7 @@ namespace SimplePartLoader
                                     }
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
                                 ErrorMessageHandler.GetInstance().DisabledModList.Add(modId + " (FATAL)");
                                 CustomLogger.AddLine("EACheck", $"Fatal error on mod load of " + modId);
@@ -368,6 +360,7 @@ namespace SimplePartLoader
                     fakeResult.current_download_link = "https://github.com/FedeArre/ModUtils/releases/download/updatehelper/UpdaterHelper.exe";
                     fakeResult.file_name = "ModUtilsAutoupdater.exe";
                     fakeResult.mod_name = "Autoupdating helper";
+
                     Data.Enqueue(fakeResult);
 
                     AutoupdaterResult.ForEach(d => Data.Enqueue(d));
@@ -423,7 +416,7 @@ namespace SimplePartLoader
         {
             if (UI)
                 GameObject.Destroy(UI);
-            
+
             UI = GameObject.Instantiate(ModMain.UI_Downloader_Prefab);
             progressText = UI.transform.Find("Panel/TextProgress").GetComponent<Text>();
 
@@ -443,7 +436,7 @@ namespace SimplePartLoader
 
         public void StartDownloads()
         {
-            if(Data.Any())
+            if (Data.Any())
             {
                 WebClient client = new WebClient();
                 client.DownloadProgressChanged += DownloadProgressChange;
@@ -453,21 +446,14 @@ namespace SimplePartLoader
                 CurrentDownloadingMod = dd;
                 try
                 {
-                    Debug.Log("Now downloading: " + new Uri(dd.current_download_link));
-                    using (var response = ModMain.Client.GetAsync(new Uri(dd.current_download_link)).Result)
-                    {
-                        response.EnsureSuccessStatusCode();
-
-                        using (Stream contentStream = response.Content.ReadAsStreamAsync().Result)
-                        using (FileStream fileStream = new FileStream(Path.Combine(DownloadFolder, dd.file_name), FileMode.Create, FileAccess.Write, FileShare.None))
-                            contentStream.CopyToAsync(fileStream);
-                    }
+                    client.DownloadFileAsync(new Uri(dd.current_download_link), Path.Combine(DownloadFolder, $"{dd.file_name}"));
                 }
                 catch (Exception ex)
                 {
                     progressText.text = "An error occurred, please report this and attach the log file!";
                     CustomLogger.AddLine("ClientHelper", ex);
                 }
+
                 return;
             }
 
@@ -485,7 +471,7 @@ namespace SimplePartLoader
                     return;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 progressText.text = "Failed to start helper, error: " + ex.Message;
                 CustomLogger.AddLine("ClientHelper", ex);
@@ -500,7 +486,7 @@ namespace SimplePartLoader
                     process.Kill();
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CustomLogger.AddLine("ClientHelper", ex);
                 Environment.Exit(0);
@@ -557,7 +543,7 @@ namespace SimplePartLoader
             aes.IV = iv;
             aes.Mode = CipherMode.CBC;
             aes.Padding = PaddingMode.PKCS7;
-            
+
             ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
             MemoryStream ms = new MemoryStream(cipherText);
             CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);

@@ -105,7 +105,13 @@ namespace SimplePartLoader
             }
 
             // Ensure part has correct material
-            prefab.GetComponent<MeshRenderer>().material = PaintMaterial;
+            var renderer = prefab.GetComponent<MeshRenderer>();
+            // If the part is already using a paintable material, keep it the same so we dont break glass / chrome dirtable parts from the game
+            if(!renderer.material.shader.name.StartsWith("Shader Graphs"))
+            {
+                renderer.material = PaintMaterial;
+            }
+
             prefab.AddComponent<P3dPaintable>();
             prefab.AddComponent<P3dMaterialCloner>();
 
@@ -278,7 +284,31 @@ namespace SimplePartLoader
                 counterDirt.Color = new Color(0.219f, 0.219f, 0.219f, 0f);
                 counterDirt.MaskMesh = meshToUse;
             }
+
+            if(config.Glass)
+            {
+                P3dPaintableTexture p3dDecalSupport = prefab.AddComponent<P3dPaintableTexture>();
+                p3dDecalSupport.Color = Color.white;
+                p3dDecalSupport.Group = 91;
+                p3dDecalSupport.Slot = new P3dSlot(0, "Decals");
+                p3dDecalSupport.UpdateMaterial();
+
+                if(!prefab.GetComponent<GlassDirtSetupIdentifier>())
+                {
+                    prefab.AddComponent<GlassDirtSetupIdentifier>();
+                }
+            }
+            else if(config.Chrome)
+            {
+                if(!prefab.GetComponent<ChromeDirtSetupIdentifier>())
+                {
+                    prefab.AddComponent<ChromeDirtSetupIdentifier>();
+                }
+            }
         }
+
+        internal class ChromeDirtSetupIdentifier : MonoBehaviour { }
+        internal class GlassDirtSetupIdentifier : MonoBehaviour { }
 
         public static Material GetBlackMaterial()
         {

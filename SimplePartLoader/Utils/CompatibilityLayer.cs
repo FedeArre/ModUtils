@@ -18,6 +18,7 @@ namespace SimplePartLoader.Utils
                 return mat;
             }
 
+            // Store original properties before shader change
             var color = mat.color;
             var mainTexture = mat.mainTexture;
             var normalMap = mat.GetTexture("_BumpMap");
@@ -28,13 +29,15 @@ namespace SimplePartLoader.Utils
             var detailAlbedo = mat.GetTexture("_DetailAlbedoMap");
             var detailNormal = mat.GetTexture("_DetailNormalMap");
 
-            var normalScale = mat.GetFloat("_BumpScale");
-            var heightScale = mat.GetFloat("_Parallax");
-            var occlusionStrength = mat.GetFloat("_OcclusionStrength");
-            var emissionColor = mat.GetColor("_EmissionColor");
-            var detailNormalScale = mat.GetFloat("_DetailNormalMapScale");
-            var detailAlbedoScale = mat.GetFloat("_DetailAlbedoMapScale");
+            // Store scalar properties (with safe property checking)
+            var normalScale = mat.HasProperty("_BumpScale") ? mat.GetFloat("_BumpScale") : 1.0f;
+            var heightScale = mat.HasProperty("_Parallax") ? mat.GetFloat("_Parallax") : 0.02f;
+            var occlusionStrength = mat.HasProperty("_OcclusionStrength") ? mat.GetFloat("_OcclusionStrength") : 1.0f;
+            var emissionColor = mat.HasProperty("_EmissionColor") ? mat.GetColor("_EmissionColor") : Color.black;
+            var detailNormalScale = mat.HasProperty("_DetailNormalMapScale") ? mat.GetFloat("_DetailNormalMapScale") : 1.0f;
+            var uvSec = mat.HasProperty("_UVSec") ? mat.GetFloat("_UVSec") : 0f;
 
+            // Handle different workflow types
             bool isSpecularWorkflow = mat.shader.name == "Standard (Specular setup)";
             bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
 
@@ -49,46 +52,55 @@ namespace SimplePartLoader.Utils
             if (isSpecularWorkflow)
             {
                 specGlossMap = mat.GetTexture("_SpecGlossMap");
-                specularColor = mat.GetColor("_SpecColor");
-                smoothness = mat.GetFloat("_Glossiness");
-                glossMapScale = mat.GetFloat("_GlossMapScale");
+                specularColor = mat.HasProperty("_SpecColor") ? mat.GetColor("_SpecColor") : Color.white;
+                smoothness = mat.HasProperty("_Glossiness") ? mat.GetFloat("_Glossiness") : 0.5f;
+                glossMapScale = mat.HasProperty("_GlossMapScale") ? mat.GetFloat("_GlossMapScale") : 1.0f;
             }
             else
             {
                 metallicGlossMap = mat.GetTexture("_MetallicGlossMap");
-                metallic = mat.GetFloat("_Metallic");
-                smoothness = mat.GetFloat("_Glossiness");
-                glossMapScale = mat.GetFloat("_GlossMapScale");
+                metallic = mat.HasProperty("_Metallic") ? mat.GetFloat("_Metallic") : 0f;
+                smoothness = mat.HasProperty("_Glossiness") ? mat.GetFloat("_Glossiness") : 0.5f;
+                glossMapScale = mat.HasProperty("_GlossMapScale") ? mat.GetFloat("_GlossMapScale") : 1.0f;
 
+                // Check if smoothness is in albedo alpha channel
                 if (mat.IsKeywordEnabled("_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A"))
                 {
                     smoothnessTextureChannel = 1f;
                 }
             }
 
-            var cutoff = mat.GetFloat("_Cutoff");
-            var mode = mat.GetFloat("_Mode");
-            var specularHighlights = mat.GetFloat("_SpecularHighlights");
-            var glossyReflections = mat.GetFloat("_GlossyReflections");
+            // Store other properties with safe checking
+            var cutoff = mat.HasProperty("_Cutoff") ? mat.GetFloat("_Cutoff") : 0.5f;
+            var mode = mat.HasProperty("_Mode") ? mat.GetFloat("_Mode") : 0f;
+            var specularHighlights = mat.HasProperty("_SpecularHighlights") ? mat.GetFloat("_SpecularHighlights") : 1f;
+            var glossyReflections = mat.HasProperty("_GlossyReflections") ? mat.GetFloat("_GlossyReflections") : 1f;
 
+            // Store UV tiling and offset before shader change
             var mainTextureScale = mat.GetTextureScale("_MainTex");
             var mainTextureOffset = mat.GetTextureOffset("_MainTex");
 
+            // Change shader to URP Lit
             mat.shader = Shader.Find("Universal Render Pipeline/Lit");
 
+            // Set workflow mode (0 = Specular, 1 = Metallic)
             mat.SetFloat("_WorkflowMode", isSpecularWorkflow ? 0f : 1f);
 
+            // Set base properties
             if (mainTexture)
             {
                 mat.SetTexture("_BaseMap", mainTexture);
             }
             mat.SetColor("_BaseColor", color);
 
+            // Set UV tiling and offset
             mat.SetTextureScale("_BaseMap", mainTextureScale);
             mat.SetTextureOffset("_BaseMap", mainTextureOffset);
 
+            // Set culling mode
             mat.SetFloat("_Cull", doubleSided ? 0 : 2);
 
+            // Handle metallic/specular workflow
             if (isSpecularWorkflow)
             {
                 if (specGlossMap)
@@ -111,30 +123,35 @@ namespace SimplePartLoader.Utils
                 mat.SetFloat("_SmoothnessTextureChannel", smoothnessTextureChannel);
             }
 
+            // Set normal map
             if (normalMap)
             {
                 mat.SetTexture("_BumpMap", normalMap);
                 mat.SetFloat("_BumpScale", normalScale);
             }
 
+            // Set height map (parallax mapping)
             if (heightMap)
             {
                 mat.SetTexture("_ParallaxMap", heightMap);
                 mat.SetFloat("_Parallax", heightScale);
             }
 
+            // Set occlusion map
             if (occlusionMap)
             {
                 mat.SetTexture("_OcclusionMap", occlusionMap);
                 mat.SetFloat("_OcclusionStrength", occlusionStrength);
             }
 
+            // Set emission
             if (emissionMap)
             {
                 mat.SetTexture("_EmissionMap", emissionMap);
             }
             mat.SetColor("_EmissionColor", emissionColor);
 
+            // Set detail maps
             if (detailMask)
             {
                 mat.SetTexture("_DetailMask", detailMask);
@@ -142,7 +159,9 @@ namespace SimplePartLoader.Utils
             if (detailAlbedo)
             {
                 mat.SetTexture("_DetailAlbedoMap", detailAlbedo);
-                mat.SetFloat("_DetailAlbedoMapScale", detailAlbedoScale);
+                // URP uses _DetailAlbedoMapScale, but Standard doesn't have this property
+                // Set to 1.0 as default for URP
+                mat.SetFloat("_DetailAlbedoMapScale", 1.0f);
             }
             if (detailNormal)
             {
@@ -150,11 +169,14 @@ namespace SimplePartLoader.Utils
                 mat.SetFloat("_DetailNormalMapScale", detailNormalScale);
             }
 
+            // Set specular highlights and environment reflections
             mat.SetFloat("_SpecularHighlights", specularHighlights);
             mat.SetFloat("_EnvironmentReflections", glossyReflections);
 
+            // Set alpha cutoff
             mat.SetFloat("_Cutoff", cutoff);
 
+            // Handle rendering modes
             if (mode == 0) // Opaque
             {
                 mat.SetFloat("_Surface", 0); // Opaque
@@ -200,6 +222,7 @@ namespace SimplePartLoader.Utils
                 mat.SetOverrideTag("RenderType", "Transparent");
             }
 
+            // Enable/disable keywords based on textures and settings
             if (normalMap)
                 mat.EnableKeyword("_NORMALMAP");
             else
@@ -258,10 +281,10 @@ namespace SimplePartLoader.Utils
             // Handle detail maps keywords
             if (detailAlbedo || detailNormal)
             {
-                if (detailAlbedoScale == 2f)
-                    mat.EnableKeyword("_DETAIL_MULX2");
-                else
-                    mat.EnableKeyword("_DETAIL_SCALED");
+                // Standard shader uses _DETAIL_MULX2, URP uses _DETAIL_MULX2 and _DETAIL_SCALED
+                // Default to _DETAIL_MULX2 for compatibility
+                mat.EnableKeyword("_DETAIL_MULX2");
+                mat.DisableKeyword("_DETAIL_SCALED");
             }
             else
             {

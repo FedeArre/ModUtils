@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static SimplePartLoader.GamePainting;
 using static UnityEngine.ParticleSystem;
 
 namespace SimplePartLoader.CarGen
@@ -538,7 +539,29 @@ namespace SimplePartLoader.CarGen
                     if (!cp)
                         continue;
                     
-                    if(cp.Paintable && cp.Washable && cp.MeshRepairable)
+                    if(cp.GetComponent<ChromeDirtSetupIdentifier>())
+                    {
+                        GamePainting.InternalSetupSpecialDirtPart(cp.gameObject, new SpecialDirtPartSetup()
+                        {
+                            Chrome = true,
+                            Glass = false,
+                            Counters = true
+                        });
+                        continue;
+                    }
+
+                    if (cp.GetComponent<GlassDirtSetupIdentifier>())
+                    {
+                        GamePainting.InternalSetupSpecialDirtPart(cp.gameObject, new SpecialDirtPartSetup()
+                        {
+                            Chrome = false,
+                            Glass = true,
+                            Counters = true
+                        });
+                        continue;
+                    }
+
+                    if (cp.Paintable && cp.Washable && cp.MeshRepairable)
                     {
                         GamePainting.InternalSetupPart(cp.gameObject, car.loadedBy);
                     }

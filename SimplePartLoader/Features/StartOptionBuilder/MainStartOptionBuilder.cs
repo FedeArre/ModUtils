@@ -305,6 +305,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 }
             }
 
+            var splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
+
             if (foundPart)
                 return foundPart;
 
@@ -361,6 +365,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 }
             }
 
+            splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
+
             if (foundPart)
                 return foundPart;
 
@@ -389,6 +397,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                         break;
                 }
             }
+
+            splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
 
             return foundPart;
         }

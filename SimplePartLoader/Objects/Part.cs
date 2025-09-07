@@ -374,6 +374,8 @@ namespace SimplePartLoader
             foreach (var mat in materials)
             {
                 mat.shader = shader;
+                mat.DisableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                mat.SetFloat("_SpecularHighlights", 1f);
             }
 
             Renderer.materials = materials;

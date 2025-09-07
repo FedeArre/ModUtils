@@ -13,6 +13,7 @@ namespace SimplePartLoader.Utils
     {
         Vector3 defaultPosition = new Vector3(-0.6f, -0.6f, -0.6f);
         Vector3 rotatedPosition = new Vector3(0.6f, -0.6f, 0.6f);
+
         void Start()
         {
             RuntimePreviewGenerator.BackgroundColor = new Color(0f, 0f, 0f, 0f);
@@ -22,8 +23,6 @@ namespace SimplePartLoader.Utils
             {
                 Directory.CreateDirectory("./Mods/ModUtilsThumbnails");
             }
-
-            GameObject matParent = GameObject.Find("MaterialParent");
 
             foreach (Part p in PartManager.modLoadedParts)
             {
@@ -35,6 +34,8 @@ namespace SimplePartLoader.Utils
                 if(p.Mod.Thumbnails)
                 {
                     GameObject instanciated = GameObject.Instantiate(p.Prefab);
+                    instanciated.transform.position = new Vector3(1000f, 1000f, 1000f);
+
                     if (instanciated.GetComponent<CarProperties>() && instanciated.GetComponent<CarProperties>().Paintable)
                     {
                         var texture = instanciated.GetComponent<P3dPaintableTexture>();

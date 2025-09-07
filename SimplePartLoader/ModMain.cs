@@ -34,10 +34,10 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.5.1B";
+        public override string Version => "v1.5.2";
         
-        bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test5";
+        bool TESTING_VERSION_REMEMBER = false;
+        internal static string TESTING_VERSION_NUMBER = "v1.5.2-test6";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -83,6 +83,7 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
+
             // Some setups
             ModUtils.Version = Version;
 
