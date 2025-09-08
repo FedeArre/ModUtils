@@ -170,7 +170,13 @@ namespace SimplePartLoader
             JunkPartsList jpl = junkyardListParent.GetComponent<JunkPartsList>();
             int sizeBeforeModify = jpl.Parts.Length;
 
-            Array.Resize(ref jpl.Parts, sizeBeforeModify + modLoadedParts.Count); // We resize the array only once.
+            // Get injected GameObjects and validate them
+            var injectedGameObjects = CatalogGameObjectManager.GetGameObjectsToInject();
+            CatalogGameObjectManager.ValidateAllGameObjects(); // Ensure all objects are still valid
+            
+            // Resize array to accommodate both mod parts and injected GameObjects
+            int totalNewObjects = modLoadedParts.Count + injectedGameObjects.Count;
+            Array.Resize(ref jpl.Parts, sizeBeforeModify + totalNewObjects);
 
             if(CustomLogger.DebugEnabled)
             {
@@ -178,6 +184,10 @@ namespace SimplePartLoader
                 foreach (Part p in modLoadedParts)
                 {
                     CustomLogger.AddLine("Parts", $"Added part: {p.Name} (GameObject name: {p.Prefab}", true);
+                }
+                foreach (GameObject go in injectedGameObjects)
+                {
+                    CustomLogger.AddLine("Parts", $"Added injected GameObject: {go.name}", true);
                 }
             }
 
@@ -212,6 +222,39 @@ namespace SimplePartLoader
                 }
             }
 
+            // Inject directly registered GameObjects into catalog
+            foreach (GameObject gameObject in injectedGameObjects)
+            {
+                if (gameObject == null)
+                {
+                    CustomLogger.AddLine("CatalogGameObjectManager", "Skipping null GameObject during injection");
+                    continue;
+                }
+
+                GameObject.DontDestroyOnLoad(gameObject);
+                jpl.Parts[sizeBeforeModify] = gameObject;
+                sizeBeforeModify++;
+                gameParts.Add(gameObject);
+
+                // Handle localization for injected GameObjects if they have CarProperties
+                if (!hasFirstLoadOccured)
+                {
+                    CarProperties carProps = gameObject.GetComponent<CarProperties>();
+                    if (carProps != null && !string.IsNullOrEmpty(carProps.PartName))
+                    {
+                        foreach (var dictionary in LocalizationManager.Dictionary)
+                        {
+                            if (!dictionary.Value.ContainsKey(carProps.PartName))
+                            {
+                                dictionary.Value.Add(carProps.PartName, carProps.PartName); // Use part name as fallback translation
+                            }
+                        }
+                    }
+                }
+
+                CustomLogger.AddLine("CatalogGameObjectManager", $"Successfully injected GameObject '{gameObject.name}' into catalog");
+            }
+
             if (SPL.PREFAB_NAME_COLLISION_CHECK)
             {
                 CustomLogger.AddLine("PrefabNameCollisionCheck", "Checking for prefab name collisions...");
@@ -225,6 +268,24 @@ namespace SimplePartLoader
                     if (prefabNames.Contains(cp.PrefabName))
                     {
                         CustomLogger.AddLine("PrefabNameCollisionCheck", $"Duplicate prefab name detected: {go.name} (prefab name: {cp.PrefabName})");
+                    }
+                    else
+                    {
+                        prefabNames.Add(cp.PrefabName);
+                    }
+                }
+
+                // Also check injected GameObjects for prefab name collisions
+                foreach (GameObject go in injectedGameObjects)
+                {
+                    if (go == null) continue;
+                    
+                    CarProperties cp = go.GetComponent<CarProperties>();
+                    if (!cp) continue;
+                    
+                    if (prefabNames.Contains(cp.PrefabName))
+                    {
+                        CustomLogger.AddLine("PrefabNameCollisionCheck", $"Duplicate prefab name detected in injected GameObject: {go.name} (prefab name: {cp.PrefabName})");
                     }
                     else
                     {
