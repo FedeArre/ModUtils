@@ -487,6 +487,7 @@
     <Compile Include="Features\GamePainting.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
+    <Compile Include="Features\SimplePartLoader\CatalogGameObjectManager.cs" />
     <Compile Include="Features\StartOptionBuilder\MainStartOptionBuilder.cs" />
     <Compile Include="Features\UI\KeybindDetector.cs" />
     <Compile Include="Features\UI\ModUtilsUI.cs" />
