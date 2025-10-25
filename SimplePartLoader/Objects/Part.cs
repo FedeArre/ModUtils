@@ -371,8 +371,19 @@ namespace SimplePartLoader
             var materials = Renderer.materials;
             var shader = Shader.Find("Universal Render Pipeline/Lit");
 
+            if(shader is null)
+            {
+                CustomLogger.AddLine("Parts", $"Could not find Universal Render Pipeline/Lit shader to set standard shader on part {Prefab.name}");
+            }
+
             foreach (var mat in materials)
             {
+                if(mat is null)
+                {
+                    // Material may be null if the slot is empty.
+                    continue;
+                }
+
                 mat.shader = shader;
                 mat.DisableKeyword("_SPECULARHIGHLIGHTS_OFF");
                 mat.SetFloat("_SpecularHighlights", 1f);
