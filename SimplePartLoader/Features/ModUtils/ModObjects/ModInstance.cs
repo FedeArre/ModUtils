@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.InputSystem.Layouts.InputControlLayout;
 
 namespace SimplePartLoader
 {
@@ -182,6 +183,17 @@ namespace SimplePartLoader
                     GameObject.Destroy(pp);
                 }
 
+                // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+                if (ModMain.UrpCompatibility.Checked)
+                {
+                    MeshRenderer[] renderers = prefab.GetComponentsInChildren<MeshRenderer>();
+
+                    foreach (var renderer in renderers)
+                    {
+                        CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
+                    }
+                }
+
                 return part; // We provide the Part instance so the developer can setup the transparents
             }
             
@@ -300,7 +312,14 @@ namespace SimplePartLoader
 
             loadedFurniture.Add(furn);
             FurnitureManager.Furnitures.Add(furn.PrefabName, furn);
-            
+
+            // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+            var renderer = furn.Prefab.GetComponent<MeshRenderer>();
+            if (ModMain.UrpCompatibility.Checked && renderer)
+            {
+                CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
+            }
+
             return furn;
         }
 
@@ -408,24 +427,39 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a car without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a car without car / empty / transparents name");
+                return null;
+            }
 
             GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
             GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
             GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
-            
+
             if (!carPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
-            
+                return null;
+            }
+
             if (!emptyCarPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+                return null;
+            }
             
             if (!transparentsPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+                return null;
+            }
 
             CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
             if(!carGen)
+            {
                 CustomLogger.AddLine("CarGenerator", $"{carObject} has no Car Generator component");
+                return null;
+            }
 
             Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
             car.loadedBy = this;
@@ -486,6 +520,13 @@ namespace SimplePartLoader
                 garage.GateOpen = buildGen.OpenPosition.gameObject;
             }
 
+            // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+            var renderer = prefab.GetComponent<MeshRenderer>();
+            if (ModMain.UrpCompatibility.Checked && renderer)
+            {
+                CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
+            }
+
             BuildableManager.Buildables.Add(buildGen.PrefabName, b);
             Saver.modParts.Add(buildGen.PrefabName, prefab);
 
@@ -523,6 +564,39 @@ namespace SimplePartLoader
 
             BuildableManager.BuildableMaterials.Add(materialName, bm);
             Saver.modParts.Add(materialName, mat);
+
+            // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+            if (ModMain.UrpCompatibility.Checked)
+            {
+                bool changesApplied = false;
+
+                if (mat && (mat.shader.name == "Standard" || mat.shader.name == "Azerilo/Double Sided Standard"))
+                {
+                    changesApplied = true;
+                    var color = mat.color;
+                    var texture = mat.mainTexture;
+
+                    bool doubleSided = mat.shader.name == "Azerilo/Double Sided Standard";
+                    mat.shader = Shader.Find("Universal Render Pipeline/Lit");
+
+                    if (texture)
+                    {
+                        mat.SetTexture("_BaseMap", texture);
+                    }
+                    else
+                    {
+                        mat.SetTexture("_BaseMap", null);
+                    }
+
+                    mat.SetColor("_BaseColor", color);
+                    mat.SetFloat("_Cull", doubleSided ? 0 : 2);
+                }
+
+                if (changesApplied)
+                {
+                    CustomLogger.AddLine("URPCompatibility", $"Buildable material {materialName} was converted to URP compatible material.");
+                }
+            }
 
             BuildableMaterials.Add(bm);
             return bm;

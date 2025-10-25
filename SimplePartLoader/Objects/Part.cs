@@ -120,6 +120,10 @@ namespace SimplePartLoader
 
             td.Owner = this;
             PartManager.transparentData.Add(td);
+
+            if (CustomLogger.DebugEnabled)
+                CustomLogger.AddLine("Transparents", $"Mod {modInstance.Mod.ID} added transparent of {Name} to {attachesTo}");
+
             return td;
         }
 
@@ -210,36 +214,39 @@ namespace SimplePartLoader
         {
             return Prefab.GetComponentsInChildren<Transform>();
         }
-        
-        /*[Obsolete("EnablePartPainting using SPL.PaintingSupportedTypes will be removed on Modutils 1.5. Use PaintingSystem.Types instead!")]
-        public void EnablePartPainting(SPL.PaintingSupportedTypes type, int paintMaterial = -1)
-        {
-            PaintingSystem.Types newType = (PaintingSystem.Types)type;
-            EnablePartPainting(newType, paintMaterial);
-        }
-        */
+
+        [Obsolete("Please use GamePainting.SetupPart instead")]
         public void EnablePartPainting(PaintingSystem.Types type, int paintMaterial = -1)
         {
+            if (Prefab.GetComponent<P3dPaintable>())
+            {
+                CustomLogger.AddLine("UrpCompatibilityLayerPaintingSystem", $"Part {Name} already has a P3dPaintable component, skipping.");
+                return;
+            }
+
+
+            Renderer.materials = new Material[1];
+
             switch (type)
             {
                 case PaintingSystem.Types.FullPaintingSupport:
-                    PaintingSystem.EnableFullSupport(this);
+                    GamePainting.SetupPart(this);
                     break;
 
                 case PaintingSystem.Types.OnlyPaint:
-                    PaintingSystem.EnablePaintOnly(this, paintMaterial);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.Paint));
                     break;
 
                 case PaintingSystem.Types.OnlyPaintAndRust:
-                    PaintingSystem.EnablePaintAndRust(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.PaintRust));
                     break;
 
                 case PaintingSystem.Types.OnlyDirt:
-                    PaintingSystem.EnableDirtOnly(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.Dirt));
                     break;
 
                 case PaintingSystem.Types.OnlyPaintAndDirt:
-                    PaintingSystem.EnablePaintAndDirt(this);
+                    GamePainting.SetupPart(this, GamePainting.GetPreset(GamePainting.PaintPreset.PaintDirt));
                     break;
 
                 default:
@@ -361,13 +368,17 @@ namespace SimplePartLoader
 
         public void SetStandardShader()
         {
-            Material[] objectMats = Renderer.materials;
-            Shader standardShader = Shader.Find("Standard");
+            var materials = Renderer.materials;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
 
-            foreach (Material m in objectMats)
-                m.shader = standardShader;
+            foreach (var mat in materials)
+            {
+                mat.shader = shader;
+                mat.DisableKeyword("_SPECULARHIGHLIGHTS_OFF");
+                mat.SetFloat("_SpecularHighlights", 1f);
+            }
 
-            Renderer.materials = objectMats;
+            Renderer.materials = materials;
         }
 
         private void GenerateHingePivot(OpeningType type)

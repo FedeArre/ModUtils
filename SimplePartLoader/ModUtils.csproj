@@ -484,6 +484,7 @@
     <Compile Include="Features\DevUI\ComponentDevUI.cs" />
     <Compile Include="Features\DataHandler.cs" />
     <Compile Include="Features\DevUI\DevUI.cs" />
+    <Compile Include="Features\GamePainting.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
     <Compile Include="Features\StartOptionBuilder\MainStartOptionBuilder.cs" />
@@ -511,6 +512,7 @@
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
+    <Compile Include="Hooks\UrpShaderCompatibilityHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
     <Compile Include="Objects\DTO\KeyAnswerDTO.cs" />
     <Compile Include="Objects\DTO\KeyValidationDTO.cs" />
@@ -570,10 +572,12 @@
     <Compile Include="Objects\TransparentEdit.cs" />
     <Compile Include="Utils\BackgroundDelayChange.cs" />
     <Compile Include="Utils\CarBuilding.cs" />
+    <Compile Include="Utils\CompatibilityLayer.cs" />
     <Compile Include="Utils\Extension.cs" />
     <Compile Include="Utils\Functions.cs" />
     <Compile Include="Features\SimplePartLoader\PaintingSystem.cs" />
     <Compile Include="Utils\ModUtils_Snapshoter.cs" />
+    <Compile Include="Utils\ShaderExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

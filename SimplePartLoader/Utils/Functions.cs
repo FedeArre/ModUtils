@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace SimplePartLoader.Utils
 {
@@ -322,5 +323,110 @@ namespace SimplePartLoader.Utils
             Array.Resize(ref array, array.Length + 1);
             array[array.Length - 1] = newValue;
         }
+
+        #region Material Cull Helpers
+
+        /// <summary>
+        /// Sets the cull mode for a specific material
+        /// </summary>
+        /// <param name="material">The material to modify</param>
+        /// <param name="cullMode">The cull mode to apply (Off = both sides, Front, Back)</param>
+        public static void SetMaterialCull(Material material, CullMode cullMode)
+        {
+            if (material == null)
+            {
+                CustomLogger.AddLine("MaterialUtils", "Tried to set cull mode on null material");
+                return;
+            }
+
+            try
+            {
+                material.SetInt("_Cull", (int)cullMode);
+            }
+            catch (Exception ex)
+            {
+                CustomLogger.AddLine("MaterialUtils", $"Failed to set cull mode on material {material.name}: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Sets the cull mode for all materials on a renderer
+        /// </summary>
+        /// <param name="renderer">The renderer to modify</param>
+        /// <param name="cullMode">The cull mode to apply (Off = both sides, Front, Back)</param>
+        public static void SetRendererCull(Renderer renderer, CullMode cullMode)
+        {
+            if (renderer == null)
+            {
+                CustomLogger.AddLine("MaterialUtils", "Tried to set cull mode on null renderer");
+                return;
+            }
+
+            Material[] materials = renderer.materials;
+            if (materials == null || materials.Length == 0)
+            {
+                CustomLogger.AddLine("MaterialUtils", $"Renderer {renderer.name} has no materials to modify");
+                return;
+            }
+
+            foreach (Material material in materials)
+            {
+                SetMaterialCull(material, cullMode);
+            }
+        }
+
+        /// <summary>
+        /// Sets the cull mode for all renderers on a GameObject
+        /// </summary>
+        /// <param name="gameObject">The GameObject to modify</param>
+        /// <param name="cullMode">The cull mode to apply (Off = both sides, Front, Back)</param>
+        public static void SetGameObjectCull(GameObject gameObject, CullMode cullMode)
+        {
+            if (gameObject == null)
+            {
+                CustomLogger.AddLine("MaterialUtils", "Tried to set cull mode on null GameObject");
+                return;
+            }
+
+            Renderer[] renderers = gameObject.GetComponents<Renderer>();
+            if (renderers == null || renderers.Length == 0)
+            {
+                CustomLogger.AddLine("MaterialUtils", $"GameObject {gameObject.name} has no renderers to modify");
+                return;
+            }
+
+            foreach (Renderer renderer in renderers)
+            {
+                SetRendererCull(renderer, cullMode);
+            }
+        }
+
+        /// <summary>
+        /// Sets the cull mode for all renderers on a GameObject and all its children recursively
+        /// </summary>
+        /// <param name="gameObject">The GameObject to modify</param>
+        /// <param name="cullMode">The cull mode to apply (Off = both sides, Front, Back)</param>
+        public static void SetGameObjectCullRecursive(GameObject gameObject, CullMode cullMode)
+        {
+            if (gameObject == null)
+            {
+                CustomLogger.AddLine("MaterialUtils", "Tried to set cull mode on null GameObject");
+                return;
+            }
+
+            Renderer[] renderers = gameObject.GetComponentsInChildren<Renderer>();
+            if (renderers == null || renderers.Length == 0)
+            {
+                CustomLogger.AddLine("MaterialUtils", $"GameObject {gameObject.name} and its children have no renderers to modify");
+                return;
+            }
+
+            foreach (Renderer renderer in renderers)
+            {
+                SetRendererCull(renderer, cullMode);
+            }
+        }
+
+        #endregion
     }
 }

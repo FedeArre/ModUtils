@@ -34,10 +34,10 @@ namespace SimplePartLoader
         public override string ID => "ModUtils";
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
-        public override string Version => "v1.5.1B";
+        public override string Version => "v1.5.2";
         
-        bool TESTING_VERSION_REMEMBER = false;
-        internal static string TESTING_VERSION_NUMBER = "v1.5.1-rc2";
+        bool TESTING_VERSION_REMEMBER = true;
+        internal static string TESTING_VERSION_NUMBER = "v1.6-dev1";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -58,7 +58,8 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility;
+        internal static ModDropdown ForcedPaintQuality;
 
         internal static HttpClient Client;
 
@@ -82,6 +83,7 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
+
             // Some setups
             ModUtils.Version = Version;
 
@@ -154,6 +156,7 @@ namespace SimplePartLoader
 
             PaintingSystem.BackfaceShader = AutoupdaterBundle.LoadAsset<Shader>("BackfaceShader");
             PaintingSystem.CullBaseMaterial = AutoupdaterBundle.LoadAsset<Material>("testMat");
+
             AutoupdaterBundle.Unload(false);
 
             // UI update
@@ -165,7 +168,8 @@ namespace SimplePartLoader
             mi.AddLabelToUI("Permit ModUI to load. This will cause you to have 2 'Mods' buttons but will make some older mods that require BrennfuchS's ModUI to work");
             DontDisableModUI = mi.AddCheckboxToUI("ModUtils_ModUIEnable", "Enable ModUI loading (Requires game restart)", false);
             RandomBG = mi.AddCheckboxToUI("ModUtils_RandomBG", "Enable random main menu background", true);
-
+            UrpCompatibility = mi.AddCheckboxToUI("ModUtils_UrpCompatibility", "Enable URP compatibility layer (For old mods)", true);
+            ForcedPaintQuality = mi.AddDropdownToUI("ModUtils_paintQuality", "Force paint quality", new string[] { "None", "Very low", "Low", "Medium", "High", "Very high" }, 0);
             mi.AddSpacerToUI();
             mi.AddSeparatorToUI();
             mi.AddHeaderToUI("Settings for developers");
@@ -331,6 +335,23 @@ namespace SimplePartLoader
 
             UI_Mods.transform.Find("OpenMods").localScale = Vector3.one / 2;
             UI_Mods.SetActive(false);
+
+            // If Urp compatibility is enabled, we can try to convert old materials to the new system.
+            if (ModMain.UrpCompatibility.Checked)
+            {
+                foreach(var part in PartManager.prefabGenParts)
+                {
+                    if (part.CarProps == null || part.CarProps.PrefabName == null || part.CarProps.PrefabName == "")
+                        continue;
+
+                    MeshRenderer[] renderers = part.Prefab.GetComponentsInChildren<MeshRenderer>();
+
+                    foreach (var renderer in renderers)
+                    {
+                        CompatibilityLayer.UpdateMaterialsOfRenderer(renderer);
+                    }
+                }
+            }
 
             // Mod shop load
             if (ModUtils.GetPlayerTools().MapMagic)

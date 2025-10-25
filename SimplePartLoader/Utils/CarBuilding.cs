@@ -86,6 +86,7 @@ namespace SimplePartLoader.Utils
         public static void AttachPrefabChilds(GameObject partToAttach, GameObject original)
         {
             DevLog("Attaching childs to " + partToAttach.name);
+            DevLog("Original has " + original.transform.childCount + " childs.");
 
             // Now we also do the same for the childs of the object.
             for (int i = 0; i < original.transform.childCount; i++)
@@ -111,15 +112,13 @@ namespace SimplePartLoader.Utils
 
                     if (!childObject.GetComponent(comp.GetType()))
                     {
-                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, true);
-
                         DevLog("Copying component " + comp.GetType());
+                        childObject.AddComponent(comp.GetType()).GetCopyOf(comp, true);
                     }
                     else
                     {
-                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), true);
-
                         DevLog("Cloning component" + comp.GetType());
+                        Functions.CopyComponentData(childObject.GetComponent(comp.GetType()), original.transform.GetChild(i).GetComponent(comp.GetType()), true);
                     }
                 }
 

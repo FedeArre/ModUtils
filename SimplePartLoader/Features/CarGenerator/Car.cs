@@ -44,6 +44,8 @@ namespace SimplePartLoader.CarGen
 
         internal void ReportIssue(string issue)
         {
+            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarReporter", $"Issue reported on {carGeneratorData.name}! Message was: {issue}");
+
             IssueExternalReport = true;
             ReportedIssue += issue + "\n";
         }

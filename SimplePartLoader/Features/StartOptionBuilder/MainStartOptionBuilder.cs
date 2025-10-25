@@ -86,19 +86,46 @@ namespace SimplePartLoader.Features.StartOptionBuilder
 
                         if (cp.Paintable && cp.Washable && cp.MeshRepairable)
                         {
-                            CarGenPainting.EnableFullSupport(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                            GamePainting.InternalSetupPart(cp.gameObject, startOption.LoadedBy);
                         }
                         else if (cp.Paintable && !cp.Washable && cp.MeshRepairable)
                         {
-                            CarGenPainting.EnablePaintOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                            GamePainting.InternalSetupPart(cp.gameObject, startOption.LoadedBy, new GamePainting.PartPaintSetup()
+                            {
+                                MetallicRustDust = true,
+                                ClearCoat = true,
+                                MainTex = false,
+                                ColorMap = true,
+                                Counters = true,
+                                HoleMap = true,
+                                PolishMap = true
+                            });
                         }
                         else if (cp.Paintable && cp.Washable && !cp.MeshRepairable)
                         {
-                            CarGenPainting.EnablePaintAndDirt(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                            GamePainting.InternalSetupPart(cp.gameObject, startOption.LoadedBy, new GamePainting.PartPaintSetup()
+                            {
+                                MetallicRustDust = false,
+                                ClearCoat = true,
+                                MainTex = true,
+                                ColorMap = true,
+                                Counters = true,
+                                HoleMap = false,
+                                PolishMap = true
+                            });
                         }
                         else if (!cp.Paintable && cp.Washable)
                         {
-                            CarGenPainting.EnableDirtOnly(cp.gameObject, PaintingSystem.PartPaintResolution.Low);
+                            GamePainting.InternalSetupPart(cp.gameObject, startOption.LoadedBy, new GamePainting.PartPaintSetup()
+                            {
+                                MetallicRustDust = false,
+                                ClearCoat = false,
+                                MainTex = true,
+                                ColorMap = false,
+                                Counters = true,
+                                HoleMap = false,
+                                PolishMap = false
+                            });
                         }
                     }
                 }
@@ -278,6 +305,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 }
             }
 
+            var splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
+
             if (foundPart)
                 return foundPart;
 
@@ -334,6 +365,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 }
             }
 
+            splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
+
             if (foundPart)
                 return foundPart;
 
@@ -362,6 +397,10 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                         break;
                 }
             }
+
+            splData = foundPart?.GetComponent<SPL_Part>();
+            if (splData && splData.Mod != startOption.LoadedBy)
+                return null;
 
             return foundPart;
         }
