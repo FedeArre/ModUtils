@@ -427,24 +427,39 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a car without valid AssetBundle");
 
             if (String.IsNullOrWhiteSpace(carObject) || String.IsNullOrWhiteSpace(emptyObject) || String.IsNullOrWhiteSpace(transparentsObject))
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a car without car / empty / transparents name");
+                return null;
+            }
 
             GameObject carPrefab = bundle.LoadAsset<GameObject>(carObject);
             GameObject emptyCarPrefab = bundle.LoadAsset<GameObject>(emptyObject);
             GameObject transparentsPrefab = bundle.LoadAsset<GameObject>(transparentsObject);
-            
+
             if (!carPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({carObject})");
-            
+                return null;
+            }
+
             if (!emptyCarPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({emptyObject})");
+                return null;
+            }
             
             if (!transparentsPrefab)
+            {
                 CustomLogger.AddLine("CarGenerator", $"Tried to create a prefab but it was not found in the AssetBundle ({transparentsObject})");
+                return null;
+            }
 
             CarGenerator carGen = carPrefab.GetComponent<CarGenerator>();
             if(!carGen)
+            {
                 CustomLogger.AddLine("CarGenerator", $"{carObject} has no Car Generator component");
+                return null;
+            }
 
             Car car = new Car(carPrefab, emptyCarPrefab, transparentsPrefab);
             car.loadedBy = this;

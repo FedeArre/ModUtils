@@ -91,7 +91,14 @@ namespace SimplePartLoader.CarGen
                 }
 
                 // Add custom transparents to our car
+
+                if (CustomLogger.DebugEnabled)
+                    CustomLogger.AddLine("CarDebug", $"Starting setup of empty variant of {car.emptyCarPrefab} - {car.transparentsObject} of {car.carGeneratorData.CarName}");
+
                 CarBuilding.AttachPrefabChilds(car.emptyCarPrefab, car.transparentsObject);
+
+                if (CustomLogger.DebugEnabled)
+                    CustomLogger.AddLine("CarDebug", $"Starting setup of built variant of {car.emptyCarPrefab} - {car.transparentsObject} of {car.carGeneratorData.CarName}");
                 CarBuilding.AttachPrefabChilds(car.carPrefab, car.transparentsObject);
                 
                 CarBuilding.UpdateTransparentsReferences(car.emptyCarPrefab);
