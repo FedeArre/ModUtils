@@ -199,7 +199,7 @@ namespace SimplePartLoader.CarGen
                     if (exceptions.ExceptionList.ContainsKey(name))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        if (carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
                         {
                             foundPart = null;
                             continue;
@@ -230,7 +230,7 @@ namespace SimplePartLoader.CarGen
                     if(exceptions.ExceptionList.ContainsKey(name))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if(carProps.PrefabName != exceptions.ExceptionList[name])
+                        if(carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
                         {
                             foundPart = null;
                             continue;
@@ -272,7 +272,7 @@ namespace SimplePartLoader.CarGen
                     if (exceptions.ExceptionList.ContainsKey(name))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+                        if (carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
                         {
                             foundPart = null;
                             continue;
