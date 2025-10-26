@@ -6,6 +6,7 @@ using UnityEngine;
 using SimplePartLoader;
 using System.Collections.Generic;
 using SimplePartLoader.Objects;
+using SimplePartLoader.Features;
 
 namespace SimplePartLoader
 {
@@ -467,9 +468,30 @@ namespace SimplePartLoader
 
             CustomLogger.AddLine("Parts", $"Succesfully set start option {option.PartToCopy}");
         }
+
+
+        public void RegisterIntoInteriorShop()
+        {
+            if(CarProps is null || PartInfo is null)
+            {
+                CustomLogger.AddLine("Parts", $"Tried to register part into interior shop but the part is not ready yet, part: {Prefab.name}");
+                return;
+            }
+
+            if(!CarProps.Interior)
+            {
+                CustomLogger.AddLine("Parts", $"{Prefab.name} is not marked as interior part, cannot register into interior shop.");
+                return;
+            }
+
+            if (CustomLogger.DebugEnabled)
+            {
+                CustomLogger.AddLine("Parts", $"Registering part {Prefab.name} into interior shop.");
+            }
+            InteriorShopCatalog.RegisterPart(this);
+        }
     }
 
-    
     public enum PartTypes
     {
         FULL_PART = 1,

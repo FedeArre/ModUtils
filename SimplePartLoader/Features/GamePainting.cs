@@ -13,8 +13,6 @@ namespace SimplePartLoader
         private static Material GlassMaterial;
         private static PartPaintSetup DefaultSettings = new PartPaintSetup();
 
-        internal static List<GameObject> TESTLIST = new List<GameObject>();
-
         public enum Quality
         {
             VeryLow = 1,
@@ -114,8 +112,6 @@ namespace SimplePartLoader
 
             prefab.AddComponent<P3dPaintable>();
             prefab.AddComponent<P3dMaterialCloner>();
-
-            TESTLIST.Add(prefab);
 
             if (config.ColorMap)
             {

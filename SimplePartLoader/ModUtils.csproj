@@ -485,6 +485,7 @@
     <Compile Include="Features\DataHandler.cs" />
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\GamePainting.cs" />
+    <Compile Include="Features\InteriorShopCatalog.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
     <Compile Include="Features\SimplePartLoader\CatalogGameObjectManager.cs" />
