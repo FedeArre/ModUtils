@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.2";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.6-dev1";
+        internal static string TESTING_VERSION_NUMBER = "v1.6-dev2";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -45,7 +45,7 @@ namespace SimplePartLoader
         public const string API_URL = "https://modding.fedes.uy/";
         //public const string API_URL = "https://localhost:7060/";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab, UI_InteriorCatalog_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -83,7 +83,6 @@ namespace SimplePartLoader
         Stopwatch watch;
         public ModMain()
         {
-
             // Some setups
             ModUtils.Version = Version;
 
@@ -148,6 +147,7 @@ namespace SimplePartLoader
             UI_EA = AutoupdaterBundle.LoadAsset<GameObject>("EACanvas");
             UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
             UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
+            UI_InteriorCatalog_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("InteriorShop");
 
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
@@ -393,6 +393,8 @@ namespace SimplePartLoader
             shopSupportCube.transform.localScale = new Vector3(31.37f, 4.26f, 84.48f);
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
 
+            shop.transform.Find("ModUtils_InteriorShopCatalog_Catalog").gameObject.layer = LayerMask.NameToLayer("Items");
+
             // Load modshop into map
             try
             {
@@ -471,10 +473,15 @@ namespace SimplePartLoader
                 {
                     UI_Mods.SetActive(true);
                 }
-
                 else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf && ModUtilsUI.currentlyEditingKeybind == null)
                 {
                     UI_Mods.SetActive(false);
+                }
+
+                if(Input.GetKeyDown(KeyCode.Escape) && InteriorShopCatalog.CurrentCanvas)
+                {
+                    InteriorShopCatalog.OpenOrClose();
+                    ModUtils.ExecuteNextFrame(ModUtils.PlayerTools.ESC);
                 }
 
                 /*

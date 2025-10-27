@@ -65,6 +65,18 @@ namespace SimplePartLoader.Objects.Furniture
             {
                 if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, Items))
                 {
+                    // Special case: Mod shop interior shop catalog
+                    if(rcHit.collider.transform.name == "ModUtils_InteriorShopCatalog_Catalog")
+                    {
+                        ShowText = true;
+                        LookText = "Press click to open the interior shop catalog";
+
+                        if (Input.GetMouseButtonDown(0) && !InteriorShopCatalog.CurrentCanvas)
+                        {
+                            InteriorShopCatalog.OpenOrClose();
+                        }
+                    }
+
                     if (rcHit.collider.transform.name.StartsWith("MODUTILS_FURNITURE_")) // If looking at ModUtils furniture
                     {
                         if (Input.GetMouseButtonDown(0))
