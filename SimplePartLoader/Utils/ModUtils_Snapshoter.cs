@@ -18,11 +18,13 @@ namespace SimplePartLoader.Utils
         {
             RuntimePreviewGenerator.BackgroundColor = new Color(0f, 0f, 0f, 0f);
             Sprite s = null;
-            
-            if(!Directory.Exists("./Mods/ModUtilsThumbnails"))
+
+
+            if (!Directory.Exists("./Mods/ModUtilsThumbnails"))
             {
                 Directory.CreateDirectory("./Mods/ModUtilsThumbnails");
             }
+            bool lightsCreated = false;
 
             foreach (Part p in PartManager.modLoadedParts)
             {
@@ -31,10 +33,38 @@ namespace SimplePartLoader.Utils
                     continue;
                 }
 
-                if(p.Mod.Thumbnails)
+                if (p.Mod.Thumbnails)
                 {
                     GameObject instanciated = GameObject.Instantiate(p.Prefab);
-                    instanciated.transform.position = new Vector3(1000f, 1000f, 1000f);
+                    instanciated.transform.position = new Vector3(1000f, 350f, 1000f);
+
+                    if (!lightsCreated)
+                    {
+                        float distance = 3f;
+
+                        for (int i = 0; i < 4; i++)
+                        {
+                            // Create a new GameObject for each spotlight
+                            GameObject lightObj = new GameObject($"SpotLight_{i + 1}");
+                            Light spot = lightObj.AddComponent<Light>();
+
+                            // Configure the light
+                            spot.type = LightType.Spot;
+                            spot.color = Color.white;
+                            spot.intensity = 3f;
+                            spot.range = 10f;
+                            spot.spotAngle = 45f;
+
+                            float angle = i * 90f * Mathf.Deg2Rad;
+                            Vector3 offset = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle)) * distance;
+                            lightObj.transform.position = instanciated.transform.position + offset + Vector3.up * 1.5f;
+
+                            // Make it look at the center object
+                            lightObj.transform.LookAt(instanciated.transform);
+                        }
+
+                        lightsCreated = true;
+                    }
 
                     if (instanciated.GetComponent<CarProperties>() && instanciated.GetComponent<CarProperties>().Paintable)
                     {
