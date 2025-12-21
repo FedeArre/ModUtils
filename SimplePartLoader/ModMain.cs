@@ -1,6 +1,6 @@
 ﻿// The following preprocessor declaration disables the timing feature from ModUtils.
 // This module can create unrequired overhead on final builds
-//#define MODUTILS_TIMING_ENABLED
+#define MODUTILS_TIMING_ENABLED
 
 using Autoupdater.Objects;
 using Newtonsoft.Json;
