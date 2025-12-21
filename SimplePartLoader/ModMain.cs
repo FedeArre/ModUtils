@@ -58,7 +58,7 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility, OfflineMode;
         internal static ModDropdown ForcedPaintQuality;
 
         internal static HttpClient Client;
@@ -90,10 +90,6 @@ namespace SimplePartLoader
             Client.BaseAddress = new Uri(API_URL);
             Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
 
-#if MODUTILS_TIMING_ENABLED
-            var watch = new System.Diagnostics.Stopwatch();
-            watch.Start();
-#endif
             watch = new System.Diagnostics.Stopwatch();
             watch.Start();
 
@@ -171,6 +167,10 @@ namespace SimplePartLoader
             UrpCompatibility = mi.AddCheckboxToUI("ModUtils_UrpCompatibility", "Enable URP compatibility layer (For old mods)", true);
             ForcedPaintQuality = mi.AddDropdownToUI("ModUtils_paintQuality", "Force paint quality", new string[] { "None", "Very low", "Low", "Medium", "High", "Very high" }, 0);
             mi.AddSpacerToUI();
+
+            mi.AddLabelToUI ("Offline mode will disable all online features of ModUtils (Autoupdater, random background, telemetry, EA)");
+            OfflineMode = mi.AddCheckboxToUI("ModUtils_OfflineMode", "Enable offline mode", false);
+
             mi.AddSeparatorToUI();
             mi.AddHeaderToUI("Settings for developers");
             DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
@@ -221,6 +221,7 @@ namespace SimplePartLoader
 #if MODUTILS_TIMING_ENABLED
             watch.Stop();
             Debug.Log($"[ModUtils/Timing/Constructor]: ModUtils succesfully loaded in {watch.ElapsedMilliseconds} ms");
+            watch.Start();
 #endif
         }
 
@@ -228,9 +229,11 @@ namespace SimplePartLoader
         {
             if (!MenuFirstLoad)
             {
+                Debug.Log("1");
                 watch.Stop();
                 CustomLogger.AddLine("Timing", $"Mods took {watch.ElapsedMilliseconds} ms to load.");
 
+                Debug.Log("1");
                 MenuFirstLoad = true;
                 CustomLogger.AddLine("Main", "Printing mod list");
                 foreach (Mod m in ModLoader.mods)
@@ -238,20 +241,24 @@ namespace SimplePartLoader
                     CustomLogger.AddLine("Main", $"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
 
+                Debug.Log("1");
                 UI_Mods = GameObject.Instantiate(UI_Mods_Prefab);
                 GameObject.DontDestroyOnLoad(UI_Mods);
 
+                Debug.Log("1");
                 ModUtilsUI.PrepareUI();
                 SettingSaver.LoadSettings();
 
+                Debug.Log("1");
                 GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
                 if (modUiRemove && !DontDisableModUI.Checked)
                 {
                     modUiRemove.SetActive(false);
                 }
 
+                Debug.Log("1");
 
-                if (RandomBG.Checked)
+                if (RandomBG.Checked && !OfflineMode.Checked)
                 {
                     try
                     {

@@ -14,7 +14,7 @@ namespace SimplePartLoader.Utils
         void Start()
         {
             // Hook image
-            if(ModMain.imageBytes.Length > 0)
+            if(ModMain.imageBytes !=  null && ModMain.imageBytes.Length > 0)
             {
                 Image img = GameObject.Find("UIController/MainMenu_Canvas/BG").GetComponent<Image>();
 

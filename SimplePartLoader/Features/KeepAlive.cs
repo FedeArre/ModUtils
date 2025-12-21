@@ -66,7 +66,7 @@ namespace SimplePartLoader
 
         private async void SendCurrentStatus()
         {
-            if(!ModMain.Telemetry.Checked)
+            if(!ModMain.Telemetry.Checked || ModMain.OfflineMode.Checked)
                 return;
 
             try

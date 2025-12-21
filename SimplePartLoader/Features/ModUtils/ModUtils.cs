@@ -46,7 +46,9 @@ namespace SimplePartLoader
         internal static void SetupSteamworks()
         {
             GameObject ModLoader = GameObject.Find("ModLoader");
-            ModLoader.AddComponent<EACheck>();
+
+            if(!ModMain.OfflineMode.Checked)
+                ModLoader.AddComponent<EACheck>();
         }
 
         internal static void OnLoadCalled()

@@ -86,10 +86,18 @@ namespace SimplePartLoader
                 }
             }
 
-            if(!GameObject.Find("ModLoader").GetComponent<EACheck>())
+            if (!GameObject.Find("ModLoader").GetComponent<EACheck>())
             {
-                CustomLogger.AddLine("Main", "EA check component was not present");
-                return;
+                if (ModMain.OfflineMode.Checked)
+                {
+                    CustomLogger.AddLine("Main", "Offline mode is enabled");
+                }
+                else
+                {
+                    // Something is wrong. Lets stop loading.
+                    CustomLogger.AddLine("Main", "EA check component was not present, offline mode is not enabled. State issue");
+                    return;
+                }
             }
 
             SPL.DevLog("Starting first load check");
