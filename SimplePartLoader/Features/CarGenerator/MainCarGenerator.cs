@@ -26,6 +26,8 @@ namespace SimplePartLoader.CarGen
         internal static List<Car> RuinedCars = new List<Car>();
         internal static Hashtable AvailableBases = new Hashtable();
         
+        internal static int AvailableId = 0;
+
         internal static void BaseSetup()
         {
             AvailableBases[CarBase.Chad] = new Chad();
@@ -35,6 +37,8 @@ namespace SimplePartLoader.CarGen
             AvailableBases[CarBase.Rat] = new Rat();
             AvailableBases[CarBase.Niv] = new Niv();
             AvailableBases[CarBase.TrailerCar] = new TrailerLong();
+
+            AvailableId = AvailableBases.Count;
         }
 
         internal static void StartCarGen()
@@ -287,7 +291,7 @@ namespace SimplePartLoader.CarGen
             
             foreach (Car car in RegisteredCars)
             {
-                ICarBase baseData = (ICarBase)MainCarGenerator.AvailableBases[car.carGeneratorData.BaseCarToUse];
+                ICarBase baseData = (ICarBase) MainCarGenerator.AvailableBases[car.CustomCarBaseId ?? (int) car.carGeneratorData.BaseCarToUse];
                 if (baseData.VehType() == VehicleType.Trailer) 
                     continue;
 
@@ -645,6 +649,16 @@ namespace SimplePartLoader.CarGen
                     }
                 }
             }
+        }
+
+        public static int RegisterCarBase(ICarBase carBase)
+        {
+            int id = AvailableId;
+            AvailableBases[AvailableId] = carBase;
+
+            AvailableId++;
+
+            return id;
         }
 
         internal static void RearBoneFix(GameObject car)

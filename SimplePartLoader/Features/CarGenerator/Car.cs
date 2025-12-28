@@ -22,6 +22,8 @@ namespace SimplePartLoader.CarGen
 
         internal ModInstance loadedBy;
 
+        public int? CustomCarBaseId { get; set; } = null;
+
         public List<string> OtherModBuildingExceptions { get; set; }
 
         public List<string> FitToCarExceptions { get; set; }
