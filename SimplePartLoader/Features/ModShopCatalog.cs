@@ -5,14 +5,32 @@ using System.Text;
 using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace SimplePartLoader.Features
 {
-    public class InteriorShopCatalog
+    public class ModShopCatalog
     {
-        internal static HashSet<InteriorShopSellData> Items { get; set; } = new HashSet<InteriorShopSellData>();
+        internal static HashSet<ModShopSellItemData> Items { get; set; } = new HashSet<ModShopSellItemData>();
+
+        internal static ModShopSellItemData RegisterObject(ModInstance mod, string name, float price, GameObject prefab, Action<GameObject, GameObject> action, Sprite photo)
+        {
+            var data = new ModShopSellItemData()
+            {
+                Name = name,
+                Price = price,
+                ModName = mod.Name,
+                Prefab = prefab,
+                OnBuy = action,
+                Photo = photo
+            };
+
+            Items.Add(data);
+
+            return data;
+        }
+
 
         internal static GameObject CurrentCanvas;
         internal static GameObject EventSystem;
@@ -22,8 +40,6 @@ namespace SimplePartLoader.Features
         internal static TMP_InputField SearchBar;
         internal static GameObject ItemCardPrefab;
         internal static Transform Viewport;
-
-        internal static Dictionary<string, ModInstance> ModList { get; set; }
 
         internal static void OpenOrClose()
         {
@@ -37,7 +53,7 @@ namespace SimplePartLoader.Features
             }
             else
             {
-                if (ModUtils.PlayerTools.EscMenu.activeSelf)
+                if(ModUtils.PlayerTools.EscMenu.activeSelf)
                 {
                     return; // Prevent opening if esc menu is open
                 }
@@ -46,12 +62,11 @@ namespace SimplePartLoader.Features
                 EventSystem.AddComponent<EventSystem>();
                 EventSystem.AddComponent<StandaloneInputModule>();
 
-                CurrentCanvas = GameObject.Instantiate(ModMain.UI_InteriorCatalog_Prefab);
+                CurrentCanvas = GameObject.Instantiate(ModMain.UI_ModShop_Prefab);
 
                 // Lock player mouse
                 ModUtils.PlayerAIO.ControllerPause();
 
-                ColorDropdown = CurrentCanvas.transform.Find("Panel/DropdownColor").GetComponent<TMP_Dropdown>();
                 ModDropdown = CurrentCanvas.transform.Find("Panel/DropdownMod").GetComponent<TMP_Dropdown>();
                 SearchBar = CurrentCanvas.transform.Find("Panel/Search").GetComponent<TMP_InputField>();
                 ItemCardPrefab = CurrentCanvas.transform.Find("Panel/ItemCardPrefab").gameObject;
@@ -64,25 +79,14 @@ namespace SimplePartLoader.Features
                 ModDropdown.onValueChanged.AddListener(ModDropdownChanged);
                 SearchBar.onValueChanged.AddListener((string s) => { FilterUpdate(); });
 
-                // Load mods to list
-                if (ModList is null)
-                {
-                    ModList = new Dictionary<string, ModInstance>();
-                    foreach (Part p in Items.Select(x => x.Part).ToArray())
-                    {
-                        if (!ModList.ContainsKey(p.Mod.Name))
-                            ModList.Add(p.Mod.Name, p.Mod);
-                    }
-                }
-
                 ModDropdown.ClearOptions();
                 List<TMP_Dropdown.OptionData> newOptions = new List<TMP_Dropdown.OptionData>();
 
                 newOptions.Add(new TMP_Dropdown.OptionData("Any mod"));
 
-                foreach (var kvp in ModList.Values.Distinct())
+                foreach (var mod in Items.Select(x => x.ModName).Distinct())
                 {
-                    newOptions.Add(new TMP_Dropdown.OptionData(kvp.Name));
+                    newOptions.Add(new TMP_Dropdown.OptionData(mod));
                 }
 
                 ModDropdown.AddOptions(newOptions);
@@ -106,14 +110,14 @@ namespace SimplePartLoader.Features
                 // Item should not be visible
                 if ((modName != "Any mod" && item.ModName != modName) || !item.Name.ToLowerInvariant().Contains(searchText))
                 {
-                    if(item.CurrentPrefab != null)
+                    if (item.CurrentPrefab != null)
                     {
                         item.CurrentPrefab.SetActive(false);
                     }
                 }
                 else // Item should be visible
                 {
-                    if(item.CurrentPrefab != null)
+                    if (item.CurrentPrefab != null)
                     {
                         item.CurrentPrefab.SetActive(true);
                     }
@@ -123,10 +127,11 @@ namespace SimplePartLoader.Features
 
                         item.CurrentPrefab.transform.Find("Title").GetComponent<TMP_Text>().text = item.Name;
                         item.CurrentPrefab.transform.Find("Price").GetComponent<TMP_Text>().text = $"Price: <color=#00FF00>{item.Price}$</color>";
+                        item.CurrentPrefab.transform.Find("ModName").GetComponent<TMP_Text>().text = item.ModName;
 
-                        if(item.Part.PartInfo.Thumbnail)
+                        if (item.Photo != null)
                         {
-                            item.CurrentPrefab.transform.Find("Image").GetComponent<Image>().sprite = Sprite.Create(item.Part.PartInfo.Thumbnail, new Rect(0f, 0f, 105.44f, 98.87f), new Vector2(0.5f, 0.5f));
+                            item.CurrentPrefab.transform.Find("Image").GetComponent<Image>().sprite = item.Photo;
                         }
 
                         item.CurrentPrefab.transform.Find("Button").GetComponent<Button>().onClick.AddListener(() =>
@@ -143,7 +148,7 @@ namespace SimplePartLoader.Features
             }
         }
 
-        internal static void BuyItem(InteriorShopSellData item)
+        internal static void BuyItem(ModShopSellItemData item)
         {
             if (tools.money < item.Price)
             {
@@ -154,33 +159,30 @@ namespace SimplePartLoader.Features
             ModUtils.PlayCashSound();
 
             GameObject spawnSpot = GameObject.Find("SpawnSpot_EXTRABUILDINGS");
-            tools.SpawnSpot = spawnSpot;
 
-            var originalInterior = item.Part.CarProps.OriginalInterior;
+            var spawned = GameObject.Instantiate(item.Prefab, spawnSpot.transform.position, spawnSpot.transform.rotation);
 
-            item.Part.CarProps.OriginalInterior = ColorDropdown.value + 1;
-            item.Part.PartInfo.SpawnThis();
-            item.Part.CarProps.OriginalInterior = originalInterior;
-        }
-
-        internal static void RegisterPart(Part p)
-        {
-            Items.Add(new InteriorShopSellData()
-            {
-                Name = p.CarProps.name,
-                Price = p.PartInfo.price,
-                ModName = p.Mod.Name,
-                Part = p
-            });
+            item.OnBuy?.Invoke(item.Prefab, spawned);
         }
     }
 
-    internal class InteriorShopSellData
+    public class ModShopSellItemData
     {
         public string Name { get; set; }
         public float Price { get; set; }
         public string ModName { get; set; }
-        public Part Part { get; set; }
-        public GameObject CurrentPrefab { get; set; }
+        public GameObject Prefab { get; set; }
+
+        public Sprite Photo { get; set; }
+
+        /// <summary>
+        /// Action called when the player succesfully buys the item. The first GameObject is the prefab of the item being bought, the second is the spawned GameObject.
+        /// </summary>
+        public Action<GameObject, GameObject> OnBuy { get; set; }
+
+        /// <summary>
+        /// Refers to the current card on the shop UI.
+        /// </summary>
+        internal GameObject CurrentPrefab { get; set; }
     }
 }

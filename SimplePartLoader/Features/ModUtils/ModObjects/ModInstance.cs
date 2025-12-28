@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Features;
 using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Utils;
 using System;
@@ -628,6 +629,20 @@ namespace SimplePartLoader
             CustomMeshHandler.Meshes.Add(cm);
         }
 
+        public ModShopSellItemData RegisterModShopItem(string name, float price, GameObject prefab, Action<GameObject, GameObject> onBuy = null, Sprite photo = null)
+        {
+            ModShopSellItemData item = new ModShopSellItemData()
+            {
+                Name = name,
+                Price = price,
+                ModName = Mod.Name,
+                Prefab = prefab,
+                OnBuy = onBuy,
+                Photo = photo
+            };
+            ModShopCatalog.Items.Add(item);
+            return item;
+        }
 
         // Mod settings update
         public Label AddLabelToUI(string text)

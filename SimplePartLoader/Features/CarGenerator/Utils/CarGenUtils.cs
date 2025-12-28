@@ -137,159 +137,439 @@ namespace SimplePartLoader.CarGen
 
         internal static GameObject PartLookup(string name, bool parentIsCustom, Car car, int type)
         {
+            Debug.Log(
+                $"[PartLookup] START name='{name}', parentIsCustom={parentIsCustom}, type={type}, car={(car != null ? car.carGeneratorData.CarName : "NULL")}"
+            );
+
             GameObject foundPart = null;
+
+            if (car == null)
+            {
+                Debug.LogError("[PartLookup] car is NULL -> returning null");
+                return null;
+            }
 
             BuildingExceptions exceptions = car.exceptionsObject;
 
+            if (exceptions == null)
+            {
+                Debug.LogError("[PartLookup] exceptionsObject is NULL -> returning null (would NRE later)");
+                return null;
+            }
+
+            Debug.Log(
+                $"[PartLookup] car.loadedBy={(car.loadedBy != null ? car.loadedBy.Name : "NULL")}"
+            );
+
+            if (car.loadedBy == null)
+            {
+                Debug.LogError("[PartLookup] car.loadedBy is NULL -> returning null");
+                return null;
+            }
+
+            if (car.loadedBy.Parts == null)
+            {
+                Debug.LogError("[PartLookup] car.loadedBy.Parts is NULL -> returning null");
+                return null;
+            }
+
+            Debug.Log($"[PartLookup] loadedBy.Parts count={car.loadedBy.Parts.Count}");
+
             // Even faster lookup, priorize mod-loaded stuff first!
+            Debug.Log("[PartLookup] PASS 1: loadedBy.Parts by GameObject.name");
             foreach (Part partObj in car.loadedBy.Parts)
             {
+                if (partObj == null)
+                {
+                    Debug.LogWarning("[PartLookup] PASS 1: partObj is NULL -> continue");
+                    continue;
+                }
+
                 GameObject part = partObj.Prefab;
 
                 if (part == null)
+                {
+                    Debug.LogWarning($"[PartLookup] PASS 1: '{partObj}' Prefab is NULL -> continue");
                     continue;
+                }
+
+                Debug.Log($"[PartLookup] PASS 1: checking part='{part.name}' vs name='{name}'");
 
                 if (part.name == name)
                 {
+                    Debug.Log($"[PartLookup] PASS 1: NAME MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    if (exceptions.ExceptionList.ContainsKey(name))
+                    bool hasExceptionKey = exceptions.ExceptionList != null
+                        && exceptions.ExceptionList.ContainsKey(name);
+
+                    Debug.Log($"[PartLookup] PASS 1: exceptions has key for '{name}'? {hasExceptionKey}");
+
+                    if (hasExceptionKey)
                     {
+                        string expectedPrefabName = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != exceptions.ExceptionList[name])
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 1: Exception expected PrefabName='{expectedPrefabName}', CarProperties={(carProps ? "OK" : "NULL")}"
+                        );
+
+                        if (carProps == null)
                         {
+                            Debug.LogWarning(
+                                "[PartLookup] PASS 1: CarProperties is NULL while exception exists -> rejecting candidate"
+                            );
+                            foundPart = null;
+                            continue;
+                        }
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 1: Candidate CarProperties.PrefabName='{carProps.PrefabName}'"
+                        );
+
+                        if (carProps.PrefabName != expectedPrefabName)
+                        {
+                            Debug.Log(
+                                $"[PartLookup] PASS 1: Reject: PrefabName mismatch ({carProps.PrefabName} != {expectedPrefabName})"
+                            );
                             foundPart = null;
                             continue;
                         }
                     }
 
-                    if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
+
+                    Debug.Log(
+                        $"[PartLookup] PASS 1: has SPL_Part? {hasSpl}, parentIsCustom={parentIsCustom}, ignoringStatus={ignoringStatus}"
+                    );
+
+                    if ((hasSpl && !parentIsCustom) && !ignoringStatus)
                     {
+                        Debug.Log("[PartLookup] PASS 1: Reject: SPL_Part but parentIsCustom=false and not ignoringStatus");
                         foundPart = null;
                         continue;
                     }
 
-                    if (foundPart.GetComponent<CarProperties>().Type != type && !exceptions.IgnoringStatusForPart(name))
+                    CarProperties propsForType = foundPart.GetComponent<CarProperties>();
+                    Debug.Log(
+                        $"[PartLookup] PASS 1: CarProperties for type check={(propsForType ? "OK" : "NULL")}"
+                    );
+
+                    if (propsForType == null)
                     {
+                        Debug.LogWarning("[PartLookup] PASS 1: Reject: missing CarProperties for type check");
+                        foundPart = null;
+                        continue;
+                    }
+
+                    Debug.Log($"[PartLookup] PASS 1: Candidate Type={propsForType.Type} expected type={type}");
+
+                    if (propsForType.Type != type && !ignoringStatus)
+                    {
+                        Debug.Log("[PartLookup] PASS 1: Reject: Type mismatch and not ignoringStatus");
                         foundPart = null;
                         continue;
                     }
 
                     if (foundPart)
+                    {
+                        Debug.Log($"[PartLookup] PASS 1: ACCEPT candidate='{foundPart.name}' -> break");
                         break;
-
+                    }
                 }
             }
 
             if (foundPart)
+            {
+                Debug.Log($"[PartLookup] RETURN after PASS 1: '{foundPart.name}'");
                 return foundPart;
+            }
 
             // Slow lookup by Partinfo RenamedPrefab. Only happens if part was not found yet (looking on mod parts only)
+            Debug.Log("[PartLookup] PASS 2: loadedBy.Parts by Partinfo.RenamedPrefab");
             foreach (Part partObj in car.loadedBy.Parts)
             {
+                if (partObj == null)
+                {
+                    Debug.LogWarning("[PartLookup] PASS 2: partObj is NULL -> continue");
+                    continue;
+                }
+
                 GameObject part = partObj.Prefab;
                 if (part == null)
+                {
+                    Debug.LogWarning($"[PartLookup] PASS 2: '{partObj}' Prefab is NULL -> continue");
                     continue;
+                }
 
                 Partinfo pi = part.GetComponent<Partinfo>();
-                if (pi.RenamedPrefab == name)
+                Debug.Log(
+                    $"[PartLookup] PASS 2: part='{part.name}', Partinfo={(pi ? "OK" : "NULL")}, RenamedPrefab='{(pi ? pi.RenamedPrefab : "NULL")}'"
+                );
+
+                if (pi != null && pi.RenamedPrefab == name)
                 {
+                    Debug.Log($"[PartLookup] PASS 2: RENAMED MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    if (exceptions.ExceptionList.ContainsKey(name))
+                    bool hasExceptionKey = exceptions.ExceptionList != null
+                        && exceptions.ExceptionList.ContainsKey(name);
+
+                    Debug.Log($"[PartLookup] PASS 2: exceptions has key for '{name}'? {hasExceptionKey}");
+
+                    if (hasExceptionKey)
                     {
+                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 2: Exception expected='{expected}', CarProperties={(carProps ? "OK" : "NULL")}"
+                        );
+
+                        if (carProps == null)
                         {
+                            Debug.LogWarning(
+                                "[PartLookup] PASS 2: CarProperties is NULL while exception exists -> rejecting candidate"
+                            );
+                            foundPart = null;
+                            continue;
+                        }
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 2: Candidate PrefabName='{carProps.PrefabName}', name='{carProps.name}'"
+                        );
+
+                        if (carProps.PrefabName != expected && carProps.name != expected)
+                        {
+                            Debug.Log(
+                                $"[PartLookup] PASS 2: Reject: exception mismatch (PrefabName='{carProps.PrefabName}', name='{carProps.name}', expected='{expected}')"
+                            );
                             foundPart = null;
                             continue;
                         }
                     }
 
-                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom && !exceptions.IgnoringStatusForPart(name))
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
+
+                    Debug.Log(
+                        $"[PartLookup] PASS 2: has SPL_Part? {hasSpl}, parentIsCustom={parentIsCustom}, ignoringStatus={ignoringStatus}"
+                    );
+
+                    if (hasSpl && !parentIsCustom && !ignoringStatus)
                     {
+                        Debug.Log("[PartLookup] PASS 2: Reject: SPL_Part but parentIsCustom=false and not ignoringStatus");
                         foundPart = null;
                         continue;
                     }
 
                     if (foundPart)
+                    {
+                        Debug.Log($"[PartLookup] PASS 2: ACCEPT candidate='{foundPart.name}' -> break");
                         break;
+                    }
                 }
+            }
+
+            if (foundPart)
+            {
+                Debug.Log($"[PartLookup] RETURN after PASS 2: '{foundPart.name}'");
+                return foundPart;
             }
 
             // Fast lookup, only by GameObject name (Works for almost all parts)
+            Debug.Log(
+                $"[PartLookup] PASS 3: PartManager.gameParts by GameObject.name, gameParts={(PartManager.gameParts != null ? PartManager.gameParts.Count.ToString() : "NULL")}"
+            );
+
+            if (PartManager.gameParts == null)
+            {
+                Debug.LogError("[PartLookup] PartManager.gameParts is NULL -> returning null");
+                return null;
+            }
+
             foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
+                {
+                    Debug.LogWarning("[PartLookup] PASS 3: part is NULL -> continue");
                     continue;
+                }
+
+                Debug.Log($"[PartLookup] PASS 3: checking part='{part.name}' vs name='{name}'");
 
                 if (part.name == name)
                 {
+                    Debug.Log($"[PartLookup] PASS 3: NAME MATCH found candidate='{part.name}'");
                     foundPart = part;
-                    
-                    if(exceptions.ExceptionList.ContainsKey(name))
+
+                    bool hasExceptionKey = exceptions.ExceptionList != null
+                        && exceptions.ExceptionList.ContainsKey(name);
+
+                    Debug.Log($"[PartLookup] PASS 3: exceptions has key for '{name}'? {hasExceptionKey}");
+
+                    if (hasExceptionKey)
                     {
+                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if(carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 3: Exception expected='{expected}', CarProperties={(carProps ? "OK" : "NULL")}"
+                        );
+
+                        if (carProps == null)
                         {
+                            Debug.LogWarning(
+                                "[PartLookup] PASS 3: CarProperties is NULL while exception exists -> rejecting candidate"
+                            );
+                            foundPart = null;
+                            continue;
+                        }
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 3: Candidate PrefabName='{carProps.PrefabName}', name='{carProps.name}'"
+                        );
+
+                        if (carProps.PrefabName != expected && carProps.name != expected)
+                        {
+                            Debug.Log(
+                                $"[PartLookup] PASS 3: Reject: exception mismatch (PrefabName='{carProps.PrefabName}', name='{carProps.name}', expected='{expected}')"
+                            );
                             foundPart = null;
                             continue;
                         }
                     }
 
-                    if ((foundPart.GetComponent<SPL_Part>() && !parentIsCustom) && !exceptions.IgnoringStatusForPart(name))
-                    {
-                        foundPart = null;
-                        continue;
-                    }
-                    
-                    if(foundPart.GetComponent<CarProperties>().Type != type && !exceptions.IgnoringStatusForPart(name))
-                    {
-                        foundPart = null;
-                        continue;
-                    }
-                    
-                    if (foundPart)
-                        break;
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
 
+                    Debug.Log(
+                        $"[PartLookup] PASS 3: has SPL_Part? {hasSpl}, parentIsCustom={parentIsCustom}, ignoringStatus={ignoringStatus}"
+                    );
+
+                    if ((hasSpl && !parentIsCustom) && !ignoringStatus)
+                    {
+                        Debug.Log("[PartLookup] PASS 3: Reject: SPL_Part but parentIsCustom=false and not ignoringStatus");
+                        foundPart = null;
+                        continue;
+                    }
+
+                    CarProperties propsForType = foundPart.GetComponent<CarProperties>();
+                    Debug.Log(
+                        $"[PartLookup] PASS 3: CarProperties for type check={(propsForType ? "OK" : "NULL")}"
+                    );
+
+                    if (propsForType == null)
+                    {
+                        Debug.LogWarning("[PartLookup] PASS 3: Reject: missing CarProperties for type check");
+                        foundPart = null;
+                        continue;
+                    }
+
+                    Debug.Log($"[PartLookup] PASS 3: Candidate Type={propsForType.Type} expected type={type}");
+
+                    if (propsForType.Type != type && !ignoringStatus)
+                    {
+                        Debug.Log("[PartLookup] PASS 3: Reject: Type mismatch and not ignoringStatus");
+                        foundPart = null;
+                        continue;
+                    }
+
+                    if (foundPart)
+                    {
+                        Debug.Log($"[PartLookup] PASS 3: ACCEPT candidate='{foundPart.name}' -> break");
+                        break;
+                    }
                 }
             }
 
             if (foundPart)
+            {
+                Debug.Log($"[PartLookup] RETURN after PASS 3: '{foundPart.name}'");
                 return foundPart;
-            
+            }
+
             // Slow lookup by Partinfo RenamedPrefab. Only happens if part was not found yet.
+            Debug.Log("[PartLookup] PASS 4: PartManager.gameParts by Partinfo.RenamedPrefab");
             foreach (GameObject part in PartManager.gameParts)
             {
                 if (part == null)
+                {
+                    Debug.LogWarning("[PartLookup] PASS 4: part is NULL -> continue");
                     continue;
+                }
 
                 Partinfo pi = part.GetComponent<Partinfo>();
-                if (pi.RenamedPrefab == name)
+                Debug.Log(
+                    $"[PartLookup] PASS 4: part='{part.name}', Partinfo={(pi ? "OK" : "NULL")}, RenamedPrefab='{(pi ? pi.RenamedPrefab : "NULL")}'"
+                );
+
+                if (pi != null && pi.RenamedPrefab == name)
                 {
+                    Debug.Log($"[PartLookup] PASS 4: RENAMED MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    if (exceptions.ExceptionList.ContainsKey(name))
+                    bool hasExceptionKey = exceptions.ExceptionList != null
+                        && exceptions.ExceptionList.ContainsKey(name);
+
+                    Debug.Log($"[PartLookup] PASS 4: exceptions has key for '{name}'? {hasExceptionKey}");
+
+                    if (hasExceptionKey)
                     {
+                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != exceptions.ExceptionList[name] && carProps.name != exceptions.ExceptionList[name])
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 4: Exception expected='{expected}', CarProperties={(carProps ? "OK" : "NULL")}"
+                        );
+
+                        if (carProps == null)
                         {
+                            Debug.LogWarning(
+                                "[PartLookup] PASS 4: CarProperties is NULL while exception exists -> rejecting candidate"
+                            );
+                            foundPart = null;
+                            continue;
+                        }
+
+                        Debug.Log(
+                            $"[PartLookup] PASS 4: Candidate PrefabName='{carProps.PrefabName}', name='{carProps.name}'"
+                        );
+
+                        if (carProps.PrefabName != expected && carProps.name != expected)
+                        {
+                            Debug.Log(
+                                $"[PartLookup] PASS 4: Reject: exception mismatch (PrefabName='{carProps.PrefabName}', name='{carProps.name}', expected='{expected}')"
+                            );
                             foundPart = null;
                             continue;
                         }
                     }
-                    
-                    if (foundPart.GetComponent<SPL_Part>() && !parentIsCustom && !exceptions.IgnoringStatusForPart(name))
+
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
+
+                    Debug.Log(
+                        $"[PartLookup] PASS 4: has SPL_Part? {hasSpl}, parentIsCustom={parentIsCustom}, ignoringStatus={ignoringStatus}"
+                    );
+
+                    if (hasSpl && !parentIsCustom && !ignoringStatus)
                     {
+                        Debug.Log("[PartLookup] PASS 4: Reject: SPL_Part but parentIsCustom=false and not ignoringStatus");
                         foundPart = null;
                         continue;
                     }
 
                     if (foundPart)
+                    {
+                        Debug.Log($"[PartLookup] PASS 4: ACCEPT candidate='{foundPart.name}' -> break");
                         break;
+                    }
                 }
             }
 
+            Debug.Log($"[PartLookup] END returning {(foundPart ? $"'{foundPart.name}'" : "null")}");
             return foundPart;
         }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace SimplePartLoader.CarGen
 {
-    internal class BuildingExceptions
+    public class BuildingExceptions
     {
         internal Dictionary<string, string> ExceptionList = new Dictionary<string, string>()
         {
@@ -23,6 +23,8 @@ namespace SimplePartLoader.CarGen
             if(forceFittingIgnoringParent)
                 ForceIgnore.Add(partName);
         }
+
+        public void ForceExceptionListReset() { ForceIgnore.Clear(); }
 
         public bool IgnoringStatusForPart(string partName)
         {

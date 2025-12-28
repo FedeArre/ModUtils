@@ -65,14 +65,7 @@ namespace SimplePartLoader
 
             Cars = new List<GameObject>();
 
-            GameObject[] carList = GameObject.Find("CarsParent").GetComponent<CarList>().Cars;
-            foreach(GameObject car in carList)
-            {
-                car.AddComponent<SPL_CarTracking>();
-            }
-
             GameObject dummy = new GameObject("SPL_Dummy");
-            dummy.AddComponent<SPL_CarTracking>().AddToAll();
             DelayFuncExecute = dummy.AddComponent<ExternalFunctionExecuter>();
         }
 

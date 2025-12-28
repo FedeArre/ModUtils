@@ -486,6 +486,7 @@
     <Compile Include="Features\DevUI\DevUI.cs" />
     <Compile Include="Features\GamePainting.cs" />
     <Compile Include="Features\InteriorShopCatalog.cs" />
+    <Compile Include="Features\ModShopCatalog.cs" />
     <Compile Include="Features\ModUtils\ExternalFunctionExecuter.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModReportStatus.cs" />
     <Compile Include="Features\SimplePartLoader\CatalogGameObjectManager.cs" />
@@ -512,6 +513,7 @@
     <Compile Include="Features\ModUtils\ModObjects\SimpleLockDTO.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModInstance.cs" />
     <Compile Include="Features\ModUtils\ModObjects\ModSettings.cs" />
+    <Compile Include="Hooks\CarTrackingHook.cs" />
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
     <Compile Include="Hooks\UrpShaderCompatibilityHook.cs" />
@@ -548,7 +550,6 @@
     <Compile Include="Objects\Autoupdater\ModDTO.cs" />
     <Compile Include="Objects\Autoupdater\ModListDTO.cs" />
     <Compile Include="Objects\Autoupdater\JSON_Mod_API_Result.cs" />
-    <Compile Include="Objects\CarUtils\SPL_CarTracking.cs" />
     <Compile Include="Objects\CarUtils\CarDetails.cs" />
     <Compile Include="Objects\CustomSaving\DataWrapper.cs" />
     <Compile Include="Objects\CustomSaving\SaveData.cs" />

@@ -65,7 +65,7 @@ namespace SimplePartLoader.Objects.Furniture
             {
                 if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, Items))
                 {
-                    // Special case: Mod shop interior shop catalog
+                    // Special case: Mod shop interior shop catalog & shop UI
                     if(rcHit.collider.transform.name == "ModUtils_InteriorShopCatalog_Catalog")
                     {
                         ShowText = true;
@@ -74,6 +74,15 @@ namespace SimplePartLoader.Objects.Furniture
                         if (Input.GetMouseButtonDown(0) && !InteriorShopCatalog.CurrentCanvas)
                         {
                             InteriorShopCatalog.OpenOrClose();
+                        }
+                    }
+                    else if(rcHit.collider.transform.name == "ModUtils_ModShopCatalog_Catalog")
+                    {
+                        ShowText = true;
+                        LookText = "Press click to open the mod shop catalog";
+                        if (Input.GetMouseButtonDown(0) && !ModShopCatalog.CurrentCanvas)
+                        {
+                            ModShopCatalog.OpenOrClose();
                         }
                     }
 
@@ -87,7 +96,7 @@ namespace SimplePartLoader.Objects.Furniture
                             Joint jointToDestroy = rcHit.collider.GetComponent<Joint>();
                             if (jointToDestroy)
                                 GameObject.Destroy(jointToDestroy);
-                            
+
                             PlayerHand.position = rcHit.point;
 
                             CurrentlyHoldingFurniture = rcHit.collider.transform;
@@ -112,7 +121,7 @@ namespace SimplePartLoader.Objects.Furniture
                             TipToShow = "";
                             PriceToShow = "";
                             EngineText = "";
-                            if(Input.GetMouseButtonDown(0))
+                            if (Input.GetMouseButtonDown(0))
                             {
                                 if (furnitureRoot.name[19] == 'F' && tools.tool != 22)
                                     return;

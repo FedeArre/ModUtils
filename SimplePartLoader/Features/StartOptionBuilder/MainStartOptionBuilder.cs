@@ -49,7 +49,7 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 CarBuilding.AttachPrefabChilds(startOption.Prefab, originalPart);
 
                 // Also add ModUtils custom identifier
-                startOption.Prefab.AddComponent<SPL_StartOption>();
+                startOption.Prefab.AddComponent<SPL_StartOption>().Mod = startOption.LoadedBy;
 
                 if (CustomLogger.DebugEnabled)
                     CustomLogger.AddLine("StartOptionBuilder", $"Copied {originalPart} to {startOption.Prefab.transform}");

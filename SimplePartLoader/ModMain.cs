@@ -45,7 +45,7 @@ namespace SimplePartLoader
         public const string API_URL = "https://modding.fedes.uy/";
         //public const string API_URL = "https://localhost:7060/";
 
-        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab, UI_InteriorCatalog_Prefab;
+        internal static GameObject UI_Prefab, UI_Error_Prefab, UI_BrokenInstallation_Prefab, UI_DeveloperLogEnabled_Prefab, UI_Downloader_Prefab, UI_Developer, UI_EA, UI_Mods, UI_Mods_Prefab, UI_Info_Prefab, UI_InteriorCatalog_Prefab, UI_ModShop_Prefab;
         AssetBundle AutoupdaterBundle;
         bool MenuFirstLoad;
 
@@ -144,6 +144,7 @@ namespace SimplePartLoader
             UI_Mods_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModUICanvas");
             UI_Info_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("CanvasInfo");
             UI_InteriorCatalog_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("InteriorShop");
+            UI_ModShop_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModShopUI");
 
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
@@ -401,6 +402,7 @@ namespace SimplePartLoader
             shopSupportCube.GetComponent<Renderer>().material = FloorMat;
 
             shop.transform.Find("ModUtils_InteriorShopCatalog_Catalog").gameObject.layer = LayerMask.NameToLayer("Items");
+            shop.transform.Find("ModUtils_ModShopCatalog_Catalog").gameObject.layer = LayerMask.NameToLayer("Items");
 
             // Load modshop into map
             try
@@ -485,9 +487,14 @@ namespace SimplePartLoader
                     UI_Mods.SetActive(false);
                 }
 
-                if(Input.GetKeyDown(KeyCode.Escape) && InteriorShopCatalog.CurrentCanvas)
+                if(Input.GetKeyDown(KeyCode.Escape) && (InteriorShopCatalog.CurrentCanvas || ModShopCatalog.CurrentCanvas))
                 {
-                    InteriorShopCatalog.OpenOrClose();
+                    if(InteriorShopCatalog.CurrentCanvas)
+                        InteriorShopCatalog.OpenOrClose();
+
+                    if (ModShopCatalog.CurrentCanvas)
+                        ModShopCatalog.OpenOrClose();
+
                     ModUtils.ExecuteNextFrame(ModUtils.PlayerTools.ESC);
                 }
 

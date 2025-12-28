@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace SimplePartLoader.CarGen
 {
-    internal interface ICarBase
+    public interface ICarBase
     {
         GameObject GetCar();
         void SetupTemplate(GameObject objective, Car car);
