@@ -50,11 +50,13 @@ namespace SimplePartLoader.Objects.Furniture
         {
             if (ModMain.DevUIEnabled.Checked && Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
             {
+                CustomLogger.AddLine("DevUI", "DevUI first stage set (MOD)");
                 DevUI.GetInstance().WasModPressed = true;
             }
 
             if (DevUI.GetInstance().WasModPressed && Input.GetKey(KeyCode.L) && Input.GetKey(KeyCode.O) && Input.GetKeyDown(KeyCode.G))
             {
+                CustomLogger.AddLine("DevUI", "DevUI second stage set, opening UI");
                 DevUI.GetInstance().LogPressed();
             }
 

@@ -37,7 +37,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.2";
         
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.6-dev2";
+        internal static string TESTING_VERSION_NUMBER = "v1.6-dev3";
         
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -58,7 +58,7 @@ namespace SimplePartLoader
         GameObject ModShopPrefab;
         Material FloorMat;
 
-        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility, OfflineMode;
+        internal static Checkbox EA_Enabled, Telemetry, DontDisableModUI, RandomBG, UrpCompatibility, OfflineMode, DetailedCarGenLog;
         internal static ModDropdown ForcedPaintQuality;
 
         internal static HttpClient Client;
@@ -175,6 +175,7 @@ namespace SimplePartLoader
             mi.AddSeparatorToUI();
             mi.AddHeaderToUI("Settings for developers");
             DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
+            DetailedCarGenLog = mi.AddCheckboxToUI("ModUtils_DetailedCarLog", "Enable detailed car generator logging", false);
             mi.AddSpacerToUI();
 
             // Developer binds

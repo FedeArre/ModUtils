@@ -288,10 +288,20 @@ namespace SimplePartLoader.CarGen
         {
             GameObject carsParent = GameObject.Find("CarsParent");
             CarList carsComp = carsParent.GetComponent<CarList>();
-            
+
             foreach (Car car in RegisteredCars)
             {
-                ICarBase baseData = (ICarBase) MainCarGenerator.AvailableBases[car.CustomCarBaseId ?? (int) car.carGeneratorData.BaseCarToUse];
+                ICarBase baseData;
+
+                if (car.CustomCarBaseId != null)
+                {
+                    baseData = (ICarBase) AvailableBases[car.CustomCarBaseId];
+                }
+                else
+                {
+                    baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
+                }
+
                 if (baseData.VehType() == VehicleType.Trailer) 
                     continue;
 

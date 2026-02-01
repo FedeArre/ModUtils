@@ -22,6 +22,8 @@ namespace SimplePartLoader.Features
         {
             if(IsUIOpen) // Close UI
             {
+                CustomLogger.AddLine("DevUI", "Closing UI");
+
                 GameObject.Destroy(CurrentCanvas);
                 GameObject.Destroy(EventSystem);
                 WasModPressed = false;
