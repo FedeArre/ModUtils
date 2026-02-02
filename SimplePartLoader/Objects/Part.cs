@@ -37,6 +37,7 @@ namespace SimplePartLoader
 
         private PartTypes Type;
         private ModInstance modInstance;
+        private PartExtendedCalls extendedCalls;
 
         public bool RotateThumbnail;
         public List<string> Properties = new List<string>();
@@ -45,6 +46,33 @@ namespace SimplePartLoader
         {
             get { return modInstance; }
         }
+
+        public PartExtendedCalls ExtendedCalls
+        {
+            get { return extendedCalls; }
+        }
+
+        public void RegisterAttached(Action<PartExtendedCalls, GameObject> callback)
+        {
+            PartExtendedCalls.RegisterOnAttached(this, callback);
+        }
+
+        public void UnregisterAttached(Action<PartExtendedCalls, GameObject> callback)
+        {
+            PartExtendedCalls.UnregisterOnAttached(this, callback);
+        }
+
+        public void RegisterDeattached(Action<PartExtendedCalls, GameObject> callback)
+        {
+            PartExtendedCalls.RegisterOnDeattached(this, callback);
+        }
+
+        public void UnregisterDeattached(Action<PartExtendedCalls, GameObject> callback)
+        {
+            PartExtendedCalls.UnregisterOnDeattached(this, callback);
+        }
+
+
         
         public PartTypes PartType
         {
@@ -64,6 +92,20 @@ namespace SimplePartLoader
             {
                 UseBetterCopy = modInstance.Settings.PreciseCloning;
             }
+        }
+
+        public void UseExtendedCalls()
+        {
+            if (Prefab == null)
+                return;
+
+            extendedCalls = Prefab.GetComponent<PartExtendedCalls>();
+            if (extendedCalls == null)
+            {
+                extendedCalls = Prefab.AddComponent<PartExtendedCalls>();
+            }
+
+            extendedCalls.OwnerPart = this;
         }
 
         [Obsolete("SetupTransparent will be removed on the future, use AddTransparent instead!")]
