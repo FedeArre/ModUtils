@@ -39,7 +39,9 @@ namespace SimplePartLoader
         private ModInstance modInstance;
         private PartExtendedCalls extendedCalls;
 
+        [Obsolete("Use ThumbnailRotation instead to specify a custom camera direction.")]
         public bool RotateThumbnail;
+        public Vector3? ThumbnailRotation = null;
         public List<string> Properties = new List<string>();
 
         public ModInstance Mod
