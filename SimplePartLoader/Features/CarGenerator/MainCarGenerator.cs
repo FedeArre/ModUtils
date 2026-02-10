@@ -305,10 +305,13 @@ namespace SimplePartLoader.CarGen
                 if (baseData.VehType() == VehicleType.Trailer) 
                     continue;
 
-                Array.Resize(ref carsComp.Cars, carsComp.Cars.Length + 1);
-                carsComp.Cars[carsComp.Cars.Length - 1] = car.carPrefab;
+                if (!car.DontAddToCarList)
+                {
+                    Array.Resize(ref carsComp.Cars, carsComp.Cars.Length + 1);
+                    carsComp.Cars[carsComp.Cars.Length - 1] = car.carPrefab;
+                }
 
-                if(car.carGeneratorData.SpawnOnJobs)
+                if (car.carGeneratorData.SpawnOnJobs)
                 {
                     Array.Resize(ref carsComp.JobCars, carsComp.JobCars.Length + 1);
                     carsComp.JobCars[carsComp.JobCars.Length - 1] = car.carPrefab;

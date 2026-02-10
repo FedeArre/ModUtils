@@ -43,6 +43,7 @@ namespace SimplePartLoader.CarGen
         internal string ReportedIssue = string.Empty;
 
         internal bool DelayRearBoneFix = false;
+        internal bool DontAddToCarList = false;
 
         internal void ReportIssue(string issue)
         {
@@ -83,6 +84,11 @@ namespace SimplePartLoader.CarGen
         public void ApplyRearBoneDelayedFix()
         {
             DelayRearBoneFix = true;
+        }
+
+        public void DisableJunkyardDealerSpawn()
+        {
+            DontAddToCarList = true;
         }
     }
 }
