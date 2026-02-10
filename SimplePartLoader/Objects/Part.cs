@@ -99,6 +99,12 @@ namespace SimplePartLoader
             if (Prefab == null)
                 return;
 
+            if(CarProps == null)
+            {
+                CustomLogger.AddLine("Parts", $"Error, part {Name} is missing CarProperties when trying to setup extended calls. Set them up on FirstLoad.");
+                return;
+            }
+
             extendedCalls = Prefab.GetComponent<PartExtendedCalls>();
             if (extendedCalls == null)
             {
