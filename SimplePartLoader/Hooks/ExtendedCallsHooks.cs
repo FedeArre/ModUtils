@@ -78,15 +78,11 @@ internal static class ExtendedCallsHookUtils
 {
     internal static void SyncAttachment(Component component)
     {
-        Debug.Log($"SyncAttachment called for component: {component?.GetType().Name}");
-        Debug.Log($"Component GameObject: {component?.gameObject.name}");
-
         if (component == null)
             return;
 
         // If it has extended calls, we continue
         var extendedCalls = component.gameObject.GetComponent<PartExtendedCalls>();
-        Debug.Log("EC: " + (extendedCalls != null ? "Found" : "Not Found"));
         if (extendedCalls == null)
             return;
 
@@ -94,7 +90,6 @@ internal static class ExtendedCallsHookUtils
 
         // Check if the part is attached or not
         bool isAttached = extendedCalls.transform.parent.GetComponent<transparents>();
-        Debug.Log("Is Attached: " + isAttached);
         Debug.Log(extendedCalls.transform.parent ? "Parent: " + extendedCalls.transform.parent.name : "No Parent");
 
         if (isAttached)
