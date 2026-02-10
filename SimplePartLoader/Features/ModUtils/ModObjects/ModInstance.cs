@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using SimplePartLoader.CarGen;
 using SimplePartLoader.Features;
+using SimplePartLoader.Features.IngameDialogs;
 using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Utils;
 using System;
@@ -729,6 +730,21 @@ namespace SimplePartLoader
         public void SetSettingsLoadedFunction(Action func)
         {
             OnSettingsLoad = func;
+        }
+
+        public IngameDialog OpenInformationDialog(InformationDialogOptions options)
+        {
+            return IngameDialogManager.OpenInformationDialog(options);
+        }
+
+        public IngameDialog OpenConfirmationDialog(ConfirmationDialogOptions options)
+        {
+            return IngameDialogManager.OpenConfirmationDialog(options);
+        }
+
+        public IngameDialog OpenInputDialog(InputDialogOptions options)
+        {
+            return IngameDialogManager.OpenInputDialog(options);
         }
 
         internal List<ISetting> GetSaveablesSettings()

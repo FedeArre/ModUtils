@@ -2,29 +2,22 @@
 // This module can create unrequired overhead on final builds
 #define MODUTILS_TIMING_ENABLED
 
-using Autoupdater.Objects;
-using Newtonsoft.Json;
-using SimplePartLoader;
+using HarmonyLib;
 using SimplePartLoader.CarGen;
+using SimplePartLoader.Features;
+using SimplePartLoader.Features.CarGenerator;
+using SimplePartLoader.Features.IngameDialogs;
+using SimplePartLoader.Features.UI;
+using SimplePartLoader.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Http;
 using UnityEngine;
 using UnityEngine.UI;
 using Debug = UnityEngine.Debug;
-using SimplePartLoader.Features;
-using SimplePartLoader.Features.CarGenerator;
-using HarmonyLib;
-using SimplePartLoader.Features.UI;
-using static Unity.Burst.Intrinsics.X86.Avx;
-using System.Linq;
-using System.Reflection;
-using EVP;
-using SimplePartLoader.Utils;
-using System.Net.Http;
-using System.Security.Policy;
 
 namespace SimplePartLoader
 {
@@ -35,10 +28,10 @@ namespace SimplePartLoader
         public override string Name => "ModUtils";
         public override string Author => "Federico Arredondo";
         public override string Version => "v1.5.2";
-        
+
         bool TESTING_VERSION_REMEMBER = true;
         internal static string TESTING_VERSION_NUMBER = "v1.6-dev3";
-        
+
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
         // Autoupdater
@@ -52,7 +45,7 @@ namespace SimplePartLoader
         // ModUtils
         Transform PlayerTransform;
         bool PlayerOnCar;
-        
+
         // Mod shop
         AssetBundle Bundle;
         GameObject ModShopPrefab;
@@ -146,6 +139,11 @@ namespace SimplePartLoader
             UI_InteriorCatalog_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("InteriorShop");
             UI_ModShop_Prefab = AutoupdaterBundle.LoadAsset<GameObject>("ModShopUI");
 
+            // Ingame dialogs
+            IngameDialogManager.Dialog1ButtonPrefab = AutoupdaterBundle.LoadAsset<GameObject>("Dialog1Button");
+            IngameDialogManager.Dialog2ButtonPrefab = AutoupdaterBundle.LoadAsset<GameObject>("Dialog2Button");
+            IngameDialogManager.Dialog2ButtonInputPrefab = AutoupdaterBundle.LoadAsset<GameObject>("Dialog2ButtonInput");
+
             // Some bug fixing
             UI_Prefab.GetComponent<Canvas>().sortingOrder = 1; // Fixes canva disappearing after a bit.
             UI_Downloader_Prefab.GetComponent<Canvas>().sortingOrder = 1;
@@ -169,7 +167,7 @@ namespace SimplePartLoader
             ForcedPaintQuality = mi.AddDropdownToUI("ModUtils_paintQuality", "Force paint quality", new string[] { "None", "Very low", "Low", "Medium", "High", "Very high" }, 0);
             mi.AddSpacerToUI();
 
-            mi.AddLabelToUI ("Offline mode will disable all online features of ModUtils (Autoupdater, random background, telemetry, EA)");
+            mi.AddLabelToUI("Offline mode will disable all online features of ModUtils (Autoupdater, random background, telemetry, EA)");
             OfflineMode = mi.AddCheckboxToUI("ModUtils_OfflineMode", "Enable offline mode", false);
 
             mi.AddSeparatorToUI();
@@ -281,7 +279,7 @@ namespace SimplePartLoader
             UI_Mods.SetActive(true);
             UI_Mods.transform.Find("OpenMods").localScale = Vector3.one;
 
-            if(RandomBG.Checked) new GameObject("test").AddComponent<BackgroundDelayChange>();
+            if (RandomBG.Checked) new GameObject("test").AddComponent<BackgroundDelayChange>();
         }
 
         public override void OnLoad()
@@ -308,17 +306,17 @@ namespace SimplePartLoader
             {
                 PartManager.OnLoadCalled();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 CustomLogger.AddLine("Parts", ex);
             }
 
             PlayerTransform = ModUtils.GetPlayer().transform;
 
-            if(PlayerPrefs.GetFloat("LoadLevel") == 0f)
+            if (PlayerPrefs.GetFloat("LoadLevel") == 0f)
                 CustomSaverHandler.NewGame();
 
-            if(CustomLogger.SaveDissasamble)
+            if (CustomLogger.SaveDissasamble)
             {
                 CustomLogger.AddLine("Dev", "Save dissasembling has been enabled! - Information in Player.log");
                 SaveSystem save = new SaveSystem(Application.persistentDataPath + "/save1/save.dat");
@@ -326,13 +324,13 @@ namespace SimplePartLoader
                 {
                     save.read();
                     Debug.Log("[ModUtils/Dev]: Save file found, loading...");
-                    foreach(DictionaryEntry s in save.table)
+                    foreach (DictionaryEntry s in save.table)
                     {
                         Debug.Log("[SD]: " + s.Key + " | " + s.Value);
-                        if(s.Value is List<String>)
+                        if (s.Value is List<String>)
                         {
                             Debug.Log("[SD]: Entry above is string list, content: ");
-                            foreach(string str in (List<string>)s.Value)
+                            foreach (string str in (List<string>)s.Value)
                             {
                                 Debug.Log("[SD]: " + str);
                             }
@@ -348,7 +346,7 @@ namespace SimplePartLoader
             // If Urp compatibility is enabled, we can try to convert old materials to the new system.
             if (ModMain.UrpCompatibility.Checked)
             {
-                foreach(var part in PartManager.prefabGenParts)
+                foreach (var part in PartManager.prefabGenParts)
                 {
                     if (part.CarProps == null || part.CarProps.PrefabName == null || part.CarProps.PrefabName == "")
                         continue;
@@ -453,7 +451,8 @@ namespace SimplePartLoader
             GameObject dummyObject = new GameObject("SPL_Dummy");
             dummyObject.AddComponent<SavingHandlerMono>().Load(saver, isBarn);
 
-            if (!isBarn) {
+            if (!isBarn)
+            {
                 FurnitureManager.LoadFurniture(saver);
                 DataHandler.OnLoad(saver);
             }
@@ -463,34 +462,38 @@ namespace SimplePartLoader
         {
             if (PlayerTransform)
             {
-                if(PlayerTransform.parent == null && PlayerOnCar)
+                if (PlayerTransform.parent == null && PlayerOnCar)
                 {
                     PlayerOnCar = false;
                     ModUtils.UpdatePlayerStatus(PlayerOnCar);
                 }
 
-                else if(PlayerTransform.parent != null && !PlayerOnCar)
+                else if (PlayerTransform.parent != null && !PlayerOnCar)
                 {
                     MainCarProperties mcp = PlayerTransform.root.GetComponent<MainCarProperties>();
-                    if(mcp)
+                    if (mcp)
                     {
                         PlayerOnCar = true;
                         ModUtils.UpdatePlayerStatus(PlayerOnCar, mcp);
                     }
                 }
 
-                if(ModUtils.PlayerTools.EscMenu.activeSelf && !UI_Mods.activeSelf)
+                if (ModUtils.PlayerTools.EscMenu.activeSelf && !UI_Mods.activeSelf)
                 {
                     UI_Mods.SetActive(true);
                 }
-                else if(!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf && ModUtilsUI.currentlyEditingKeybind == null)
+                else if (!ModUtils.PlayerTools.EscMenu.activeSelf && UI_Mods.activeSelf && ModUtilsUI.currentlyEditingKeybind == null)
                 {
                     UI_Mods.SetActive(false);
                 }
 
-                if(Input.GetKeyDown(KeyCode.Escape) && (InteriorShopCatalog.CurrentCanvas || ModShopCatalog.CurrentCanvas))
+                if (Input.GetKeyDown(KeyCode.Escape) && IngameDialogManager.IsDialogOpen)
                 {
-                    if(InteriorShopCatalog.CurrentCanvas)
+                    IngameDialogManager.HandleEscapePress();
+                }
+                else if (Input.GetKeyDown(KeyCode.Escape) && (InteriorShopCatalog.CurrentCanvas || ModShopCatalog.CurrentCanvas))
+                {
+                    if (InteriorShopCatalog.CurrentCanvas)
                         InteriorShopCatalog.OpenOrClose();
 
                     if (ModShopCatalog.CurrentCanvas)
