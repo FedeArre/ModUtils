@@ -7,6 +7,9 @@ namespace SimplePartLoader
 {
     public class PartExtendedCalls : MonoBehaviour
     {
+        [SerializeField]
+        internal string OwnerPartPrefabName;
+
         public Part OwnerPart { get; internal set; }
 
         public bool IsAttached { get; private set; }
@@ -18,7 +21,37 @@ namespace SimplePartLoader
         void Start()
         {
             Debug.Log("PartExtendedCall start, awaiting 5 frames to check current status of " + name);
+
+            if (OwnerPart == null && !string.IsNullOrEmpty(OwnerPartPrefabName))
+            {
+                ResolveOwnerPart();
+            }
+
             StartCoroutine(DelayedStart());
+        }
+
+        private void ResolveOwnerPart()
+        {
+            foreach (Part part in PartManager.modLoadedParts)
+            {
+                if (part == null)
+                    continue;
+
+                string partPrefabName = null;
+                if (part.CarProps != null)
+                    partPrefabName = part.CarProps.PrefabName;
+                else
+                    partPrefabName = part.Name;
+
+                if (partPrefabName == OwnerPartPrefabName)
+                {
+                    OwnerPart = part;
+                    Debug.Log($"PartExtendedCalls resolved OwnerPart for {name} to {OwnerPartPrefabName}");
+                    return;
+                }
+            }
+
+            Debug.LogWarning($"PartExtendedCalls could not resolve OwnerPart for {name} with PrefabName {OwnerPartPrefabName}");
         }
 
         IEnumerator DelayedStart()

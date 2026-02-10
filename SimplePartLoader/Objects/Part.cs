@@ -106,6 +106,7 @@ namespace SimplePartLoader
             }
 
             extendedCalls.OwnerPart = this;
+            extendedCalls.OwnerPartPrefabName = CarProps != null ? CarProps.PrefabName : Name;
         }
 
         [Obsolete("SetupTransparent will be removed on the future, use AddTransparent instead!")]
