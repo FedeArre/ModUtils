@@ -704,6 +704,19 @@ namespace SimplePartLoader
                             break;
                     }
 
+                    var mf = part.GetComponent<MeshFilter>();
+                    if (mf == null)
+                    {
+                        part.ReportIssue($"Mesh change is enabled but no MeshFilter was found on the prefab.");
+                        continue;
+                    }
+
+                    if(mf.sharedMesh == null)
+                    {
+                        part.ReportIssue($"Mesh change is enabled but no mesh was found on the MeshFilter.");
+                        continue;
+                    }
+
                     if (!data.GetComponent<MeshFilter>().sharedMesh.isReadable && (part.CarProps.Paintable || part.CarProps.DMGdeformMesh || part.CarProps.DMGdisplacepart))
                         part.ReportIssue($"Mesh is not readable and part is paintable or deformable.");
                 }
