@@ -249,6 +249,7 @@ namespace SimplePartLoader
 
         internal void ReportIssue(string issue)
         {
+            CustomLogger.AddLine("Parts", $"Issue reported on part {Name}: {issue}");
             IssueExternalReport = true;
             ReportedIssue += issue + "\n";
         }
