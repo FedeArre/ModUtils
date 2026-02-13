@@ -59,15 +59,18 @@ namespace SimplePartLoader.Utils
 
                     if (instanciated.GetComponent<CarProperties>() && instanciated.GetComponent<CarProperties>().Paintable)
                     {
-                        var texture = instanciated.GetComponent<P3dPaintableTexture>();
-                        if (texture is null)
+                        var textures = instanciated.GetComponents<P3dPaintableTexture>();
+                        if (textures.Length == 0)
                         {
                             CustomLogger.AddLine("ThumbnailGenerator", $"Part {p.CarProps.PrefabName} does not have a P3dPaintableTexture component! Skipping thumbnail generation.");
                             break;
                         }
 
-                        texture.Color = Color.gray;
-                        texture.Activate();
+                        foreach (var texture in textures)
+                        {
+                            texture.Activate();
+                            texture.Clear();
+                        }
                     }
 
                     foreach (var a in instanciated.GetComponentsInChildren<HexNut>())
