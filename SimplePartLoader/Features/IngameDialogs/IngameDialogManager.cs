@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 namespace SimplePartLoader.Features.IngameDialogs
 {
-    internal class IngameDialogManager
+    public class IngameDialogManager
     {
         internal static GameObject Dialog1ButtonPrefab;
         internal static GameObject Dialog2ButtonPrefab;
@@ -21,7 +21,7 @@ namespace SimplePartLoader.Features.IngameDialogs
 
         internal static bool IsDialogOpen => currentDialog != null;
 
-        internal static IngameDialog OpenInformationDialog(InformationDialogOptions options)
+        public static IngameDialog OpenInformationDialog(InformationDialogOptions options)
         {
             if (currentDialog != null)
             {
@@ -53,7 +53,7 @@ namespace SimplePartLoader.Features.IngameDialogs
             return dialog;
         }
 
-        internal static IngameDialog OpenConfirmationDialog(ConfirmationDialogOptions options)
+        public static IngameDialog OpenConfirmationDialog(ConfirmationDialogOptions options)
         {
             if (currentDialog != null)
             {
@@ -97,7 +97,7 @@ namespace SimplePartLoader.Features.IngameDialogs
             return dialog;
         }
 
-        internal static IngameDialog OpenInputDialog(InputDialogOptions options)
+        public static IngameDialog OpenInputDialog(InputDialogOptions options)
         {
             if (currentDialog != null)
             {

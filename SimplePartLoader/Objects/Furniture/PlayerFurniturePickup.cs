@@ -48,10 +48,17 @@ namespace SimplePartLoader.Objects.Furniture
 
         void Update()
         {
-            if (ModMain.DevUIEnabled.Checked && Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
+            if (Input.GetKey(KeyCode.M) && Input.GetKey(KeyCode.O) && Input.GetKey(KeyCode.D))
             {
-                CustomLogger.AddLine("DevUI", "DevUI first stage set (MOD)");
-                DevUI.GetInstance().WasModPressed = true;
+                if(!ModMain.DevUIEnabled.Checked)
+                {
+                    CustomLogger.AddLine("DevUI", "DevUI first stage can not be set - DevUiEnabled is false");
+                }
+                else
+                {
+                    CustomLogger.AddLine("DevUI", "DevUI first stage set (MOD)");
+                    DevUI.GetInstance().WasModPressed = true;
+                }
             }
 
             if (DevUI.GetInstance().WasModPressed && Input.GetKey(KeyCode.L) && Input.GetKey(KeyCode.O) && Input.GetKeyDown(KeyCode.G))
