@@ -86,11 +86,8 @@ internal static class ExtendedCallsHookUtils
         if (extendedCalls == null)
             return;
 
-        Debug.Log("Found PartExtendedCalls component.");
-
         // Check if the part is attached or not
         bool isAttached = extendedCalls.transform.parent.GetComponent<transparents>();
-        Debug.Log(extendedCalls.transform.parent ? "Parent: " + extendedCalls.transform.parent.name : "No Parent");
 
         if (isAttached)
         {

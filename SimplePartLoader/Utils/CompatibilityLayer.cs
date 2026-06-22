@@ -297,14 +297,14 @@ namespace SimplePartLoader.Utils
 
         public static void UpdateMaterialsOfRenderer(MeshRenderer mr)
         {
-            var mats = mr.materials;
+            var mats = mr.sharedMaterials;
 
             for(int i = 0; i < mats.Length; i++)
             {
                 mats[i] = ConvertMaterial(mats[i]);
             }
 
-            mr.materials = mats;
+            mr.sharedMaterials = mats;
         }
     }
 }

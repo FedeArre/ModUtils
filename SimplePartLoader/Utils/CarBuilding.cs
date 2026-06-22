@@ -135,7 +135,8 @@ namespace SimplePartLoader.Utils
         {
             bool referenceUpdated = false;
 
-            foreach (transparents t in p.GetComponentsInChildren<transparents>())
+            transparents[] allTransparents = p.GetComponentsInChildren<transparents>();
+            foreach (transparents t in allTransparents)
             {
                 if(t.DEPENDANTS != null && t.DEPENDANTS.Length > 0)
                 {
@@ -160,7 +161,7 @@ namespace SimplePartLoader.Utils
                         }
 
                         int savePosition = tr.SavePosition;
-                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
+                        foreach (transparents t2 in allTransparents)
                         {
                             if(t2 == null)
                             {
@@ -207,7 +208,7 @@ namespace SimplePartLoader.Utils
                         }
 
                         int savePosition = dp.Attachable.GetComponent<transparents>().SavePosition;
-                        foreach (transparents t2 in p.GetComponentsInChildren<transparents>())
+                        foreach (transparents t2 in allTransparents)
                         {
                             if (t2 == null)
                             {

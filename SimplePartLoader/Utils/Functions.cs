@@ -324,6 +324,25 @@ namespace SimplePartLoader.Utils
             array[array.Length - 1] = newValue;
         }
 
+        /// <summary>
+        /// Disables collisions between every pair of the given colliders.
+        /// </summary>
+        /// <param name="colliders">The colliders to make mutually non-colliding</param>
+        public static void IgnoreCollisionsBetweenAll(Collider[] colliders)
+        {
+            if (colliders == null)
+                return;
+
+            for (int i = 0; i < colliders.Length; i++)
+            {
+                for (int j = i + 1; j < colliders.Length; j++)
+                {
+                    if (colliders[i] != colliders[j])
+                        Physics.IgnoreCollision(colliders[i], colliders[j], true);
+                }
+            }
+        }
+
         #region Material Cull Helpers
 
         /// <summary>

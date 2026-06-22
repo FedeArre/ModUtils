@@ -6,6 +6,7 @@ using SimplePartLoader.Features.StartOptionBuilder;
 using SimplePartLoader.Objects;
 using SimplePartLoader.Objects.EditorComponents;
 using SimplePartLoader.Utils;
+using SkrilStudio;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -333,25 +334,56 @@ namespace SimplePartLoader
 
             SPL.DevLog("Starting transparent attaching, transparents to attach: " + transparentData.Count);
 
+            Dictionary<string, List<GameObject>> partsByName = new Dictionary<string, List<GameObject>>();
+            foreach (GameObject part in gameParts)
+            {
+                if (part == null)
+                    continue;
+
+                if (!partsByName.TryGetValue(part.name, out List<GameObject> namedParts))
+                {
+                    namedParts = new List<GameObject>();
+                    partsByName[part.name] = namedParts;
+                }
+                namedParts.Add(part);
+            }
+
+            Dictionary<string, List<Transform>> carChildrenByName = new Dictionary<string, List<Transform>>();
+            for (int i = 0; i < cars.Length; i++)
+            {
+                if (cars[i] == null)
+                    continue;
+
+                foreach (Transform child in cars[i].GetComponentsInChildren<Transform>())
+                {
+                    if (!carChildrenByName.TryGetValue(child.name, out List<Transform> namedChilds))
+                    {
+                        namedChilds = new List<Transform>();
+                        carChildrenByName[child.name] = namedChilds;
+                    }
+                    namedChilds.Add(child);
+                }
+            }
+
             // We now load our transparents. We have to load them for the junkyard parts, car prefabs.
             foreach(TransparentData t in transparentData)
             {
                 // We check the car part list for every possible part that has the transparent. This is slow but required for dummy part transparent attaching and will not impact FPS (Only loading time).
-                foreach(GameObject part in gameParts)
-                { 
-                    if(t.AttachesTo == part.name)
+                if (partsByName.TryGetValue(t.AttachesTo, out List<GameObject> matchingParts))
+                {
+                    foreach (GameObject part in matchingParts)
                     {
                         bool preventTransparentCreation = false;
 
-                        foreach(transparents transparent in part.GetComponentsInChildren<transparents>())
+                        foreach (transparents transparent in part.GetComponentsInChildren<transparents>())
                         {
-                            if(transparent.name == t.Name && transparent.SavePosition == t.SavePosition)
+                            if (transparent.name == t.Name && transparent.SavePosition == t.SavePosition)
                             {
                                 preventTransparentCreation = true;
                             }
                         }
 
-                        if(preventTransparentCreation)
+                        if (preventTransparentCreation)
                         {
                             CustomLogger.AddLine("Transparents", $"Prevented transparent {t.Name} creation due to existing transparent with same save position ({t.SavePosition})");
                             break;
@@ -368,25 +400,21 @@ namespace SimplePartLoader
                     }
                 }
 
-                for (int i = 0; i < cars.Length; i++) // Now we need to also attach the part into the car prefabs (or it will not spawn in the game)
+                // Now we need to also attach the part into the car prefabs (or it will not spawn in the game)
+                if (carChildrenByName.TryGetValue(t.AttachesTo, out List<Transform> matchingChilds))
                 {
-                    Transform[] childs = cars[i].GetComponentsInChildren<Transform>();
-
-                    foreach (Transform child in childs) // We check for every car part in the game
+                    foreach (Transform child in matchingChilds) // We check for every car part in the game
                     {
-                        if(t.AttachesTo == child.name)
+                        if(!child.GetComponent<transparents>())
                         {
-                            if(!child.GetComponent<transparents>())
-                            {
-                                GameObject transparentObject = GetTransparentReadyObject(t);
-                                transparentObject.transform.SetParent(child);
+                            GameObject transparentObject = GetTransparentReadyObject(t);
+                            transparentObject.transform.SetParent(child);
 
-                                SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name}) (car-prefab variant)");
+                            SPL.DevLog($"Internally attaching transparent to {t.AttachesTo} (for object {t.Name}) (car-prefab variant)");
 
-                                transparentObject.transform.localPosition = t.LocalPos;
-                                transparentObject.transform.localScale = t.Scale;
-                                transparentObject.transform.localRotation = t.LocalRot;
-                            }
+                            transparentObject.transform.localPosition = t.LocalPos;
+                            transparentObject.transform.localScale = t.Scale;
+                            transparentObject.transform.localRotation = t.LocalRot;
                         }
                     }
                 }
@@ -735,7 +763,7 @@ namespace SimplePartLoader
                     part.PartInfo.Thumbnail = data.CatalogImage;
                 }
 
-                if (!String.IsNullOrWhiteSpace(data.RenamedPrefab))
+                if (!string.IsNullOrWhiteSpace(data.RenamedPrefab))
                 {
                     part.PartInfo.RenamedPrefab = data.RenamedPrefab;
                 }
@@ -844,6 +872,7 @@ namespace SimplePartLoader
                 }
 
                 part.PrefabGenLoaded = true;
+
                 // Destroy some stuff
                 DestroyConsideringSetting(part, part.Prefab.GetComponent<PrefabGenerator>());
                 

@@ -20,8 +20,6 @@ namespace SimplePartLoader
 
         void Start()
         {
-            Debug.Log("PartExtendedCall start, awaiting 5 frames to check current status of " + name);
-
             if (OwnerPart == null && !string.IsNullOrEmpty(OwnerPartPrefabName))
             {
                 ResolveOwnerPart();
@@ -46,7 +44,6 @@ namespace SimplePartLoader
                 if (partPrefabName == OwnerPartPrefabName)
                 {
                     OwnerPart = part;
-                    Debug.Log($"PartExtendedCalls resolved OwnerPart for {name} to {OwnerPartPrefabName}");
                     return;
                 }
             }
@@ -65,7 +62,6 @@ namespace SimplePartLoader
             // 5 frames later, we check if we are attached to something
             if(transform.parent != null && transform.parent.GetComponent<transparents>())
             {
-                Debug.Log("PartExtendedCall detected attachment on start for " + name);
                 NotifyAttached(gameObject);
             }
         }
@@ -92,8 +88,6 @@ namespace SimplePartLoader
 
         internal void NotifyAttached(GameObject target)
         {
-            Debug.Log("NotifyAttached called for " + name + " to target " + target.name);
-            Debug.Log("Current IsAttached: " + IsAttached + ", AttachedTo: " + (AttachedTo != null ? AttachedTo.name : "null"));
             if (IsAttached && AttachedTo == target)
                 return;
 
@@ -104,8 +98,6 @@ namespace SimplePartLoader
 
         internal void NotifyDetached(GameObject target)
         {
-            Debug.Log("NotifyDetached called for " + name + " from target " + target.name);
-
             if (!IsAttached)
                 return;
 

@@ -47,17 +47,9 @@ namespace SimplePartLoader.Features.CarGenerator
             // MainCarProperties.PreventChildCollisions (but using Collider instead of MeshCollider)
             Collider[] array = base.GetComponentsInChildren<Collider>();
             for (int i = 0; i < array.Length; i++)
-            {
                 array[i].material = vc.physicsMaterial;
-                for (int j = i + 1; j < array.Length; j++)
-                {
-                    if (!(array[i] == array[j]))
-                    {
-                        //Debug.Log($"Ignoring collision between {Functions.GetTransformPath(array[i].transform)} && {Functions.GetTransformPath(array[j].transform)}");
-                        Physics.IgnoreCollision(array[i], array[j], true);
-                    }
-                }
-            }
+
+            Functions.IgnoreCollisionsBetweenAll(array);
             yield return 0;
 
             GameObject.Destroy(this);

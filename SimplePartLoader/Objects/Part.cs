@@ -124,7 +124,7 @@ namespace SimplePartLoader
             MeshFilter mf = Prefab.GetComponent<MeshFilter>();
             if(mf)
             {
-                td.MeshToUse = mf.mesh;
+                td.MeshToUse = mf.sharedMesh;
             }
 
             td.Owner = this;
@@ -138,7 +138,7 @@ namespace SimplePartLoader
             MeshFilter mf = Prefab.GetComponent<MeshFilter>();
             if (mf)
             {
-                td.MeshToUse = mf.mesh;
+                td.MeshToUse = mf.sharedMesh;
             }
 
             td.Owner = this;
@@ -167,7 +167,7 @@ namespace SimplePartLoader
             MeshFilter mf = Prefab.GetComponent<MeshFilter>();
             if (mf)
             {
-                td.MeshToUse = mf.mesh;
+                td.MeshToUse = mf.sharedMesh;
             }
 
             td.Owner = this;

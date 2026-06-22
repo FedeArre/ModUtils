@@ -79,6 +79,10 @@ internal static class ExceptionHook
         if (method.GetMethodBody() == null)
             return false;
 
+        // Skip property accessors - extremely hot and almost never the meaningful source of an exception
+        if (method.IsSpecialName && (method.Name.StartsWith("get_") || method.Name.StartsWith("set_")))
+            return false;
+
         return true;
     }
 

@@ -15,6 +15,7 @@ namespace SimplePartLoader.Objects.Furniture
         internal static PlayerFurniturePickup Instance;
 
         Transform PlayerHand;
+        Camera mainCamera;
         Transform CurrentlyHoldingFurniture = null;
 
         public string LookText;
@@ -37,6 +38,7 @@ namespace SimplePartLoader.Objects.Furniture
         void Start()
         {
             PlayerHand = GameObject.Find("hand").transform;
+            mainCamera = Camera.main;
 
             LookingText = ModUtils.GetPlayerTools().LookingText;
             PriceText = ModUtils.GetPlayerTools().PriceText;
@@ -70,9 +72,12 @@ namespace SimplePartLoader.Objects.Furniture
             RaycastHit rcHit;
             ShowText = false;
 
-            if ((tools.tool == 22 || tools.tool == 1) && tools.helditem == "Nothing")
+            if (mainCamera == null)
+                mainCamera = Camera.main; // Re-acquire only if lost; avoids the per-frame Camera.main tag search
+
+            if (mainCamera && (tools.tool == 22 || tools.tool == 1) && tools.helditem == "Nothing")
             {
-                if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out rcHit, 2f, Items))
+                if (Physics.Raycast(mainCamera.transform.position, mainCamera.transform.forward, out rcHit, 2f, Items))
                 {
                     // Special case: Mod shop interior shop catalog & shop UI
                     if(rcHit.collider.transform.name == "ModUtils_InteriorShopCatalog_Catalog")

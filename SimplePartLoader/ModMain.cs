@@ -30,7 +30,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.2";
 
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.6-dev5";
+        internal static string TESTING_VERSION_NUMBER = "v1.6-dev6";
 
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -55,6 +55,11 @@ namespace SimplePartLoader
         internal static ModDropdown ForcedPaintQuality;
 
         internal static HttpClient Client;
+
+        // Exception tracer (ExceptionHook) is patched on demand - see SetExceptionTracer
+        const string EXCEPTION_HARMONY_ID = "com.fedes.modutils.exceptiontracer";
+        static Harmony ExceptionHarmony;
+        static bool ExceptionTracerActive;
 
         // Developer stuff for UI
         internal static Checkbox DevUIEnabled;
@@ -81,6 +86,7 @@ namespace SimplePartLoader
 
             Client = new HttpClient();
             Client.BaseAddress = new Uri(API_URL);
+            Client.Timeout = TimeSpan.FromSeconds(15); // Prevent the game from hanging if an endpoint stalls
             Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
 
             watch = new System.Diagnostics.Stopwatch();
@@ -91,8 +97,19 @@ namespace SimplePartLoader
             if (TESTING_VERSION_REMEMBER)
                 Debug.Log($"This is a testing version ({TESTING_VERSION_NUMBER}) - remember to report bugs and send feedback");
 
+            // Patch everything except ExceptionHook. ExceptionHook installs a finalizer on every method of
+            // several hot game classes, so it is only applied on demand (when DeveloperUI is enabled) to avoid
+            // wrapping per-frame game calls during normal play.
             var harmony = new Harmony("com.fedes.modutils");
-            harmony.PatchAll();
+            foreach (var type in AccessTools.GetTypesFromAssembly(typeof(ModMain).Assembly))
+            {
+                if (type == typeof(ExceptionHook))
+                    continue;
+
+                harmony.CreateClassProcessor(type).Patch();
+            }
+
+            ExceptionHarmony = new Harmony(EXCEPTION_HARMONY_ID);
 
             // Deleting unused stuff
             string ModsFolderPath = Application.dataPath + "/../Mods/";
@@ -172,7 +189,7 @@ namespace SimplePartLoader
 
             mi.AddSeparatorToUI();
             mi.AddHeaderToUI("Settings for developers");
-            DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false);
+            DevUIEnabled = mi.AddCheckboxToUI("ModUtils_DevUI", "Enable DeveloperUI", false, SetExceptionTracer);
             DetailedCarGenLog = mi.AddCheckboxToUI("ModUtils_DetailedCarLog", "Enable detailed car generator logging", false);
             mi.AddSpacerToUI();
 
@@ -229,34 +246,23 @@ namespace SimplePartLoader
         {
             if (!MenuFirstLoad)
             {
-                Debug.Log("1");
                 watch.Stop();
                 CustomLogger.AddLine("Timing", $"Mods took {watch.ElapsedMilliseconds} ms to load.");
-
-                Debug.Log("1");
                 MenuFirstLoad = true;
                 CustomLogger.AddLine("Main", "Printing mod list");
                 foreach (Mod m in ModLoader.mods)
                 {
                     CustomLogger.AddLine("Main", $"{m.Name} (ID: {m.ID}) - Version {m.Version}");
                 }
-
-                Debug.Log("1");
                 UI_Mods = GameObject.Instantiate(UI_Mods_Prefab);
                 GameObject.DontDestroyOnLoad(UI_Mods);
-
-                Debug.Log("1");
                 ModUtilsUI.PrepareUI();
                 SettingSaver.LoadSettings();
-
-                Debug.Log("1");
                 GameObject modUiRemove = GameObject.Find("ModUICanvas(Clone)");
                 if (modUiRemove && !DontDisableModUI.Checked)
                 {
                     modUiRemove.SetActive(false);
                 }
-
-                Debug.Log("1");
 
                 if (RandomBG.Checked && !OfflineMode.Checked)
                 {
@@ -600,6 +606,27 @@ namespace SimplePartLoader
         {
             // Enable heartbeat
             KeepAlive.GetInstance().Ready();
+
+            // Apply the saved DeveloperUI state (settings load sets the value directly, without firing the toggle handler)
+            SetExceptionTracer(DevUIEnabled.Checked);
+        }
+
+        /// <summary>
+        /// Applies or removes the ExceptionHook finalizer patches. Patching is conditional on DeveloperUI so the
+        /// hot game classes are not wrapped during normal play. Safe to call repeatedly - it no-ops when already in
+        /// the requested state. Main-thread only (called from settings load and the DeveloperUI checkbox handler).
+        /// </summary>
+        internal static void SetExceptionTracer(bool enabled)
+        {
+            if (ExceptionHarmony == null || enabled == ExceptionTracerActive)
+                return;
+
+            if (enabled)
+                ExceptionHarmony.CreateClassProcessor(typeof(ExceptionHook)).Patch();
+            else
+                ExceptionHarmony.UnpatchSelf(); // Dedicated instance - removes only the ExceptionHook finalizers
+
+            ExceptionTracerActive = enabled;
         }
     }
 }

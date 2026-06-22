@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using HarmonyLib;
 using NWH.WheelController3D;
 using SimplePartLoader;
+using SimplePartLoader.Utils;
 using UnityEngine;
 
 [HarmonyPatch(typeof(MainCarProperties), nameof(CheckDr))]
@@ -15,18 +16,7 @@ internal class WCLayerHook
     {
         if (!__instance.transform.parent)
         {
-            Collider[] componentsInChildren = __instance.GetComponentsInChildren<Collider>();
-            Collider[] array = componentsInChildren;
-            for (int i = 0; i < array.Length; i++)
-            {
-                for (int j = i + 1; j < array.Length; j++)
-                {
-                    if (!(array[i] == array[j]))
-                    {
-                        Physics.IgnoreCollision(array[i], array[j], true);
-                    }
-                }
-            }
+            Functions.IgnoreCollisionsBetweenAll(__instance.GetComponentsInChildren<Collider>());
         }
     }
 }

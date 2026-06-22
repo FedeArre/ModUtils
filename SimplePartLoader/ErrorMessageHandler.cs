@@ -33,6 +33,7 @@ namespace SimplePartLoader
         public List<string> Dissasembler = new List<string>();
         public List<string> UpdateRequired = new List<string>();
         GameObject ui;
+        TMP_Text infoText;
 
         void Start()
         {
@@ -40,10 +41,12 @@ namespace SimplePartLoader
                 return;
 
             ui = GameObject.Instantiate(ModMain.UI_Info_Prefab);
+            infoText = ui.transform.Find("Panel/Text").GetComponent<TMP_Text>();
 
             StartCoroutine(updatingText());
 
-            Button[] bt = Resources.FindObjectsOfTypeAll(typeof(Button)) as Button[];
+            // Only wire active scene buttons (e.g. the menu) - FindObjectsOfTypeAll would also hit every prefab/asset.
+            Button[] bt = UnityEngine.Object.FindObjectsOfType<Button>();
             foreach(Button b in bt)
             {
                 b.onClick.AddListener(remove);
@@ -52,6 +55,7 @@ namespace SimplePartLoader
 
         IEnumerator updatingText()
         {
+            string lastText = null;
             while(ui != null)
             {
                 yield return new WaitForSeconds(1);
@@ -123,8 +127,13 @@ namespace SimplePartLoader
                     textToAdd += "\n";
                 }
 
-                ui.transform.Find("Panel/Text").GetComponent<TMP_Text>().text = textToAdd;
-
+                // Avoid the TMP mesh rebuild every second when nothing changed
+                if (textToAdd != lastText)
+                {
+                    lastText = textToAdd;
+                    if (infoText != null)
+                        infoText.text = textToAdd;
+                }
             }
         }
 
