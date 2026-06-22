@@ -858,6 +858,26 @@ namespace SimplePartLoader
                     DestroyConsideringSetting(part, bn);
                 foreach (var bn in part.Prefab.GetComponentsInChildren<ChildDestroy>())
                     DestroyConsideringSetting(part, bn);
+
+                // Sound fix for engine blocks
+                if(part.Prefab.name.Contains("CylinderBlock") || part.PartInfo.RenamedPrefab.Contains("CylinderBlock"))
+                {
+                    // Sound fix - Update of 06/05/2026 broke engine sound for modded cars.
+                    var soundComponent = part.Prefab.GetComponentInChildren<NWH2_RES2>();
+                    if (soundComponent != null)
+                    {
+                        if (CustomLogger.DebugEnabled) CustomLogger.AddLine("PrefabGenerator", $"Applying sound fix for {part.CarProps.PrefabName}, starting custom call");
+
+                        soundComponent.gameObject.SetActive(false);
+                        foreach (var childrens in soundComponent.GetComponentsInChildren<Transform>(true))
+                        {
+                            if (childrens.gameObject == soundComponent.gameObject) continue;
+
+                            childrens.gameObject.SetActive(true);
+                        }
+                    }
+
+                }
             }
         }
 

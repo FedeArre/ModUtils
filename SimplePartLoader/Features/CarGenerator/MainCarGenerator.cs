@@ -5,6 +5,7 @@ using SimplePartLoader.Features;
 using SimplePartLoader.Features.CarGenerator;
 using SimplePartLoader.Features.CarGenerator.CarBases;
 using SimplePartLoader.Utils;
+using SkrilStudio;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -357,20 +358,35 @@ namespace SimplePartLoader.CarGen
             ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
 
             // Force part name already so is easy to work on
-            if(car.carGeneratorData.EnableAttachFix)
+            if (car.carGeneratorData.EnableAttachFix)
             {
                 if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Applying EnableAttachFix - part rename setup {car.carGeneratorData.CarName}");
                 foreach (Partinfo partinfo in car.carPrefab.GetComponentsInChildren<Partinfo>())
                 {
                     partinfo.HingePivot = null;
-                    if (!String.IsNullOrEmpty(partinfo.RenamedPrefab))
+                    if (!string.IsNullOrEmpty(partinfo.RenamedPrefab))
                         partinfo.gameObject.name = partinfo.RenamedPrefab;
                 }
             }
 
             if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Calling base postbuild for {car.carGeneratorData.CarName}");
             baseData.PostBuild(car.carPrefab, car);
-            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending base postbuild in {car.carGeneratorData.CarName}, starting custom");
+            if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Ending base postbuild in {car.carGeneratorData.CarName}, trying to fix sound");
+
+            // Sound fix - Update of 06/05/2026 broke engine sound for modded cars.
+            var soundComponent = car.carPrefab.GetComponentInChildren<NWH2_RES2>();
+            if (soundComponent != null)
+            {
+                if (CustomLogger.DebugEnabled) CustomLogger.AddLine("CarGenerator", $"Applying sound fix for {car.carGeneratorData.CarName}, starting custom call");
+
+                soundComponent.gameObject.SetActive(false);
+                foreach(var childrens in soundComponent.GetComponentsInChildren<Transform>(true))
+                {
+                    if (childrens.gameObject == soundComponent.gameObject) continue;
+
+                    childrens.gameObject.SetActive(true);
+                }
+            }
 
             try
             {
