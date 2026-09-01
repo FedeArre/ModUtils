@@ -23,6 +23,7 @@ namespace SimplePartLoader.CarGen
         internal ModInstance loadedBy;
 
         public int? CustomCarBaseId { get; set; } = null;
+        public string CustomCarBaseKey { get; private set; }
 
         public List<string> OtherModBuildingExceptions { get; set; }
 
@@ -74,6 +75,11 @@ namespace SimplePartLoader.CarGen
         public void SetPostBuildFunction(Action<GameObject> function)
         {
             OnPostBuild = function;
+        }
+
+        public void SetCustomCarBase(string carBaseKey)
+        {
+            CustomCarBaseKey = string.IsNullOrWhiteSpace(carBaseKey) ? null : carBaseKey;
         }
 
         public void AddException(string partName, string prefabName, bool forceFittingIgnoringModUtilsConditions = false)

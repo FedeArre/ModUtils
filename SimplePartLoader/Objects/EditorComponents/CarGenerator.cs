@@ -10,6 +10,7 @@ public class CarGenerator : MonoBehaviour
     public string CarName = "";
     public int CarPrice = 0;
     public CarBase BaseCarToUse = CarBase.Chad;
+    public string CustomCarBaseId = "";
 
     [Header("Custom meshes - Fuel line")]
     public Mesh Inline4FuelLine;

@@ -26,6 +26,7 @@ namespace SimplePartLoader.CarGen
         internal static List<Car> RegisteredCars = new List<Car>();
         internal static List<Car> RuinedCars = new List<Car>();
         internal static Hashtable AvailableBases = new Hashtable();
+        internal static Dictionary<string, ICarBase> AvailableCustomBases = new Dictionary<string, ICarBase>(StringComparer.Ordinal);
         
         internal static int AvailableId = 0;
 
@@ -42,6 +43,34 @@ namespace SimplePartLoader.CarGen
             AvailableId = AvailableBases.Count;
         }
 
+        internal static ICarBase ResolveBase(Car car)
+        {
+            if (car == null)
+            {
+                CustomLogger.AddLine("CarGenerator", "Tried to resolve a car base for a null car");
+                return null;
+            }
+
+            if (car.carGeneratorData == null)
+            {
+                CustomLogger.AddLine("CarGenerator", "Tried to resolve a car base for a car without CarGenerator data");
+                return null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(car.CustomCarBaseKey)) return ResolveCustomBase(car.CustomCarBaseKey, car);
+            if (car.CustomCarBaseId != null) return (ICarBase)AvailableBases[car.CustomCarBaseId.Value];
+            if (!string.IsNullOrWhiteSpace(car.carGeneratorData.CustomCarBaseId)) return ResolveCustomBase(car.carGeneratorData.CustomCarBaseId, car);
+            return (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
+        }
+
+        private static ICarBase ResolveCustomBase(string carBaseKey, Car car)
+        {
+            if (AvailableCustomBases.TryGetValue(carBaseKey, out ICarBase carBase)) return carBase;
+
+            CustomLogger.AddLine("CarGenerator", $"Unable to find custom car base '{carBaseKey}' for {car.carGeneratorData.CarName}");
+            return null;
+        }
+
         internal static void StartCarGen()
         {
 #if MODUTILS_TIMING_ENABLED
@@ -53,7 +82,8 @@ namespace SimplePartLoader.CarGen
                 if(!car.loadedBy.CheckAllow)
                     return;
 
-                ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
+                ICarBase baseData = ResolveBase(car);
+                if (baseData == null) continue;
                 
                 // First, clone our base to our empty.
                 CarBuilding.CopyCarToPrefab(baseData.GetCar(), car.emptyCarPrefab);
@@ -292,16 +322,8 @@ namespace SimplePartLoader.CarGen
 
             foreach (Car car in RegisteredCars)
             {
-                ICarBase baseData;
-
-                if (car.CustomCarBaseId != null)
-                {
-                    baseData = (ICarBase) AvailableBases[car.CustomCarBaseId];
-                }
-                else
-                {
-                    baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
-                }
+                ICarBase baseData = ResolveBase(car);
+                if (baseData == null) continue;
 
                 if (baseData.VehType() == VehicleType.Trailer) 
                     continue;
@@ -355,7 +377,8 @@ namespace SimplePartLoader.CarGen
             }
 
             // Post build
-            ICarBase baseData = (ICarBase)AvailableBases[car.carGeneratorData.BaseCarToUse];
+            ICarBase baseData = ResolveBase(car);
+            if (baseData == null) return;
 
             // Force part name already so is easy to work on
             if (car.carGeneratorData.EnableAttachFix)
@@ -688,6 +711,30 @@ namespace SimplePartLoader.CarGen
             AvailableId++;
 
             return id;
+        }
+
+        internal static bool RegisterCarBase(string carBaseKey, ICarBase carBase)
+        {
+            if (string.IsNullOrWhiteSpace(carBaseKey))
+            {
+                CustomLogger.AddLine("CarGenerator", "Tried to register a custom car base without a key");
+                return false;
+            }
+
+            if (carBase == null)
+            {
+                CustomLogger.AddLine("CarGenerator", $"Tried to register custom car base '{carBaseKey}' without an implementation");
+                return false;
+            }
+
+            if (AvailableCustomBases.ContainsKey(carBaseKey))
+            {
+                CustomLogger.AddLine("CarGenerator", $"Custom car base '{carBaseKey}' is already registered");
+                return false;
+            }
+
+            AvailableCustomBases.Add(carBaseKey, carBase);
+            return true;
         }
 
         internal static void RearBoneFix(GameObject car)

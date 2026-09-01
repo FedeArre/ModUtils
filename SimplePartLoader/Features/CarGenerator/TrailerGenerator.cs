@@ -15,7 +15,13 @@ namespace SimplePartLoader.CarGen
 
         public static TrailerSaleItemObject RegisterSaleItem(string name, float price, Car trailer, Action<GameObject> onSaleItemCreation)
         {
-            ICarBase baseData = (ICarBase)MainCarGenerator.AvailableBases[trailer.carGeneratorData.BaseCarToUse];
+            ICarBase baseData = MainCarGenerator.ResolveBase(trailer);
+
+            if (baseData == null)
+            {
+                CustomLogger.AddLine("TrailerGenerator", $"{trailer.carGeneratorData.CarName} has no valid car base, sale item can not be created");
+                return null;
+            }
 
             if (baseData.VehType() != VehicleType.Trailer)
             {

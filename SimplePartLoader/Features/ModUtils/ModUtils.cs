@@ -1,5 +1,6 @@
 ﻿using EnviroSamples;
 using Rewired;
+using SimplePartLoader.CarGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -242,6 +243,16 @@ namespace SimplePartLoader
         {
             if (!PartManager.CarCategoriesToAdd.Contains(name))
                 PartManager.CarCategoriesToAdd.Add(name);
+        }
+
+        public static int RegisterCarBase(ICarBase carBase)
+        {
+            return MainCarGenerator.RegisterCarBase(carBase);
+        }
+
+        public static bool RegisterCarBase(string carBaseKey, ICarBase carBase)
+        {
+            return MainCarGenerator.RegisterCarBase(carBaseKey, carBase);
         }
 
         public static void ExecuteNextFrame(Action functionToCall)
