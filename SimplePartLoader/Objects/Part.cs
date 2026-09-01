@@ -521,8 +521,13 @@ namespace SimplePartLoader
             CustomLogger.AddLine("Parts", $"Succesfully set start option {option.PartToCopy}");
         }
 
-
+        // For compatibility reasons
         public void RegisterIntoInteriorShop()
+        {
+            RegisterIntoInteriorShop(null);
+        }
+
+        public void RegisterIntoInteriorShop(string name)
         {
             if(CarProps is null || PartInfo is null)
             {
@@ -540,7 +545,7 @@ namespace SimplePartLoader
             {
                 CustomLogger.AddLine("Parts", $"Registering part {Prefab.name} into interior shop.");
             }
-            InteriorShopCatalog.RegisterPart(this);
+            InteriorShopCatalog.RegisterPart(this, name);
         }
     }
 

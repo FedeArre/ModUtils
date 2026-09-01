@@ -163,11 +163,11 @@ namespace SimplePartLoader.Features
             item.Part.CarProps.OriginalInterior = originalInterior;
         }
 
-        internal static void RegisterPart(Part p)
+        internal static void RegisterPart(Part p, string name = null)
         {
             Items.Add(new InteriorShopSellData()
             {
-                Name = p.CarProps.name,
+                Name = string.IsNullOrWhiteSpace(name) ? p.CarProps.name : name,
                 Price = p.PartInfo.price,
                 ModName = p.Mod.Name,
                 Part = p
