@@ -335,20 +335,20 @@ namespace SimplePartLoader
                 {
                     if (go.name == "DoorFL06")
                     {
-                        PaintMaterial = go.transform.GetComponent<MeshRenderer>().sharedMaterial;
-                        ChromeMaterial = go.transform.Find("DoorFLFram06").GetComponent<Renderer>().sharedMaterial;
+                        PaintMaterial = go.transform.GetComponent<MeshRenderer>().material;
+                        ChromeMaterial = go.transform.Find("DoorFLFram06").GetComponent<Renderer>().material;
                     }
                     else if (go.name == "Firewall06")
                     {
-                        BlackMaterial = go.transform.GetComponent<MeshRenderer>().sharedMaterial;
+                        BlackMaterial = go.transform.GetComponent<MeshRenderer>().material;
                     }
                     else if(go.name == "WindowFR06")
                     {
-                        GlassMaterial = go.transform.GetComponent<MeshRenderer>().sharedMaterial;
+                        GlassMaterial = go.transform.GetComponent<MeshRenderer>().material;
                     }
                     else if(go.name == "BumperR07")
                     {
-                        ChromePaintableMaterial = go.transform.GetComponent<MeshRenderer>().sharedMaterial;
+                        ChromePaintableMaterial = go.transform.GetComponent<MeshRenderer>().material;
                     }
                 }
 

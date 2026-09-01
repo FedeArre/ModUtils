@@ -64,7 +64,7 @@ namespace SimplePartLoader
             Mesh mesh = reference.GetComponent<MeshFilter>().sharedMesh;
 
             Mesh boxMesh = reference.transform.Find("Box (2)").GetComponent<MeshFilter>().sharedMesh;
-            Material boxMat = reference.transform.Find("Box (2)").GetComponent<MeshRenderer>().sharedMaterial;
+            Material boxMat = reference.transform.Find("Box (2)").GetComponent<MeshRenderer>().material;
 
             Mesh planeMesh = reference.transform.Find("Plane").GetComponent<MeshFilter>().sharedMesh;
 
