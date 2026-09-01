@@ -65,7 +65,8 @@ namespace SimplePartLoader.CarGen
                     isParentCustom = true;
                 }
 
-                GameObject part = PartLookup(t.name, isParentCustom, car, t.Type);
+                string path = Functions.GetTransformPath(t.transform, car.carPrefab.transform);
+                GameObject part = PartLookup(t.name, path, isParentCustom, car, t.Type);
                 
                 if(t.name == t.transform.parent.name)
                 {
@@ -135,10 +136,10 @@ namespace SimplePartLoader.CarGen
             return true;
         }
 
-        internal static GameObject PartLookup(string name, bool parentIsCustom, Car car, int type)
+        internal static GameObject PartLookup(string name, string path, bool parentIsCustom, Car car, int type)
         {
             InternalLog(() =>
-                $"[PartLookup] START name='{name}', parentIsCustom={parentIsCustom}, type={type}, car={(car != null ? car.carGeneratorData.CarName : "NULL")}"
+                $"[PartLookup] START name='{name}', path='{path}', parentIsCustom={parentIsCustom}, type={type}, car={(car != null ? car.carGeneratorData.CarName : "NULL")}"
             );
 
             GameObject foundPart = null;
@@ -200,14 +201,13 @@ namespace SimplePartLoader.CarGen
                     InternalLog(() => $"[PartLookup] PASS 1: NAME MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    bool hasExceptionKey = exceptions.ExceptionList != null
-                        && exceptions.ExceptionList.ContainsKey(name);
+                    string expectedPrefabName;
+                    bool hasExceptionKey = exceptions.TryGetException(name, path, out expectedPrefabName);
 
-                    InternalLog(() => $"[PartLookup] PASS 1: exceptions has key for '{name}'? {hasExceptionKey}");
+                    InternalLog(() => $"[PartLookup] PASS 1: exceptions has key for name='{name}', path='{path}'? {hasExceptionKey}");
 
                     if (hasExceptionKey)
                     {
-                        string expectedPrefabName = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
 
                         InternalLog(() =>
@@ -237,7 +237,7 @@ namespace SimplePartLoader.CarGen
                         }
                     }
 
-                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name, path);
                     bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
 
                     InternalLog(() =>
@@ -313,14 +313,13 @@ namespace SimplePartLoader.CarGen
                     InternalLog(() => $"[PartLookup] PASS 2: RENAMED MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    bool hasExceptionKey = exceptions.ExceptionList != null
-                        && exceptions.ExceptionList.ContainsKey(name);
+                    string expected;
+                    bool hasExceptionKey = exceptions.TryGetException(name, path, out expected);
 
-                    InternalLog(() => $"[PartLookup] PASS 2: exceptions has key for '{name}'? {hasExceptionKey}");
+                    InternalLog(() => $"[PartLookup] PASS 2: exceptions has key for name='{name}', path='{path}'? {hasExceptionKey}");
 
                     if (hasExceptionKey)
                     {
-                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
 
                         InternalLog(() =>
@@ -350,7 +349,7 @@ namespace SimplePartLoader.CarGen
                         }
                     }
 
-                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name, path);
                     bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
 
                     InternalLog(() =>
@@ -404,14 +403,13 @@ namespace SimplePartLoader.CarGen
                     InternalLog(() => $"[PartLookup] PASS 3: NAME MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    bool hasExceptionKey = exceptions.ExceptionList != null
-                        && exceptions.ExceptionList.ContainsKey(name);
+                    string expected;
+                    bool hasExceptionKey = exceptions.TryGetException(name, path, out expected);
 
-                    InternalLog(() => $"[PartLookup] PASS 3: exceptions has key for '{name}'? {hasExceptionKey}");
+                    InternalLog(() => $"[PartLookup] PASS 3: exceptions has key for name='{name}', path='{path}'? {hasExceptionKey}");
 
                     if (hasExceptionKey)
                     {
-                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
 
                         InternalLog(() =>
@@ -441,7 +439,7 @@ namespace SimplePartLoader.CarGen
                         }
                     }
 
-                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name, path);
                     bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
 
                     InternalLog(() =>
@@ -510,14 +508,13 @@ namespace SimplePartLoader.CarGen
                     InternalLog(() => $"[PartLookup] PASS 4: RENAMED MATCH found candidate='{part.name}'");
                     foundPart = part;
 
-                    bool hasExceptionKey = exceptions.ExceptionList != null
-                        && exceptions.ExceptionList.ContainsKey(name);
+                    string expected;
+                    bool hasExceptionKey = exceptions.TryGetException(name, path, out expected);
 
-                    InternalLog(() => $"[PartLookup] PASS 4: exceptions has key for '{name}'? {hasExceptionKey}");
+                    InternalLog(() => $"[PartLookup] PASS 4: exceptions has key for name='{name}', path='{path}'? {hasExceptionKey}");
 
                     if (hasExceptionKey)
                     {
-                        string expected = exceptions.ExceptionList[name];
                         CarProperties carProps = part.GetComponent<CarProperties>();
 
                         InternalLog(() =>
@@ -547,7 +544,7 @@ namespace SimplePartLoader.CarGen
                         }
                     }
 
-                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name);
+                    bool ignoringStatus = exceptions.IgnoringStatusForPart(name, path);
                     bool hasSpl = foundPart.GetComponent<SPL_Part>() != null;
 
                     InternalLog(() =>

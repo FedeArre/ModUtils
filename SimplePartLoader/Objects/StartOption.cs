@@ -21,6 +21,8 @@ namespace SimplePartLoader
         /// </summary>
         internal Dictionary<string, string> Exceptions = new Dictionary<string, string>();
 
+        internal Dictionary<string, string> PathExceptions = new Dictionary<string, string>();
+
         /// <summary>
         /// Function to be called after the prefab is built, so fixes can be applied to it.
         /// </summary>
@@ -59,6 +61,46 @@ namespace SimplePartLoader
             {
                 Exceptions.Add(renamedPrefab, prefabNameToForce);
             }
+        }
+
+        public void AddPathException(string path, string prefabNameToForce)
+        {
+            path = NormalizePath(path);
+            if(PathExceptions.ContainsKey(path))
+            {
+                PathExceptions[path] = prefabNameToForce;
+            }
+            else
+            {
+                PathExceptions.Add(path, prefabNameToForce);
+            }
+        }
+
+        internal bool TryGetException(string renamedPrefab, string path, out string prefabNameToForce)
+        {
+            if (TryGetPathException(path, out prefabNameToForce))
+                return true;
+
+            return Exceptions.TryGetValue(renamedPrefab, out prefabNameToForce);
+        }
+
+        private static string NormalizePath(string path)
+        {
+            return String.IsNullOrEmpty(path) ? path : path.Trim('/');
+        }
+
+        private bool TryGetPathException(string path, out string prefabNameToForce)
+        {
+            path = NormalizePath(path);
+            if (!String.IsNullOrEmpty(path) && PathExceptions.TryGetValue(path, out prefabNameToForce))
+                return true;
+
+            int rootSeparator = String.IsNullOrEmpty(path) ? -1 : path.IndexOf('/');
+            if (rootSeparator >= 0 && PathExceptions.TryGetValue(path.Substring(rootSeparator + 1), out prefabNameToForce))
+                return true;
+
+            prefabNameToForce = null;
+            return false;
         }
 
         /// <summary>

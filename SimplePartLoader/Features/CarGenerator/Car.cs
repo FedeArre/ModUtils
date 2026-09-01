@@ -81,6 +81,11 @@ namespace SimplePartLoader.CarGen
             exceptionsObject.AddException(partName, prefabName, forceFittingIgnoringModUtilsConditions);
         }
 
+        public void AddPathException(string path, string prefabName, bool forceFittingIgnoringModUtilsConditions = false)
+        {
+            exceptionsObject.AddPathException(path, prefabName, forceFittingIgnoringModUtilsConditions);
+        }
+
         public void ApplyRearBoneDelayedFix()
         {
             DelayRearBoneFix = true;

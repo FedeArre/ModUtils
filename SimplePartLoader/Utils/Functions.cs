@@ -138,6 +138,24 @@ namespace SimplePartLoader.Utils
             return null;
         }
 
+        public static string GetTransformPath(Transform transform, Transform root)
+        {
+            if (transform == null || root == null)
+                return null;
+
+            Stack<string> path = new Stack<string>();
+            while (transform != null)
+            {
+                path.Push(transform.name);
+                if (transform == root)
+                    return string.Join("/", path.ToArray());
+
+                transform = transform.parent;
+            }
+
+            return null;
+        }
+
         // Function from Unity forums
         /// <summary>
         /// Copies all the component properties from a component to another

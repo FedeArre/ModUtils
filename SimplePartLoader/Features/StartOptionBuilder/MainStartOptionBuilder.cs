@@ -23,7 +23,7 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                     CustomLogger.AddLine("StartOptionBuilder", $"Now trying to build {startOption.PartToCopy} from {startOption.LoadedBy.Name}");
                 
                 // Lookup part reference of the original
-                GameObject originalPart = PartLookup(startOption.PartToCopy, startOption, true);
+                GameObject originalPart = PartLookup(startOption.PartToCopy, null, startOption, true);
 
                 if(originalPart is null)
                 {
@@ -255,7 +255,7 @@ namespace SimplePartLoader.Features.StartOptionBuilder
             }
         }
 
-        internal static GameObject PartLookup(string name, StartOption startOption, bool isPrefabName = false)
+        internal static GameObject PartLookup(string name, string path, StartOption startOption, bool isPrefabName = false)
         {
             GameObject foundPart = null;
 
@@ -289,10 +289,11 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 {
                     foundPart = part;
 
-                    if (startOption.Exceptions.ContainsKey(name))
+                    string prefabNameToForce;
+                    if (startOption.TryGetException(name, path, out prefabNameToForce))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != startOption.Exceptions[name])
+                        if (carProps == null || carProps.PrefabName != prefabNameToForce)
                         {
                             foundPart = null;
                             continue;
@@ -324,10 +325,11 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 {
                     foundPart = part;
 
-                    if (startOption.Exceptions.ContainsKey(name))
+                    string prefabNameToForce;
+                    if (startOption.TryGetException(name, path, out prefabNameToForce))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != startOption.Exceptions[name])
+                        if (carProps == null || carProps.PrefabName != prefabNameToForce)
                         {
                             foundPart = null;
                             continue;
@@ -349,10 +351,11 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 {
                     foundPart = part;
 
-                    if (startOption.Exceptions.ContainsKey(name))
+                    string prefabNameToForce;
+                    if (startOption.TryGetException(name, path, out prefabNameToForce))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != startOption.Exceptions[name])
+                        if (carProps == null || carProps.PrefabName != prefabNameToForce)
                         {
                             foundPart = null;
                             continue;
@@ -383,10 +386,11 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 {
                     foundPart = part;
 
-                    if (startOption.Exceptions.ContainsKey(name))
+                    string prefabNameToForce;
+                    if (startOption.TryGetException(name, path, out prefabNameToForce))
                     {
                         CarProperties carProps = part.GetComponent<CarProperties>();
-                        if (carProps.PrefabName != startOption.Exceptions[name])
+                        if (carProps == null || carProps.PrefabName != prefabNameToForce)
                         {
                             foundPart = null;
                             continue;
@@ -419,7 +423,8 @@ namespace SimplePartLoader.Features.StartOptionBuilder
                 if (!IsTransparentEmpty(t) || t.name == "Hook" || !t.GetComponent<MeshFilter>()) // Hook causes recursive loop, we can evade it - Mesh Filter check for some old stuff that isnt anymore around like ignition coil, is disabled just by that.
                     continue;
 
-                GameObject part = PartLookup(t.name, startOption);
+                string path = Functions.GetTransformPath(t.transform, startOption.Prefab.transform);
+                GameObject part = PartLookup(t.name, path, startOption);
 
                 if (t.name == t.transform.parent.name)
                 {
