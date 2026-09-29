@@ -22,7 +22,7 @@ namespace SimplePartLoader.CarGen
 
         public void AddException(string partName, string prefabName, bool forceFittingIgnoringParent = false)
         {
-            ExceptionList.Add(partName, prefabName);
+            ExceptionList[partName] = prefabName;
 
             if(forceFittingIgnoringParent)
                 ForceIgnore.Add(partName);
@@ -31,7 +31,7 @@ namespace SimplePartLoader.CarGen
         public void AddPathException(string path, string prefabName, bool forceFittingIgnoringParent = false)
         {
             path = NormalizePath(path);
-            PathExceptionList.Add(path, prefabName);
+            PathExceptionList[path] = prefabName;
 
             if(forceFittingIgnoringParent)
                 PathForceIgnore.Add(path);

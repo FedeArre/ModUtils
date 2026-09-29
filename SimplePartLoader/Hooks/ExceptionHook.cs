@@ -18,6 +18,7 @@ internal static class ExceptionHook
         "Partinfo",
         "DISABLER",
         "FLUID",
+        "transparents"
     };
 
     [HarmonyTargetMethods]

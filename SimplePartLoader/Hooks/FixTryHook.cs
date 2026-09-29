@@ -12,8 +12,12 @@ using SimplePartLoader.Utils;
 [HarmonyPatch(typeof(MainCarProperties), nameof(MainCarProperties.PreventChildCollisions))]
 internal class FixTryHook
 {
+    public static Func<bool> ExternalCollisionSetup = null;
+
     static void Postfix(MainCarProperties __instance)
     {
+        if (ExternalCollisionSetup != null && ExternalCollisionSetup())
+            return;
         if (!__instance.transform.parent)
         {
             Functions.IgnoreCollisionsBetweenAll(__instance.GetComponentsInChildren<Collider>());
