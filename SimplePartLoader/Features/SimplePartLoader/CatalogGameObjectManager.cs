@@ -44,6 +44,9 @@ namespace SimplePartLoader
                 return;
             }
 
+            if (gameObject.scene.IsValid())
+                GameObject.DontDestroyOnLoad(gameObject.transform.root.gameObject);
+
             gameObjectsToInject.Add(gameObject);
             CustomLogger.AddLine("CatalogGameObjectManager", $"Registered GameObject '{gameObject.name}' for catalog injection");
         }

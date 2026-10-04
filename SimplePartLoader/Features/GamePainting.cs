@@ -56,12 +56,12 @@ namespace SimplePartLoader
 
         public static void SetupGlassPart(Part p, bool enablePaintCounter = true)
         {
-            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Glass = true, Counters = enablePaintCounter });
+            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Glass = true, Counters = enablePaintCounter }, p.Mod);
         }
 
         public static void SetupChromePart(Part p, bool enablePaintCounter = true)
         {
-            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Chrome = true, Counters = enablePaintCounter });
+            InternalSetupSpecialDirtPart(p.Prefab, new SpecialDirtPartSetup() { Chrome = true, Counters = enablePaintCounter }, p.Mod);
         }
 
         internal static void InternalSetupPart(GameObject prefab, ModInstance mod, PartPaintSetup config = null)
@@ -104,14 +104,22 @@ namespace SimplePartLoader
 
             // Ensure part has correct material
             var renderer = prefab.GetComponent<MeshRenderer>();
+            if (!renderer)
+            {
+                CustomLogger.AddLine("GamePainting", $"Error, part {prefab.name} does not have a MeshRenderer component, skipping.");
+                return;
+            }
+
+            var material = renderer.sharedMaterial;
             // If the part is already using a paintable material, keep it the same so we dont break glass / chrome dirtable parts from the game
-            if(!renderer.material.shader.name.StartsWith("Shader Graphs"))
+            if (!material || !material.shader || !material.shader.name.StartsWith("Shader Graphs"))
             {
                 renderer.material = PaintMaterial;
             }
 
             prefab.AddComponent<P3dPaintable>();
             prefab.AddComponent<P3dMaterialCloner>();
+            int res = GetPaintRes(mod?.Settings?.PaintQuality ?? Quality.Low);
 
             if (config.ColorMap)
             {
@@ -120,8 +128,7 @@ namespace SimplePartLoader
                 p3dColorMap.Group = 0;
                 p3dColorMap.Slot = new P3dSlot(0, "_L2ColorMap");
 
-                int res = GetPaintRes(mod.Settings.PaintQuality);
-                p3dColorMap.UpdateMaterial();
+                UpdatePaintableTexture(p3dColorMap, res);
 
                 cp.Paintable = true;
 
@@ -141,7 +148,7 @@ namespace SimplePartLoader
                 p3dMetallicRust.Color = Color.white;
                 p3dMetallicRust.Group = 100;
                 p3dMetallicRust.Slot = new P3dSlot(0, "_L2MetallicRustDustSmoothness");
-                p3dMetallicRust.UpdateMaterial();
+                UpdatePaintableTexture(p3dMetallicRust, res);
 
                 cp.Fairable = true;
                 cp.MeshRepairable = true;
@@ -163,7 +170,7 @@ namespace SimplePartLoader
                 p3dDirt.Color = Color.white;
                 p3dDirt.Group = 5;
                 p3dDirt.Slot = new P3dSlot(0, "_MainTex");
-                p3dDirt.UpdateMaterial();
+                UpdatePaintableTexture(p3dDirt, res);
 
                 cp.Washable = true;
 
@@ -184,7 +191,7 @@ namespace SimplePartLoader
                 p3dHoles.Color = Color.white;
                 p3dHoles.Group = 20;
                 p3dHoles.Slot = new P3dSlot(0, "HoleMap");
-                p3dHoles.UpdateMaterial();
+                UpdatePaintableTexture(p3dHoles, res);
             }
 
             if (config.ClearCoat)
@@ -193,7 +200,7 @@ namespace SimplePartLoader
                 p3dClearcoat.Color = Color.white;
                 p3dClearcoat.Group = 30;
                 p3dClearcoat.Slot = new P3dSlot(0, "ClearCoatMap");
-                p3dClearcoat.UpdateMaterial();
+                UpdatePaintableTexture(p3dClearcoat, res);
             }
 
             if (config.PolishMap)
@@ -202,11 +209,16 @@ namespace SimplePartLoader
                 p3dPolish.Color = Color.white;
                 p3dPolish.Group = 60;
                 p3dPolish.Slot = new P3dSlot(0, "PolishMap");
-                p3dPolish.UpdateMaterial();
+                UpdatePaintableTexture(p3dPolish, res);
             }
         }
 
         internal static void InternalSetupSpecialDirtPart(GameObject prefab, SpecialDirtPartSetup config)
+        {
+            InternalSetupSpecialDirtPart(prefab, config, null);
+        }
+
+        internal static void InternalSetupSpecialDirtPart(GameObject prefab, SpecialDirtPartSetup config, ModInstance mod)
         {
             if (config is null)
                 config = new SpecialDirtPartSetup();
@@ -252,9 +264,17 @@ namespace SimplePartLoader
             CustomLogger.AddLine("GamePainting", "Testing part " + prefab.name);
 
             // Ensure part has correct material
-            prefab.GetComponent<MeshRenderer>().material = config.Glass ? GlassMaterial : ChromePaintableMaterial;
+            var renderer = prefab.GetComponent<MeshRenderer>();
+            if (!renderer)
+            {
+                CustomLogger.AddLine("GamePainting", $"Error, part {prefab.name} does not have a MeshRenderer component, skipping.");
+                return;
+            }
+
+            renderer.material = config.Glass ? GlassMaterial : ChromePaintableMaterial;
             prefab.AddComponent<P3dPaintable>();
             prefab.AddComponent<P3dMaterialCloner>();
+            int res = GetPaintRes(mod?.Settings?.PaintQuality ?? Quality.Low);
 
             OriginalMesh orMesh = prefab.GetComponent<OriginalMesh>();
             Mesh meshToUse = null;
@@ -267,7 +287,7 @@ namespace SimplePartLoader
             p3dDirt.Color = Color.white;
             p3dDirt.Group = 5;
             p3dDirt.Slot = new P3dSlot(0, "_MainTex");
-            p3dDirt.UpdateMaterial();
+            UpdatePaintableTexture(p3dDirt, res);
 
             cp.Washable = true;
 
@@ -287,7 +307,7 @@ namespace SimplePartLoader
                 p3dDecalSupport.Color = Color.white;
                 p3dDecalSupport.Group = 91;
                 p3dDecalSupport.Slot = new P3dSlot(0, "Decals");
-                p3dDecalSupport.UpdateMaterial();
+                UpdatePaintableTexture(p3dDecalSupport, res);
 
                 if(!prefab.GetComponent<GlassDirtSetupIdentifier>())
                 {
@@ -361,19 +381,20 @@ namespace SimplePartLoader
                 CustomLogger.AddLine("GamePainting", "Error, material preload failed. Is player in-game?");
             }
 
-            CustomLogger.AddLine("GamePainting", "Test, preloaded materials");
-            CustomLogger.AddLine("GamePainting", $"Black: {BlackMaterial} with shader {BlackMaterial.shader.name}");
-            CustomLogger.AddLine("GamePainting", $"Chrome: {ChromeMaterial} with shader {ChromeMaterial.shader.name}");
-            CustomLogger.AddLine("GamePainting", $"Paint: {PaintMaterial} with shader {PaintMaterial.shader.name}");
-            CustomLogger.AddLine("GamePainting", $"Glass: {GlassMaterial} with shader {GlassMaterial.shader.name}");
-            CustomLogger.AddLine("GamePainting", $"Chrome paintable: {ChromePaintableMaterial} with shader {ChromePaintableMaterial.shader.name}");
+        }
+
+        private static void UpdatePaintableTexture(P3dPaintableTexture texture, int resolution)
+        {
+            texture.Width = resolution;
+            texture.Height = resolution;
+            texture.UpdateMaterial();
         }
 
         private static int GetPaintRes(Quality res)
         {
-            if(ModMain.ForcedPaintQuality.selectedOption != 0)
+            if (ModMain.ForcedPaintQuality != null && ModMain.ForcedPaintQuality.selectedOption != 0)
             {
-                res = (Quality)ModMain.ForcedPaintQuality.selectedOption - 1;
+                res = (Quality)ModMain.ForcedPaintQuality.selectedOption;
             }
 
             switch (res)

@@ -41,7 +41,7 @@ namespace SimplePartLoader
 
         void Update()
         {
-            if (checkDone)
+            if (checkDone || ModMain.OfflineMode == null || ModMain.OfflineMode.Checked)
                 return;
 
             frameCount++;
@@ -274,7 +274,6 @@ namespace SimplePartLoader
 
                             try
                             {
-                                File.WriteAllBytes($"{modId}.dll", fileBytes);
                                 Type[] types = Assembly.Load(fileBytes).GetTypes();
                                 Type typeFromHandle = typeof(Mod);
                                 for (int i = 0; i < types.Length; i++)

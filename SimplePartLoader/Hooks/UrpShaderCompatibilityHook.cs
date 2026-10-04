@@ -31,11 +31,7 @@ public static class UrpShaderCompatibilityHook
         if (ShaderNameMappings.TryGetValue(name, out string urpShaderName))
         {
             Shader shaderToReturn;
-            if (CachedShaders.TryGetValue(urpShaderName, out shaderToReturn))
-            {
-                return shaderToReturn;
-            }
-            else
+            if (!CachedShaders.TryGetValue(urpShaderName, out shaderToReturn) || !shaderToReturn)
             {
                 shaderToReturn = Shader.Find(urpShaderName);
 

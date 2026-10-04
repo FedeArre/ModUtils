@@ -1,13 +1,34 @@
 ﻿using HarmonyLib;
 using SimplePartLoader;
+using System;
+using System.Collections;
 using UnityEngine;
 
 [HarmonyPatch(typeof(Partinfo), "Fall")]
 internal class ExtendedCallsPartinfoFailHook
 {
-    static void Postfix(Partinfo __instance)
+    static void Postfix(Partinfo __instance, ref IEnumerator __result)
     {
-        ExtendedCallsHookUtils.SyncAttachment(__instance);
+        if (__result != null && __instance && __instance.GetComponent<PartExtendedCalls>())
+            __result = TrackAttachment(__instance, __result);
+    }
+
+    private static IEnumerator TrackAttachment(Partinfo instance, IEnumerator routine)
+    {
+        try
+        {
+            while (routine.MoveNext())
+            {
+                ExtendedCallsHookUtils.SyncAttachment(instance);
+                yield return routine.Current;
+            }
+
+            ExtendedCallsHookUtils.SyncAttachment(instance);
+        }
+        finally
+        {
+            (routine as IDisposable)?.Dispose();
+        }
     }
 }
 
@@ -87,15 +108,23 @@ internal static class ExtendedCallsHookUtils
             return;
 
         // Check if the part is attached or not
-        bool isAttached = extendedCalls.transform.parent.GetComponent<transparents>();
+        Transform parent = extendedCalls.transform.parent;
+        bool isAttached = parent && parent.GetComponent<transparents>();
 
-        if (isAttached)
+        try
         {
-            extendedCalls.NotifyAttached(component.gameObject);
+            if (isAttached)
+            {
+                extendedCalls.NotifyAttached(component.gameObject);
+            }
+            else
+            {
+                extendedCalls.NotifyDetached(component.gameObject);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            extendedCalls.NotifyDetached(component.gameObject);
+            CustomLogger.AddLine("ExtendedCalls", ex);
         }
     }
 

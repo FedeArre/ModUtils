@@ -609,7 +609,7 @@ namespace SimplePartLoader.CarGen
                             Chrome = true,
                             Glass = false,
                             Counters = true
-                        });
+                        }, car.loadedBy);
                         continue;
                     }
 
@@ -620,7 +620,7 @@ namespace SimplePartLoader.CarGen
                             Chrome = false,
                             Glass = true,
                             Counters = true
-                        });
+                        }, car.loadedBy);
                         continue;
                     }
 

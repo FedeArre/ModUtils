@@ -14,11 +14,22 @@ namespace SimplePartLoader.Features.IngameDialogs
             Instance = instance;
             Type = type;
             OnDismiss = onDismiss;
+            instance.AddComponent<IngameDialogLifetime>().Dialog = this;
         }
 
         public void Close()
         {
             IngameDialogManager.CloseDialog(this);
+        }
+    }
+
+    internal class IngameDialogLifetime : MonoBehaviour
+    {
+        internal IngameDialog Dialog;
+
+        void OnDestroy()
+        {
+            IngameDialogManager.HandleDialogDestroyed(Dialog);
         }
     }
 }

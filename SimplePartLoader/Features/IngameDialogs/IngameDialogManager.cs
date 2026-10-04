@@ -18,12 +18,22 @@ namespace SimplePartLoader.Features.IngameDialogs
 
         static IngameDialog currentDialog = null;
         static GameObject eventSystemObject = null;
+        static FirstPersonAIO pausedPlayer = null;
 
-        internal static bool IsDialogOpen => currentDialog != null;
+        internal static bool IsDialogOpen
+        {
+            get
+            {
+                if (currentDialog != null && !currentDialog.Instance)
+                    CloseCurrentDialog();
+
+                return currentDialog != null;
+            }
+        }
 
         public static IngameDialog OpenInformationDialog(InformationDialogOptions options)
         {
-            if (currentDialog != null)
+            if (IsDialogOpen)
             {
                 CustomLogger.AddLine("IngameDialog", "Tried to open an information dialog but another dialog is already open.");
                 return null;
@@ -35,19 +45,19 @@ namespace SimplePartLoader.Features.IngameDialogs
             instance.transform.Find("Panel/Title").GetComponent<TMP_Text>().text = options.Title;
             instance.transform.Find("Panel/Description").GetComponent<TMP_Text>().text = options.Description;
 
-            TMP_Text buttonText = instance.transform.Find("Panel/Button1/Text (TMP)").GetComponent<TMP_Text>();
+            TMP_Text buttonText = instance.transform.Find("Panel/Button/Text (TMP)").GetComponent<TMP_Text>();
             buttonText.text = options.ButtonText;
 
-            Button button = instance.transform.Find("Panel/Button1").GetComponent<Button>();
+            IngameDialog dialog = new IngameDialog(instance, DialogType.Information, options.OnButtonClick);
+            Button button = instance.transform.Find("Panel/Button").GetComponent<Button>();
             button.onClick.AddListener(delegate
             {
+                CloseDialog(dialog);
+
                 if (options.OnButtonClick != null)
                     options.OnButtonClick.Invoke();
-
-                CloseCurrentDialog();
             });
 
-            IngameDialog dialog = new IngameDialog(instance, DialogType.Information, options.OnButtonClick);
             currentDialog = dialog;
             CreateEventSystem();
             return dialog;
@@ -55,7 +65,7 @@ namespace SimplePartLoader.Features.IngameDialogs
 
         public static IngameDialog OpenConfirmationDialog(ConfirmationDialogOptions options)
         {
-            if (currentDialog != null)
+            if (IsDialogOpen)
             {
                 CustomLogger.AddLine("IngameDialog", "Tried to open a confirmation dialog but another dialog is already open.");
                 return null;
@@ -73,25 +83,25 @@ namespace SimplePartLoader.Features.IngameDialogs
             TMP_Text noText = instance.transform.Find("Panel/ButtonLeft/Text (TMP)").GetComponent<TMP_Text>();
             noText.text = options.NoButtonText;
 
+            IngameDialog dialog = new IngameDialog(instance, DialogType.Confirmation, options.OnNoClick);
             Button yesButton = instance.transform.Find("Panel/ButtonRight").GetComponent<Button>();
             yesButton.onClick.AddListener(delegate
             {
+                CloseDialog(dialog);
+
                 if (options.OnYesClick != null)
                     options.OnYesClick.Invoke();
-
-                CloseCurrentDialog();
             });
 
             Button noButton = instance.transform.Find("Panel/ButtonLeft").GetComponent<Button>();
             noButton.onClick.AddListener(delegate
             {
+                CloseDialog(dialog);
+
                 if (options.OnNoClick != null)
                     options.OnNoClick.Invoke();
-
-                CloseCurrentDialog();
             });
 
-            IngameDialog dialog = new IngameDialog(instance, DialogType.Confirmation, options.OnNoClick);
             currentDialog = dialog;
             CreateEventSystem();
             return dialog;
@@ -99,7 +109,7 @@ namespace SimplePartLoader.Features.IngameDialogs
 
         public static IngameDialog OpenInputDialog(InputDialogOptions options)
         {
-            if (currentDialog != null)
+            if (IsDialogOpen)
             {
                 CustomLogger.AddLine("IngameDialog", "Tried to open an input dialog but another dialog is already open.");
                 return null;
@@ -124,25 +134,26 @@ namespace SimplePartLoader.Features.IngameDialogs
             if (placeholder != null)
                 placeholder.text = options.InputPlaceholderText;
 
+            IngameDialog dialog = new IngameDialog(instance, DialogType.Input, options.OnNoClick);
             Button yesButton = instance.transform.Find("Panel/ButtonRight").GetComponent<Button>();
             yesButton.onClick.AddListener(delegate
             {
-                if (options.OnYesClick != null)
-                    options.OnYesClick.Invoke(inputField.text);
+                string input = inputField.text;
+                CloseDialog(dialog);
 
-                CloseCurrentDialog();
+                if (options.OnYesClick != null)
+                    options.OnYesClick.Invoke(input);
             });
 
             Button noButton = instance.transform.Find("Panel/ButtonLeft").GetComponent<Button>();
             noButton.onClick.AddListener(delegate
             {
+                CloseDialog(dialog);
+
                 if (options.OnNoClick != null)
                     options.OnNoClick.Invoke();
-
-                CloseCurrentDialog();
             });
 
-            IngameDialog dialog = new IngameDialog(instance, DialogType.Input, options.OnNoClick);
             currentDialog = dialog;
             CreateEventSystem();
             return dialog;
@@ -150,12 +161,13 @@ namespace SimplePartLoader.Features.IngameDialogs
 
         internal static void HandleEscapePress()
         {
-            if (currentDialog == null) return;
+            if (!IsDialogOpen) return;
 
-            if (currentDialog.OnDismiss != null)
-                currentDialog.OnDismiss.Invoke();
+            IngameDialog dialog = currentDialog;
+            CloseDialog(dialog);
 
-            CloseCurrentDialog();
+            if (dialog.OnDismiss != null)
+                dialog.OnDismiss.Invoke();
         }
 
         internal static void CloseDialog(IngameDialog dialog)
@@ -166,12 +178,26 @@ namespace SimplePartLoader.Features.IngameDialogs
             }
         }
 
+        internal static void HandleDialogDestroyed(IngameDialog dialog)
+        {
+            if (dialog == null || currentDialog != dialog) return;
+
+            currentDialog = null;
+            DestroyEventSystem();
+        }
+
         static void CloseCurrentDialog()
         {
             if (currentDialog == null) return;
 
-            GameObject.Destroy(currentDialog.Instance);
+            IngameDialog dialog = currentDialog;
             currentDialog = null;
+            if (dialog.Instance)
+            {
+                dialog.Instance.SetActive(false);
+                GameObject.Destroy(dialog.Instance);
+            }
+
             DestroyEventSystem();
         }
 
@@ -183,17 +209,23 @@ namespace SimplePartLoader.Features.IngameDialogs
             eventSystemObject.AddComponent<EventSystem>();
             eventSystemObject.AddComponent<StandaloneInputModule>();
 
-            ModUtils.PlayerAIO?.ControllerPause();
+            pausedPlayer = ModUtils.PlayerAIO;
+            if (pausedPlayer)
+                pausedPlayer.ControllerPause();
         }
 
         static void DestroyEventSystem()
         {
-            if (eventSystemObject == null) return;
-
-            GameObject.Destroy(eventSystemObject);
+            if (eventSystemObject)
+            {
+                eventSystemObject.SetActive(false);
+                GameObject.Destroy(eventSystemObject);
+            }
             eventSystemObject = null;
 
-            ModUtils.PlayerAIO?.ControllerUnPause();
+            if (pausedPlayer)
+                pausedPlayer.ControllerUnPause();
+            pausedPlayer = null;
         }
     }
 }

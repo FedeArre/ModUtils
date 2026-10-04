@@ -38,8 +38,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\My Garage\BepInEx\core\0Harmony.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\BepInEx\BepInEx\core\0Harmony.dll</HintPath>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Assembly-CSharp.dll</HintPath>
@@ -71,7 +70,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml.Linq" />

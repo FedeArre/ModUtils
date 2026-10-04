@@ -126,7 +126,7 @@ namespace SimplePartLoader.Features
 
                         if(item.Part.PartInfo.Thumbnail)
                         {
-                            item.CurrentPrefab.transform.Find("Image").GetComponent<Image>().sprite = Sprite.Create(item.Part.PartInfo.Thumbnail, new Rect(0f, 0f, 105.44f, 98.87f), new Vector2(0.5f, 0.5f));
+                            item.CurrentPrefab.transform.Find("Image").GetComponent<Image>().sprite = Sprite.Create(item.Part.PartInfo.Thumbnail, new Rect(0f, 0f, item.Part.PartInfo.Thumbnail.width, item.Part.PartInfo.Thumbnail.height), new Vector2(0.5f, 0.5f));
                         }
 
                         item.CurrentPrefab.transform.Find("Button").GetComponent<Button>().onClick.AddListener(() =>

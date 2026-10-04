@@ -1,6 +1,6 @@
 ﻿// The following preprocessor declaration disables the timing feature from ModUtils.
 // This module can create unrequired overhead on final builds
-#define MODUTILS_TIMING_ENABLED
+//#define MODUTILS_TIMING_ENABLED
 
 using HarmonyLib;
 using SimplePartLoader.CarGen;
@@ -30,7 +30,7 @@ namespace SimplePartLoader
         public override string Version => "v1.5.2";
 
         bool TESTING_VERSION_REMEMBER = true;
-        internal static string TESTING_VERSION_NUMBER = "v1.6-dev7";
+        internal static string TESTING_VERSION_NUMBER = "v1.6-rc1";
 
         public override byte[] Icon => Properties.Resources.SimplePartLoaderIcon;
 
@@ -86,7 +86,7 @@ namespace SimplePartLoader
 
             Client = new HttpClient();
             Client.BaseAddress = new Uri(API_URL);
-            Client.Timeout = TimeSpan.FromSeconds(15); // Prevent the game from hanging if an endpoint stalls
+            Client.Timeout = TimeSpan.FromSeconds(30); // Prevent the game from hanging if an endpoint stalls
             Client.DefaultRequestHeaders.Add("User-Agent", $"ModUtils/{ModUtils.Version}");
 
             watch = new System.Diagnostics.Stopwatch();
