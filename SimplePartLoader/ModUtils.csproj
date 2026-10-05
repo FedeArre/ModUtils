@@ -50,7 +50,7 @@
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\SteamLibrary\steamapps\common\My Garage\My Garage_Data\Managed\Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\My Garage\My Garage_Data\Managed\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PaintIn3D">
@@ -565,6 +565,7 @@
     <Compile Include="Hooks\CustomEngineHook.cs" />
     <Compile Include="Hooks\ExceptionHook.cs" />
     <Compile Include="Hooks\ExtendedCallsHooks.cs" />
+    <Compile Include="Hooks\OpenDoorHook.cs" />
     <Compile Include="Hooks\FixTryHook.cs" />
     <Compile Include="Hooks\UrpShaderCompatibilityHook.cs" />
     <Compile Include="Objects\Autoupdater\EarlyAccessObjectModel.cs" />
@@ -610,6 +611,7 @@
     <Compile Include="Objects\EditorComponents\MarkAsFlatnut.cs" />
     <Compile Include="Objects\EditorComponents\MarkAsHexnut.cs" />
     <Compile Include="Objects\Part.cs" />
+    <Compile Include="Objects\OpenDoorSettings.cs" />
     <Compile Include="Objects\PartExtendedCalls.cs" />
     <Compile Include="Objects\ReworkedTransparentEdit.cs" />
     <Compile Include="Objects\SPL_Part.cs" />

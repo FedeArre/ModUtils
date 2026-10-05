@@ -30,7 +30,7 @@ namespace SimplePartLoader.Objects.Furniture
         TMPro.TMP_Text TipsText;
         TMPro.TMP_Text FitEngineText;
 
-        LayerMask Items = LayerMask.GetMask("Items");
+        LayerMask Items;
 
         Transform LookingLastFrame = null;
         CustomFurnitureSaleItem cachedCsfi = null;
@@ -44,6 +44,7 @@ namespace SimplePartLoader.Objects.Furniture
             PriceText = ModUtils.GetPlayerTools().PriceText;
             TipsText = ModUtils.GetPlayerTools().TipsText;
             FitEngineText = ModUtils.GetPlayerTools().LookingFitEngineText;
+            Items = LayerMask.GetMask("Items");
 
             Instance = this;
         }

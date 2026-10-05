@@ -846,6 +846,9 @@ namespace SimplePartLoader
                                 
                                 if (part.Prefab.GetComponent<OpenDoor>())
                                     DestroyConsideringSetting(part, part.Prefab.GetComponent<OpenDoor>());
+
+                                if (part.Prefab.GetComponent<OpenDoorSettings>())
+                                    DestroyConsideringSetting(part, part.Prefab.GetComponent<OpenDoorSettings>());
                             }
                             
                             break;

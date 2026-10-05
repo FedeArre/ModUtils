@@ -247,6 +247,35 @@ namespace SimplePartLoader
             }
         }
 
+        public void MakeOpenable(OpeningType type, Vector3 axis, float angle)
+        {
+            MakeOpenable(type);
+            SetOpenDoorRotation(axis, angle);
+        }
+
+        public void SetOpenDoorRotation(Vector3 axis, float angle)
+        {
+            if (!Prefab || !Prefab.GetComponent<OpenDoor>())
+            {
+                ReportIssue("SetOpenDoorRotation requires an OpenDoor component. Call MakeOpenable first.");
+                return;
+            }
+
+            float axisMagnitude = axis.sqrMagnitude;
+            if (float.IsNaN(axisMagnitude) || float.IsInfinity(axisMagnitude) || axisMagnitude < 0.000001f || float.IsNaN(angle) || float.IsInfinity(angle) || angle <= 0f || angle > 180f)
+            {
+                ReportIssue("SetOpenDoorRotation requires a nonzero finite axis and an angle greater than 0 and at most 180 degrees.");
+                return;
+            }
+
+            OpenDoorSettings settings = Prefab.GetComponent<OpenDoorSettings>();
+            if (!settings)
+                settings = Prefab.AddComponent<OpenDoorSettings>();
+
+            settings.Axis = axis.normalized;
+            settings.Angle = angle;
+        }
+
         internal void ReportIssue(string issue)
         {
             CustomLogger.AddLine("Parts", $"Issue reported on part {Name}: {issue}");
